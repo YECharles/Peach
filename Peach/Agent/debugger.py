@@ -1078,4 +1078,220 @@ try:
 except:
 	pass
 
+try:
+	
+	import vtrace
+	
+	class PeachNotifier(vtrace.Notifier):
+		def __init__(self):
+			pass
+		
+		def notify(self, event, trace):
+			print "Got event: %d from pid %d" % (event, trace.getPid())
+			for key in trace.metadata.keys():
+				print "Meta key:", key
+	
+	class _TraceThread(Thread):
+		
+		def __init__(self):
+			Thread.__init__(self)
+		
+		def run(self):
+			
+			self.trace = vtrace.getTrace()
+			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, PeachNotifier())
+			self.trace.execute(self._command + " " + self._params)
+			
+			if UnixDebugger.quit.isSet():
+				return
+			
+			UnixDebugger.handlingFault.set()
+			
+			#buff = "Crash output from GDB\n"
+			#buff+= "=====================\n\n"
+			#buff+= "break: reason: %s, thread-id: %s\n\n" % (result.reason, result.thread_id)
+			#buff+= self._getLocals(gdb)
+			#buff+= "\n-------------------\n"
+			#buff+= self._getArguments(gdb)
+			#buff+= "\n-------------------\n"
+			#buff+= self._getStack(gdb)
+			#buff+= "\n-------------------\n"
+			#buff+= self._getRegisters(gdb)
+			
+			UnixDebugger.lock.acquire()
+			UnixDebugger.creashInfo = { 'DebuggerOutput.txt' : buff }
+			UnixDebugger.fault = True
+			UnixDebugger.lock.release()
+			UnixDebugger.handledFault.set()
+
+		def _getLocals(self, gdb):
+			buff = "Frame Locals:\n"
+			try:
+				result = gdb.stack_list_locals().wait()
+				for local in resul.locals:
+					buff += "\t%s = %s\n" % (local.name, local.value)
+			except:
+				pass
+			
+			return buff
+		
+		def _getArguments(self, gdb):
+			buff = "Frame Arguments:\n"
+			try:
+				result = gdb.stack_list_arguments().wait()
+				for frame in result.stack_args.frame:
+					buff += "\tframe: " + frame.level + "\n"
+					for arg in frame.args:
+						buff += "\t\t%s = %s\n" % (arg.name, arg.value)
+			except:
+				pass
+			
+			return buff
+		
+		def _getStack(self, gdb):
+			buff = "Stack:\n"
+			try:
+				result = gdb.stack_list_frames().wait()
+				for frame in result.stack.frame:
+					buff += "\t%s, at %s:%s\n" % (frame.func, frame.file, frame.line)
+			except:
+				pass
+			
+			return buff
+		
+		def _getRegisters(self, gdb):
+			buff = "Registers:\n"
+			try:
+				names = gdb.data_list_register_names().wait()
+				result = gdb.data_list_register_values(regno=registers).wait()
+				for register in result.register_values:
+					name = names.register_names[int(register.number)]
+					buff += "\t%s: %s\n" % (name, register.value)
+			except:
+				pass
+			
+			return buff
+	
+	class UnixDebugger(Monitor):
+		'''
+		Unix GDB monitor.  This debugger monitor uses the gdb
+		debugger via pygdb wrapper.  Tested under Linux and OS X.
+		
+			* Collect core files
+			* User mode debugging
+			* Capturing stack trace, registers, etc
+			* Symbols is available
+		'''
+		
+		def __init__(self, args):
+			
+			UnixDebugger.quit = Event()
+			UnixDebugger.started = Event()
+			UnixDebugger.handlingFault = Event()
+			UnixDebugger.handledFault = Event()
+			UnixDebugger.lock = Lock()
+			UnixDebugger.crashInfo = None
+			UnixDebugger.fault = False
+			
+			if args.has_key('Command'):
+				self._command = str(args['Command']).replace("'''", "\"")
+				self._params = str(args['Params']).replace("'''", "\"")
+				self._pid = None
+			
+			elif args.has_key('ProcessName'):
+				self._command = None
+				self._params = None
+				self._pid = self.GetProcessIdByName(str(args['ProcessName']).replace("'''", "\""))
+			
+			else:
+				raise Exception("Unable to create UnixGdb!  Error in params!")
+		
+		def _StartDebugger(self):
+			UnixDebugger.quit.clear()
+			UnixDebugger.started.clear()
+			UnixDebugger.handlingFault.clear()
+			UnixDebugger.handledFault.clear()
+			UnixDebugger.fault = False
+			UnixDebugger.crashInfo = None
+			
+			self.thread = _TraceThread()
+			self.thread._command = self._command
+			self.thread._params = self._params
+			self.thread._pid = self._pid
+			
+			self.thread.start()
+			UnixDebugger.started.wait()
+			time.sleep(2)	# Let things spin up!
+		
+		def _StopDebugger(self):
+			
+			if self.thread.isAlive():
+				UnixDebugger.quit.set()
+				UnixDebugger.started.clear()
+				self.thread.gdb.quit()
+				self.thread.join()
+				time.sleep(0.25)	# Take a breath
+		
+		def _IsDebuggerAlive(seld):
+			return self.thread != None and self.thread.isAlive()
+		
+		def OnTestStarting(self):
+			'''
+			Called right before start of test.
+			'''
+			if not self._IsDebuggerAlive():
+				self._StartDebugger()
+		
+		def GetMonitorData(self):
+			'''
+			Get any monitored data.
+			'''
+			UnixDebugger.lock.acquire()
+			if UnixDebugger.crashInfo != None:
+				ret = UnixDebugger.crashInfo
+				UnixDebugger.crashInfo = None
+				_GdbEventHandler.buff = ""
+				UnixDebugger.lock.release()
+				return ret
+			
+			UnixDebugger.lock.release()
+			return None
+		
+		def DetectedFault(self):
+			'''
+			Check if a fault was detected.
+			'''
+			
+			time.sleep(0.15)
+
+			if not UnixDebugger.handlingFault.isSet():
+				return False
+			
+			UnixDebugger.handledFault.wait()
+			UnixDebugger.lock.acquire()
+			
+			if UnixDebugger.fault or not self.thread.isAlive():
+				print ">>>>>> RETURNING FAULT <<<<<<<<<"
+				UnixDebugger.fault = False
+				UnixDebugger.lock.release()
+				return True
+			
+			UnixDebugger.lock.release()
+			return False
+		
+		def OnFault(self):
+			'''
+			Called when a fault was detected.
+			'''
+			self._StopDebugger()
+		
+		def OnShutdown(self):
+			'''
+			Called when Agent is shutting down.
+			'''
+			self._StopDebugger()
+
+except:
+	pass
+
 # end
