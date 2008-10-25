@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Server.twistedserver_console</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzz.sf.net">Peach Fuzzing Framework</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        <a href="Peach.Server-module.html">Package&nbsp;Server</a> ::
+        Module&nbsp;twistedserver_console
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="Peach.Server.twistedserver_console-module.html">Module Peach.Server.twistedserver_console</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">Peach testing server.  This is an XML-RPC server that stored test run</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">information in a MySQL database using the schema found in 'server.sql'.</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">The client portion of the client server can be found in 'client.py' (go</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">figure).</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">The server portion requires the twisted python module to be installed.</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">@author: Michael Eddington</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">@version: $Id$</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Copyright (c) 2006-2007 Michael Eddington</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Permission is hereby granted, free of charge, to any person obtaining a copy </tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># of this software and associated documentation files (the "Software"), to deal</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># in the Software without restriction, including without limitation the rights </tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell </tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># copies of the Software, and to permit persons to whom the Software is </tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># furnished to do so, subject to the following conditions:</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># The above copyright notice and this permission notice shall be included in    </tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># all copies or substantial portions of the Software.</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR </tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, </tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE </tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER </tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># SOFTWARE.</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-comment"># Authors:</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#   Michael Eddington (mike@phed.org)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-comment"># $Id$</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">sys</tt><tt class="py-op">,</tt> <tt class="py-name">string</tt><tt class="py-op">,</tt> <tt class="py-name">time</tt><tt class="py-op">,</tt> <tt class="py-name">os</tt><tt class="py-op">,</tt> <tt class="py-name">base64</tt> <tt class="py-comment">#, MySQLdb</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">twisted</tt><tt class="py-op">.</tt><tt class="py-name">internet</tt> <tt class="py-keyword">import</tt> <tt class="py-name">reactor</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">twisted</tt><tt class="py-op">.</tt><tt class="py-name">web</tt> <tt class="py-keyword">import</tt> <tt class="py-name">xmlrpc</tt><tt class="py-op">,</tt> <tt class="py-name">server</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">twisted</tt><tt class="py-op">.</tt><tt class="py-name">enterprise</tt> <tt class="py-keyword">import</tt> <tt class="py-name">util</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"> </tt>
+<a name="PeachServer"></a><div id="PeachServer-def"><a name="L46"></a><tt class="py-lineno"> 46</tt> <a class="py-toggle" href="#" id="PeachServer-toggle" onclick="return toggle('PeachServer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="Peach.Server.twistedserver_console.PeachServer-class.html">PeachServer</a><tt class="py-op">(</tt><tt class="py-base-class">xmlrpc</tt><tt class="py-op">.</tt><tt class="py-base-class">XMLRPC</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PeachServer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="PeachServer-expanded"><a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">         </tt>
+<a name="PeachServer.xmlrpc_RunStarting"></a><div id="PeachServer.xmlrpc_RunStarting-def"><a name="L48"></a><tt class="py-lineno"> 48</tt> <a class="py-toggle" href="#" id="PeachServer.xmlrpc_RunStarting-toggle" onclick="return toggle('PeachServer.xmlrpc_RunStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Server.twistedserver_console.PeachServer-class.html#xmlrpc_RunStarting">xmlrpc_RunStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">runId</tt><tt class="py-op">,</tt> <tt class="py-param">client</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PeachServer.xmlrpc_RunStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="PeachServer.xmlrpc_RunStarting-expanded"><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-docstring">                Indicate start of test run.</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Module Peach.Publishers.stdout=Peach.Publishers.stdout-module.html"><a title="Peach.Publishers.stdout" class="py-name" href="#" onclick="return doclink('link-0', 'stdout', 'link-0');">stdout</a></tt><tt class="py-op">.</tt><tt class="py-name">write</tt><tt class="py-op">(</tt><tt class="py-string">"RunStarting: %s %s\n"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">runId</tt><tt class="py-op">,</tt> <tt id="link-1" class="py-name" targets="Module Peach.Server.client=Peach.Server.client-module.html,Variable Peach.Server.test.client=Peach.Server.test-module.html#client"><a title="Peach.Server.client
+Peach.Server.test.client" class="py-name" href="#" onclick="return doclink('link-1', 'client', 'link-1');">client</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">                <tt class="py-comment">#cursor.execute("insert into testrun (runid, client, starttime) values (%s, %s, NOW())", </tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#       (runId, client))</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#dbconn.commit()</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-comment"></tt>                 </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-string">'OK'</tt> </tt>
+</div><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">         </tt>
+<a name="PeachServer.xmlrpc_RunFinished"></a><div id="PeachServer.xmlrpc_RunFinished-def"><a name="L59"></a><tt class="py-lineno"> 59</tt> <a class="py-toggle" href="#" id="PeachServer.xmlrpc_RunFinished-toggle" onclick="return toggle('PeachServer.xmlrpc_RunFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Server.twistedserver_console.PeachServer-class.html#xmlrpc_RunFinished">xmlrpc_RunFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">runId</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PeachServer.xmlrpc_RunFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="PeachServer.xmlrpc_RunFinished-expanded"><a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"><tt class="py-docstring">                Indicate test run has completed.</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">                <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name"><a title="Peach.Publishers.stdout" class="py-name" href="#" onclick="return doclink('link-2', 'stdout', 'link-0');">stdout</a></tt><tt class="py-op">.</tt><tt class="py-name">write</tt><tt class="py-op">(</tt><tt class="py-string">"RunFinished: %s\n"</tt> <tt class="py-op">%</tt> <tt class="py-name">runId</tt><tt class="py-op">)</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">                <tt class="py-comment">#cursor.execute("update testrun set finished = 1, finishtime = NOW() where runid = %s", </tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#       (runId))</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#dbconn.commit()</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-comment"></tt>                 </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-string">'OK'</tt> </tt>
+</div><a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">         </tt>
+<a name="PeachServer.xmlrpc_StartTest"></a><div id="PeachServer.xmlrpc_StartTest-def"><a name="L70"></a><tt class="py-lineno"> 70</tt> <a class="py-toggle" href="#" id="PeachServer.xmlrpc_StartTest-toggle" onclick="return toggle('PeachServer.xmlrpc_StartTest');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Server.twistedserver_console.PeachServer-class.html#xmlrpc_StartTest">xmlrpc_StartTest</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">runId</tt><tt class="py-op">,</tt> <tt class="py-param">testName</tt><tt class="py-op">,</tt> <tt class="py-param">testNum</tt><tt class="py-op">,</tt> <tt class="py-param">testData</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PeachServer.xmlrpc_StartTest-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="PeachServer.xmlrpc_StartTest-expanded"><a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line"><tt class="py-docstring">                Signal start of test.  All parameters are strings.</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">                 </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">                <tt class="py-name">testData</tt> <tt class="py-op">=</tt> <tt class="py-name">base64</tt><tt class="py-op">.</tt><tt class="py-name">decodestring</tt><tt class="py-op">(</tt><tt class="py-name">testData</tt><tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">                <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name"><a title="Peach.Publishers.stdout" class="py-name" href="#" onclick="return doclink('link-3', 'stdout', 'link-0');">stdout</a></tt><tt class="py-op">.</tt><tt class="py-name">write</tt><tt class="py-op">(</tt><tt class="py-string">"Test: %s: %s: %s: %s\n"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">runId</tt><tt class="py-op">,</tt> <tt class="py-name">testName</tt><tt class="py-op">,</tt> <tt class="py-name">testNum</tt><tt class="py-op">,</tt> <tt class="py-name">testData</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">                <tt class="py-comment">#cursor.execute("insert into test (runid, testnum, testname, testdata, starttime) values (%s, %s, %s, %s, NOW())", </tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#       (runId, int(testNum), testName, testData))</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#dbconn.commit()</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-comment"></tt>                 </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-string">'OK'</tt> </tt>
+</div><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">         </tt>
+<a name="PeachServer.xmlrpc_EndTest"></a><div id="PeachServer.xmlrpc_EndTest-def"><a name="L83"></a><tt class="py-lineno"> 83</tt> <a class="py-toggle" href="#" id="PeachServer.xmlrpc_EndTest-toggle" onclick="return toggle('PeachServer.xmlrpc_EndTest');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Server.twistedserver_console.PeachServer-class.html#xmlrpc_EndTest">xmlrpc_EndTest</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">runId</tt><tt class="py-op">,</tt> <tt class="py-param">testName</tt><tt class="py-op">,</tt> <tt class="py-param">testNum</tt><tt class="py-op">,</tt> <tt class="py-param">result</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PeachServer.xmlrpc_EndTest-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="PeachServer.xmlrpc_EndTest-expanded"><a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">                Signal end of test.  All parameters are strings.</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">                 </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                <tt class="py-comment">#sys.stdout.write("o")</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#result = base64.decodestring(result)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#cursor.execute("update test set testresult = %s, finishtime = NOW() where runid = %s and testname = %s and testnum = %s", </tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-comment">#       (result, runId, testName, int(testNum)))</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-comment"></tt>                 </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-string">'OK'</tt> </tt>
+</div></div><a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-keyword">print</tt> <tt class="py-string">""</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-keyword">print</tt> <tt class="py-string">"] Twisted Peach Test Server v0.3"</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-keyword">print</tt> <tt class="py-string">"] Copyright (c) 2006-2007 Michael Eddington\n"</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">argv</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"Syntax:"</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"  python twistedserver.py &lt;PORT&gt;\n"</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">exit</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-comment">#dbconn = MySQLdb.connect(host=sys.argv[2], db=sys.argv[3], user=sys.argv[4], passwd=sys.argv[5])</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#cursor = dbconn.cursor()</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-keyword">print</tt> <tt class="py-string">"Starting on port %s\n"</tt> <tt class="py-op">%</tt> <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">argv</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt id="link-4" class="py-name" targets="Variable Peach.Server.twistedserver.r=Peach.Server.twistedserver-module.html#r,Variable Peach.Server.twistedserver_console.r=Peach.Server.twistedserver_console-module.html#r"><a title="Peach.Server.twistedserver.r
+Peach.Server.twistedserver_console.r" class="py-name" href="#" onclick="return doclink('link-4', 'r', 'link-4');">r</a></tt> <tt class="py-op">=</tt> <tt id="link-5" class="py-name" targets="Class Peach.Server.twistedserver.PeachServer=Peach.Server.twistedserver.PeachServer-class.html,Class Peach.Server.twistedserver_console.PeachServer=Peach.Server.twistedserver_console.PeachServer-class.html"><a title="Peach.Server.twistedserver.PeachServer
+Peach.Server.twistedserver_console.PeachServer" class="py-name" href="#" onclick="return doclink('link-5', 'PeachServer', 'link-5');">PeachServer</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-name">reactor</tt><tt class="py-op">.</tt><tt class="py-name">listenTCP</tt><tt class="py-op">(</tt><tt class="py-name">string</tt><tt class="py-op">.</tt><tt class="py-name">atoi</tt><tt class="py-op">(</tt><tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">argv</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">server</tt><tt class="py-op">.</tt><tt class="py-name">Site</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name"><a title="Peach.Server.twistedserver.r
+Peach.Server.twistedserver_console.r" class="py-name" href="#" onclick="return doclink('link-6', 'r', 'link-4');">r</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-name">reactor</tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Method Peach.Agent.network.PcapThread.run()=Peach.Agent.network.PcapThread-class.html#run"><a title="Peach.Agent.network.PcapThread.run" class="py-name" href="#" onclick="return doclink('link-7', 'run', 'link-7');">run</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-comment"># end</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzz.sf.net">Peach Fuzzing Framework</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0beta1 on Mon Oct 22 23:50:51 2007
+    </td>
+    <td align="right" class="footer">
+      <a href="http://epydoc.sourceforge.net">http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie()
+  // -->
+</script>
+  
+</body>
+</html>

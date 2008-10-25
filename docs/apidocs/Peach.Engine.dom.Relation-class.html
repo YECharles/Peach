@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Engine.dom.Relation</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Peach ::
+        Engine ::
+        dom ::
+        Relation ::
+        Class&nbsp;Relation
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Relation</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_peach_en_34" name="uml_class_diagram_for_peach_en_34">
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html" title="Specifies relations between data" alt="" coords="49,435,239,680"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#type" title="Type of relation (size, count, when)" alt="" coords="51,452,237,471"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#of" title="Reference to target" alt="" coords="51,471,237,489"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#From" title="Reference to matching of relation" alt="" coords="51,489,237,508"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#parent" title="Parent of this object" alt="" coords="51,508,237,527"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#expressionGet" title="Expression to apply to relation when getting value" alt="" coords="51,527,237,545"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#expressionSet" title="Expression to apply to relation when setting value" alt="" coords="51,545,237,564"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#__init__" title="Peach.Engine.dom.Relation.__init__" alt="" coords="51,567,237,585"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#getFullnameInDataModel" title="This will get fully qualified name of this element starting with the root  node of the data model." alt="" coords="51,585,237,604"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#getValue" title="For a size&#45;of relation get the size of the referenced value." alt="" coords="51,604,237,623"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#setValue" title="For a size&#45;of relation get the size of the referenced value." alt="" coords="51,623,237,641"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#getOfElement" title="Resolve of reference." alt="" coords="51,641,237,660"/>
+<area shape="rect" href="Peach.Engine.dom.Relation&#45;class.html#getFromElement" title="Resolve of reference." alt="" coords="51,660,237,679"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html" title="Element in our template tree." alt="" coords="16,11,272,405"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#name" title="Name of Element, cannot include &quot;.&quot;s" alt="" coords="17,28,271,47"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#hasChildren" title="If element has children" alt="" coords="17,47,271,65"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#elementType" title="Type of this element" alt="" coords="17,65,271,84"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#fullName" title="Fullname cache" alt="" coords="17,84,271,103"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#node" title="Our XML node" alt="" coords="17,103,271,121"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#ref" title="The reference that made us, or None" alt="" coords="17,121,271,140"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#GuidRegex" title="Peach.Engine.dom.Element.GuidRegex" alt="" coords="17,140,271,159"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getElementsByType" title="Will return an array all elements of a specific type in the tree starting  with us." alt="" coords="17,161,271,180"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getUniqueName" title="Peach.Engine.dom.Element.getUniqueName" alt="" coords="17,180,271,199"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullDataName" title="Return fully qualified name inside of data map" alt="" coords="17,199,271,217"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getRoot" title="Get the root of this DOM tree" alt="" coords="17,217,271,236"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#printDomMap" title="Print out a map of the dom." alt="" coords="17,236,271,255"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#toXmlDom" title="Convert to an XML DOM object tree for use in xpath queries." alt="" coords="17,255,271,273"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#toXmlDomLight" title="Convert to an XML DOM object tree for use in xpath queries." alt="" coords="17,273,271,292"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#updateFromXmlDom" title="Update our object based on an XML DOM object." alt="" coords="17,292,271,311"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#compareTree" title="This method will compare two ElementWithChildren object tree&#39;s." alt="" coords="17,311,271,329"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#copy" title="Peach.Engine.dom.Element.copy" alt="" coords="17,329,271,348"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullname" title="Peach.Engine.dom.Element.getFullname" alt="" coords="17,348,271,367"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#nextSibling" title="Get the next sibling or return None" alt="" coords="17,367,271,385"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#previousSibling" title="Get the prior sibling or return None" alt="" coords="17,385,271,404"/>
+</map>
+  <img src="uml_class_diagram_for_peach_en_34.gif" alt='' usemap="#uml_class_diagram_for_peach_en_34" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<pre class="literalblock">
+
+Specifies relations between data
+
+- size-of
+- (when a flag indicates something exists)
+- Zero or more
+- 1 or more
+
+</pre>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Relation-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">parent</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getFullnameInDataModel"></a><span class="summary-sig-name">getFullnameInDataModel</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      This will get fully qualified name of this element starting with the 
+      root node of the data model.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getFullnameInDataModel">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Relation-class.html#getValue" class="summary-sig-name">getValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">False</span>)</span><br />
+      For a size-of relation get the size of the referenced value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Relation-class.html#setValue" class="summary-sig-name">setValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">value</span>)</span><br />
+      For a size-of relation get the size of the referenced value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.setValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Relation-class.html#getOfElement" class="summary-sig-name">getOfElement</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Resolve of reference.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getOfElement">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Relation-class.html#getFromElement" class="summary-sig-name">getFromElement</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Resolve of reference.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getFromElement">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#compareTree">compareTree</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#copy">copy</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getElementsByType">getElementsByType</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getFullDataName">getFullDataName</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getFullname">getFullname</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getRoot">getRoot</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#nextSibling">nextSibling</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#previousSibling">previousSibling</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#printDomMap">printDomMap</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#toXmlDom">toXmlDom</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#toXmlDomLight">toXmlDomLight</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#updateFromXmlDom">updateFromXmlDom</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b> (private):
+      <code><a href="Peach.Engine.dom.Element-class.html#_FixParents" onclick="show_private();">_FixParents</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_getXmlAttribute" onclick="show_private();">_getXmlAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_setAttribute" onclick="show_private();">_setAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_setXmlAttribute" onclick="show_private();">_setXmlAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_xmlHadChild" onclick="show_private();">_xmlHadChild</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#getUniqueName">getUniqueName</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#GuidRegex">GuidRegex</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="type"></a><span class="summary-name">type</span><br />
+      Type of relation (size, count, when)
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="of"></a><span class="summary-name">of</span><br />
+      Reference to target
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="From"></a><span class="summary-name">From</span><br />
+      Reference to matching of relation
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="parent"></a><span class="summary-name">parent</span><br />
+      Parent of this object
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="expressionGet"></a><span class="summary-name">expressionGet</span><br />
+      Expression to apply to relation when getting value
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="expressionSet"></a><span class="summary-name">expressionSet</span><br />
+      Expression to apply to relation when setting value
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#elementType">elementType</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#fullName">fullName</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#hasChildren">hasChildren</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#name">name</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#node">node</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#ref">ref</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">name</span>,
+        <span class="sig-arg">parent</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Engine.dom.Element-class.html#__init__">Element.__init__</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">default</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>For a size-of relation get the size of the referenced value.  Apply 
+  expression to the value if needed.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>default</code></strong> (Boolean) - Should we try for .defaultValue first? (defaults False)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="setValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">value</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.setValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>For a size-of relation get the size of the referenced value.  Apply 
+  expression to the value if needed.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getOfElement"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getOfElement</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getOfElement">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Resolve of reference.  We want todo this at runtime in case we are 
+  copied around.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getFromElement"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFromElement</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Relation.getFromElement">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Resolve of reference.  We want todo this at runtime in case we are 
+  copied around.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:25 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

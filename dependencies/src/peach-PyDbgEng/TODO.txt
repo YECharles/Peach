@@ -1,0 +1,17 @@
+Testing
+	extensive unit tests
+	extensive system tests
+		check all connection modes. 
+		check all interfaces. 
+		check all events.
+	
+Development
+	PyDbg interface and PaiMei integration. improve kstalker module (code coverage, smart pointer reference)
+	add support to call dbgeng extention functions (!handle, !analyze)
+	setup and installation
+	
+Documentation
+
+.
+.
+.

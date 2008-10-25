@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Engine.dom.Data</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Peach ::
+        Engine ::
+        dom ::
+        Data ::
+        Class&nbsp;Data
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Data</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Data">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_peach_en_13" name="uml_class_diagram_for_peach_en_13">
+<area shape="rect" href="Peach.Engine.dom.Data&#45;class.html" title="Default data container." alt="" coords="80,709,208,787"/>
+<area shape="rect" href="Peach.Engine.dom.Data&#45;class.html#fileName" title="Name of file containing data to load" alt="" coords="81,727,207,745"/>
+<area shape="rect" href="Peach.Engine.dom.Data&#45;class.html#expression" title="Expression that returns data to load" alt="" coords="81,745,207,764"/>
+<area shape="rect" href="Peach.Engine.dom.Data&#45;class.html#__init__" title="Peach.Engine.dom.Data.__init__" alt="" coords="81,767,207,785"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html" title="Contains functions that cause Element to act as a hash table and array for children." alt="" coords="16,360,272,680"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#children" title="Children object, has children as attributes by name" alt="" coords="17,377,271,396"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#getElementsByType" title="Will return array of a specific type in the tree starting with us." alt="" coords="17,399,271,417"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#printDomMap" title="Print out a map of the dom." alt="" coords="17,417,271,436"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#verifyDomMap" title="Verify parent child relationship across DOM Tree" alt="" coords="17,436,271,455"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#toXmlDom" title="Convert to an XML DOM boject tree for use in xpath queries." alt="" coords="17,455,271,473"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#toXmlDomLight" title="Convert to an XML DOM boject tree for use in xpath queries." alt="" coords="17,473,271,492"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#updateFromXmlDom" title="Update our object based on an XML DOM object." alt="" coords="17,492,271,511"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#setDefaults" title="Set data elements defaultValue based on a Data object." alt="" coords="17,511,271,529"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#append" title="Peach.Engine.dom.ElementWithChildren.append" alt="" coords="17,529,271,548"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#index" title="Peach.Engine.dom.ElementWithChildren.index" alt="" coords="17,548,271,567"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#insert" title="Peach.Engine.dom.ElementWithChildren.insert" alt="" coords="17,567,271,585"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#firstChild" title="Peach.Engine.dom.ElementWithChildren.firstChild" alt="" coords="17,585,271,604"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#lastChild" title="Peach.Engine.dom.ElementWithChildren.lastChild" alt="" coords="17,604,271,623"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#has_key" title="Peach.Engine.dom.ElementWithChildren.has_key" alt="" coords="17,623,271,641"/>
+<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#__contains__" title="Peach.Engine.dom.ElementWithChildren.__contains__" alt="" coords="17,660,271,679"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html" title="Element in our template tree." alt="" coords="40,11,248,331"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#name" title="Name of Element, cannot include &quot;.&quot;s" alt="" coords="41,28,247,47"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#parent" title="Parent of Element" alt="" coords="41,47,247,65"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#hasChildren" title="If element has children" alt="" coords="41,65,247,84"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#elementType" title="Type of this element" alt="" coords="41,84,247,103"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#fullName" title="Fullname cache" alt="" coords="41,103,247,121"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#node" title="Our XML node" alt="" coords="41,121,247,140"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#ref" title="The reference that made us, or None" alt="" coords="41,140,247,159"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#GuidRegex" title="Peach.Engine.dom.Element.GuidRegex" alt="" coords="41,159,247,177"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getUniqueName" title="Peach.Engine.dom.Element.getUniqueName" alt="" coords="41,180,247,199"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullDataName" title="Return fully qualified name inside of data map" alt="" coords="41,199,247,217"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getRoot" title="Get the root of this DOM tree" alt="" coords="41,217,247,236"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#compareTree" title="This method will compare two ElementWithChildren object tree&#39;s." alt="" coords="41,236,247,255"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#copy" title="Peach.Engine.dom.Element.copy" alt="" coords="41,255,247,273"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullname" title="Peach.Engine.dom.Element.getFullname" alt="" coords="41,273,247,292"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#nextSibling" title="Get the next sibling or return None" alt="" coords="41,292,247,311"/>
+<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#previousSibling" title="Get the prior sibling or return None" alt="" coords="41,311,247,329"/>
+</map>
+  <img src="uml_class_diagram_for_peach_en_13.gif" alt='' usemap="#uml_class_diagram_for_peach_en_13" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<p>Default data container.  Children are Field objects.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.Data-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Data.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.ElementWithChildren-class.html">ElementWithChildren</a></code></b>:
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__contains__">__contains__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__delitem__">__delitem__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__getitem__">__getitem__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__iter__">__iter__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__len__">__len__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#__setitem__">__setitem__</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#append">append</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#firstChild">firstChild</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#getElementsByType">getElementsByType</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#has_key">has_key</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#index">index</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#insert">insert</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#lastChild">lastChild</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#printDomMap">printDomMap</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#setDefaults">setDefaults</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#toXmlDom">toXmlDom</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#toXmlDomLight">toXmlDomLight</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#updateFromXmlDom">updateFromXmlDom</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#verifyDomMap">verifyDomMap</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#compareTree">compareTree</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#copy">copy</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getFullDataName">getFullDataName</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getFullname">getFullname</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#getRoot">getRoot</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#nextSibling">nextSibling</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#previousSibling">previousSibling</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b> (private):
+      <code><a href="Peach.Engine.dom.Element-class.html#_FixParents" onclick="show_private();">_FixParents</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_getXmlAttribute" onclick="show_private();">_getXmlAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_setAttribute" onclick="show_private();">_setAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_setXmlAttribute" onclick="show_private();">_setXmlAttribute</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#_xmlHadChild" onclick="show_private();">_xmlHadChild</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#getUniqueName">getUniqueName</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#GuidRegex">GuidRegex</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="fileName"></a><span class="summary-name">fileName</span><br />
+      Name of file containing data to load
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="expression"></a><span class="summary-name">expression</span><br />
+      Expression that returns data to load
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.ElementWithChildren-class.html">ElementWithChildren</a></code></b>:
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#children">children</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.ElementWithChildren-class.html">ElementWithChildren</a></code></b> (private):
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#_children" onclick="show_private();">_children</a></code>,
+      <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#_childrenHash" onclick="show_private();">_childrenHash</a></code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
+      <code><a href="Peach.Engine.dom.Element-class.html#elementType">elementType</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#fullName">fullName</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#hasChildren">hasChildren</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#name">name</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#node">node</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#parent">parent</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#ref">ref</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">name</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Data.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Engine.dom.Element-class.html#__init__">Element.__init__</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:23 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

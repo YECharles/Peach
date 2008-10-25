@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Publishers.remote</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        <a href="Peach.Publishers-module.html">Package&nbsp;Publishers</a> ::
+        Module&nbsp;remote
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="Peach.Publishers.remote-module.html">Module Peach.Publishers.remote</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring">Use the Agent system to have remote Publishers</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">@author: Michael Eddington</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring">@version: $Id$</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Copyright (c) 2008 Michael Eddington</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Permission is hereby granted, free of charge, to any person obtaining a copy </tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># of this software and associated documentation files (the "Software"), to deal</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># in the Software without restriction, including without limitation the rights </tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell </tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># copies of the Software, and to permit persons to whom the Software is </tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># furnished to do so, subject to the following conditions:</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># The above copyright notice and this permission notice shall be included in    </tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># all copies or substantial portions of the Software.</tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR </tt> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, </tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE </tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER </tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># SOFTWARE.</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"><tt class="py-comment"># Authors:</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#   Michael Eddington (mike@phed.org)</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line"><tt class="py-comment"># $Id$</tt> </tt>
+<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package Peach=Peach-module.html,Class Peach.Engine.dom.Peach=Peach.Engine.dom.Peach-class.html"><a title="Peach
+Peach.Engine.dom.Peach" class="py-name" href="#" onclick="return doclink('link-0', 'Peach', 'link-0');">Peach</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Package Peach.Engine=Peach.Engine-module.html,Class Peach.Engine.engine.Engine=Peach.Engine.engine.Engine-class.html"><a title="Peach.Engine
+Peach.Engine.engine.Engine" class="py-name" href="#" onclick="return doclink('link-1', 'Engine', 'link-1');">Engine</a></tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Module Peach.Engine.engine=Peach.Engine.engine-module.html"><a title="Peach.Engine.engine" class="py-name" href="#" onclick="return doclink('link-2', 'engine', 'link-2');">engine</a></tt> <tt class="py-keyword">import</tt> <tt id="link-3" class="py-name"><a title="Peach.Engine
+Peach.Engine.engine.Engine" class="py-name" href="#" onclick="return doclink('link-3', 'Engine', 'link-1');">Engine</a></tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-4" class="py-name"><a title="Peach
+Peach.Engine.dom.Peach" class="py-name" href="#" onclick="return doclink('link-4', 'Peach', 'link-0');">Peach</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Module Peach.publisher=Peach.publisher-module.html"><a title="Peach.publisher" class="py-name" href="#" onclick="return doclink('link-5', 'publisher', 'link-5');">publisher</a></tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"> </tt>
+<a name="RemotePublisher"></a><div id="RemotePublisher-def"><a name="L39"></a><tt class="py-lineno">39</tt> <a class="py-toggle" href="#" id="RemotePublisher-toggle" onclick="return toggle('RemotePublisher');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html">RemotePublisher</a><tt class="py-op">(</tt><tt class="py-base-class">Publisher</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="RemotePublisher-expanded"><a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line"><tt class="py-docstring">        Load a publisher on a remote Agent</tt> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.__init__"></a><div id="RemotePublisher.__init__-def"><a name="L44"></a><tt class="py-lineno">44</tt> <a class="py-toggle" href="#" id="RemotePublisher.__init__-toggle" onclick="return toggle('RemotePublisher.__init__');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">agentName</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">,</tt> <tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.__init__-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.__init__-expanded"><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agentName</tt> <tt class="py-op">=</tt> <tt class="py-name">agentName</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Variable Peach.group.Group._name=Peach.group.Group-class.html#_name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-6', '_name', 'link-6');">_name</a></tt> <tt class="py-op">=</tt> <tt class="py-name">name</tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_cls</tt> <tt class="py-op">=</tt> <tt class="py-name">cls</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_args</tt> <tt class="py-op">=</tt> <tt class="py-name">args</tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_initialized</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+</div><a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.start"></a><div id="RemotePublisher.start-def"><a name="L51"></a><tt class="py-lineno">51</tt> <a class="py-toggle" href="#" id="RemotePublisher.start-toggle" onclick="return toggle('RemotePublisher.start');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#start">start</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.start-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.start-expanded"><a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_initialized</tt> <tt class="py-op">==</tt> <tt class="py-name">False</tt><tt class="py-op">:</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="Peach.Engine
+Peach.Engine.engine.Engine" class="py-name" href="#" onclick="return doclink('link-7', 'Engine', 'link-1');">Engine</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Variable Peach.Agent.debugger.__crash_bin_struct__.context=Peach.Agent.debugger.__crash_bin_struct__-class.html#context"><a title="Peach.Agent.debugger.__crash_bin_struct__.context" class="py-name" href="#" onclick="return doclink('link-8', 'context', 'link-8');">context</a></tt><tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Module Peach.agent=Peach.agent-module.html"><a title="Peach.agent" class="py-name" href="#" onclick="return doclink('link-9', 'agent', 'link-9');">agent</a></tt><tt class="py-op">[</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agentName</tt><tt class="py-op">]</tt> </tt>
+<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name" targets="Method Peach.agent.AgentClient.PublisherInitialize()=Peach.agent.AgentClient-class.html#PublisherInitialize,Method Peach.agent.AgentPlexer.PublisherInitialize()=Peach.agent.AgentPlexer-class.html#PublisherInitialize"><a title="Peach.agent.AgentClient.PublisherInitialize
+Peach.agent.AgentPlexer.PublisherInitialize" class="py-name" href="#" onclick="return doclink('link-10', 'PublisherInitialize', 'link-10');">PublisherInitialize</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-11', '_name', 'link-6');">_name</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_cls</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_args</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_initialized</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line"> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method Peach.agent.AgentClient.PublisherStart()=Peach.agent.AgentClient-class.html#PublisherStart,Method Peach.agent.AgentPlexer.PublisherStart()=Peach.agent.AgentPlexer-class.html#PublisherStart,Variable Peach.agent._MsgType.PublisherStart=Peach.agent._MsgType-class.html#PublisherStart"><a title="Peach.agent.AgentClient.PublisherStart
+Peach.agent.AgentPlexer.PublisherStart
+Peach.agent._MsgType.PublisherStart" class="py-name" href="#" onclick="return doclink('link-12', 'PublisherStart', 'link-12');">PublisherStart</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-13', '_name', 'link-6');">_name</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.stop"></a><div id="RemotePublisher.stop-def"><a name="L59"></a><tt class="py-lineno">59</tt> <a class="py-toggle" href="#" id="RemotePublisher.stop-toggle" onclick="return toggle('RemotePublisher.stop');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#stop">stop</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.stop-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.stop-expanded"><a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name" targets="Method Peach.agent.AgentClient.PublisherStop()=Peach.agent.AgentClient-class.html#PublisherStop,Method Peach.agent.AgentPlexer.PublisherStop()=Peach.agent.AgentPlexer-class.html#PublisherStop,Variable Peach.agent._MsgType.PublisherStop=Peach.agent._MsgType-class.html#PublisherStop"><a title="Peach.agent.AgentClient.PublisherStop
+Peach.agent.AgentPlexer.PublisherStop
+Peach.agent._MsgType.PublisherStop" class="py-name" href="#" onclick="return doclink('link-14', 'PublisherStop', 'link-14');">PublisherStop</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-15', '_name', 'link-6');">_name</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L61"></a><tt class="py-lineno">61</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.send"></a><div id="RemotePublisher.send-def"><a name="L62"></a><tt class="py-lineno">62</tt> <a class="py-toggle" href="#" id="RemotePublisher.send-toggle" onclick="return toggle('RemotePublisher.send');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#send">send</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">data</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.send-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.send-expanded"><a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Method Peach.agent.AgentClient.PublisherSend()=Peach.agent.AgentClient-class.html#PublisherSend,Method Peach.agent.AgentPlexer.PublisherSend()=Peach.agent.AgentPlexer-class.html#PublisherSend,Variable Peach.agent._MsgType.PublisherSend=Peach.agent._MsgType-class.html#PublisherSend"><a title="Peach.agent.AgentClient.PublisherSend
+Peach.agent.AgentPlexer.PublisherSend
+Peach.agent._MsgType.PublisherSend" class="py-name" href="#" onclick="return doclink('link-16', 'PublisherSend', 'link-16');">PublisherSend</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-17', '_name', 'link-6');">_name</a></tt><tt class="py-op">,</tt> <tt id="link-18" class="py-name" targets="Module Peach.Generators.data=Peach.Generators.data-module.html"><a title="Peach.Generators.data" class="py-name" href="#" onclick="return doclink('link-18', 'data', 'link-18');">data</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.receive"></a><div id="RemotePublisher.receive-def"><a name="L65"></a><tt class="py-lineno">65</tt> <a class="py-toggle" href="#" id="RemotePublisher.receive-toggle" onclick="return toggle('RemotePublisher.receive');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#receive">receive</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.receive-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.receive-expanded"><a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name" targets="Method Peach.agent.AgentClient.PublisherReceive()=Peach.agent.AgentClient-class.html#PublisherReceive,Method Peach.agent.AgentPlexer.PublisherReceive()=Peach.agent.AgentPlexer-class.html#PublisherReceive,Variable Peach.agent._MsgType.PublisherReceive=Peach.agent._MsgType-class.html#PublisherReceive"><a title="Peach.agent.AgentClient.PublisherReceive
+Peach.agent.AgentPlexer.PublisherReceive
+Peach.agent._MsgType.PublisherReceive" class="py-name" href="#" onclick="return doclink('link-19', 'PublisherReceive', 'link-19');">PublisherReceive</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-20', '_name', 'link-6');">_name</a></tt><tt class="py-op">,</tt> <tt id="link-21" class="py-name" targets="Module Peach.Mutators.size=Peach.Mutators.size-module.html"><a title="Peach.Mutators.size" class="py-name" href="#" onclick="return doclink('link-21', 'size', 'link-21');">size</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.call"></a><div id="RemotePublisher.call-def"><a name="L68"></a><tt class="py-lineno">68</tt> <a class="py-toggle" href="#" id="RemotePublisher.call-toggle" onclick="return toggle('RemotePublisher.call');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#call">call</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">method</tt><tt class="py-op">,</tt> <tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.call-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.call-expanded"><a name="L69"></a><tt class="py-lineno">69</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name" targets="Method Peach.agent.AgentClient.PublisherCall()=Peach.agent.AgentClient-class.html#PublisherCall,Method Peach.agent.AgentPlexer.PublisherCall()=Peach.agent.AgentPlexer-class.html#PublisherCall,Variable Peach.agent._MsgType.PublisherCall=Peach.agent._MsgType-class.html#PublisherCall"><a title="Peach.agent.AgentClient.PublisherCall
+Peach.agent.AgentPlexer.PublisherCall
+Peach.agent._MsgType.PublisherCall" class="py-name" href="#" onclick="return doclink('link-22', 'PublisherCall', 'link-22');">PublisherCall</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-23', '_name', 'link-6');">_name</a></tt><tt class="py-op">,</tt> <tt class="py-name">method</tt><tt class="py-op">,</tt> <tt class="py-name">args</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L70"></a><tt class="py-lineno">70</tt>  <tt class="py-line"> </tt>
+<a name="RemotePublisher.property"></a><div id="RemotePublisher.property-def"><a name="L71"></a><tt class="py-lineno">71</tt> <a class="py-toggle" href="#" id="RemotePublisher.property-toggle" onclick="return toggle('RemotePublisher.property');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#property">property</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">property</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.property-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.property-expanded"><a name="L72"></a><tt class="py-lineno">72</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method Peach.agent.AgentClient.PublisherProperty()=Peach.agent.AgentClient-class.html#PublisherProperty,Method Peach.agent.AgentPlexer.PublisherProperty()=Peach.agent.AgentPlexer-class.html#PublisherProperty,Variable Peach.agent._MsgType.PublisherProperty=Peach.agent._MsgType-class.html#PublisherProperty"><a title="Peach.agent.AgentClient.PublisherProperty
+Peach.agent.AgentPlexer.PublisherProperty
+Peach.agent._MsgType.PublisherProperty" class="py-name" href="#" onclick="return doclink('link-24', 'PublisherProperty', 'link-24');">PublisherProperty</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-25', '_name', 'link-6');">_name</a></tt><tt class="py-op">,</tt> <tt class="py-name">value</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L73"></a><tt class="py-lineno">73</tt>  <tt class="py-line">         </tt>
+<a name="RemotePublisher.connect"></a><div id="RemotePublisher.connect-def"><a name="L74"></a><tt class="py-lineno">74</tt> <a class="py-toggle" href="#" id="RemotePublisher.connect-toggle" onclick="return toggle('RemotePublisher.connect');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#connect">connect</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.connect-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.connect-expanded"><a name="L75"></a><tt class="py-lineno">75</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-26" class="py-name" targets="Method Peach.agent.AgentClient.PublisherConnect()=Peach.agent.AgentClient-class.html#PublisherConnect,Method Peach.agent.AgentPlexer.PublisherConnect()=Peach.agent.AgentPlexer-class.html#PublisherConnect,Variable Peach.agent._MsgType.PublisherConnect=Peach.agent._MsgType-class.html#PublisherConnect"><a title="Peach.agent.AgentClient.PublisherConnect
+Peach.agent.AgentPlexer.PublisherConnect
+Peach.agent._MsgType.PublisherConnect" class="py-name" href="#" onclick="return doclink('link-26', 'PublisherConnect', 'link-26');">PublisherConnect</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-27', '_name', 'link-6');">_name</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L76"></a><tt class="py-lineno">76</tt>  <tt class="py-line"> </tt>
+<a name="RemotePublisher.accept"></a><div id="RemotePublisher.accept-def"><a name="L77"></a><tt class="py-lineno">77</tt> <a class="py-toggle" href="#" id="RemotePublisher.accept-toggle" onclick="return toggle('RemotePublisher.accept');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#accept">accept</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.accept-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.accept-expanded"><a name="L78"></a><tt class="py-lineno">78</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Method Peach.agent.AgentClient.PublisherAccept()=Peach.agent.AgentClient-class.html#PublisherAccept,Method Peach.agent.AgentPlexer.PublisherAccept()=Peach.agent.AgentPlexer-class.html#PublisherAccept,Variable Peach.agent._MsgType.PublisherAccept=Peach.agent._MsgType-class.html#PublisherAccept"><a title="Peach.agent.AgentClient.PublisherAccept
+Peach.agent.AgentPlexer.PublisherAccept
+Peach.agent._MsgType.PublisherAccept" class="py-name" href="#" onclick="return doclink('link-28', 'PublisherAccept', 'link-28');">PublisherAccept</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-29', '_name', 'link-6');">_name</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L79"></a><tt class="py-lineno">79</tt>  <tt class="py-line"> </tt>
+<a name="RemotePublisher.close"></a><div id="RemotePublisher.close-def"><a name="L80"></a><tt class="py-lineno">80</tt> <a class="py-toggle" href="#" id="RemotePublisher.close-toggle" onclick="return toggle('RemotePublisher.close');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.remote.RemotePublisher-class.html#close">close</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RemotePublisher.close-collapsed" style="display:none;" pad="++" indent="++++++++++++"></div><div id="RemotePublisher.close-expanded"><a name="L81"></a><tt class="py-lineno">81</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_agent</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name" targets="Method Peach.agent.AgentClient.PublisherClose()=Peach.agent.AgentClient-class.html#PublisherClose,Method Peach.agent.AgentPlexer.PublisherClose()=Peach.agent.AgentPlexer-class.html#PublisherClose,Variable Peach.agent._MsgType.PublisherClose=Peach.agent._MsgType-class.html#PublisherClose"><a title="Peach.agent.AgentClient.PublisherClose
+Peach.agent.AgentPlexer.PublisherClose
+Peach.agent._MsgType.PublisherClose" class="py-name" href="#" onclick="return doclink('link-30', 'PublisherClose', 'link-30');">PublisherClose</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="Peach.group.Group._name" class="py-name" href="#" onclick="return doclink('link-31', '_name', 'link-6');">_name</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L82"></a><tt class="py-lineno">82</tt>  <tt class="py-line"> </tt>
+<a name="L83"></a><tt class="py-lineno">83</tt>  <tt class="py-line"> </tt>
+<a name="L84"></a><tt class="py-lineno">84</tt>  <tt class="py-line"> </tt>
+<a name="L85"></a><tt class="py-lineno">85</tt>  <tt class="py-line"><tt class="py-comment"># end</tt> </tt>
+<a name="L86"></a><tt class="py-lineno">86</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:48 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

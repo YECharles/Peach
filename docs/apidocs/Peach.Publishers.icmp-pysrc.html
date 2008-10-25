@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Publishers.icmp</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        <a href="Peach.Publishers-module.html">Package&nbsp;Publishers</a> ::
+        Module&nbsp;icmp
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="Peach.Publishers.icmp-module.html">Module Peach.Publishers.icmp</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">Default included ICMP publishers.</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">@author: Michael Eddington</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">@author: Adam Cecchetti</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">@version: $Id: icmp.py 795 2008-03-25 05:34:00Z meddingt $</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Copyright (c) 2005-2008 Michael Eddington</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Copyright (c) 2004-2005 IOActive Inc.</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Permission is hereby granted, free of charge, to any person obtaining a copy </tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># of this software and associated documentation files (the "Software"), to deal</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># in the Software without restriction, including without limitation the rights </tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell </tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># copies of the Software, and to permit persons to whom the Software is </tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># furnished to do so, subject to the following conditions:</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># The above copyright notice and this permission notice shall be included in    </tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># all copies or substantial portions of the Software.</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR </tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, </tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE </tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER </tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># SOFTWARE.</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-comment"># Authors:</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#   Michael Eddington (mike@phed.org)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#   Adam Cecchetti (adam@cecchetti.com)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># $Id: icmp.py 795 2008-03-25 05:34:00Z meddingt $</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">socket</tt><tt class="py-op">,</tt> <tt class="py-name">time</tt><tt class="py-op">,</tt> <tt class="py-name">sys</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package Peach=Peach-module.html,Class Peach.Engine.dom.Peach=Peach.Engine.dom.Peach-class.html"><a title="Peach
+Peach.Engine.dom.Peach" class="py-name" href="#" onclick="return doclink('link-0', 'Peach', 'link-0');">Peach</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Module Peach.publisher=Peach.publisher-module.html"><a title="Peach.publisher" class="py-name" href="#" onclick="return doclink('link-1', 'publisher', 'link-1');">publisher</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class Peach.Engine.dom.Publisher=Peach.Engine.dom.Publisher-class.html,Class Peach.publisher.Publisher=Peach.publisher.Publisher-class.html"><a title="Peach.Engine.dom.Publisher
+Peach.publisher.Publisher" class="py-name" href="#" onclick="return doclink('link-2', 'Publisher', 'link-2');">Publisher</a></tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="Icmp"></a><div id="Icmp-def"><a name="L43"></a><tt class="py-lineno"> 43</tt> <a class="py-toggle" href="#" id="Icmp-toggle" onclick="return toggle('Icmp');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html">Icmp</a><tt class="py-op">(</tt><tt class="py-base-class">Publisher</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Icmp-expanded"><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">        A simple Icmp publisher.</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">         </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt id="link-3" class="py-name" targets="Variable Peach.Publishers.icmp.Icmp._host=Peach.Publishers.icmp.Icmp-class.html#_host,Variable Peach.Publishers.raw.Raw._host=Peach.Publishers.raw.Raw-class.html#_host"><a title="Peach.Publishers.icmp.Icmp._host
+Peach.Publishers.raw.Raw._host" class="py-name" href="#" onclick="return doclink('link-3', '_host', 'link-3');">_host</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt id="link-4" class="py-name" targets="Variable Peach.Publishers.icmp.Icmp._socket=Peach.Publishers.icmp.Icmp-class.html#_socket,Variable Peach.Publishers.raw.Raw._socket=Peach.Publishers.raw.Raw-class.html#_socket"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-4', '_socket', 'link-4');">_socket</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">         </tt>
+<a name="Icmp.__init__"></a><div id="Icmp.__init__-def"><a name="L51"></a><tt class="py-lineno"> 51</tt> <a class="py-toggle" href="#" id="Icmp.__init__-toggle" onclick="return toggle('Icmp.__init__');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">host</tt><tt class="py-op">,</tt> <tt class="py-param">timeout</tt> <tt class="py-op">=</tt> <tt class="py-number">0.1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.__init__-expanded"><a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">                @type   host: string</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">                @param  host: Remote host</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-docstring">                @type   timeout: number</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-docstring">                @param  timeout: How long to wait for reponse</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name"><a title="Peach.Publishers.icmp.Icmp._host
+Peach.Publishers.raw.Raw._host" class="py-name" href="#" onclick="return doclink('link-5', '_host', 'link-3');">_host</a></tt> <tt class="py-op">=</tt> <tt class="py-name">host</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_timeout</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">timeout</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                 </tt>
+<a name="Icmp.stop"></a><div id="Icmp.stop-def"><a name="L61"></a><tt class="py-lineno"> 61</tt> <a class="py-toggle" href="#" id="Icmp.stop-toggle" onclick="return toggle('Icmp.stop');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#stop">stop</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.stop-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.stop-expanded"><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"><tt class="py-docstring">                Close connection if open.</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Method Peach.Publishers.file.FilePerIteration.close()=Peach.Publishers.file.FilePerIteration-class.html#close,Method Peach.Publishers.file.FileReader.close()=Peach.Publishers.file.FileReader-class.html#close,Method Peach.Publishers.file.FileWriter.close()=Peach.Publishers.file.FileWriter-class.html#close,Method Peach.Publishers.file.FileWriterLauncher.close()=Peach.Publishers.file.FileWriterLauncher-class.html#close,Method Peach.Publishers.file.FileWriterLauncherGui.close()=Peach.Publishers.file.FileWriterLauncherGui-class.html#close,Method Peach.Publishers.http.HttpBasicAuth.close()=Peach.Publishers.http.HttpBasicAuth-class.html#close,Method Peach.Publishers.http.HttpDigestAuth.close()=Peach.Publishers.http.HttpDigestAuth-class.html#close,Method Peach.Publishers.icmp.Icmp.close()=Peach.Publishers.icmp.Icmp-class.html#close,Method Peach.Publishers.raw.Raw.close()=Peach.Publishers.raw.Raw-class.html#close,Method Peach.Publishers.remote.RemotePublisher.close()=Peach.Publishers.remote.RemotePublisher-class.html#close,Method Peach.Publishers.stdout.Null.close()=Peach.Publishers.stdout.Null-class.html#close,Method Peach.Publishers.stdout.Stdout.close()=Peach.Publishers.stdout.Stdout-class.html#close,Method Peach.Publishers.tcp.Tcp.close()=Peach.Publishers.tcp.Tcp-class.html#close,Method Peach.Publishers.tcp.TcpListener.close()=Peach.Publishers.tcp.TcpListener-class.html#close,Method Peach.Publishers.udp.Udp.close()=Peach.Publishers.udp.Udp-class.html#close,Method Peach.publisher.Publisher.close()=Peach.publisher.Publisher-class.html#close"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-6', 'close', 'link-6');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">         </tt>
+<a name="Icmp.connect"></a><div id="Icmp.connect-def"><a name="L67"></a><tt class="py-lineno"> 67</tt> <a class="py-toggle" href="#" id="Icmp.connect-toggle" onclick="return toggle('Icmp.connect');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#connect">connect</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.connect-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.connect-expanded"><a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-7" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-7', '_socket', 'link-4');">_socket</a></tt> <tt class="py-op">!=</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                        <tt class="py-comment"># Close out old socket first</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-comment"></tt>                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-8', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-9', 'close', 'link-6');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-10', '_socket', 'link-4');">_socket</a></tt> <tt class="py-op">=</tt> <tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">socket</tt><tt class="py-op">(</tt><tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">AF_INET</tt><tt class="py-op">,</tt> <tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">SOCK_RAW</tt><tt class="py-op">,</tt> <tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">getprotobyname</tt><tt class="py-op">(</tt><tt class="py-string">'icmp'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-11', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method Peach.Publishers.file.FilePerIteration.connect()=Peach.Publishers.file.FilePerIteration-class.html#connect,Method Peach.Publishers.file.FileReader.connect()=Peach.Publishers.file.FileReader-class.html#connect,Method Peach.Publishers.file.FileWriter.connect()=Peach.Publishers.file.FileWriter-class.html#connect,Method Peach.Publishers.file.FileWriterLauncher.connect()=Peach.Publishers.file.FileWriterLauncher-class.html#connect,Method Peach.Publishers.file.FileWriterLauncherGui.connect()=Peach.Publishers.file.FileWriterLauncherGui-class.html#connect,Method Peach.Publishers.http.HttpDigestAuth.connect()=Peach.Publishers.http.HttpDigestAuth-class.html#connect,Method Peach.Publishers.icmp.Icmp.connect()=Peach.Publishers.icmp.Icmp-class.html#connect,Method Peach.Publishers.raw.Raw.connect()=Peach.Publishers.raw.Raw-class.html#connect,Method Peach.Publishers.remote.RemotePublisher.connect()=Peach.Publishers.remote.RemotePublisher-class.html#connect,Method Peach.Publishers.stdout.Null.connect()=Peach.Publishers.stdout.Null-class.html#connect,Method Peach.Publishers.stdout.Stdout.connect()=Peach.Publishers.stdout.Stdout-class.html#connect,Method Peach.Publishers.tcp.Tcp.connect()=Peach.Publishers.tcp.Tcp-class.html#connect,Method Peach.Publishers.tcp.TcpListener.connect()=Peach.Publishers.tcp.TcpListener-class.html#connect,Method Peach.Publishers.udp.Udp.connect()=Peach.Publishers.udp.Udp-class.html#connect"><a title="Peach.Publishers.file.FilePerIteration.connect
+Peach.Publishers.file.FileReader.connect
+Peach.Publishers.file.FileWriter.connect
+Peach.Publishers.file.FileWriterLauncher.connect
+Peach.Publishers.file.FileWriterLauncherGui.connect
+Peach.Publishers.http.HttpDigestAuth.connect
+Peach.Publishers.icmp.Icmp.connect
+Peach.Publishers.raw.Raw.connect
+Peach.Publishers.remote.RemotePublisher.connect
+Peach.Publishers.stdout.Null.connect
+Peach.Publishers.stdout.Stdout.connect
+Peach.Publishers.tcp.Tcp.connect
+Peach.Publishers.tcp.TcpListener.connect
+Peach.Publishers.udp.Udp.connect" class="py-name" href="#" onclick="return doclink('link-12', 'connect', 'link-12');">connect</a></tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="Peach.Publishers.icmp.Icmp._host
+Peach.Publishers.raw.Raw._host" class="py-name" href="#" onclick="return doclink('link-13', '_host', 'link-3');">_host</a></tt><tt class="py-op">,</tt><tt class="py-number">22</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">         </tt>
+<a name="Icmp.close"></a><div id="Icmp.close-def"><a name="L74"></a><tt class="py-lineno"> 74</tt> <a class="py-toggle" href="#" id="Icmp.close-toggle" onclick="return toggle('Icmp.close');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#close">close</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.close-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.close-expanded"><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-14', '_socket', 'link-4');">_socket</a></tt> <tt class="py-op">!=</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-15', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-16', 'close', 'link-6');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-17', '_socket', 'link-4');">_socket</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+</div><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">         </tt>
+<a name="Icmp.send"></a><div id="Icmp.send-def"><a name="L79"></a><tt class="py-lineno"> 79</tt> <a class="py-toggle" href="#" id="Icmp.send-toggle" onclick="return toggle('Icmp.send');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#send">send</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">data</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.send-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.send-expanded"><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">                Send data via sendall.</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">                </tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">                @type   data: string</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">                @param  data: Data to send</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-18', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt class="py-name">sendall</tt><tt class="py-op">(</tt><tt id="link-19" class="py-name" targets="Module Peach.Generators.data=Peach.Generators.data-module.html"><a title="Peach.Generators.data" class="py-name" href="#" onclick="return doclink('link-19', 'data', 'link-19');">data</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">         </tt>
+<a name="Icmp.receive"></a><div id="Icmp.receive-def"><a name="L88"></a><tt class="py-lineno"> 88</tt> <a class="py-toggle" href="#" id="Icmp.receive-toggle" onclick="return toggle('Icmp.receive');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.Publishers.icmp.Icmp-class.html#receive">receive</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Icmp.receive-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Icmp.receive-expanded"><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">                Receive upto 10000 bytes of data.</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-docstring">                </tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">                @rtype: string</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">                @return: received data.</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                 </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt id="link-20" class="py-name" targets="Module Peach.Mutators.size=Peach.Mutators.size-module.html"><a title="Peach.Mutators.size" class="py-name" href="#" onclick="return doclink('link-20', 'size', 'link-20');">size</a></tt> <tt class="py-op">!=</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-21', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt class="py-name">recv</tt><tt class="py-op">(</tt><tt id="link-22" class="py-name"><a title="Peach.Mutators.size" class="py-name" href="#" onclick="return doclink('link-22', 'size', 'link-20');">size</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                 </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">                         </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-23', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt class="py-name">setblocking</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">                         </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">                        <tt class="py-name">timeout</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_timeout</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">                        <tt class="py-name">beginTime</tt> <tt class="py-op">=</tt> <tt class="py-name">time</tt><tt class="py-op">.</tt><tt class="py-name">time</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">                        <tt id="link-24" class="py-name" targets="Variable Peach.Engine.webwatcher.WebHandler.ret=Peach.Engine.webwatcher.WebHandler-class.html#ret"><a title="Peach.Engine.webwatcher.WebHandler.ret" class="py-name" href="#" onclick="return doclink('link-24', 'ret', 'link-24');">ret</a></tt> <tt class="py-op">=</tt> <tt class="py-string">''</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">                         </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">                        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">                                <tt class="py-keyword">while</tt> <tt class="py-name">True</tt><tt class="py-op">:</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">                                        <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-25" class="py-name"><a title="Peach.Engine.webwatcher.WebHandler.ret" class="py-name" href="#" onclick="return doclink('link-25', 'ret', 'link-24');">ret</a></tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt> <tt class="py-keyword">or</tt> <tt class="py-name">time</tt><tt class="py-op">.</tt><tt class="py-name">time</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-name">beginTime</tt> <tt class="py-op">&gt;</tt> <tt class="py-name">timeout</tt><tt class="py-op">:</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">                                                <tt class="py-keyword">break</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                                         </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">                                        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                                                <tt id="link-26" class="py-name"><a title="Peach.Engine.webwatcher.WebHandler.ret" class="py-name" href="#" onclick="return doclink('link-26', 'ret', 'link-24');">ret</a></tt> <tt class="py-op">+=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-27', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt class="py-name">recv</tt><tt class="py-op">(</tt><tt class="py-number">10000</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">                                        <tt class="py-keyword">except</tt> <tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                                                <tt class="py-keyword">if</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">e</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Method Peach.Engine.dom.DataElement.find()=Peach.Engine.dom.DataElement-class.html#find"><a title="Peach.Engine.dom.DataElement.find" class="py-name" href="#" onclick="return doclink('link-28', 'find', 'link-28');">find</a></tt><tt class="py-op">(</tt><tt class="py-string">'The socket operation could not complete without blocking'</tt><tt class="py-op">)</tt> <tt class="py-op">==</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                                                        <tt class="py-keyword">raise</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                                 </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">                        <tt class="py-keyword">except</tt> <tt class="py-name">socket</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                                <tt class="py-keyword">print</tt> <tt class="py-string">"Tcp::Receive():  Caught socket.error [%s]"</tt> <tt class="py-op">%</tt> <tt class="py-name">e</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                         </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="Peach.Publishers.icmp.Icmp._socket
+Peach.Publishers.raw.Raw._socket" class="py-name" href="#" onclick="return doclink('link-29', '_socket', 'link-4');">_socket</a></tt><tt class="py-op">.</tt><tt class="py-name">setblocking</tt><tt class="py-op">(</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">                        <tt class="py-keyword">return</tt> <tt id="link-30" class="py-name"><a title="Peach.Engine.webwatcher.WebHandler.ret" class="py-name" href="#" onclick="return doclink('link-30', 'ret', 'link-24');">ret</a></tt> </tt>
+</div></div><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-comment"># end</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:50 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

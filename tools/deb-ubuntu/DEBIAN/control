@@ -1,0 +1,11 @@
+Package: peach
+Version: 2.2
+Section: games
+Maintainer: Michael Eddington <mike@phed.org>
+Architecture: all
+Depends: python2.5, python-twisted, python2.5-4suite
+Description: Peach is a fuzzer capable of fuzzing
+ just about anything from file formats, network
+ protocols, and APIs.  Peach features debugger
+ integration, pluggable I/O connectors, and an
+ XML modeling language.  http://peachfuzzer.com.

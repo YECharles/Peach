@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.Mutators.random._BuildStaticPeach</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        <a href="Peach.Mutators-module.html">Package&nbsp;Mutators</a> ::
+        <a href="Peach.Mutators.random-module.html">Module&nbsp;random</a> ::
+        Class&nbsp;_BuildStaticPeach
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class _BuildStaticPeach</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach">source&nbsp;code</a></span></p>
+<p>Logic to build a tree of generators around a Template.  This used to 
+  be the base fuzzer logic for Peach 2.0 release and was in Engineuild.py.
+  No longer :)</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__init__"></a><span class="summary-sig-name">__init__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">peachXml</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="GetClassesInModule"></a><span class="summary-sig-name">GetClassesInModule</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">module</span>)</span><br />
+      Return array of class names in module</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach.GetClassesInModule">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getDefaultPeachByName"></a><span class="summary-sig-name">getDefaultPeachByName</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">templateName</span>,
+        <span class="summary-sig-arg">dataName</span>=<span class="summary-sig-default">None</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach.getDefaultPeachByName">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getDefaultPeach"></a><span class="summary-sig-name">getDefaultPeach</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">template</span>,
+        <span class="summary-sig-arg">dataName</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Return a master generator and group</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach.getDefaultPeach">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_HasSizeofRelation"></a><span class="summary-sig-name">_HasSizeofRelation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._HasSizeofRelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_GetSizeofRelation"></a><span class="summary-sig-name">_GetSizeofRelation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetSizeofRelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_HasCountofRelation"></a><span class="summary-sig-name">_HasCountofRelation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._HasCountofRelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_GetCountofRelation"></a><span class="summary-sig-name">_GetCountofRelation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetCountofRelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_ResetTemplate"></a><span class="summary-sig-name">_ResetTemplate</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Set the .generator values in template tree to None</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._ResetTemplate">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_performAllImports"></a><span class="summary-sig-name">_performAllImports</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Find all Import objects and insert them into the current namespace.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._performAllImports">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_performImport"></a><span class="summary-sig-name">_performImport</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">importObj</span>)</span><br />
+      Import the specified import object into the current namespace.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._performImport">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.random._BuildStaticPeach-class.html#_GetTemplateByName" class="summary-sig-name" onclick="show_private();">_GetTemplateByName</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">str</span>)</span><br />
+      Get the object indicated by ref.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetTemplateByName">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.random._BuildStaticPeach-class.html#_GetDataByName" class="summary-sig-name" onclick="show_private();">_GetDataByName</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">str</span>)</span><br />
+      Get the data object indicated by ref.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetDataByName">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_lookUp"></a><span class="summary-sig-name">_lookUp</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">start</span>)</span><br />
+      Search up an object tree looking for an element name.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._lookUp">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_lookDown"></a><span class="summary-sig-name">_lookDown</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">start</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._lookDown">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_lookSiblings"></a><span class="summary-sig-name">_lookSiblings</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">start</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._lookSiblings">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_getRef"></a><span class="summary-sig-name">_getRef</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">parent</span>)</span><br />
+      Get a reference to an element in a tempalte</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._getRef">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_createExtraGenerator"></a><span class="summary-sig-name">_createExtraGenerator</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">generator</span>)</span><br />
+      Will create and return an instance of an extra generated that was 
+      specified by the user.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._createExtraGenerator">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_getDefaultGenerator"></a><span class="summary-sig-name">_getDefaultGenerator</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">group</span>)</span><br />
+      Build up a generator construct for a peach dom node.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._getDefaultGenerator">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="_GetTemplateByName"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_GetTemplateByName</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">str</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetTemplateByName">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get the object indicated by ref.  Currently the object must have been 
+  defined prior to this point in the XML</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_GetDataByName"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_GetDataByName</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">str</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.random-pysrc.html#_BuildStaticPeach._GetDataByName">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get the data object indicated by ref.  Currently the object must have 
+  been defined prior to this point in the XML.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Jul 16 21:40:37 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

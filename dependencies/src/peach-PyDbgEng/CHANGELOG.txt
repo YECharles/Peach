@@ -1,0 +1,37 @@
+05.05.08 [v0.6]: Michael Eddington
+    - removed need for compiled event proxy
+    - updated pydbgeng to work with latest comtypes
+
+03.03.07 [v0.5]:
+	- minor type fix in KernelAttacher.py
+
+02.23.07 [v0.4]:
+	- added breakpoint support in main pydbgeng class
+	- pydbgeng.py classes moved to separate files
+	- treat "pulong BytesRead", "PDEBUG_STACK_FRAME", "PSTR NameBuffer", "pulong64 Displacement" as input parameter (hpp_to_idl.pl)
+	- improve user-mode debug session classes (ProcessAttacher, ProcessCreator)
+	- added RegMon.py, FaultInjector.py, KernelFileMon.py examples
+	- going public with http://pydbgeng.sourceforge.net/ =)
+
+01.12.07 [v0.3]:
+	- moved to newer dbgeng version (6.6.0007.5)
+	- fixed replace_idl_types() in hpp_to_idl.pl
+	- fixed nameless union struct in _DEBUG_VALUE (DbgEng.h)
+	- treat "pvoid buffer" as input parameter (hpp_to_idl.pl)
+	- started PyDbgEng.py,  kernel_stalker.py and kstalker PAIMEI module
+
+01.02.07 [v0.2]:
+	- bugfix ctypes crash at exit. increase DbgEventProxy ref count in dllmain
+	- added IDebugOutputCallbacks to DbgEventProxy
+	- renamed classes in DbgEventProxy. fixed DbgEventProxy solution file.
+	- ret val is now properly returned from comtypes even sink methods.
+	- added InterestMask to CreateIDebugEventCallbacks
+	- kstalker POC!
+
+12.30.06 [v0.1]:
+	- tlb creation with interfaces, structs and enums.
+	- debug_creator returns IDebugClient
+	- query other interfaces from IDebugClient
+	- DbgEventProxy with IDebugEventCallbacksProxy. Fires on all methods.
+	- basically a working prototype =)
+	

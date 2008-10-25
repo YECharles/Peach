@@ -1,0 +1,51 @@
+<!--
+#
+# Copyright (c) 2008 Blake Frantz & Michael Eddington
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in	
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+# Authors:
+#	Blake Frantz(blakefrantz@gmail.com)
+#
+# $Id$
+-->
+
+<?xml version="1.0" encoding="utf-8"?>
+<gadget>
+  <name>Peach Monitor</name>
+  <version>1.0.0.0</version>
+  <author name="Blake Frantz">
+	<info url="http://peachfuzz.sf.net" text="Peach Fuzz"/>
+	<logo src="icon.png"/>
+  </author>
+  <copyright>2008 Blake Frantz (blakefrantz@gmail.com and Michael Eddington (mike@phed.org)</copyright>
+  <description>Displays Peach Fuzz Statistics</description>
+  <icons>
+    <icon height="48" width="48" src="icon.png"/>
+  </icons>
+  <hosts>
+    <host name="sidebar">
+      <base type="HTML" apiVersion="1.0.0" src="peach.html"/>
+      <permissions>Full</permissions>
+      <platform minPlatformVersion="1.0"/>
+      <defaultImage src="icon.png"/>
+    </host>
+  </hosts>
+</gadget>

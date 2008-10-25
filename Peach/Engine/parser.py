@@ -1,0 +1,2593 @@
+
+'''
+Peach XML Parser.  Sucks in the crazy XML and returns a top level context
+object that contians things like templates, namespaces, etc.
+
+@author: Michael Eddington
+@version: $Id$
+'''
+
+#
+# Copyright (c) 2007-2008 Michael Eddington
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in	
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+# Authors:
+#   Michael Eddington (mike@phed.org)
+
+# $Id$
+
+import sys, re, types
+import traceback
+from uuid import uuid1
+
+try:
+	import Ft.Xml.Domlette
+	from Ft.Xml.Catalog import GetDefaultCatalog
+	from Ft.Xml.InputSource import InputSourceFactory
+	from Ft.Lib.Resolvers import SchemeRegistryResolver
+	from Ft.Lib import Uri
+	from Ft.Xml import Parse
+	from Ft.Xml.Sax import DomBuilder
+	from Ft.Xml import Sax, CreateInputSource
+except:
+	raise PeachException("Error loading 4Suite XML library.  This library\ncan be installed from the dependencies folder or\ndownloaded from http://4suite.org/.\n\n")
+
+from Peach.Engine.dom import *
+from Peach.Engine import dom
+from Peach.Mutators import *
+from Peach.Engine.common import *
+
+def PeachStr(s):
+	'''
+	Our implementation of str() which does not
+	convert None to 'None'.
+	'''
+	
+	if s == None:
+		return None
+	
+	return str(s)
+
+class PeachResolver(SchemeRegistryResolver):
+	def __init__(self):
+		SchemeRegistryResolver.__init__(self)
+	
+	def resolve(self, uri, base=None):
+		scheme = Uri.GetScheme(uri)
+		if scheme == None:
+			if base != None:
+				scheme = Uri.GetScheme(base)
+			if scheme == None:
+				#Another option is to fall back to Base class behavior
+				raise Uri.UriException(Uri.UriException.SCHEME_REQUIRED,
+									   base=base, ref=uri)
+		
+		# Add the files path to our sys.path
+		
+		if scheme == 'file':
+			filename = uri[5:]
+			try:
+				index = filename.rindex('\\')
+				sys.path.append(filename[: 0 - (index+1)])
+				#print "Adding [%s]" % filename[: 0 - (index+1)]
+				
+			except:
+				try:
+					index = filename.rindex('/')
+					sys.path.append(filename[: 0 - (index+1)])
+					#print "Adding [%s]" % filename[: 0 - (index+1)]
+					
+				except:
+					#print "Adding [.][%s]" % uri
+					sys.path.append('.')
+		
+		try:
+			func = self.handlers.get(scheme)
+			if func == None:
+				func = self.handlers.get(None)
+				if func == None:
+					return Uri.UriResolverBase.resolve(self, uri, base)
+			
+			return func(uri, base)
+		
+		except:
+			
+			if scheme != 'file':
+				raise PeachException("Peach was unable to locate [%s]" % uri)
+			
+			# Lets try looking in our sys.path
+			
+			paths = []
+			for path in sys.path:
+				paths.append(path)
+				paths.append("%s/Peach/Engine" % path)
+			
+			for path in paths:
+				newuri = uri[:5] + path + '/' + uri[5:]
+				#print "Trying: [%s]" % newuri
+				
+				try:
+					func = self.handlers.get(scheme)
+					if func == None:
+						func = self.handlers.get(None)
+						if func == None:
+							return Uri.UriResolverBase.resolve(self, newuri, base)
+					
+					return func(uri, base)
+				except:
+					pass
+			
+			raise PeachException("Peach was unable to locate [%s]" % uri)
+
+
+class ParseTemplate:
+	'''
+	The Peach 2.0 XML -> Peach DOM parser.  Uses 4Suite XML
+	library.
+	'''
+	
+	dontCrack = False
+	
+	def parse(self, uri):
+		'''
+		Parse a Peach XML file pointed to by uri.
+		'''
+		
+		factory = InputSourceFactory(resolver=PeachResolver(), catalog=GetDefaultCatalog())
+		isrc = factory.fromUri(uri)
+		doc = Ft.Xml.Domlette.NonvalidatingReader.parse(isrc)
+		
+		return self.HandleDocument(doc)
+	
+	def parseString(self, xml):
+		'''
+		Parse a string as Peach XML.
+		'''
+		
+		doc = Ft.Xml.Domlette.NonvalidatingReader.parseString(xml, "http://phed.org")
+		return self.HandleDocument(doc)
+	
+	def GetClassesInModule(self, module):
+		'''
+		Return array of class names in module
+		'''
+		
+		classes = []
+		for item in dir(module):
+			i = getattr(module, item)
+			if type(i) == types.ClassType and item[0] != '_':
+				classes.append(item)
+			elif type(i) == types.MethodType and item[0] != '_':
+				classes.append(item)
+			elif type(i) == types.FunctionType and item[0] != '_':
+				classes.append(item)
+		
+		return classes
+	
+	def HandleDocument(self, doc):
+		
+		self.StripComments(doc)
+		self.StripText(doc)
+		
+		ePeach = doc.firstChild
+		
+		peach = dom.Peach()
+		#peach.node = doc
+		self.context = peach
+		peach.mutators = None
+		
+		#: List of nodes that need some parse love list of [xmlNode, parent]
+		self.unfinishedReferences = []
+		
+		setattr(peach, 'templates',		ElementWithChildren())
+		setattr(peach, 'data',			ElementWithChildren())
+		setattr(peach, 'agents',		ElementWithChildren())
+		setattr(peach, 'namespaces',	ElementWithChildren())
+		setattr(peach, 'tests',			ElementWithChildren())
+		setattr(peach, 'runs',			ElementWithChildren())
+		
+		if ePeach.nodeName != 'Peach':
+			raise PeachException("First element in document must be Peach")
+		
+		# Peach attributes
+		
+		setattr(peach, 'version',		self._getAttribute(ePeach, 'version'))
+		setattr(peach, 'author',		self._getAttribute(ePeach, 'author'))
+		setattr(peach, 'description',	self._getAttribute(ePeach, 'description'))
+		
+		# The good stuff -- We are going todo multiple passes here to increase the likely hood
+		# that things will turn out okay.
+		
+		# Pass 1 -- Include and PythonPath
+		for child in ePeach.childNodes:
+			
+			if child.nodeName == 'Include':
+				# Include this file
+				
+				nsName = self._getAttribute(child, 'ns')
+				nsSrc = self._getAttribute(child, 'src')
+				
+				parser = ParseTemplate()
+				ns = parser.parse(nsSrc)
+				
+				ns.name = nsName + ':' + nsSrc
+				ns.nsName = nsName
+				ns.nsSrc = nsSrc
+				ns.elementType = 'namespace'
+				ns.toXml = new.instancemethod(NamespaceToXml, ns, ns.__class__)
+				
+				nss = Namespace()
+				nss.ns = ns
+				nss.nsName = nsName
+				nss.nsSrc = nsSrc
+				nss.name = nsName + ":" + nsSrc
+				nss.parent = peach
+				ns.parent = nss
+				
+				peach.append(nss)
+				peach.namespaces.append(ns)
+				setattr(peach.namespaces, nsName, ns)
+			
+			elif child.nodeName == 'PythonPath':
+				# Add a search path
+				
+				p = self.HandlePythonPath(child, peach)
+				peach.append(p)
+				sys.path.append(p.name)
+				
+		# Pass 2 -- Import
+		for child in ePeach.childNodes:
+			
+			if child.nodeName == 'Import':
+				# Import module
+				
+				if not child.hasAttributeNS(None, 'import'):
+					raise PeachException("Import element did not have import attribute!")
+				
+				importStr = self._getAttribute(child, 'import')
+				
+				if child.hasAttributeNS(None, 'from'):
+					fromStr = self._getAttribute(child, 'from')
+					
+					if importStr == "*":
+						module = __import__(PeachStr(fromStr), globals(), locals(), [ PeachStr(importStr) ], -1)
+						
+						try:
+							# If we are a module with other modules in us then we have an __all__
+							for item in module.__all__:
+								globals()["PeachXml_"+item] = getattr(module, item)
+							
+						except:
+							# Else we just have some classes in us with no __all__
+							for item in self.GetClassesInModule(module):
+								globals()["PeachXml_"+item] = getattr(module, item)
+						
+					else:
+						module = __import__(PeachStr(fromStr), globals(), locals(), [ PeachStr(importStr) ], -1)
+						for item in importStr.split(','):
+							item = item.strip()
+							globals()["PeachXml_"+item] = getattr(module, item)
+				
+				else:
+					globals()["PeachXml_"+importStr] = __import__(PeachStr(importStr), globals(), locals(), [], -1)
+					
+				Holder.globals = globals()
+				Holder.locals = locals()
+					
+				i = Element()
+				i.elementType = 'import'
+				i.importStr = self._getAttribute(child, 'import')
+				i.fromStr = self._getAttribute(child, 'from')
+				
+				peach.append(i)
+		
+		# Pass 3 -- Template
+		for child in ePeach.childNodes:
+			
+			if child.nodeName == "Python":
+				code = self._getAttribute(child, "code")
+				if code != None:
+					exec(code)
+			
+			elif child.nodeName == 'DataModel' or child.nodeName == 'Template':
+				# do something
+				template = self.HandleTemplate(child, peach)
+				#template.node = child
+				peach.append(template)
+				peach.templates.append(template)
+				setattr(peach.templates, template.name, template)
+		
+		# Pass 4 -- Data, Agent
+		for child in ePeach.childNodes:
+			
+			if child.nodeName == 'Data':
+				# do data
+				data = self.HandleData(child, peach)
+				#data.node = child
+				peach.append(data)
+				peach.data.append(data)
+				setattr(peach.data, data.name, data)
+			
+			elif child.nodeName == 'Agent':
+				agent = self.HandleAgent(child, None)
+				#agent.node = child
+				peach.append(agent)
+				peach.agents.append(agent)
+				setattr(peach.agents, agent.name, agent)
+			
+			elif child.nodeName == 'StateModel' or child.nodeName == 'StateMachine':
+				stateMachine = self.HandleStateMachine(child, peach)
+				#stateMachine.node = child
+				peach.append(stateMachine)
+			
+			elif child.nodeName == 'Mutators':
+				mutators = self.HandleMutators(child, peach)
+				peach.mutators = mutators
+		
+		# Pass 5 -- Tests
+		for child in ePeach.childNodes:
+			
+			if child.nodeName == 'Test':
+				
+				tests = self.HandleTest(child, None)
+				#tests.node = child
+				peach.append(tests)
+				peach.tests.append(tests)
+				setattr(peach.tests, tests.name, tests)
+			
+			elif child.nodeName == 'Run':
+				
+				run = self.HandleRun(child, None)
+				#run.node = child
+				peach.append(run)
+				peach.runs.append(run)
+				setattr(peach.runs, run.name, run)
+		
+		# We suck, so fix this up
+		peach._FixParents()
+		peach.verifyDomMap()
+		#peach.printDomMap()
+		
+		return peach
+	
+	def StripComments(self, node):
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == '#comment':
+				node.removeChild(child)
+			else:
+				self.StripComments(child)
+	
+	def StripText(self, node):
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == '#text':
+				node.removeChild(child)
+			else:
+				self.StripText(child)
+	
+	def GetRef(self, str, parent = None, childAttr = 'templates'):
+		'''
+		Get the object indicated by ref.  Currently the object must have
+		been defined prior to this point in the XML
+		'''
+		
+		#print "GetRef(%s) -- Starting" % str
+		
+		origStr = str
+		baseObj = self.context
+		hasNamespace = False
+		isTopName = True
+		found = False
+		
+		# Parse out a namespace
+		
+		if str.find(":") > -1:
+			ns, tmp = str.split(':')
+			str = tmp
+			
+			#print "GetRef(%s): Found namepsace: %s" % (str, ns)
+			
+			# Check for namespace
+			if hasattr(self.context.namespaces, ns):
+				baseObj = getattr(self.context.namespaces, ns)
+			else:
+				#print self
+				raise PeachException("Unable to locate namespace: " + origStr)
+			
+			hasNamespace = True
+		
+		for name in str.split('.'):
+			
+			#print "GetRef(%s): Looking for part %s" % (str, name)
+			
+			found = False
+			
+			if not hasNamespace and isTopName and parent != None:
+				# check parent, walk up from current parent to top
+				# level parent checking at each level.
+				
+				while parent != None and not found:
+					
+					#print "GetRef(%s): Parent.name: %s" % (name, parent.name)
+					
+					if hasattr(parent, 'name') and parent.name == name:
+						baseObj = parent
+						found = True
+						
+					elif hasattr(parent, name):
+						baseObj = getattr(parent, name)
+						found = True
+					
+					elif hasattr(parent.children, name):
+						baseObj = getattr(parent.children, name)
+						found = True
+					
+					elif hasattr(parent, childAttr) and hasattr( getattr(parent, childAttr), name):
+						baseObj = getattr( getattr(parent, childAttr), name)
+						found = True
+						
+					else:
+						parent = parent.parent
+			
+			# check base obj
+			elif hasattr(baseObj, name):
+				baseObj = getattr(baseObj, name)
+				found = True
+				
+			# check childAttr
+			elif hasattr(baseObj, childAttr):
+				obj = getattr(baseObj, childAttr)
+				if hasattr(obj, name):
+					baseObj = getattr(obj, name)
+					found = True
+			
+			else:
+				raise PeachException("Could not resolve ref %s" % origStr)
+			
+			# check childAttr
+			if found == False and hasattr(baseObj, childAttr):
+				obj = getattr(baseObj, childAttr)
+				if hasattr(obj, name):
+					baseObj = getattr(obj, name)
+					found = True
+			
+			# check across namespaces if we can't find it in ours
+			if isTopName and found == False:
+				for child in baseObj:
+					if child.elementType != 'namespace':
+						continue
+					
+					#print "GetRef(%s): CHecking namepsace: %s" % (str, child.name)
+					ret = self._SearchNamespaces(child, name, childAttr)
+					if ret:
+						#print "GetRef(%s) Found part %s in namespace" % (str, name)
+						baseObj = ret
+						found = True
+			
+			isTopName = False
+		
+		if found == False:
+			raise PeachException("Unable to resolve reference: %s" % origStr)
+		
+		return baseObj
+	
+	def _SearchNamespaces(self, obj, name, attr):
+		'''
+		Used by GetRef to search across namespaces
+		'''
+		
+		#print "_SearchNamespaces(%s, %s)" % (obj.name, name)
+		#print "dir(obj): ", dir(obj)
+		
+		# Namespaces are stuffed under this variable
+		# if we have it we should be it :)
+		if hasattr(obj, 'ns'):
+			obj = obj.ns
+
+		if hasattr(obj, name):
+			return getattr(obj, name)
+		
+		elif hasattr(obj, attr) and hasattr(getattr(obj, attr), name):
+			return getattr(getattr(obj, attr), name)
+		
+		for child in obj:
+			if child.elementType != 'namespace':
+				continue
+			
+			ret = self._SearchNamespaces(child, name, attr)
+			if ret != None:
+				return ret
+		
+		return None
+	
+	def GetDataRef(self, str):
+		'''
+		Get the data object indicated by ref.  Currently the object must
+		have been defined prior to this point in the XML.
+		'''
+		
+		origStr = str
+		baseObj = self.context
+		
+		# Parse out a namespace
+		
+		if str.find(":") > -1:
+			ns, tmp = str.split(':')
+			str = tmp
+			
+			#print "GetRef(): Found namepsace:",ns
+			
+			# Check for namespace
+			if hasattr(self.context.namespaces, ns):
+				baseObj = getattr(self.context.namespaces, ns)
+			else:
+				raise PeachException("Unable to locate namespace")
+		
+		for name in str.split('.'):
+			
+			# check base obj
+			if hasattr(baseObj, name):
+				baseObj = getattr(baseObj, name)
+			
+			# check templates
+			elif hasattr(baseObj, 'data') and hasattr(baseObj.data, name):
+				baseObj = getattr(baseObj.data, name)
+			
+			else:
+				raise PeachException("Could not resolve ref", origStr)
+		
+		return baseObj
+	
+	_regsHex = (
+		re.compile(r"^([,\s]*\\x([a-zA-Z0-9]{2})[,\s]*)"),
+		re.compile(r"^([,\s]*%([a-zA-Z0-9]{2})[,\s]*)"),
+		re.compile(r"^([,\s]*0x([a-zA-Z0-9]{2})[,\s]*)"),
+		re.compile(r"^([,\s]*x([a-zA-Z0-9]{2})[,\s]*)"),
+		re.compile(r"^([,\s]*([a-zA-Z0-9]{2})[,\s]*)")
+	)
+	
+	def GetValueFromNode(self, node):
+		
+		value = None
+		type = 'literal'
+		
+		if node.hasAttributeNS(None, 'valueType'):
+			type = self._getAttribute(node, 'valueType')
+			if not (type == 'literal' or type == 'hex'):
+				type = 'literal'
+		
+		if node.hasAttributeNS(None, 'value'):
+			value = self._getAttribute(node, 'value')
+			#value = value.replace("\r", "")
+			#value = value.replace("\n", "")
+			
+			#print "FROM VALUE: " + value
+			
+			# Convert variouse forms of hex into a binary string
+			if type == 'hex':
+				
+				ret = ''
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += chr(int(match.group(2),16))
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
+				
+				return ret
+		
+		#print "GetValueFromNode"
+		if value != None and (self._getAttribute(node, 'valueType') == 'string' or not node.hasAttributeNS(None, 'valueType')):
+			value = re.sub(r"([^\\])\\n", r"\1\n", value)
+			value = re.sub(r"([^\\])\\r", r"\1\r", value)
+			value = re.sub(r"([^\\])\\t", r"\1\t", value)
+			value = re.sub(r"([^\\])\\\\", r"\1\\", value)
+			value = re.sub(r"([^\\])\\n", r"\1\n", value)
+			value = re.sub(r"([^\\])\\r", r"\1\r", value)
+			value = re.sub(r"([^\\])\\t", r"\1\t", value)
+			value = re.sub(r"([^\\])\\\\", r"\1\\", value)
+			value = re.sub(r"^\\n", r"\n", value)
+			value = re.sub(r"^\\r", r"\r", value)
+			value = re.sub(r"^\\t", r"\t", value)
+			value = re.sub(r"^\\\\", r"\\", value)
+
+		return value
+		
+	def GetValueFromNodeNumber(self, node):
+		
+		value = None
+		type = 'literal'
+		
+		if node.hasAttributeNS(None, 'valueType'):
+			type = self._getAttribute(node, 'valueType')
+			if not (type == 'literal' or type == 'hex'):
+				type = 'literal'
+		
+		if node.hasAttributeNS(None, 'value'):
+			value = self._getAttribute(node, 'value')
+			
+			# Convert variouse forms of hex into a binary string
+			if type == 'hex':
+				
+				ret = ''
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += match.group(2)
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
+				
+				return long(ret, 16)
+			
+			elif type == 'literal':
+				value = eval(value)
+			
+		#if value != None and (self._getAttribute(node, 'valueType') or not node.hasAttributeNS(None, 'valueType')):
+		#	value = value.replace("\\r", "\r")
+		#	value = value.replace("\\n", "\n")
+		#	value = value.replace("\\t", "\t")
+		#	value = value.replace("\\\\", "\\")
+		
+		return value
+		
+	# Handlers for Template ###################################################
+	
+	def HandleTemplate(self, node, parent):
+		'''
+		Parse an element named Template.  Can handle actual
+		Template elements and also reference Template elements.
+		
+		e.g.:
+		
+		<Template name="Xyz"> ... </Template>
+		
+		or
+		
+		<Template ref="Xyz" />
+		'''
+		
+		template = None
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			
+			# We have a base template
+			obj = self.GetRef( self._getAttribute(node, 'ref') )
+			
+			template = obj.copy(parent)
+			template.ref = self._getAttribute(node, 'ref')
+			template.parent = parent
+		
+		else:
+			template = Template(self._getAttribute(node, 'name'))
+			template.ref = None
+			template.parent = parent
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			templateName = self._getAttribute(node, 'name')
+			template.name = templateName
+		
+		template.elementType = 'template'
+		#template.node = node
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Block':
+				self.HandleBlock(child, template)
+			elif child.nodeName == 'String':
+				self.HandleString(child, template)
+			elif child.nodeName == 'Number':
+				self.HandleNumber(child, template)
+			elif child.nodeName == 'Flags':
+				self.HandleFlags(child, template)
+			elif child.nodeName == 'Blob':
+				self.HandleBlob(child, template)
+			elif child.nodeName == 'Transformer':
+				template.transformer = self.HandleTransformer(child, template)
+			elif child.nodeName == 'Sequence':
+				self.HandleSequence(child, template)
+			elif child.nodeName == 'Choice':
+				self.HandleChoice(child, template)
+			elif child.nodeName == 'Fixup':
+				self.HandleFixup(child, template)
+			elif child.nodeName == 'Placement':
+				self.HandlePlacement(child, template)
+			elif child.nodeName == 'Seek':
+				self.HandleSeek(child, template)
+			elif child.nodeName == 'Custom':
+				self.HandleCustom(child, template)
+			else:
+				raise str("found unexpected node in Template: %s" % child.nodeName)
+		
+		#template.printDomMap()
+		return template
+	
+	def HandleCommonTemplate(self, node, elem):
+		'''
+		Handle the common children of data elements like String and Number.
+		'''
+		
+		elem.onArrayNext = self._getAttribute(node, "onArrayNext")
+		
+		for child in node:
+			
+			if child.nodeName == 'Relation':
+				relation = self.HandleRelation(child, elem)
+				elem.relations.append(relation)
+				elem.append(relation)
+			
+			elif child.nodeName == 'Transformer':
+				elem.transformer = self.HandleTransformer(child, elem)
+				
+			elif child.nodeName == 'Fixup':
+				self.HandleFixup(child, elem)
+			
+			elif child.nodeName == 'Placement':
+				self.HandlePlacement(child, elem)
+			
+			elif child.nodeName == 'Hint':
+				self.HandleHint(child, elem)
+			
+			else:
+				raise str("found unexpected child node: %s" % child.nodeName)
+	
+	def HandleTransformer(self, node, parent):
+		'''
+		Handle Transformer element
+		'''
+		
+		transformer = Transformer(parent)
+		
+		childTransformer = None
+		params = []
+		
+		# class
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Transformer element missing class attribute")
+		
+		generatorClass = self._getAttribute(node, "class")
+		transformer.classStr = generatorClass
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Transformer':
+				if childTransformer != None:
+					raise PeachException("A transformer can only have one child transformer")
+				
+				childTransformer = self.HandleTransformer(child, transformer)
+				continue
+			
+			if child.nodeName == 'Param':
+				param = self.HandleParam(child, transformer)
+				transformer.append(param)
+				params.append([param.name, param.defaultValue])
+		
+		code = "PeachXml_"+generatorClass + '('
+		
+		isFirst = True
+		for param in params:
+			if not isFirst:
+				code += ', '
+			else:
+				isFirst = False
+			
+			code += PeachStr(param[1])
+		
+		code += ')'
+		
+		trans = eval(code, globals(), locals())
+		
+		if childTransformer != None:
+			trans.setAnotherTransformer(childTransformer.transformer)
+		
+		transformer.transformer = trans
+		
+		if parent != None:
+			parent.transformer = transformer
+			parent.append(transformer)
+		
+		return transformer
+		
+	def HandleFixup(self, node, parent):
+		'''
+		Handle Fixup element
+		'''
+		
+		fixup = Fixup(parent)
+		
+		params = []
+		
+		# class
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Fixup element missing class attribute")
+		
+		fixup.classStr = self._getAttribute(node, "class")
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Param':
+				param = self.HandleParam(child, fixup)
+				fixup.append(param)
+				params.append([param.name, param.defaultValue])
+		
+		code = "PeachXml_"+fixup.classStr + '('
+		
+		isFirst = True
+		for param in params:
+			if not isFirst:
+				code += ', '
+			else:
+				isFirst = False
+			
+			code += PeachStr(param[1])
+		
+		code += ')'
+		
+		fixup.fixup = eval(code, globals(), locals())
+		
+		if parent != None:
+			parent.fixup = fixup
+			parent.append(fixup)
+		
+		return fixup
+		
+	def HandlePlacement(self, node, parent):
+		'''
+		Handle Placement element
+		'''
+		
+		placement = Placement(parent)
+		
+		placement.after = self._getAttribute(node, "after")
+		placement.before = self._getAttribute(node, "before")
+		
+		if placement.after == None and placement.before == None:
+			raise PeachException("Error: Placement element must have an 'after' or 'before' attribute.")
+		
+		if placement.after != None and placement.before != None:
+			raise PeachException("Error: Placement can only have one of 'after' or 'before' but not both.")
+		
+		if parent != None:
+			parent.placement = placement
+			parent.append(placement)
+		
+		return placement
+		
+	def HandleRelation(self, node, elem):
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Relation element does not have type attribute")
+		
+		type = self._getAttribute(node, "type")
+		of = self._getAttribute(node, "of")
+		From = self._getAttribute(node, "from")
+		name = self._getAttribute(node, "name")
+		when = self._getAttribute(node, "when")
+		expressionGet = self._getAttribute(node, "expressionGet")
+		expressionSet = self._getAttribute(node, "expressionSet")
+		
+		if of == None and From == None and when == None:
+			raise PeachException("Relation element does not have of, from, or when attribute.")
+		
+		if type not in ['size', 'count', 'index', 'when', 'offset']:
+			raise PeachException("Unknown type value in Relation element")
+		
+		relation = Relation(name, elem)
+		relation.of = of
+		relation.From = From
+		relation.type = type
+		#relation.node = node
+		relation.when = when
+		relation.expressionGet = expressionGet
+		relation.expressionSet = expressionSet
+		
+		# Logic checks
+		#if type == 'size' and of == None:
+		#	raise PeachException("Size relation only supports of attribute, not from.")
+		
+		return relation
+	
+	def _HandleOccurs(self, node, element):
+		'''
+		Grab min, max, and generated Occurs attributes
+		'''
+		
+		if node.hasAttributeNS(None, 'generatedOccurs'):
+			element.generatedOccurs = self._getAttribute(node, 'generatedOccurs')
+		else:
+			element.generatedOccurs = 10
+		
+		occurs = self._getAttribute(node, 'occurs')
+		minOccurs = self._getAttribute(node, 'minOccurs')
+		maxOccurs = self._getAttribute(node, 'maxOccurs')
+		
+		if minOccurs == None:
+			minOccurs = 1
+		else:
+			minOccurs = eval(minOccurs)
+		
+		if maxOccurs == None:
+			maxOccurs = 1
+		else:
+			maxOccurs = eval(maxOccurs)
+		
+		if minOccurs != None and maxOccurs != None:
+			element.minOccurs = int(minOccurs)
+			element.maxOccurs = int(maxOccurs)
+		
+		elif minOccurs != None and maxOccurs == None:
+			element.minOccurs = int(minOccurs)
+			element.maxOccurs = 1024
+		
+		elif maxOccurs != None and minOccurs == None:
+			element.minOccurs = 0
+			element.maxOccurs = int(maxOccurs)
+			
+		else:
+			element.minOccurs = 1
+			element.maxOccurs = 1
+	
+		if occurs != None:
+			element.occurs = element.minOccurs = element.maxOccurs = int(occurs)
+	
+	def HandleBlock(self, node, parent):
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			
+			if name == None or len(name) == 0:
+				name = Element.getUniqueName()
+			
+			# We have a base template
+			obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
+			
+			block = obj.copy(parent)
+			block.name = name
+			block.parent = parent
+			block.ref = self._getAttribute(node, 'ref')
+			
+			# Block may not be a block!
+			block.toXml = new.instancemethod(BlockToXml, block, block.__class__)
+			block.elementType = 'block'
+			
+		else:
+			block = dom.Block(name, parent)
+			block.ref = None
+		
+		#block.node = node
+		
+		# length (in bytes)
+
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			block.lengthType = self._getAttribute(node, 'lengthType')
+			block.lengthCalc = self._getAttribute(node, 'length')
+			block.length = -1
+
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length != None and len(length) != 0:
+				block.length = int(length)
+			else:
+				block.length = None
+
+		# alignment
+		
+		try:
+			alignment = self._getAttribute(node, 'alignment')
+			if len(alignment) == 0:
+				alignment = None
+		except:
+			alignment = None
+		
+		if alignment != None:
+			block.isAligned = True
+			block.alignment = int(alignment)**2
+		
+		# minOccurs and maxOccurs
+		
+		self._HandleOccurs(node, block)
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Block':
+				self.HandleBlock(child, block)
+			elif child.nodeName == 'String':
+				self.HandleString(child, block)
+			elif child.nodeName == 'Number':
+				self.HandleNumber(child, block)
+			elif child.nodeName == 'Flags':
+				self.HandleFlags(child, block)
+			elif child.nodeName == 'Blob':
+				self.HandleBlob(child, block)
+			elif child.nodeName == 'Choice':
+				self.HandleChoice(child, block)
+			elif child.nodeName == 'Transformer':
+				block.transformer = self.HandleTransformer(child, block)
+			elif child.nodeName == 'Relation':
+				relation = self.HandleRelation(child, block)
+				block.relations.append(relation)
+				block.append(relation)
+			elif child.nodeName == 'Fixup':
+				self.HandleFixup(child, block)
+			elif child.nodeName == 'Placement':
+				self.HandlePlacement(child, block)
+			elif child.nodeName == 'Hint':
+				self.HandleHint(child, block)
+			elif child.nodeName == 'Seek':
+				self.HandleSeek(child, block)
+			elif child.nodeName == 'Custom':
+				self.HandleCustom(child, block)
+			
+			else:
+				raise PeachException(PeachStr("found unexpected node in Block: %s" % child.nodeName))
+		
+		# Add to parent
+		
+		if parent.ref == None and parent.has_key(block.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
+
+		parent.append(block)
+		return block
+	
+	def HandleMutators(self, node, parent):
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		mutators = dom.Mutators(name, parent)
+		#mutators.node = node
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName != 'Mutator':
+				raise PeachException(PeachStr("Found unexpected node in Mutators element: %s" % child.NodeName))
+				
+			if not child.hasAttributeNS(None, 'class'):
+				raise PeachException("Mutator element does not have required class attribute")
+			
+			className = "PeachXml_" + self._getAttribute(child, 'class') + "(self.context)"
+			
+			mutator = Mutator(self._getAttribute(child, 'class'), mutators)
+			mutator.mutator = eval(className, globals(), locals())
+			mutators.append(mutator)
+			
+		parent.append(mutators)
+		return mutators
+
+	
+	def HandleChoice(self, node, parent):
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			
+			if name == None or len(name) == 0:
+				name = Element.getUniqueName()
+			
+			# We have a base template
+			obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
+			
+			#print "About to deep copy: ", obj, " for ref: ", self._getAttribute(node, 'ref')
+			
+			block = obj.copy(parent)
+			block.name = name
+			block.parent = parent
+			block.ref = self._getAttribute(node, 'ref')
+			
+		else:
+			block = Choice(name, parent)
+			block.ref = None
+			
+		block.elementType = 'choice'
+		#block.node = node
+		
+		# length (in bytes)
+
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			block.lengthType = self._getAttribute(node, 'lengthType')
+			block.lengthCalc = self._getAttribute(node, 'length')
+			block.length = -1
+
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length != None and len(length) != 0:
+				block.length = int(length)
+			else:
+				block.length = None
+
+		# minOccurs and maxOccurs
+		self._HandleOccurs(node, block)
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Block':
+				self.HandleBlock(child, block)
+			elif child.nodeName == 'String':
+				self.HandleString(child, block)
+			elif child.nodeName == 'Number':
+				self.HandleNumber(child, block)
+			elif child.nodeName == 'Flags':
+				self.HandleFlags(child, block)
+			elif child.nodeName == 'Blob':
+				self.HandleBlob(child, block)
+			elif child.nodeName == 'Transformer':
+				block.transformer = self.HandleTransformer(child, block)
+			elif child.nodeName == 'Sequence':
+				self.HandleSequence(child, block)
+			elif child.nodeName == 'Choice':
+				self.HandleChoice(child, block)
+			elif child.nodeName == 'Seek':
+				self.HandleSeek(child, block)
+			elif child.nodeName == 'Custom':
+				self.HandleCustom(child, block)
+			else:
+				raise PeachException(PeachStr("found unexpected node in Sequence: %s" % child.nodeName))
+		
+		if parent.ref == None and parent.has_key(block.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
+
+		parent.append(block)
+		return block
+
+	def _getAttribute(self, node, name):
+		
+		if not node.hasAttributeNS(None, name):
+			return None
+		
+		return PeachStr(node.getAttributeNS(None, name))
+	
+	def _getValueType(self, node):
+		
+		valueType = self._getAttribute(node, 'valueType')
+		if valueType == None:
+			return 'string'
+		
+		return valueType
+		
+	def HandleString(self, node, parent):
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		string = String(name, parent)
+		#string.node = node
+		
+		# value
+		
+		string.defaultValue = PeachStr(self.GetValueFromNode(node))
+		string.valueType = self._getValueType(node)
+		#print "HandleString(%s): Before handletype: [%s]" % (string.name, string.defaultValue)
+		string.defaultValue = self._HandleValueType(string.defaultValue, string.valueType)
+		#print "HandleString(%s): After handletype: [%s]" % (string.name, string.defaultValue)
+
+		# tokens
+		
+		if node.hasAttributeNS(None, 'tokens'):
+			string.tokens = self._getAttribute(node, 'tokens')
+		else:
+			string.tokens = None
+
+		# padCharacter
+		
+		if node.hasAttributeNS(None, 'padCharacter'):
+			val = str(self._getAttribute(node, 'padCharacter'))
+			val = val.replace("'", "\\'")
+			string.padCharacter = eval("'''" + val + "'''")
+		
+		# type
+		
+		type = self._getAttribute(node, 'type')
+		if type == None or len(type) == 0:
+			string.type = 'char'
+		
+		elif not (type == 'char' or type == 'wchar' or type == 'utf8'):
+			raise PeachException("Unknown type of String")
+		
+		else:
+			string.type = type
+		
+		if type == 'wchar':
+			string.padCharacter = string.padCharacter * 2
+
+		# isStatic
+		
+		isStatic = self._getAttribute(node, 'isStatic')
+		if isStatic == None or len(isStatic) == 0:
+			string.isStatic = False
+		
+		elif isStatic.lower() == 'true':
+			string.isStatic = True
+			
+		elif isStatic.lower() == 'false':
+			string.isStatic = False
+		
+		else:
+			raise PeachException("Unknown isStatic of String")
+	
+
+		# nullTerminated (optional)
+		
+		nullTerminated = self._getAttribute(node, 'nullTerminated')
+		if nullTerminated == None or len(nullTerminated) == 0:
+			nullTerminated = 'false'
+		
+		if nullTerminated.lower() == 'true':
+			string.nullTerminated = True
+		elif nullTerminated.lower() == 'false':
+			string.nullTerminated = False
+		else:
+			raise PeachException("nullTerminated should be true or false")
+		
+		# length (bytes)
+		
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			string.lengthType = self._getAttribute(node, 'lengthType')
+			string.lengthCalc = self._getAttribute(node, 'length')
+			string.length = -1
+		
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length == None or len(length) == 0:
+				length = None
+			
+			try:
+				if length != None:
+					string.length = int(length)
+				else:
+					string.length = None
+			except:
+				raise PeachException("length must be a number or missing %s" % length)
+		
+		# minOccurs and maxOccurs
+		self._HandleOccurs(node, string)
+		
+		# Handle any common children
+		
+		self.HandleCommonTemplate(node, string)
+		
+		if parent.ref == None and parent.has_key(string.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, string.name))
+
+		parent.append(string)
+		return string	
+		
+	def HandleNumber(self, node, parent):
+	
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		number = Number(name, parent)
+		#number.node = node
+		
+		# value
+		
+		number.defaultValue = PeachStr(self.GetValueFromNodeNumber(node))
+		number.valueType = self._getValueType(node)
+		
+		if number.defaultValue != None:
+			try:
+				number.defaultValue = long(number.defaultValue)
+			except:
+				raise PeachException("Error: The default value for <Number> elements must be an integer.")
+		
+		# size (bits)
+		
+		size = self._getAttribute(node, 'size')
+		number.size = int(size)
+		
+		if not number.size in number._allowedSizes:
+			raise PeachException("invalid size")
+		
+		# endian (optional)
+		
+		number.endian = self._getAttribute(node, 'endian')
+		if number.endian == None or len(number.endian) == 0:
+			number.endian = 'little'
+		
+		if number.endian == 'network':
+			number.endian = 'big'
+		
+		if number.endian != 'little' and number.endian != 'big':
+			raise PeachException("invalid endian %s" % number.endian)
+	
+
+		# isStatic
+		
+		isStatic = self._getAttribute(node, 'isStatic')
+		if isStatic == None or len(isStatic) == 0:
+			number.isStatic = False
+		
+		elif isStatic.lower() == 'true':
+			number.isStatic = True
+			
+		elif isStatic.lower() == 'false':
+			number.isStatic = False
+		
+		else:
+			raise PeachException("Unknown isStatic of Number")
+		
+		# signed (optional)
+		
+		signed = self._getAttribute(node, 'signed')
+		if signed == None or len(signed) == 0:
+			signed = 'false'
+		
+		if signed.lower() == 'true':
+			number.signed = True
+		elif signed.lower() == 'false':
+			number.signed = False
+		else:
+			raise PeachException("signed must be true or false")
+		
+		# minOccurs and maxOccurs
+		self._HandleOccurs(node, number)
+		
+		# Handle any common children
+		
+		self.HandleCommonTemplate(node, number)
+		
+		if parent.ref == None and parent.has_key(number.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, number.name))
+
+		parent.append(number)
+		return number
+		
+		
+	def HandleFlags(self, node, parent):
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		flags = dom.Flags(name, parent)
+		#flags.node = node
+		
+		# length (in bits)
+		
+		length = self._getAttribute(node, 'size')
+		flags.length = int(length)
+		if flags.length % 2 != 0:
+			raise PeachException("length must be multiple of 2")
+		
+		if flags.length not in [8, 16, 24, 32, 64]:
+			raise PeachException("Flags size must be one of 8, 16, 24, 32, or 64.")
+		
+		# endian
+		
+		if node.hasAttributeNS(None, 'endian'):
+			flags.endian = self._getAttribute(node, 'endian')
+			
+			if not ( flags.endian == 'little' or flags.endian == 'big' ):
+				raise PeachException("Invalid endian type on Flags element")
+		
+		else:
+			flags.endian = 'little'
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Flag':
+				self.HandleFlag(child, flags)
+			else:
+				raise PeachException(PeachStr("found unexpected node in Flags: %s" % child.nodeName))
+		
+		if parent.ref == None and parent.has_key(flags.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, flags.name))
+
+		parent.append(flags)
+		return flags
+	
+
+	def HandleFlag(self, node, parent):
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		flag = Flag(name, parent)
+		#flag.node = node
+		
+		# value
+		
+		flag.defaultValue = PeachStr(self.GetValueFromNode(node))
+		flag.valueType = self._getValueType(node)
+		
+		# position (in bits)
+		
+		position = self._getAttribute(node, 'position')
+		flag.position = int(position)
+		
+		# length (in bits)
+		
+		length = self._getAttribute(node, 'size')
+		flag.length = int(length)
+		
+		if flag.position > parent.length:
+			raise PeachException("Invalid position, parent not big enough")
+		
+		if flag.position + flag.length > parent.length:
+			raise PeachException("Invalid length, parent not big enough")
+		
+		
+		# Handle any common children
+		
+		self.HandleCommonTemplate(node, flag)
+		
+		if parent.ref == None and parent.has_key(flag.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, flag.name))
+
+		parent.append(flag)
+		return flag
+	
+
+	def HandleBlob(self, node, parent):
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		blob = Blob(name, parent)
+		#blob.node = node
+		
+		# value
+		
+		blob.defaultValue = PeachStr(self.GetValueFromNode(node))
+		blob.valueType = self._getValueType(node)
+		
+		#print "Value of blob: ", repr(blob.defaultValue)
+		
+		# Hex handled elsewere.
+		if blob.valueType == 'literal':
+			blob.defaultValue = PeachStr(eval(blob.defaultValue))
+		
+		# length (in bytes)
+		
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			blob.lengthType = self._getAttribute(node, 'lengthType')
+			blob.lengthCalc = self._getAttribute(node, 'length')
+			blob.length = -1
+		
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length != None and len(length) != 0:
+				blob.length = int(length)
+			else:
+				blob.length = None
+	
+		# isStatic
+		
+		isStatic = self._getAttribute(node, 'isStatic')
+		if isStatic == None or len(isStatic) == 0:
+			blob.isStatic = False
+		
+		elif isStatic.lower() == 'true':
+			blob.isStatic = True
+			
+		elif isStatic.lower() == 'false':
+			blob.isStatic = False
+		
+		else:
+			raise PeachException("Unknown isStatic of Blob")
+		
+		# padValue
+		
+		if node.hasAttributeNS(None, 'padValue'):
+			blob.padValue = self._getAttribute(node, 'padValue')
+		else:
+			blob.padValue = "\0"
+		
+		# minOccurs and maxOccurs
+		self._HandleOccurs(node, blob)
+		
+		# Handle any common children
+		
+		self.HandleCommonTemplate(node, blob)
+		
+		if parent.ref == None and parent.has_key(blob.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, blob.name))
+
+		parent.append(blob)
+		return blob
+
+
+	def HandleCustom(self, node, parent):
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		if node.hasAttributeNS(None, 'class'):
+			cls = self._getAttribute(node, 'class')
+		else:
+			cls = None
+
+		code = "PeachXml_%s(name, parent)" % cls
+		custom = eval(code, globals(), locals())
+		#custom.node = node
+
+		# value
+
+		custom.defaultValue = PeachStr(self.GetValueFromNode(node))
+		custom.valueType = self._getValueType(node)
+
+		# Hex handled elsewere.
+		if custom.valueType == 'literal':
+			custom.defaultValue = PeachStr(eval(custom.defaultValue))
+
+		# isStatic
+
+		isStatic = self._getAttribute(node, 'isStatic')
+		if isStatic == None or len(isStatic) == 0:
+			custom.isStatic = False
+
+		elif isStatic.lower() == 'true':
+			custom.isStatic = True
+
+		elif isStatic.lower() == 'false':
+			custom.isStatic = False
+
+		else:
+			raise PeachException("Unknown isStatic of Custom")
+
+		# minOccurs and maxOccurs
+		self._HandleOccurs(node, custom)
+
+		# Handle any common children
+
+		self.HandleCommonTemplate(node, custom)
+
+		# Custom parsing
+		custom.handleParsing(node)
+
+		# Done
+		if parent.ref == None and parent.has_key(custom.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, custom.name))
+
+		parent.append(custom)
+		return custom
+
+
+	def HandleSeek(self, node, parent):
+		'''
+		Parse a <Seek> element, part of a data model.
+		'''
+		
+		seek = Seek(None, parent)
+		#seek.node = node
+		
+		seek.expression = self._getAttribute(node, 'expression')
+		seek.position = self._getAttribute(node, 'position')
+		seek.relative = self._getAttribute(node, 'relative')
+		
+		if seek.relative != None:
+			seek.relative = int(seek.relative)
+		
+		if seek.position != None:
+			seek.position = int(seek.position)
+		
+		if seek.expression == None and seek.position == None and seek.relative == None:
+			raise PeachException("Error: <Seek> element must have an expression, position, or relative attribute.")
+		
+		parent.append(seek)
+		return seek
+
+
+	# Handlers for Data ###################################################
+
+	def HandleData(self, node, parent):
+		
+		data = None
+		
+		# name
+		
+		if not node.hasAttributeNS(None, 'name'):
+			raise PeachException(PeachStr('Error: Data element must have name attribute!'))
+		
+		name = self._getAttribute(node, 'name')
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			
+			if name == None or len(name) == 0:
+				name = Element.getUniqueName()
+			
+			# We have a base template
+			obj = self.GetDataRef( self._getAttribute(node, 'ref') )
+			
+			data = obj.copy(parent)
+			data.name = name
+			
+		else:
+			data = Data(name)
+		
+		data.elementType = 'data'
+		#data.node = node
+		
+		# fileName
+		
+		if node.hasAttributeNS(None, 'fileName'):
+			data.fileName = self._getAttribute(node, 'fileName')
+		
+		# expression
+		
+		if node.hasAttributeNS(None, 'expression'):
+			
+			if data.fileName != None:
+				raise PeachException("Data element cannot have both a fileName and expression attribute.")
+			
+			data.expression = self._getAttribute(node, 'expression')
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Field':
+				if data.fileName != None or data.expression != None:
+					raise PeachException("Data element cannot have a fileName or expression attribute along with Field child elements.")
+				
+				self.HandleField(child, data)
+			
+			else:
+				raise PeachException(PeachStr("found unexpected node in Data: %s" % child.nodeName))
+		
+		return data
+	
+
+	def HandleField(self, node, parent):
+		
+		# name
+		
+		if not node.hasAttributeNS(None, 'name'):
+			raise PeachException("No attribute name found on field element")
+		
+		name = self._getAttribute(node, 'name')
+		
+		# value
+		
+		if not node.hasAttributeNS(None, 'value'):
+			raise PeachException("No attribute value found on Field element")
+		
+		value = self._getAttribute(node, 'value')
+		
+		field = Field(name, value, parent)
+		field.value = PeachStr(self.GetValueFromNode(node))
+		field.valueType = self._getValueType(node)
+		parent.append(field)
+		#field.node = node
+		
+		return field
+
+	# Handlers for Agent ###################################################
+	
+	def HandleAgent(self, node, parent):
+		
+		# name
+		
+		name = None
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+			
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			if name == None or len(name) == 0:
+				name = Element.getUniqueName()
+			
+			obj = self.GetRef( self._getAttribute(node, 'ref') )
+			
+			agent = obj.copy(parent)
+			agent.name = name
+			agent.ref = self._getAttribute(node, 'ref')
+
+		else:
+			agent = Agent(name, parent)
+		
+		#agent.node = node
+		agent.description = self._getAttribute(node, 'description')
+		agent.location = self._getAttribute(node, 'location')
+		if agent.location == None or len(agent.location) == 0:
+			raise PeachException("Error: Agent definition must include location attribute.")
+		
+		agent.password = self._getAttribute(node, 'password')
+		if agent.password != None and len(agent.password) == 0:
+			agent.password = None
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Monitor':
+				agent.append(self.HandleMonitor(child, agent))
+			
+			elif child.nodeName == 'PythonPath':
+				p = self.HandlePythonPath(child, agent)
+				agent.append(p)
+				
+			elif child.nodeName == 'Import':
+				p = self.HandleImport(child, agent)
+				agent.append(p)
+				
+			else:
+				raise PeachException("Found unexpected child of Agent element")
+		
+		## A remote publisher might be in play
+		#if len(agent) < 1:
+		#	raise Exception("Agent must have at least one Monitor child.")
+		
+		return agent
+	
+	def HandleMonitor(self, node, parent):
+		'''
+		Handle Monitor element
+		'''
+		
+		name = None
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		
+		monitor = Monitor(name, parent)
+		
+		# class
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Monitor element missing class attribute")
+		
+		monitor.classStr = self._getAttribute(node, "class")
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if not child.nodeName == 'Param':
+				raise PeachException(PeachStr("Unexpected Monitor child node: %s" % child.nodeName))
+			
+			param = self.HandleParam(child, parent)
+			monitor.params[param.name] = param.defaultValue
+		
+		return monitor
+	
+	
+	# Handlers for Test ###################################################
+	
+	def HandleTest(self, node, parent):
+		
+		# name
+		
+		name = None
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			if name == None or len(name) == 0:
+				name = Element.getUniqueName()
+			
+			obj = self.GetRef( self._getAttribute(node, 'ref') , None, 'tests')
+			
+			test = obj.copy(parent)
+			test.name = name
+			test.ref = self._getAttribute(node, 'ref')
+			
+		else:
+			test = Test(name, parent)
+		
+		#test.node = node
+		if node.hasAttributeNS(None, 'description'):
+			test.description = self._getAttribute(node, 'description')
+		
+		test.mutators = None
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Data':
+				
+				#data = self.HandleData(child)
+				if child.hasAttributeNS(None, 'ref'):
+					data = self.GetRef( self._getAttribute(child, 'ref') , None, 'data')
+					
+				if data == None:
+					raise PeachException(PeachStr("Unable to locate data %s specified in Test element %s" % (templateName, name)))
+				
+				test.data = data
+				test.append(data)
+			
+			elif child.nodeName == 'Publisher':
+				test.publisher = self.HandlePublisher(child, test)
+				test.append(test.publisher.domPublisher)
+			
+			elif child.nodeName == 'Agent':
+				if child.hasAttributeNS(None, 'ref'):
+					agent = self.GetRef( self._getAttribute(child, 'ref') , None, 'agents')
+					
+				if agent == None:
+					raise PeachException(PeachStr("Unable to locate agent %s specified in Test element %s" % (self._getAttribute(child, 'ref'), name)))
+				
+				test.append(agent.copy(test))
+			
+			elif child.nodeName == 'StateMachine' or child.nodeName == 'StateModel':
+				if not child.hasAttributeNS(None, 'ref'):
+					raise PeachException("StateMachine element in Test declaration must have a ref attribute.")
+				
+				stateMachine = self.GetRef( self._getAttribute(child, 'ref'), None, 'children')
+				if stateMachine == None:
+					raise PeachException("Unable to locate StateMachine [%s] specified in Test [%s]" % (str(self._getAttribute(child, 'ref')), name))
+				
+				#print "*** StateMachine: ", stateMachine
+				test.stateMachine = stateMachine.copy(test)
+				test.append(test.stateMachine)
+				
+				path = None
+				for child2 in child.childNodes:
+					if child2.nodeName == 'Path':
+						path = self.HandlePath(child2, test.stateMachine)
+						test.stateMachine.append(path)
+						
+					elif child2.nodeName == 'Stop':
+						if path == None:
+							raise PeachException("Stop element must be used after a Path element.")
+						
+						path.stop = True
+						# Do not accept anything after Stop element ;)
+						break
+					
+					elif child2.nodeName == 'Strategy':
+						strategy = self.HandleStrategy(child2, test.stateMachine)
+						test.stateMachine.append(strategy)
+					
+					else:
+						raise PeachException("Unexpected node %s" % child2.nodeName)
+						
+			elif child.nodeName == 'Mutator':
+				
+				if not child.hasAttributeNS(None, 'class'):
+					raise PeachException("Mutator element does not have required class attribute")
+				
+				className = "PeachXml_" + self._getAttribute(child, 'class') + "(self.context)"
+				
+				mutator = Mutator(self._getAttribute(child, 'class'), test)
+				mutator.mutator = eval(className, globals(), locals())
+				
+				if not test.mutators:
+					test.mutators = Mutators(None, test)
+				
+				mutator.parent = test.mutators
+				test.mutators.append(mutator)
+				
+			elif child.nodeName == 'Include' or child.nodeName == 'Exclude':				
+				self._HandleIncludeExclude(child, test)
+					
+			else:
+				raise PeachException("Found unexpected child of Test element")
+		
+		if test.mutators == None:
+			# Add the default mutators instead of erroring out
+			test.mutators = self._locateDefaultMutators()
+		
+		if test.template == None and test.stateMachine == None:
+			raise PeachException(PeachStr("Test %s does not have a Template or StateMachine defined" % name))
+		
+		if test.publisher == None:
+			raise PeachException(PeachStr("Test %s does not have a publisher defined!" % name))
+		
+		if test.template != None and test.stateMachine != None:
+			raise PeachException(PeachStr("Test %s has both a Template and StateMachine defined.  Only one of them can be defined at a time." % name))
+		
+		# Now mark Mutatable(being fuzzed) elements
+		# instructing on inclusions/exlusions
+		test.markMutatableElements(node)
+		
+		return test
+	
+	def HandlePath(self, node, parent):
+		if not node.hasAttributeNS(None, 'ref'):
+			raise PeachException("Parser: Test::StateModel::Path missing ref attribute")
+
+		stateMachine = parent
+		ref = self._getAttribute(node, 'ref')
+		state = self.GetRef(ref, stateMachine, None)
+		
+		path = Path(ref, parent)
+		
+		for child in node.childNodes:
+			if child.nodeName == 'Include' or child.nodeName == 'Exclude':				
+				self._HandleIncludeExclude(child, state)
+			
+			elif child.nodeName == 'Data':
+			# Handle Data elements at Test-level
+				data = self.HandleData(child, path)
+				#data.node = child
+				
+				actions = [child for child in state if child.elementType=='action']
+				for action in actions:
+					action.template.setDefaults(data, self.dontCrack)
+				
+			elif child.nodeName not in ['Mutator']:
+				raise PeachException("Found unexpected child of Path element")
+					
+		
+		return path
+	
+	def _HandleIncludeExclude(self, node, parent):
+		ref = None
+		
+		isExclude = node.nodeName != 'Exclude'
+		
+		if node.hasAttributeNS(None, 'ref') and node.hasAttributeNS(None, 'xpath'):
+			raise PeachException("Include/Exclude node can only have one of either ref or xpath attributes.")
+		
+		xpath = None
+		if node.hasAttributeNS(None, 'xpath'):
+			xpath = self._getAttribute(node, 'xpath')
+		else:
+			ref = None;
+			if node.hasAttributeNS(None, 'ref'):
+				ref = self._getAttribute(node, 'ref').replace('.','/')
+				
+			xpath = self._retrieveXPath(ref, node.parentNode)
+		
+		test = self._getTest(parent)
+		test.mutatables.append([isExclude, xpath])
+			
+	def _getTest(self, element):
+		if element == None:
+			return None
+		
+		if element.elementType == 'test':
+			return element
+		
+		return self._getTest(element.parent)
+		
+	def _retrieveXPath(self, xpath, node):
+		if node.nodeName == 'Test':
+			if xpath == None:
+				return "//*"
+			else:
+				return "//%s" % xpath
+		
+		if not node.hasAttributeNS(None, 'ref'):
+			raise PeachException("All upper elements must have a ref attribute. Cannot retrieve relative XPath.")
+					
+		ref = self._getAttribute(node, 'ref')
+		
+		if xpath != None:
+			xpath = ref + "/" + xpath
+		else:
+			xpath = ref
+			
+		return self._retrieveXPath(xpath, node.parentNode)
+	
+	def HandleStrategy(self, node, parent):
+		# class
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Strategy element missing class attribute")
+		
+		classStr = self._getAttribute(node, "class")
+		strategy = Strategy(classStr, parent)
+		
+		# children
+		for child in node.childNodes:
+			if not child.nodeName == 'Param':
+				raise PeachException(PeachStr("Unexpected Transformer child node: %s" % child.nodeName))
+			
+			param = self.HandleParam(child, parent)
+			strategy.params[param.name] = eval(param.defaultValue)
+		
+		return strategy
+
+	def _locateDefaultMutators(self, obj = None):
+		'''
+		Look for a default set of mutators.  We will follow this
+		search pattern:
+		
+		1. Look at our self (context) level
+		2. Look at our imported namespaces
+		3. Recerse into namespaces (sub namespaces, etc)
+		
+		This means a <Mutators> element in the top level XML file will
+		get precidence over the defaults.xml file which is included into
+		a namepsace.
+		'''
+		
+		if obj == None:
+			obj = self.context
+		
+		# First look at us
+		if obj.mutators != None:
+			return obj.mutators
+		
+		# Now look at namespaces
+		for n in obj:
+			if n.elementType == 'namespace':
+				if n.ns.mutators != None:
+					return n.ns.mutators
+		
+		# Now look inside namespace
+		for n in obj:
+			if n.elementType == 'namespace':
+				m = self._locateDefaultMutators(n.ns)
+				if m != None:
+					return m
+		
+		# YUCK
+		raise PeachException("Could not locate default set of Mutators to use.  Please fix this!")
+	
+	
+	def HandleRun(self, node, parent):
+				
+		# name
+		
+		name = None
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+			
+		run = Run(name, parent)
+		#run.node = node
+		run.description = self._getAttribute(node, 'description')
+		
+		if node.hasAttributeNS(None, 'waitTime'):
+			run.waitTime = float(self._getAttribute(node, 'waitTime'))
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Test':
+				
+				#test = self.HandleTest(child, self)
+				if child.hasAttributeNS(None, 'ref'):
+					test = self.GetRef( self._getAttribute(child, 'ref') , None, 'tests')
+				
+				if test == None:
+					raise PeachException(PeachStr("Unable to locate tests %s specified in Run element %s" % (testsName, name)))
+				
+				test = test.copy(run)
+				run.tests.append(test)
+				run.append(test)
+				
+			elif child.nodeName == 'Logger':
+				logger = self.HandleLogger(child, run)
+				#logger.node = child
+				run.append(logger)
+				
+			else:
+				raise PeachException("Found unexpected child of Run element")
+		
+		if len(run.tests) == 0:
+			raise PeachException(PeachStr("Run %s does not have any tests defined!" % name))
+		
+		return run
+	
+	
+	def HandlePublisher(self, node, parent):
+		
+		params = []
+		
+		publisher = Publisher()
+		
+		# class
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Publisher element missing class attribute")
+		
+		publisher.classStr = publisherClass = self._getAttribute(node, "class")
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if not child.hasAttributeNS(None, "name"):
+				raise PeachException("Publisher element missing name attribute")
+			
+			if not child.hasAttributeNS(None, "value"):
+				raise PeachException("Publisher element missing value attribute")
+			
+			if not child.hasAttributeNS(None, "valueType"):
+				valueType = "string"
+			else:
+				valueType = self._getAttribute(child, "valueType")
+			
+			name = self._getAttribute(child, "name")
+			value = self._getAttribute(child, "value")
+			
+			param = Param(publisher)
+			param.name = name
+			param.defaultValue = PeachStr(value)
+			param.valueType = valueType
+			
+			if valueType == 'string':
+				# create a literal out of a string value
+				value = "'''" + value + "'''"
+			elif valueType == 'hex':
+				
+				ret = ''
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += '\\x' + match.group(2)
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
+				
+				value = "'" + ret + "'"
+			
+			publisher.append(param)
+			params.append([name, value])
+		
+		code = "PeachXml_"+publisherClass + '('
+		
+		isFirst = True
+		for param in params:
+			if not isFirst:
+				code += ', '
+			else:
+				isFirst = False
+			
+			code += PeachStr(param[1])
+		
+		code += ')'
+		
+		pub = eval(code, globals(), locals())
+		pub.domPublisher = publisher
+		return pub
+	
+
+	def HandleLogger(self, node, parent):
+		
+		params = {}
+		logger = Logger(parent)
+		#logger.node = node
+		
+		# class
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Logger element missing class attribute")
+		
+		logger.classStr = self._getAttribute(node, "class")
+		
+		# children
+		
+		for child in node.childNodes:
+			
+			if not child.hasAttributeNS(None, "name"):
+				raise PeachException("Logger element missing name attribute")
+			
+			if not child.hasAttributeNS(None, "value"):
+				raise PeachException("Logger element missing value attribute")
+			
+			if not child.hasAttributeNS(None, "valueType"):
+				valueType = "string"
+			else:
+				valueType = self._getAttribute(child, "valueType")
+			
+			name = self._getAttribute(child, "name")
+			value = self._getAttribute(child, "value")
+			
+			param = Param(logger)
+			param.name = name
+			param.defaultValue = PeachStr(value)
+			param.valueType = valueType
+			
+			if valueType == 'string':
+				# create a literal out of a string value
+				value = "'''" + value + "'''"
+			elif valueType == 'hex':
+				
+				ret = ''
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += '\\x' + match.group(2)
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
+				
+				value = "'" + ret + "'"
+			
+			#print "LoggeR: Adding %s:%s" % (PeachStr(name),PeachStr(value))
+			logger.append(param)
+			params[PeachStr(name)] = PeachStr(value)
+		
+		code = "PeachXml_"+ logger.classStr + '(params)'
+		pub = eval(code)
+		pub.domLogger = logger
+		return pub
+	
+	
+	def HandleStateMachine(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "name"):
+			raise PeachException("Parser: StateMachine missing name attribute")
+		
+		if not node.hasAttributeNS(None, 'initialState'):
+			raise PeachException("Parser: StateMachine missing initialState attribute")
+		
+		stateMachine = StateMachine(self._getAttribute(node, "name"), parent)
+		stateMachine.initialState = self._getAttribute(node, 'initialState')
+		stateMachine.onLoad = self._getAttribute(node, 'onLoad')
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'State':
+				state = self.HandleState(child, stateMachine)
+				stateMachine.append(state)
+			
+			else:
+				raise PeachException("Parser: StateMachine has unknown child [%s]" % PeachStr(child.nodeName))
+		
+		return stateMachine
+	
+	def HandleState(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "name"):
+			raise PeachException("Parser: State missing name attribute")
+		
+		state = State(self._getAttribute(node, 'name'), parent)
+		state.onEnter = self._getAttribute(node, 'onEnter')
+		state.onExit = self._getAttribute(node, 'onExit')
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Action':
+				action = self.HandleAction(child, state)
+				state.append(action)
+			elif child.nodeName == 'Choice': 
+				choice = self.HandleStateChoice(child, state)
+				state.append(choice)
+		
+			else:
+				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
+		
+		return state
+	
+	def HandleStateChoice(self, node, parent):
+		choice = StateChoice(parent)
+	
+		for child in node.childNodes:
+			choice.append(self.HandleStateChoiceAction(child, node))
+		
+		return choice
+	
+	def HandleStateChoiceAction(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "ref"):
+			raise PeachException("Parser: State::Choice::Action missing ref attribute")
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Parser: State::Choice::Action missing type attribute")
+		
+		ref = self._getAttribute(node, "ref")
+		type = self._getAttribute(node, "type")
+		
+		return StateChoiceAction(ref, type, parent)
+		  	
+	def HandleAction(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Parser: Action missing 'type' attribute")
+		
+		action = Action(self._getAttribute(node, 'name'), parent)
+		action.type = self._getAttribute(node, 'type')
+		
+		if not action.type in [ 'input', 'output', 'call', 'setprop', 'getprop', 'changeState',
+								'slurp', 'connect', 'close', 'accept', 'start', 'stop', 'wait', 'open' ]:
+			raise PeachException("Parser: Action type attribute is not valid [%s]." % action.type)
+		
+		action.onStart = self._getAttribute(node, 'onStart')
+		action.onComplete = self._getAttribute(node, 'onComplete')
+		action.when = self._getAttribute(node, 'when')
+		action.ref = self._getAttribute(node, 'ref')
+		action.setXpath = self._getAttribute(node, 'setXpath')
+		action.valueXpath = self._getAttribute(node, 'valueXpath')
+		action.valueLiteral = self._getAttribute(node, 'value')
+		action.method = self._getAttribute(node, 'method')
+		action.property = self._getAttribute(node, 'property')
+		
+		# Quick hack to get open support.  open and connect are same.
+		if action.type == 'open':
+			action.type = 'connect'
+		
+		if (action.setXpath or action.valueXpath or action.valueLiteral) and (action.type != 'slurp' and action.type != 'wait'):
+			raise PeachException("Parser: Invalid attribute for Action were type != 'slurp'")
+		
+		if action.method != None and action.type != 'call':
+			raise PeachException("Parser: Method attribute on an Action only available when type is 'call'.")
+		
+		if action.property != None and not action.type in ['setprop', 'getprop']:
+			raise PeachException("Parser: Property attribute on an Action only available when type is 'setprop' or 'getprop'.")
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Param':
+				if not action.type in ['call', 'setprop', 'getprop' ]:
+					raise PeachException("Parser: Param is an invalid child of Action for this Action type")
+				
+				param = self.HandleActionParam(child, action)
+				action.append(param)
+			
+			elif child.nodeName == 'Template' or child.nodeName == 'DataModel':
+				
+				if action.type not in ['input', 'output', 'getprop']:
+					raise PeachException("Parser: DataModel is an invalid child of Action for this Action type")
+				
+				if not child.hasAttributeNS(None, 'ref'):
+					raise PeachException("Parser: When DataModel is a child of Action it must have the ref attribute.")
+				
+				obj = self.HandleTemplate(child, action)
+				action.template = obj
+				action.append(obj)
+			
+			elif child.nodeName == 'Data':
+				
+				if not (action.type == 'input' or action.type == 'output'):
+					raise PeachException("Parser: Data is an invalid child of Action for this Action type")
+				
+				data = self.HandleData(child, action)
+				action.data = data
+				
+			else:
+				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
+		
+		if action.template != None and action.data != None:
+			action.template.setDefaults(action.data, self.dontCrack)
+		
+		# Verify action has a DataModel if needed
+		if action.type in ['input', 'output']:
+			if action.template == None:
+				raise PeachException("Parser: Action [%s] of type [%s] must have a DataModel child element." % (action.name, action.type))
+		
+		# Verify that setprop has a parameter
+		if action.type == 'setprop':
+			foundActionParam = False
+			for c in action:
+				if isinstance(c, ActionParam):
+					foundActionParam = True
+			
+			if not foundActionParam:
+				raise PeachException("Parser: Action [%s] of type [%s] must have a Param child element." % (action.name, action.type))
+		
+		return action
+	
+	def HandleActionParam(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Parser: ActionParam missing required type attribute")
+		
+		param = ActionParam(self._getAttribute(node, 'name'), parent)
+		param.type = self._getAttribute(node, 'type')
+		
+		if not param.type in [ 'in', 'out', 'inout', 'return' ]:
+			raise PeachException("Parser: ActionParam type attribute is not valid [%s].  Must be one of: in, out, or inout" % param.type)
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Template' or child.nodeName == 'DataModel':
+				
+				if not child.hasAttributeNS(None, 'ref'):
+					raise PeachException("Parser: When Template is a child of ActionParam it must have the ref attribute.")
+				
+				obj = self.HandleTemplate(child, param)
+				param.template = obj
+				param.append(obj)
+			
+			elif child.nodeName == 'Data':
+				
+				if not (param.type == 'in' or param.type == 'inout'):
+					raise PeachException("Parser: Data is an invalid child of ActionParam for this type [%s]" % param.type)
+				
+				data = self.HandleData(child, param)
+				data.parent = param
+				param.data = data
+				
+			else:
+				raise PeachException("Parser: ActionParam has unknown child [%s]" % PeachStr(child.nodeName))
+		
+		if param.template != None and param.data != None:
+			param.template.setDefaults(param.data, self.dontCrack)
+		
+		# Verify param has data model
+		if param.template == None:
+			raise PeachException("Parser: Action Param must have DataModel as child element.")
+		
+		return param
+	
+	def _HandleValueType(self, value, valueType):
+		'''
+		Handle types: string, literal, and hex
+		'''
+		
+		if not value or not valueType:
+			return None
+		
+		#print "_HandleValueType"
+		#if valueType == 'string':
+		#	value = re.sub(r"([^\\])\\n", r"\1\n", value)
+		#	value = re.sub(r"([^\\])\\r", r"\1\n", value)
+		#	value = re.sub(r"([^\\])\\t", r"\1\n", value)
+		#	value = re.sub(r"([^\\])\\\\", r"\1\\", value)
+		#	value = re.sub(r"^\\n", r"\n", value)
+		#	value = re.sub(r"^\\r", r"\n", value)
+		#	value = re.sub(r"^\\t", r"\n", value)
+		#	value = re.sub(r"^\\\\", r"\\", value)
+		#	#value = value.replace('\\n', '\n')
+		#	#value = value.replace('\\r', '\r')
+			
+		#if valueType == 'hex':
+		#	#print "_HandleValueType: Converting from hex"
+		#	ret = ''
+		#	
+		#	print "VALUE: [%s]" % value
+		#	
+		#	for i in range(len(self._regsHex)):
+		#		match = self._regsHex[i].search(value)
+		#		if match != None:
+		#			while match != None:
+		#				ret += '\\x' + match.group(2)
+		#				value = self._regsHex[i].sub('', value)
+		#				match = self._regsHex[i].search(value)
+		#			break
+		#	
+		#	print "Eval String: [%s]" % ret
+		#	return PeachStr(eval("'" + ret + "'"))
+		#
+		if valueType == 'literal':
+			#print "_HandleValueType: Converting from literal"
+			return PeachStr(eval(value))
+		
+		#print "_HandleValueType: No conversion: %s" % valueType
+		return PeachStr(value)
+		
+	
+	def HandleParam(self, node, parent):
+		param = Param(parent)
+		
+		if not node.hasAttributeNS(None, "name"):
+			raise PeachException("Parser: Param element missing name attribute.  Parent is [%s]" % node.parentNode.nodeName)
+		
+		if not node.hasAttributeNS(None, "value"):
+			raise PeachException("Parser: Param element missing value attribute")
+		
+		if not node.hasAttributeNS(None, "valueType"):
+			valueType = "string"
+		else:
+			valueType = self._getAttribute(node, "valueType")
+		
+		name = self._getAttribute(node, "name")
+		value = self._getAttribute(node, "value")
+		
+		if valueType == 'string':
+			# create a literal out of a string value
+			value = "'''" + value + "'''"
+		
+		elif valueType == 'hex':
+			
+			ret = ''
+			
+			for i in range(len(self._regsHex)):
+				match = self._regsHex[i].search(value)
+				if match != None:
+					while match != None:
+						ret += '\\x' + match.group(2)
+						value = self._regsHex[i].sub('', value)
+						match = self._regsHex[i].search(value)
+					break
+			
+			value = "'" + ret + "'"
+		
+		param.name = name
+		param.defaultValue = PeachStr(value)
+		param.valueType = valueType
+		
+		return param
+	
+	def HandlePythonPath(self, node, parent):
+		if not node.hasAttributeNS(None, 'path'):
+			raise PeachException("PythonPath element did not have a path attribute!")
+		
+		p = PythonPath()
+		p.name = self._getAttribute(node, 'path')
+		
+		return p
+	
+	def HandleImport(self, node, parent):
+		# Import module
+		
+		if not node.hasAttributeNS(None, 'import'):
+			raise PeachException("HandleImport: Import element did not have import attribute!")
+		
+		i = Element()
+		i.elementType = 'import'
+		i.importStr = self._getAttribute(node, 'import')
+		if node.hasAttributeNS(None, 'from'):
+			i.fromStr = self._getAttribute(node, 'from')
+		else:
+			i.fromStr = None
+		
+		return i
+	
+	def HandleHint(self, node, parent):
+		
+		if not node.hasAttributeNS(None, 'name') or not node.hasAttributeNS(None, 'value'):
+			raise PeachException("Error: Found Hint element that didn't have both name and value attributes.")
+		
+		hint = Hint(self._getAttribute(node, 'name'), parent)
+		hint.value = self._getAttribute(node, 'value')
+		parent.append(hint)
+		
+		return hint
+
+# ###########################################################################
+
+# end

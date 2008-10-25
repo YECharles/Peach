@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Peach.logger</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        Module&nbsp;logger
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="Peach.logger-module.html">Module Peach.logger</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">Peach Logging System</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">This is the Peach logging sub-system.  To implement a new logging method</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">extend from Logger.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">@author: Michael Eddington</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">@version: $Id: logger.py 1266 2008-10-12 22:06:00Z meddingt $</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Copyright (c) 2007-2008 Michael Eddington</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># Permission is hereby granted, free of charge, to any person obtaining a copy </tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># of this software and associated documentation files (the "Software"), to deal</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># in the Software without restriction, including without limitation the rights </tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell </tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># copies of the Software, and to permit persons to whom the Software is </tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># furnished to do so, subject to the following conditions:</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># The above copyright notice and this permission notice shall be included in    </tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># all copies or substantial portions of the Software.</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR </tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, </tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE </tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER </tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment"># SOFTWARE.</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-comment"># Authors:</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-comment"></tt><tt class="py-comment">#   Michael Eddington (mike@phed.org)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-comment"># $Id: logger.py 1266 2008-10-12 22:06:00Z meddingt $</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package Peach.Engine=Peach.Engine-module.html,Class Peach.Engine.engine.Engine=Peach.Engine.engine.Engine-class.html"><a title="Peach.Engine
+Peach.Engine.engine.Engine" class="py-name" href="#" onclick="return doclink('link-0', 'Engine', 'link-0');">Engine</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Module Peach.Engine.engine=Peach.Engine.engine-module.html"><a title="Peach.Engine.engine" class="py-name" href="#" onclick="return doclink('link-1', 'engine', 'link-1');">engine</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class Peach.Engine.engine.EngineWatcher=Peach.Engine.engine.EngineWatcher-class.html"><a title="Peach.Engine.engine.EngineWatcher" class="py-name" href="#" onclick="return doclink('link-2', 'EngineWatcher', 'link-2');">EngineWatcher</a></tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"> </tt>
+<a name="Logger"></a><div id="Logger-def"><a name="L40"></a><tt class="py-lineno"> 40</tt> <a class="py-toggle" href="#" id="Logger-toggle" onclick="return toggle('Logger');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html">Logger</a><tt class="py-op">(</tt><tt class="py-base-class">EngineWatcher</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Logger-expanded"><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">        Parent class for all logger implementations.</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnRunStarting"></a><div id="Logger.OnRunStarting-def"><a name="L45"></a><tt class="py-lineno"> 45</tt> <a class="py-toggle" href="#" id="Logger.OnRunStarting-toggle" onclick="return toggle('Logger.OnRunStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnRunStarting">OnRunStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnRunStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnRunStarting-expanded"><a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"><tt class="py-docstring">                Called when a run is starting.</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnRunFinished"></a><div id="Logger.OnRunFinished-def"><a name="L51"></a><tt class="py-lineno"> 51</tt> <a class="py-toggle" href="#" id="Logger.OnRunFinished-toggle" onclick="return toggle('Logger.OnRunFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnRunFinished">OnRunFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnRunFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnRunFinished-expanded"><a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">                Called when a run is finished.</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnTestStarting"></a><div id="Logger.OnTestStarting-def"><a name="L57"></a><tt class="py-lineno"> 57</tt> <a class="py-toggle" href="#" id="Logger.OnTestStarting-toggle" onclick="return toggle('Logger.OnTestStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestStarting">OnTestStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">totalVariations</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestStarting-expanded"><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">                Called on start of a test.  Each test has multiple variations.</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnTestFinished"></a><div id="Logger.OnTestFinished-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="Logger.OnTestFinished-toggle" onclick="return toggle('Logger.OnTestFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestFinished">OnTestFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestFinished-expanded"><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">                Called on completion of a test.</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"> </tt>
+<a name="Logger.OnTestCaseStarting"></a><div id="Logger.OnTestCaseStarting-def"><a name="L69"></a><tt class="py-lineno"> 69</tt> <a class="py-toggle" href="#" id="Logger.OnTestCaseStarting-toggle" onclick="return toggle('Logger.OnTestCaseStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestCaseStarting">OnTestCaseStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestCaseStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestCaseStarting-expanded"><a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"><tt class="py-docstring">                Called on start of a test case.</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnTestCaseReceived"></a><div id="Logger.OnTestCaseReceived-def"><a name="L75"></a><tt class="py-lineno"> 75</tt> <a class="py-toggle" href="#" id="Logger.OnTestCaseReceived-toggle" onclick="return toggle('Logger.OnTestCaseReceived');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestCaseReceived">OnTestCaseReceived</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestCaseReceived-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestCaseReceived-expanded"><a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"><tt class="py-docstring">                Called when data is received from test case.</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnTestCaseException"></a><div id="Logger.OnTestCaseException-def"><a name="L81"></a><tt class="py-lineno"> 81</tt> <a class="py-toggle" href="#" id="Logger.OnTestCaseException-toggle" onclick="return toggle('Logger.OnTestCaseException');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestCaseException">OnTestCaseException</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">exception</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestCaseException-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestCaseException-expanded"><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">                Called when an exception occurs during a test case.</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnTestCaseFinished"></a><div id="Logger.OnTestCaseFinished-def"><a name="L87"></a><tt class="py-lineno"> 87</tt> <a class="py-toggle" href="#" id="Logger.OnTestCaseFinished-toggle" onclick="return toggle('Logger.OnTestCaseFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnTestCaseFinished">OnTestCaseFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">actionValues</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnTestCaseFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnTestCaseFinished-expanded"><a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-docstring">                Called when a test case has completed.</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnFault"></a><div id="Logger.OnFault-def"><a name="L93"></a><tt class="py-lineno"> 93</tt> <a class="py-toggle" href="#" id="Logger.OnFault-toggle" onclick="return toggle('Logger.OnFault');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnFault">OnFault</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">monitorData</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnFault-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnFault-expanded"><a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">         </tt>
+<a name="Logger.OnStopRun"></a><div id="Logger.OnStopRun-def"><a name="L96"></a><tt class="py-lineno"> 96</tt> <a class="py-toggle" href="#" id="Logger.OnStopRun-toggle" onclick="return toggle('Logger.OnStopRun');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Logger-class.html#OnStopRun">OnStopRun</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">monitorData</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger.OnStopRun-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger.OnStopRun-expanded"><a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">os</tt><tt class="py-op">,</tt><tt class="py-name">uuid</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">time</tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"> </tt>
+<a name="Filesystem"></a><div id="Filesystem-def"><a name="L102"></a><tt class="py-lineno">102</tt> <a class="py-toggle" href="#" id="Filesystem-toggle" onclick="return toggle('Filesystem');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html">Filesystem</a><tt class="py-op">(</tt><tt class="py-base-class">Logger</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Filesystem-expanded"><a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">        A file system logger.</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.__init__"></a><div id="Filesystem.__init__-def"><a name="L107"></a><tt class="py-lineno">107</tt> <a class="py-toggle" href="#" id="Filesystem.__init__-toggle" onclick="return toggle('Filesystem.__init__');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">params</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.__init__-expanded"><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">=</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">uuid</tt><tt class="py-op">.</tt><tt class="py-name">uuid1</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Variable Peach.mutator.Mutator.elementType=Peach.mutator.Mutator-class.html#elementType"><a title="Peach.mutator.Mutator.elementType" class="py-name" href="#" onclick="return doclink('link-3', 'elementType', 'link-3');">elementType</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'logger'</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">params</tt> <tt class="py-op">=</tt> <tt class="py-name">params</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">heartBeat</tt> <tt class="py-op">=</tt> <tt class="py-number">512</tt> </tt>
+</div><a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem._writeMsg"></a><div id="Filesystem._writeMsg-def"><a name="L113"></a><tt class="py-lineno">113</tt> <a class="py-toggle" href="#" id="Filesystem._writeMsg-toggle" onclick="return toggle('Filesystem._writeMsg');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#_writeMsg">_writeMsg</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">line</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem._writeMsg-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem._writeMsg-expanded"><a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Module Peach.Publishers.file=Peach.Publishers.file-module.html"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-4', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method Peach.Engine.common.StreamBuffer.write()=Peach.Engine.common.StreamBuffer-class.html#write"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-5', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-name">asctime</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">": "</tt> <tt class="py-op">+</tt> <tt class="py-name">line</tt> <tt class="py-op">+</tt> <tt class="py-string">"\n"</tt><tt class="py-op">)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-6', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt class="py-name">flush</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                 </tt>
+<a name="Filesystem.OnRunStarting"></a><div id="Filesystem.OnRunStarting-def"><a name="L117"></a><tt class="py-lineno">117</tt> <a class="py-toggle" href="#" id="Filesystem.OnRunStarting-toggle" onclick="return toggle('Filesystem.OnRunStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnRunStarting">OnRunStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnRunStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnRunStarting-expanded"><a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">                <tt class="py-name">suppliedPath</tt> <tt class="py-op">=</tt> <tt class="py-name">eval</tt><tt class="py-op">(</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">params</tt><tt class="py-op">[</tt><tt class="py-string">'path'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                 </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Module Peach.Engine.path=Peach.Engine.path-module.html,Module Peach.Mutators.path=Peach.Mutators.path-module.html"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-7', 'path', 'link-7');">path</a></tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-8', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">suppliedPath</tt><tt class="py-op">,</tt> <tt id="link-9" class="py-name" targets="Method Peach.Agent.debugger.WindowsDebugEngineThread.run()=Peach.Agent.debugger.WindowsDebugEngineThread-class.html#run,Method Peach.Agent.debugger.WindowsDebuggerThread.run()=Peach.Agent.debugger.WindowsDebuggerThread-class.html#run,Method Peach.Agent.debugger._GdbThread.run()=Peach.Agent.debugger._GdbThread-class.html#run,Method Peach.Agent.gui._WindowWatcher.run()=Peach.Agent.gui._WindowWatcher-class.html#run,Method Peach.Agent.network.PcapThread.run()=Peach.Agent.network.PcapThread-class.html#run,Method Peach.Agent.socketmon.ReactorThread.run()=Peach.Agent.socketmon.ReactorThread-class.html#run,Method Peach.Engine.mitm.PitmStateEngine.run()=Peach.Engine.mitm.PitmStateEngine-class.html#run,Method Peach.Engine.state.StateEngine.run()=Peach.Engine.state.StateEngine-class.html#run,Method Peach.Engine.webwatcher.PeachWebWatcher.run()=Peach.Engine.webwatcher.PeachWebWatcher-class.html#run,Method Peach.mutator.MutatorCountCalculator.run()=Peach.mutator.MutatorCountCalculator-class.html#run"><a title="Peach.Agent.debugger.WindowsDebugEngineThread.run
+Peach.Agent.debugger.WindowsDebuggerThread.run
+Peach.Agent.debugger._GdbThread.run
+Peach.Agent.gui._WindowWatcher.run
+Peach.Agent.network.PcapThread.run
+Peach.Agent.socketmon.ReactorThread.run
+Peach.Engine.mitm.PitmStateEngine.run
+Peach.Engine.state.StateEngine.run
+Peach.Engine.webwatcher.PeachWebWatcher.run
+Peach.mutator.MutatorCountCalculator.run" class="py-name" href="#" onclick="return doclink('link-9', 'run', 'link-9');">run</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">+</tt> <tt class="py-string">"_"</tt> <tt class="py-op">+</tt> <tt class="py-name">strftime</tt><tt class="py-op">(</tt><tt class="py-string">"%Y_%b_%d_%H_%M_%S"</tt><tt class="py-op">,</tt> <tt class="py-name">gmtime</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">faultPath</tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-10', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-11', 'path', 'link-7');">path</a></tt><tt class="py-op">,</tt> <tt class="py-string">"Faults"</tt><tt class="py-op">)</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">                        <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method Peach.Publishers.file.FileWriter.mkdir()=Peach.Publishers.file.FileWriter-class.html#mkdir,Method Peach.Publishers.file.FileWriterLauncher.mkdir()=Peach.Publishers.file.FileWriterLauncher-class.html#mkdir,Method Peach.Publishers.file.FileWriterLauncherGui.mkdir()=Peach.Publishers.file.FileWriterLauncherGui-class.html#mkdir"><a title="Peach.Publishers.file.FileWriter.mkdir
+Peach.Publishers.file.FileWriterLauncher.mkdir
+Peach.Publishers.file.FileWriterLauncherGui.mkdir" class="py-name" href="#" onclick="return doclink('link-12', 'mkdir', 'link-12');">mkdir</a></tt><tt class="py-op">(</tt><tt class="py-name">suppliedPath</tt><tt class="py-op">)</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">                        <tt class="py-keyword">pass</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">                        <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="Peach.Publishers.file.FileWriter.mkdir
+Peach.Publishers.file.FileWriterLauncher.mkdir
+Peach.Publishers.file.FileWriterLauncherGui.mkdir" class="py-name" href="#" onclick="return doclink('link-13', 'mkdir', 'link-12');">mkdir</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-14', 'path', 'link-7');">path</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">                        <tt class="py-keyword">pass</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">                 </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-15', 'file', 'link-4');">file</a></tt> <tt class="py-op">=</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-16', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-17', 'path', 'link-7');">path</a></tt><tt class="py-op">,</tt><tt class="py-string">"status.txt"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-string">"w"</tt><tt class="py-op">)</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">                 </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-18', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-19', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-string">"Peach 2.0 Fuzzer Run\n"</tt><tt class="py-op">)</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-20', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-21', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-string">"====================\n\n"</tt><tt class="py-op">)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-22', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-23', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-string">"Date of run: "</tt> <tt class="py-op">+</tt> <tt class="py-name">asctime</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"\n"</tt><tt class="py-op">)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-24', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-25', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-string">"Run name: "</tt> <tt class="py-op">+</tt> <tt id="link-26" class="py-name"><a title="Peach.Agent.debugger.WindowsDebugEngineThread.run
+Peach.Agent.debugger.WindowsDebuggerThread.run
+Peach.Agent.debugger._GdbThread.run
+Peach.Agent.gui._WindowWatcher.run
+Peach.Agent.network.PcapThread.run
+Peach.Agent.socketmon.ReactorThread.run
+Peach.Engine.mitm.PitmStateEngine.run
+Peach.Engine.state.StateEngine.run
+Peach.Engine.webwatcher.PeachWebWatcher.run
+Peach.mutator.MutatorCountCalculator.run" class="py-name" href="#" onclick="return doclink('link-26', 'run', 'link-9');">run</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">+</tt> <tt class="py-string">"\n\n"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnRunFinished"></a><div id="Filesystem.OnRunFinished-def"><a name="L138"></a><tt class="py-lineno">138</tt> <a class="py-toggle" href="#" id="Filesystem.OnRunFinished-toggle" onclick="return toggle('Filesystem.OnRunFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnRunFinished">OnRunFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnRunFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnRunFinished-expanded"><a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-27', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-28', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-string">"\n\n== Run completed ==\n"</tt> <tt class="py-op">+</tt> <tt class="py-name">asctime</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"\n"</tt><tt class="py-op">)</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-29', 'file', 'link-4');">file</a></tt><tt class="py-op">.</tt><tt id="link-30" class="py-name" targets="Method Peach.Publishers.file.FilePerIteration.close()=Peach.Publishers.file.FilePerIteration-class.html#close,Method Peach.Publishers.file.FileReader.close()=Peach.Publishers.file.FileReader-class.html#close,Method Peach.Publishers.file.FileWriter.close()=Peach.Publishers.file.FileWriter-class.html#close,Method Peach.Publishers.file.FileWriterLauncher.close()=Peach.Publishers.file.FileWriterLauncher-class.html#close,Method Peach.Publishers.file.FileWriterLauncherGui.close()=Peach.Publishers.file.FileWriterLauncherGui-class.html#close,Method Peach.Publishers.http.HttpBasicAuth.close()=Peach.Publishers.http.HttpBasicAuth-class.html#close,Method Peach.Publishers.http.HttpDigestAuth.close()=Peach.Publishers.http.HttpDigestAuth-class.html#close,Method Peach.Publishers.icmp.Icmp.close()=Peach.Publishers.icmp.Icmp-class.html#close,Method Peach.Publishers.raw.Raw.close()=Peach.Publishers.raw.Raw-class.html#close,Method Peach.Publishers.remote.RemotePublisher.close()=Peach.Publishers.remote.RemotePublisher-class.html#close,Method Peach.Publishers.stdout.Null.close()=Peach.Publishers.stdout.Null-class.html#close,Method Peach.Publishers.stdout.Stdout.close()=Peach.Publishers.stdout.Stdout-class.html#close,Method Peach.Publishers.tcp.Tcp.close()=Peach.Publishers.tcp.Tcp-class.html#close,Method Peach.Publishers.tcp.TcpListener.close()=Peach.Publishers.tcp.TcpListener-class.html#close,Method Peach.Publishers.udp.Udp.close()=Peach.Publishers.udp.Udp-class.html#close,Method Peach.publisher.Publisher.close()=Peach.publisher.Publisher-class.html#close"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-30', 'close', 'link-30');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="Peach.Publishers.file" class="py-name" href="#" onclick="return doclink('link-31', 'file', 'link-4');">file</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+</div><a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnTestStarting"></a><div id="Filesystem.OnTestStarting-def"><a name="L143"></a><tt class="py-lineno">143</tt> <a class="py-toggle" href="#" id="Filesystem.OnTestStarting-toggle" onclick="return toggle('Filesystem.OnTestStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnTestStarting">OnTestStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">totalVariations</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnTestStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnTestStarting-expanded"><a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name" targets="Method Peach.logger.Filesystem._writeMsg()=Peach.logger.Filesystem-class.html#_writeMsg"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-32', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-33', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"Test starting: "</tt> <tt class="py-op">+</tt> <tt id="link-34" class="py-name" targets="Module Peach.Agent.test=Peach.Agent.test-module.html"><a title="Peach.Agent.test" class="py-name" href="#" onclick="return doclink('link-34', 'test', 'link-34');">test</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">                <tt class="py-comment">#self._writeMsg("Test has %d variations" % totalVariations)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"><tt class="py-comment"></tt>                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-35', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnTestFinished"></a><div id="Filesystem.OnTestFinished-def"><a name="L149"></a><tt class="py-lineno">149</tt> <a class="py-toggle" href="#" id="Filesystem.OnTestFinished-toggle" onclick="return toggle('Filesystem.OnTestFinished');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnTestFinished">OnTestFinished</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnTestFinished-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnTestFinished-expanded"><a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-36', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-37" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-37', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"Test completed: "</tt> <tt class="py-op">+</tt> <tt id="link-38" class="py-name"><a title="Peach.Agent.test" class="py-name" href="#" onclick="return doclink('link-38', 'test', 'link-34');">test</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-39" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-39', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnTestCaseException"></a><div id="Filesystem.OnTestCaseException-def"><a name="L154"></a><tt class="py-lineno">154</tt> <a class="py-toggle" href="#" id="Filesystem.OnTestCaseException-toggle" onclick="return toggle('Filesystem.OnTestCaseException');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnTestCaseException">OnTestCaseException</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">exception</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnTestCaseException-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnTestCaseException-expanded"><a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnFault"></a><div id="Filesystem.OnFault-def"><a name="L157"></a><tt class="py-lineno">157</tt> <a class="py-toggle" href="#" id="Filesystem.OnFault-toggle" onclick="return toggle('Filesystem.OnFault');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnFault">OnFault</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">monitorData</tt><tt class="py-op">,</tt> <tt class="py-param">actionValues</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnFault-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnFault-expanded"><a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-40', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"Fault was detected on test %d"</tt> <tt class="py-op">%</tt> <tt class="py-name">variationCount</tt><tt class="py-op">)</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">                 </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">                <tt id="link-41" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-41', 'path', 'link-7');">path</a></tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-42', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">faultPath</tt><tt class="py-op">,</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">variationCount</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">                        <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-43" class="py-name"><a title="Peach.Publishers.file.FileWriter.mkdir
+Peach.Publishers.file.FileWriterLauncher.mkdir
+Peach.Publishers.file.FileWriterLauncherGui.mkdir" class="py-name" href="#" onclick="return doclink('link-43', 'mkdir', 'link-12');">mkdir</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">faultPath</tt><tt class="py-op">)</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">                        <tt class="py-keyword">pass</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">                        <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-44" class="py-name"><a title="Peach.Publishers.file.FileWriter.mkdir
+Peach.Publishers.file.FileWriterLauncher.mkdir
+Peach.Publishers.file.FileWriterLauncherGui.mkdir" class="py-name" href="#" onclick="return doclink('link-44', 'mkdir', 'link-12');">mkdir</a></tt><tt class="py-op">(</tt><tt id="link-45" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-45', 'path', 'link-7');">path</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">                        <tt class="py-keyword">pass</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">                 </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">                <tt class="py-comment"># Expand actionValues</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-comment"></tt>                 </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">actionValues</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">                        <tt class="py-name">fileName</tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-46" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-46', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt id="link-47" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-47', 'path', 'link-7');">path</a></tt><tt class="py-op">,</tt> <tt class="py-string">"data_%d_%s_%s.txt"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">                         </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">                        <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">                                <tt class="py-name">fout</tt> <tt class="py-op">=</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">fileName</tt><tt class="py-op">,</tt> <tt class="py-string">"w+b"</tt><tt class="py-op">)</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">                                <tt class="py-name">fout</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-48', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">[</tt><tt class="py-number">2</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">                                 </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">                                <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">3</tt><tt class="py-op">:</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">                                        <tt class="py-name">fout</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-49', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-name">repr</tt><tt class="py-op">(</tt><tt class="py-name">actionValues</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">[</tt><tt class="py-number">3</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">                                 </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">                                <tt class="py-name">fout</tt><tt class="py-op">.</tt><tt id="link-50" class="py-name"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-50', 'close', 'link-30');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">                 </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt class="py-name">key</tt> <tt class="py-keyword">in</tt> <tt class="py-name">monitorData</tt><tt class="py-op">.</tt><tt class="py-name">keys</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">                        <tt class="py-name">fout</tt> <tt class="py-op">=</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-51', 'path', 'link-7');">path</a></tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt id="link-52" class="py-name"><a title="Peach.Engine.path
+Peach.Mutators.path" class="py-name" href="#" onclick="return doclink('link-52', 'path', 'link-7');">path</a></tt><tt class="py-op">,</tt><tt class="py-name">key</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-string">"wb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">                        <tt class="py-name">fout</tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="Peach.Engine.common.StreamBuffer.write" class="py-name" href="#" onclick="return doclink('link-53', 'write', 'link-5');">write</a></tt><tt class="py-op">(</tt><tt class="py-name">monitorData</tt><tt class="py-op">[</tt><tt class="py-name">key</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">                        <tt class="py-name">fout</tt><tt class="py-op">.</tt><tt id="link-54" class="py-name"><a title="Peach.Publishers.file.FilePerIteration.close
+Peach.Publishers.file.FileReader.close
+Peach.Publishers.file.FileWriter.close
+Peach.Publishers.file.FileWriterLauncher.close
+Peach.Publishers.file.FileWriterLauncherGui.close
+Peach.Publishers.http.HttpBasicAuth.close
+Peach.Publishers.http.HttpDigestAuth.close
+Peach.Publishers.icmp.Icmp.close
+Peach.Publishers.raw.Raw.close
+Peach.Publishers.remote.RemotePublisher.close
+Peach.Publishers.stdout.Null.close
+Peach.Publishers.stdout.Stdout.close
+Peach.Publishers.tcp.Tcp.close
+Peach.Publishers.tcp.TcpListener.close
+Peach.Publishers.udp.Udp.close
+Peach.publisher.Publisher.close" class="py-name" href="#" onclick="return doclink('link-54', 'close', 'link-30');">close</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">         </tt>
+<a name="Filesystem.OnStopRun"></a><div id="Filesystem.OnStopRun-def"><a name="L189"></a><tt class="py-lineno">189</tt> <a class="py-toggle" href="#" id="Filesystem.OnStopRun-toggle" onclick="return toggle('Filesystem.OnStopRun');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnStopRun">OnStopRun</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">,</tt> <tt class="py-param">monitorData</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnStopRun-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnStopRun-expanded"><a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-55', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-56', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"</tt><tt class="py-op">)</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-57" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-57', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"!!!! TEST ABORTING AT %d"</tt> <tt class="py-op">%</tt> <tt class="py-name">variationCount</tt><tt class="py-op">)</tt> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-58" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-58', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"</tt><tt class="py-op">)</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-59" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-59', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">""</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">                 </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">                 </tt>
+<a name="Filesystem.OnTestCaseStarting"></a><div id="Filesystem.OnTestCaseStarting-def"><a name="L197"></a><tt class="py-lineno">197</tt> <a class="py-toggle" href="#" id="Filesystem.OnTestCaseStarting-toggle" onclick="return toggle('Filesystem.OnTestCaseStarting');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="Peach.logger.Filesystem-class.html#OnTestCaseStarting">OnTestCaseStarting</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">run</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">,</tt> <tt class="py-param">variationCount</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Filesystem.OnTestCaseStarting-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Filesystem.OnTestCaseStarting-expanded"><a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">                <tt class="py-docstring">'''</tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line"><tt class="py-docstring">                Called on start of a test case.</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line"><tt class="py-docstring">                '''</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">variationCount</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">heartBeat</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-60" class="py-name"><a title="Peach.logger.Filesystem._writeMsg" class="py-name" href="#" onclick="return doclink('link-60', '_writeMsg', 'link-32');">_writeMsg</a></tt><tt class="py-op">(</tt><tt class="py-string">"On test variation # %d"</tt> <tt class="py-op">%</tt> <tt class="py-name">variationCount</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line"><tt class="py-comment"># end</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line"><tt class="py-comment"></tt> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="Peach-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://peachfuzzer.com">Peach API</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:44 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
