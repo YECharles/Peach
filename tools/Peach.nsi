@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.2"
-  OutFile "Peach-2.2-py.exe"
+  Name "Peach 2.3 DEV"
+  OutFile "Peach-2.3-DEV-py.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"

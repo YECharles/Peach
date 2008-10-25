@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.2"
-  OutFile "Peach-2.2.exe"
+  Name "Peach 2.3 DEV"
+  OutFile "Peach-2.3-DEV.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
