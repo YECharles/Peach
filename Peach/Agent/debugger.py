@@ -35,13 +35,14 @@ detect faults.  Would be nice to also eventually do other things like
 
 # $Id$
 
+import struct, sys, time
+from threading import Thread, Event, Lock
+from Peach.agent import Monitor
+
+import struct, sys, time,os
+
 try:
 	import pydbg, win32process, win32api, win32pdhutil, win32con
-	import struct, sys, time
-	from threading import Thread, Event, Lock
-	from Peach.agent import Monitor
-	
-	import struct, sys, time,os
 	import comtypes
 	from ctypes import *
 	from comtypes import HRESULT, COMError
@@ -1016,7 +1017,7 @@ try:
 				self.thread.join()
 				time.sleep(0.25)	# Take a breath
 		
-		def _IsDebuggerAlive(seld):
+		def _IsDebuggerAlive(self):
 			return self.thread != None and self.thread.isAlive()
 		
 		def OnTestStarting(self):
@@ -1076,7 +1077,7 @@ try:
 			self._StopDebugger()
 
 except:
-	pass
+	raise
 
 try:
 	
@@ -1192,6 +1193,7 @@ try:
 			UnixDebugger.lock = Lock()
 			UnixDebugger.crashInfo = None
 			UnixDebugger.fault = False
+			self.thread = None
 			
 			if args.has_key('Command'):
 				self._command = str(args['Command']).replace("'''", "\"")
@@ -1232,7 +1234,7 @@ try:
 				self.thread.join()
 				time.sleep(0.25)	# Take a breath
 		
-		def _IsDebuggerAlive(seld):
+		def _IsDebuggerAlive(self):
 			return self.thread != None and self.thread.isAlive()
 		
 		def OnTestStarting(self):
@@ -1292,6 +1294,6 @@ try:
 			self._StopDebugger()
 
 except:
-	pass
+	raise
 
 # end
