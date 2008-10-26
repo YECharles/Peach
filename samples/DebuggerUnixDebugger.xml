@@ -47,8 +47,9 @@
 
 	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
 		<Monitor class="debugger.UnixDebugger">
-			<Param name="Command" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4242" />
-			<Param name="Params" value="127.0.0.1 4242" />
+			<Param name="Command"
+		value="/home/dd/peach/samples/UnixCrashServer/unixcrash" />
+			<Param name="Params" value="" />
 		</Monitor>
 	</Agent>
 
@@ -60,13 +61,14 @@
 			<Param name="host" value="127.0.0.1" />
 			<Param name="port" value="4242" />
 		</Publisher>
+		<Mutator class="string.StringTokenMutator" /> 
 	</Test>
 
 <Run name="DefaultRun">
 	<Test ref="TheTest" />
 
 	<Logger class="logger.Filesystem">
-		<Param name="path" value="c:\peach\logtest" />
+		<Param name="path" value="logtest" />
 	</Logger>
 </Run>
 

@@ -1081,97 +1081,106 @@ except:
 
 try:
 	
-	import vtrace
+	import vtrace, envi
 	
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
 			pass
 		
 		def notify(self, event, trace):
-			print "Got event: %d from pid %d" % (event, trace.getPid())
-			for key in trace.metadata.keys():
-				print "Meta key:", key
-	
-	class _TraceThread(Thread):
+			print "Got event: %d from pid %d, signal: %d" % (event, trace.getPid(), trace.getMeta("PendingSignal"))
+			
+			UnixDebugger.handlingFault.set()
+			buff = ""
+			
+			addr = None
+			
+			# Stacktrace
+			buff += "\nStacktrace:\n"
+			buff += "   [   PC   ] [ Frame  ] [ Location ]\n"
+			for frame in trace.getStackTrace():
+				buff += "   0x%.8x 0x%.8x %s\n" % (frame[0],frame[1],self.bestName(trace,frame[0]))
+				if addr == None:
+					addr = frame[0]
+			
+			# Registers
+			buff += "\nRegisters:\n"
+			regs = trace.getRegisters()
+			rnames = regs.keys()
+			rnames.sort()
+			for r in rnames:
+				buff += "   %s 0x%.8x\n" % (r, regs[r])
+			
+			# Dissassembly
+			arch = trace.getMeta("Architecture")
+			arch = envi.getArchModule(arch)
+			
+			mem = trace.readMemory(addr-256, 512)
+			addrStart = addr - 256
+			offset = 0
+			count = 0
+			buff += "\nDissassembly:\n"
+			ops = []
+			while offset < 500 and count < 200:
+				va = addrStart + offset
+				op = arch.makeOpcode(mem[offset:])
+				
+				if va == addr:
+					for i in ops[-20:]:
+						buff += i
+					
+					buff += ">>>0x%.8x: %s\n" % (va, arch.reprOpcode(op, va=va))
+					count = 190
+				elif va < addr:
+					ops.append("   0x%.8x: %s\n" % (va, arch.reprOpcode(op, va=va)))
+				else:
+					buff += "   0x%.8x: %s\n" % (va, arch.reprOpcode(op, va=va))
+					
+				offset += len(op)
+				count += 1
+			
+			print buff
+			
+			UnixDebugger.lock.acquire()
+			UnixDebugger.crashInfo = { 'DebuggerOutput.txt' : buff }
+			UnixDebugger.fault = True
+			UnixDebugger.lock.release()
+			UnixDebugger.handledFault.set()
+			
+			
+		def bestName(self, trace, address):
+			"""
+			Return a string representing the best known name for
+			the given address
+			"""
+			if not address:
+				return "NULL"
+
+			match = trace.getSymByAddr(address)
+			if match != None:
+				if long(match) == address:
+					return repr(match)
+				else:
+					return "%s+%d" % (repr(match), address - long(match))
 		
+			map = trace.getMap(address)
+			if map:
+				return map[3]
+		
+			return "Who knows?!?!!?"
+
+	class _TraceThread(Thread):
 		def __init__(self):
 			Thread.__init__(self)
-		
+
 		def run(self):
 			
 			self.trace = vtrace.getTrace()
 			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, PeachNotifier())
 			self.trace.execute(self._command + " " + self._params)
+			UnixDebugger.started.set()
+			self.trace.run()
 			
-			if UnixDebugger.quit.isSet():
-				return
-			
-			UnixDebugger.handlingFault.set()
-			
-			#buff = "Crash output from GDB\n"
-			#buff+= "=====================\n\n"
-			#buff+= "break: reason: %s, thread-id: %s\n\n" % (result.reason, result.thread_id)
-			#buff+= self._getLocals(gdb)
-			#buff+= "\n-------------------\n"
-			#buff+= self._getArguments(gdb)
-			#buff+= "\n-------------------\n"
-			#buff+= self._getStack(gdb)
-			#buff+= "\n-------------------\n"
-			#buff+= self._getRegisters(gdb)
-			
-			UnixDebugger.lock.acquire()
-			UnixDebugger.creashInfo = { 'DebuggerOutput.txt' : buff }
-			UnixDebugger.fault = True
-			UnixDebugger.lock.release()
-			UnixDebugger.handledFault.set()
-
-		def _getLocals(self, gdb):
-			buff = "Frame Locals:\n"
-			try:
-				result = gdb.stack_list_locals().wait()
-				for local in resul.locals:
-					buff += "\t%s = %s\n" % (local.name, local.value)
-			except:
-				pass
-			
-			return buff
-		
-		def _getArguments(self, gdb):
-			buff = "Frame Arguments:\n"
-			try:
-				result = gdb.stack_list_arguments().wait()
-				for frame in result.stack_args.frame:
-					buff += "\tframe: " + frame.level + "\n"
-					for arg in frame.args:
-						buff += "\t\t%s = %s\n" % (arg.name, arg.value)
-			except:
-				pass
-			
-			return buff
-		
-		def _getStack(self, gdb):
-			buff = "Stack:\n"
-			try:
-				result = gdb.stack_list_frames().wait()
-				for frame in result.stack.frame:
-					buff += "\t%s, at %s:%s\n" % (frame.func, frame.file, frame.line)
-			except:
-				pass
-			
-			return buff
-		
-		def _getRegisters(self, gdb):
-			buff = "Registers:\n"
-			try:
-				names = gdb.data_list_register_names().wait()
-				result = gdb.data_list_register_values(regno=registers).wait()
-				for register in result.register_values:
-					name = names.register_names[int(register.number)]
-					buff += "\t%s: %s\n" % (name, register.value)
-			except:
-				pass
-			
-			return buff
 	
 	class UnixDebugger(Monitor):
 		'''
@@ -1230,7 +1239,7 @@ try:
 			if self.thread.isAlive():
 				UnixDebugger.quit.set()
 				UnixDebugger.started.clear()
-				self.thread.gdb.quit()
+				self.thread.trace.kill()
 				self.thread.join()
 				time.sleep(0.25)	# Take a breath
 		
@@ -1252,11 +1261,12 @@ try:
 			if UnixDebugger.crashInfo != None:
 				ret = UnixDebugger.crashInfo
 				UnixDebugger.crashInfo = None
-				_GdbEventHandler.buff = ""
 				UnixDebugger.lock.release()
+				print "Returning crash data!"
 				return ret
 			
 			UnixDebugger.lock.release()
+			print "Not returning any crash data!"
 			return None
 		
 		def DetectedFault(self):
@@ -1264,7 +1274,7 @@ try:
 			Check if a fault was detected.
 			'''
 			
-			time.sleep(0.15)
+			time.sleep(0.25)
 
 			if not UnixDebugger.handlingFault.isSet():
 				return False
