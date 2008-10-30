@@ -898,6 +898,79 @@ class ParseTemplate:
 		
 		return relation
 	
+	def HandleCommonDataElementAttributes(self, node, element):
+		'''
+		Handle attributes common to all DataElements such as:
+		
+		 - minOccurs, maxOccurs
+		 - mutable
+		 - isStatic
+		 - constraint
+		 - pointer
+		 - pointerDepth
+		 - token
+		
+		'''
+		
+		# min/maxOccurs
+		
+		self._HandleOccurs(node, element)
+		
+		# isStatic/token
+		
+		isStatic = self._getAttribute(node, 'isStatic')
+		if isStatic == None:
+			isStatic = self._getAttribute(node, 'token')
+		if isStatic == None or len(isStatic) == 0:
+			element.isStatic = False
+		
+		elif isStatic.lower() == 'true':
+			element.isStatic = True
+		
+		elif isStatic.lower() == 'false':
+			element.isStatic = False
+		
+		else:
+			if node.hasAttributeNS(None, "isStatic"):
+				raise PeachException("Attribute 'isStatic' has unexpected value [%s], only 'true' and 'false' are supported." % isStatic)
+			else:
+				raise PeachException("Attribute 'token' has unexpected value [%s], only 'true' and 'false' are supported." % isStatic)
+		
+		# mutable
+		
+		mutable = self._getAttribute(node, 'mutable')
+		if mutable == None or len(mutable) == 0:
+			element.isMutable = True
+		
+		elif mutable.lower() == 'true':
+			element.isMutable = True
+			
+		elif mutable.lower() == 'false':
+			element.isMutable = False
+		
+		else:
+			raise PeachException("Attribute 'mutable' has unexpected value [%s], only 'true' and 'false' are supported." % mutable)
+		
+		# pointer
+		
+		pointer = self._getAttribute(node, 'pointer')
+		if pointer == None or len(pointer) == 0:
+			element.isPointer = True
+		
+		elif pointer.lower() == 'true':
+			element.isPointer = True
+			
+		elif pointer.lower() == 'false':
+			element.isPointer = False
+		
+		else:
+			raise PeachException("Attribute 'pointer' has unexpected value [%s], only 'true' and 'false' are supported." % pointer)
+		
+		# constraint
+		
+		element.constraint = self._getAttribute(node, "constraint")
+
+	
 	def _HandleOccurs(self, node, element):
 		'''
 		Grab min, max, and generated Occurs attributes
@@ -1002,9 +1075,9 @@ class ParseTemplate:
 			block.isAligned = True
 			block.alignment = int(alignment)**2
 		
-		# minOccurs and maxOccurs
+		# common attributes
 		
-		self._HandleOccurs(node, block)
+		self.HandleCommonDataElementAttributes(node, block)
 		
 		# children
 		
@@ -1149,8 +1222,9 @@ class ParseTemplate:
 			else:
 				block.length = None
 
-		# minOccurs and maxOccurs
-		self._HandleOccurs(node, block)
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, block)
 		
 		# children
 		self.HandleDataContainerChildren(node, block)
@@ -1225,25 +1299,6 @@ class ParseTemplate:
 		if type == 'wchar':
 			string.padCharacter = string.padCharacter * 2
 
-		# constraint
-		string.constraint = self._getAttribute(node, "constraint")
-
-		# isStatic
-		
-		isStatic = self._getAttribute(node, 'isStatic')
-		if isStatic == None or len(isStatic) == 0:
-			string.isStatic = False
-		
-		elif isStatic.lower() == 'true':
-			string.isStatic = True
-			
-		elif isStatic.lower() == 'false':
-			string.isStatic = False
-		
-		else:
-			raise PeachException("Unknown isStatic of String")
-	
-
 		# nullTerminated (optional)
 		
 		nullTerminated = self._getAttribute(node, 'nullTerminated')
@@ -1277,8 +1332,10 @@ class ParseTemplate:
 			except:
 				raise PeachException("length must be a number or missing %s" % length)
 		
-		# minOccurs and maxOccurs
-		self._HandleOccurs(node, string)
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, string)
+
 		
 		# Handle any common children
 		
@@ -1333,22 +1390,6 @@ class ParseTemplate:
 		if number.endian != 'little' and number.endian != 'big':
 			raise PeachException("invalid endian %s" % number.endian)
 	
-
-		# isStatic
-		
-		isStatic = self._getAttribute(node, 'isStatic')
-		if isStatic == None or len(isStatic) == 0:
-			number.isStatic = False
-		
-		elif isStatic.lower() == 'true':
-			number.isStatic = True
-			
-		elif isStatic.lower() == 'false':
-			number.isStatic = False
-		
-		else:
-			raise PeachException("Unknown isStatic of Number")
-		
 		# signed (optional)
 		
 		signed = self._getAttribute(node, 'signed')
@@ -1362,12 +1403,10 @@ class ParseTemplate:
 		else:
 			raise PeachException("signed must be true or false")
 		
-		# minOccurs and maxOccurs
-		self._HandleOccurs(node, number)
+		# common attributes
 		
-		# constraint
-		number.constraint = self._getAttribute(node, "constraint")
-
+		self.HandleCommonDataElementAttributes(node, number)
+		
 		# Handle any common children
 		
 		self.HandleCommonTemplate(node, number)
@@ -1503,21 +1542,6 @@ class ParseTemplate:
 				blob.length = int(length)
 			else:
 				blob.length = None
-	
-		# isStatic
-		
-		isStatic = self._getAttribute(node, 'isStatic')
-		if isStatic == None or len(isStatic) == 0:
-			blob.isStatic = False
-		
-		elif isStatic.lower() == 'true':
-			blob.isStatic = True
-			
-		elif isStatic.lower() == 'false':
-			blob.isStatic = False
-		
-		else:
-			raise PeachException("Unknown isStatic of Blob")
 		
 		# padValue
 		
@@ -1526,11 +1550,9 @@ class ParseTemplate:
 		else:
 			blob.padValue = "\0"
 		
-		# constraint
-		blob.constraint = self._getAttribute(node, "constraint")
-
-		# minOccurs and maxOccurs
-		self._HandleOccurs(node, blob)
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, string)
 		
 		# Handle any common children
 		
@@ -1567,23 +1589,9 @@ class ParseTemplate:
 		if custom.valueType == 'literal':
 			custom.defaultValue = PeachStr(eval(custom.defaultValue))
 
-		# isStatic
-
-		isStatic = self._getAttribute(node, 'isStatic')
-		if isStatic == None or len(isStatic) == 0:
-			custom.isStatic = False
-
-		elif isStatic.lower() == 'true':
-			custom.isStatic = True
-
-		elif isStatic.lower() == 'false':
-			custom.isStatic = False
-
-		else:
-			raise PeachException("Unknown isStatic of Custom")
-
-		# minOccurs and maxOccurs
-		self._HandleOccurs(node, custom)
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, string)
 
 		# Handle any common children
 

@@ -750,6 +750,24 @@
 					must evaulate to true or false.  The special variables 'self', and 'value' are available.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="mutable" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is data elmement mutable (able to be changed).  Setting to false will cause this field
+					to not be fuzzed.  Default is true.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pointer" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is data element wrapped in a pointer?  Default is false.  This attribute only applies when 
+					ctypes based publishers are in use.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pointerDepth" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>To what depth data element is wrapped in pointers (e.g. void** p is 2).  Defaults to 1.  This
+					attribute only applies when used with the pointer attribute.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:attributeGroup>
 	<xs:element name="Include">
 		<xs:annotation>

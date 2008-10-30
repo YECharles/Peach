@@ -855,6 +855,12 @@ class DataElement(Mutatable):
 		if name != None and (name.find(".") > -1 or name.find(":") > -1):
 			raise PeachException("Name '%s' contains characters not allowed in names such as period (.) or collen (:)" % name)
 		
+		#: Is this a ctypes pointer to something? (Defaults to False)
+		self.isPointer = False
+		
+		#: What is out pointer depth? (e.g. void** p is 2), (Defaults to 1)
+		self.pointerDepth = 1
+		
 		#: Optional constraint used during data cracking, python expression
 		self.constraint = None
 		
