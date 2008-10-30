@@ -43,10 +43,10 @@ performing parsing tests of Peach XML files.
 import sys, getopt, os
 sys.path.append(".")
 
-if sys.version.find("AMD64") > -1:
-	PSYCO = False
-else:
-	PSYCO = True
+#if sys.version.find("AMD64") > -1:
+#	PSYCO = False
+#else:
+#	PSYCO = False
 
 PROFILE = False
 
@@ -216,11 +216,11 @@ for i in range(len(optlist)):
 	
 	elif optlist[i][0] == '--debug':
 		
-		if PSYCO:
-			import psyco
-			# 300MB
-			psyco.full(memory=307200)
-			PSYCO = False
+		#if PSYCO:
+		#	import psyco
+		#	# 300MB
+		#	psyco.full(memory=307200)
+		#	PSYCO = False
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -229,11 +229,11 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--new':
 		
-		if PSYCO:
-			import psyco
-			# 300MB
-			psyco.full(memory=307200)
-			PSYCO = False
+		#if PSYCO:
+		#	import psyco
+		#	# 300MB
+		#	psyco.full(memory=307200)
+		#	PSYCO = False
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -242,11 +242,11 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--test' or optlist[0][0] == '-t':
 
-		if PSYCO:
-			import psyco
-			# 300MB
-			psyco.full(memory=307200)
-			PSYCO = False
+		#if PSYCO:
+		#	import psyco
+		#	# 300MB
+		#	psyco.full(memory=307200)
+		#	PSYCO = False
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -282,11 +282,11 @@ for i in range(len(optlist)):
 	elif optlist[i][0] == '--count' or optlist[i][0] == '-c':
 		
 		# count test cases
-		if PSYCO:
-			import psyco
-			# 300MB
-			psyco.full(memory=307200)
-			PSYCO = False
+		#if PSYCO:
+		#	import psyco
+		#	# 300MB
+		#	psyco.full(memory=307200)
+		#	PSYCO = False
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -391,10 +391,10 @@ for i in range(len(optlist)):
 	else:
 		usage()
 
-if PSYCO:
-	import psyco
-	# 300MB
-	psyco.full(memory=307200)
+#if PSYCO:
+#	import psyco
+#	# 300MB
+#	psyco.full(memory=307200)
 
 from Peach.Engine import *
 from Peach.Engine.common import *

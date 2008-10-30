@@ -517,6 +517,26 @@ class DataCracker:
 		# Would be nice to have our current pos in scripting :)
 		node.possiblePos = pos
 		
+		## Check for count relation, verify > 0
+		if node.minOccurs == 0:
+			relation = node.getRelationOfThisElement('count')
+			if relation != None and node.parent != None:
+				occurs = int(relation.getValue(True))
+				if occurs == 0:
+					# Remove element
+					node.parent.__delitem__(node.name)
+					
+					# Remove relation (else we get errors)
+					relation.parent.relations.remove(relation)
+					relation.parent.__delitem__(relation.name)
+					
+					# We passed muster...I think :)
+					rating = 2
+					pos = origPos
+					
+					Debug(1, "_handleNode(%s): Zero count on array, removed <<EXIT")
+					return (rating, pos)
+		
 		# 3.5. Save origional copy
 		
 		origionalNode = node.copy(node.parent)
@@ -1562,8 +1582,25 @@ class DataCracker:
 				print "Error decoding: ", repr(value)
 				raise
 		
+		# contraint
+		if node.constraint != None and rating < 3:
+			env = {
+				"self":node,
+				"pos":pos,
+				"newpos":newpos,
+				"value":value,
+				}
+			
+			if not evalEvent(node.constraint, env, node):
+				rating = 4
+				newpos = pos
+				Debug(1, "_handleString: Constraint failed")
+			else:
+				Debug(1, "_handleString: Constraint passed")
+		
 		# Set value
-		eval("node.%s(value)" % self.method)
+		if rating < 3:
+			eval("node.%s(value)" % self.method)
 		
 		# Are we last?
 		if self._nextNode(node) == None:
@@ -1660,12 +1697,28 @@ class DataCracker:
 		else:
 			node.rating = 2
 		
+		# contraint
+		if node.constraint != None:
+			env = {
+				"self":node,
+				"value":int(value),
+				"pos":pos,
+				"newpos":newpos,
+				}
+			
+			if not evalEvent(node.constraint, env, node):
+				node.rating = 4
+				newpos = pos
+				Debug(1, "_handleNumber: Constraint failed")
+			else:
+				Debug(1, "_handleNumber: Constraint passed")
+		
 		# Set value on data element
+		if node.rating < 3:
+			eval("node.%s(value)" % self.method)
 		
-		eval("node.%s(value)" % self.method)
-		
-		# Return all of it
-		node.pos = pos
+			# Return all of it
+			node.pos = pos
 		
 		Debug(1, "<--- %s (%d, %d-%d)" % (node.name, node.rating, self.parentPos+pos, self.parentPos+newpos))
 		return (node.rating, newpos)
@@ -1696,15 +1749,11 @@ class DataCracker:
 		value = data[pos:pos+length]
 		newpos = pos + length
 		
+		#print "prepack value: %s pos: %d" % (repr(value), pos)
+		#print "data: %s" % repr(data)
 		# Now, unpack the integer
 		
-		fmt = ''
-		
-		if node.endian == 'little':
-			fmt = '<'
-		else:
-			fmt = '>'
-		
+		fmt = '>'
 		if node.length == 8:
 			fmt += 'B'
 		elif node.length == 16:
@@ -1719,26 +1768,62 @@ class DataCracker:
 		
 		# Now, do the Flag portions
 
+		#print "start value:", self.binaryFormatter(value, node.length)
+		
 		for child in node._children:
 			if child.elementType != 'flag':
 				continue
 			
-			childValue = value >> child.position
+			if node.endian == 'little':
+				childValue = value >> child.position
+				
+				mask = 0
+				for i in range(0, child.length):
+					mask += 1 << i
 			
-			mask = 0
-			for i in range(0, child.length):
-				mask += 1 << i
+				#print "_handleFlags(): %d, %d, %d" % (childValue, mask, childValue & mask)
+				childValue = childValue & mask
 			
-			#print "_handleFlags(): %d, %d, %d" % (childValue, mask, childValue & mask)
-			childValue = childValue & mask
+			else:
+				# We will +1 here because position is zero based
+				childValue = value >> child.position + 1
+				
+				mask = 0
+				for i in range(0, child.length):
+					mask += 1 << i
+				
+				#preValue = childValue
+				childValue = childValue & mask
+				#print "mask: %s pre-value: %s post-value: %d" % (
+				#	self.binaryFormatter(mask, node.length),
+				#	self.binaryFormatter(preValue, node.length),
+				#	childValue
+				#	)
+			
 			Debug(1, "Found child flag %s value of %s" % (child.name, str(childValue)))
 			
 			# Set child node value
-			eval("child.%s(int(childValue))" % self.method)
+			eval("child.%s(childValue)" % self.method)
+			#print "[%s] child value:" % child.name, child.getInternalValue()
 		
 		# Determin rating
 		
 		rating = 2
+		
+		# contraint
+		if node.constraint != None:
+			env = {
+				"self":node,
+				"pos":pos,
+				"newpos":newpos,
+				}
+			
+			if not evalEvent(node.constraint, env, node):
+				rating = 4
+				newpos = pos
+				Debug(1, "_handleFlags: Constraint failed")
+			else:
+				Debug(1, "_handleFlags: Constraint passed")
 		
 		Debug(1, "<--- %s (%d, %d-%d)" % (node.name, rating, self.parentPos+pos, self.parentPos+newpos))
 		
@@ -1746,6 +1831,14 @@ class DataCracker:
 		node.rating = rating
 		return (rating, newpos)
 
+	def binaryFormatter(self, num, bits):
+		ret = ""
+		for i in range(bits-1, -1, -1):
+			ret += str((num >> i) & 1)
+		
+		assert len(ret) == bits
+		return ret
+	
 
 	def _handleSeek(self, node, data, pos, parent, doingMinMax = False):
 		'''
@@ -1803,6 +1896,22 @@ class DataCracker:
 		
 		rating, newpos = node.handleIncoming(self, data, pos, parent, doingMinMax)
 		
+		# contraint
+		if node.constraint != None and rating < 3:
+			env = {
+				"self":node,
+				"data":data,
+				"pos":pos,
+				"newpos":newpos,
+				}
+			
+			if not evalEvent(node.constraint, env, node):
+				rating = 4
+				newpos = pos
+				Debug(1, "_handleNumber: Constraint failed")
+			else:
+				Debug(1, "_handleNumber: Constraint passed")
+			
 		if rating < 3:
 			node.pos = newpos
 			node.rating = rating
@@ -1984,7 +2093,24 @@ class DataCracker:
 				
 				#print "Found blob: [%s]" % value
 		
-		eval("node.%s(value)" % self.method)
+		# contraint
+		if node.constraint != None:
+			env = {
+				"self":node,
+				"value":value,
+				"pos":pos,
+				"newpos":newpos,
+				}
+			
+			if not evalEvent(node.constraint, env, node):
+				rating = 4
+				newpos = pos
+				Debug(1, "_handleNumber: Constraint failed")
+			else:
+				Debug(1, "_handleNumber: Constraint passed")
+		
+		if rating < 3:
+			eval("node.%s(value)" % self.method)
 		
 		Debug(1, "<--- %s (%d, %d-%d)" % (node.name, rating, self.parentPos+pos, self.parentPos+newpos))
 		
@@ -2027,5 +2153,9 @@ def printDom(node, level = 0):
 			printDom(child, level+1)
 	except:
 		pass
+
+if sys.version.find("AMD64") == -1:
+	import psyco
+	psyco.bind(DataCracker)
 
 # end

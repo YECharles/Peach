@@ -140,7 +140,7 @@ class PeachResolver(SchemeRegistryResolver):
 
 class ParseTemplate:
 	'''
-	The Peach 2.0 XML -> Peach DOM parser.  Uses 4Suite XML
+	The Peach 2 XML -> Peach DOM parser.  Uses 4Suite XML
 	library.
 	'''
 	
@@ -702,34 +702,7 @@ class ParseTemplate:
 		
 		# children
 		
-		for child in node.childNodes:
-			
-			if child.nodeName == 'Block':
-				self.HandleBlock(child, template)
-			elif child.nodeName == 'String':
-				self.HandleString(child, template)
-			elif child.nodeName == 'Number':
-				self.HandleNumber(child, template)
-			elif child.nodeName == 'Flags':
-				self.HandleFlags(child, template)
-			elif child.nodeName == 'Blob':
-				self.HandleBlob(child, template)
-			elif child.nodeName == 'Transformer':
-				template.transformer = self.HandleTransformer(child, template)
-			elif child.nodeName == 'Sequence':
-				self.HandleSequence(child, template)
-			elif child.nodeName == 'Choice':
-				self.HandleChoice(child, template)
-			elif child.nodeName == 'Fixup':
-				self.HandleFixup(child, template)
-			elif child.nodeName == 'Placement':
-				self.HandlePlacement(child, template)
-			elif child.nodeName == 'Seek':
-				self.HandleSeek(child, template)
-			elif child.nodeName == 'Custom':
-				self.HandleCustom(child, template)
-			else:
-				raise str("found unexpected node in Template: %s" % child.nodeName)
+		self.HandleDataContainerChildren(node, template)
 		
 		#template.printDomMap()
 		return template
@@ -1035,47 +1008,68 @@ class ParseTemplate:
 		
 		# children
 		
-		for child in node.childNodes:
-			
-			if child.nodeName == 'Block':
-				self.HandleBlock(child, block)
-			elif child.nodeName == 'String':
-				self.HandleString(child, block)
-			elif child.nodeName == 'Number':
-				self.HandleNumber(child, block)
-			elif child.nodeName == 'Flags':
-				self.HandleFlags(child, block)
-			elif child.nodeName == 'Blob':
-				self.HandleBlob(child, block)
-			elif child.nodeName == 'Choice':
-				self.HandleChoice(child, block)
-			elif child.nodeName == 'Transformer':
-				block.transformer = self.HandleTransformer(child, block)
-			elif child.nodeName == 'Relation':
-				relation = self.HandleRelation(child, block)
-				block.relations.append(relation)
-				block.append(relation)
-			elif child.nodeName == 'Fixup':
-				self.HandleFixup(child, block)
-			elif child.nodeName == 'Placement':
-				self.HandlePlacement(child, block)
-			elif child.nodeName == 'Hint':
-				self.HandleHint(child, block)
-			elif child.nodeName == 'Seek':
-				self.HandleSeek(child, block)
-			elif child.nodeName == 'Custom':
-				self.HandleCustom(child, block)
-			
-			else:
-				raise PeachException(PeachStr("found unexpected node in Block: %s" % child.nodeName))
-		
+		self.HandleDataContainerChildren(node, block)
+
 		# Add to parent
-		
+
 		if parent.ref == None and parent.has_key(block.name):
 			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
 
 		parent.append(block)
 		return block
+	
+
+	def HandleDataContainerChildren(self, node, parent, errorOnUnknown = True):
+		'''
+		Handle parsing conatiner children.  This method
+		will handle children of DataElement types for
+		containers like Block, Choice, and Template.
+		
+		Can be used by Custom types to create Custom container
+		types.
+		
+		@type	node: XML Element
+		@param	node: Current XML Node being handled
+		@type	parent: ElementWithChildren
+		@param	parent: Parent of this DataElement
+		@type	errorOnUnknown: Boolean
+		@param	errorOnUnknonw: Should we throw an error on unexpected child node (default True)
+		'''
+		# children
+
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Block':
+				self.HandleBlock(child, parent)
+			elif child.nodeName == 'String':
+				self.HandleString(child, parent)
+			elif child.nodeName == 'Number':
+				self.HandleNumber(child, parent)
+			elif child.nodeName == 'Flags':
+				self.HandleFlags(child, parent)
+			elif child.nodeName == 'Blob':
+				self.HandleBlob(child, parent)
+			elif child.nodeName == 'Choice':
+				self.HandleChoice(child, parent)
+			elif child.nodeName == 'Transformer':
+				block.transformer = self.HandleTransformer(child, parent)
+			elif child.nodeName == 'Relation':
+				relation = self.HandleRelation(child, parent)
+				parent.relations.append(relation)
+				parent.append(relation)
+			elif child.nodeName == 'Fixup':
+				self.HandleFixup(child, parent)
+			elif child.nodeName == 'Placement':
+				self.HandlePlacement(child, parent)
+			elif child.nodeName == 'Hint':
+				self.HandleHint(child, parent)
+			elif child.nodeName == 'Seek':
+				self.HandleSeek(child, parent)
+			elif child.nodeName == 'Custom':
+				self.HandleCustom(child, parent)
+			
+			elif errorOnUnknown:
+				raise PeachException(PeachStr("found unexpected node in Element: %s" % node.nodeName))
 	
 	def HandleMutators(self, node, parent):
 		# name
@@ -1159,31 +1153,7 @@ class ParseTemplate:
 		self._HandleOccurs(node, block)
 		
 		# children
-		
-		for child in node.childNodes:
-			
-			if child.nodeName == 'Block':
-				self.HandleBlock(child, block)
-			elif child.nodeName == 'String':
-				self.HandleString(child, block)
-			elif child.nodeName == 'Number':
-				self.HandleNumber(child, block)
-			elif child.nodeName == 'Flags':
-				self.HandleFlags(child, block)
-			elif child.nodeName == 'Blob':
-				self.HandleBlob(child, block)
-			elif child.nodeName == 'Transformer':
-				block.transformer = self.HandleTransformer(child, block)
-			elif child.nodeName == 'Sequence':
-				self.HandleSequence(child, block)
-			elif child.nodeName == 'Choice':
-				self.HandleChoice(child, block)
-			elif child.nodeName == 'Seek':
-				self.HandleSeek(child, block)
-			elif child.nodeName == 'Custom':
-				self.HandleCustom(child, block)
-			else:
-				raise PeachException(PeachStr("found unexpected node in Sequence: %s" % child.nodeName))
+		self.HandleDataContainerChildren(node, block)
 		
 		if parent.ref == None and parent.has_key(block.name):
 			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
@@ -1254,6 +1224,9 @@ class ParseTemplate:
 		
 		if type == 'wchar':
 			string.padCharacter = string.padCharacter * 2
+
+		# constraint
+		string.constraint = self._getAttribute(node, "constraint")
 
 		# isStatic
 		
@@ -1392,6 +1365,9 @@ class ParseTemplate:
 		# minOccurs and maxOccurs
 		self._HandleOccurs(node, number)
 		
+		# constraint
+		number.constraint = self._getAttribute(node, "constraint")
+
 		# Handle any common children
 		
 		self.HandleCommonTemplate(node, number)
@@ -1433,6 +1409,9 @@ class ParseTemplate:
 		else:
 			flags.endian = 'little'
 		
+		# constraint
+		flags.constraint = self._getAttribute(node, "constraint")
+
 		# children
 		
 		for child in node.childNodes:
@@ -1547,6 +1526,9 @@ class ParseTemplate:
 		else:
 			blob.padValue = "\0"
 		
+		# constraint
+		blob.constraint = self._getAttribute(node, "constraint")
+
 		# minOccurs and maxOccurs
 		self._HandleOccurs(node, blob)
 		
@@ -1606,6 +1588,9 @@ class ParseTemplate:
 		# Handle any common children
 
 		self.HandleCommonTemplate(node, custom)
+
+		# constraint
+		custom.constraint = self._getAttribute(node, "constraint")
 
 		# Custom parsing
 		custom.handleParsing(node)
@@ -2589,5 +2574,9 @@ class ParseTemplate:
 		return hint
 
 # ###########################################################################
+
+if sys.version.find("AMD64") == -1:
+	import psyco
+	psyco.bind(ParseTemplate)
 
 # end

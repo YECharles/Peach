@@ -41,8 +41,7 @@ if PROFILE:
 	print " --- INCOMING PROFILING ENABLED ---- "
 	import profile
 
-
-import sys, re, types, new, base64, time
+import sys, re, types, new, base64, time, ctypes
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
@@ -856,6 +855,9 @@ class DataElement(Mutatable):
 		if name != None and (name.find(".") > -1 or name.find(":") > -1):
 			raise PeachException("Name '%s' contains characters not allowed in names such as period (.) or collen (:)" % name)
 		
+		#: Optional constraint used during data cracking, python expression
+		self.constraint = None
+		
 		#: Should element be mutated?
 		self.isMutable = True
 		
@@ -925,6 +927,13 @@ class DataElement(Mutatable):
 	
 	#def __getinitargs__(self):
 	#	return (self.name, None)
+	
+	def asCType(self):
+		'''
+		Returns a ctypes module type for this DataElement.
+		'''
+		
+		raise Exception("Error: asCType method not implemented yet!")
 	
 	def BuildFullNameCache(self):
 		'''
@@ -1983,6 +1992,19 @@ class Template(DataElement):
 		self.length = None
 		self.lengthType = None
 	
+	def asCType(self):
+		
+		ret = _DefaultStructure()
+		ret._fields_ = []
+		
+		for c in self:
+			if isinstance(c, DataElement):
+				cValue = c.asCType()
+				ret._fields_.append( (c.name, type(cValue) ) )
+				ret[c.name] = cValue
+		
+		return ret
+	
 	def hasLength(self):
 		if self.length != None:
 			return True
@@ -2148,6 +2170,11 @@ class Choice(DataElement):
 		self.length = None
 		self.lengthType = None
 	
+	def asCType(self):
+		
+		self.getValue()
+		return self.currentElement.asCType()
+	
 	def hasLength(self):
 		if self.length != None:
 			return True
@@ -2223,6 +2250,9 @@ def BlockToXml(self, parent):
 	
 	return node
 
+class _DefaultStructure(ctypes.Structure):
+	pass
+
 class Block(DataElement):
 	'''
 	Block or sequence of other data types.
@@ -2236,6 +2266,19 @@ class Block(DataElement):
 		self.toXml = new.instancemethod(BlockToXml, self, self.__class__)
 		self.length = None
 		self.lengthType = None
+	
+	def asCType(self):
+		
+		ret = _DefaultStructure()
+		ret._fields_ = []
+		
+		for c in self:
+			if isinstance(c, DataElement):
+				cValue = c.asCType()
+				ret._fields_.append( (c.name, type(cValue) ) )
+				ret[c.name] = cValue
+		
+		return ret
 	
 	def hasLength(self):
 		if self.length != None:
@@ -2344,6 +2387,23 @@ class Number(DataElement):
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
+	
+	def asCType(self):
+		
+		if self.size == 24:
+			raise Exception("Number.asCType does not support 24bit numbers")
+		
+		value = int(self.getInternalValue())
+		ret = None
+		
+		if self.signed:
+			evalString = "ret = ctypes.c_int%d(value)" % (self.size)
+		else:
+			evalString = "ret = ctypes.c_uint%d(value)" % (self.size)
+		
+		eval(evalString)
+		
+		return ret
 	
 	def getMinValue(self):
 		'''
@@ -2518,6 +2578,13 @@ class String(DataElement):
 		self.nullTerminated = False	#: Is string null terminated, defaults to false
 		self.tokens = None			#: DEPRICATED, Use hint instead
 	
+	def asCType(self):
+		
+		if self.type == 'char':
+			return ctypes.c_char_p(self.getInternalValue())
+		else:
+			return ctypes.c_wchar_p(self.getInternalValue())
+		
 	def getLength(self, inRaw = True):
 		'''
 		Get the length of this element.
@@ -2646,6 +2713,28 @@ class Flags(DataElement):
 		self.length = None	# called size
 		self.endian = 'little'
 
+	def asCType(self):
+		
+		value = int(self.getInternalValue())
+		ret = None
+		
+		evalString = "ret = ctypes.c_uint%d(value)" % (self.size)
+		eval(evalString)
+		
+		return ret
+
+	def binaryFormatter(self, num, bits):
+		'''
+		Convert number to binary string
+		'''
+		
+		ret = ""
+		for i in range(bits-1, -1, -1):
+			ret += str((num >> i) & 1)
+		
+		assert len(ret) == bits
+		return ret
+	
 	def getInternalValue(self, sout = None):
 		'''
 		Return the internal value of this date element.  This
@@ -2665,23 +2754,53 @@ class Flags(DataElement):
 			if n.elementType == 'flag':
 				flags.append(n)
 		
-		for flag in flags:
-			mask = 0x00 << self.length - (flag.position + flag.length)
+		if self.endian == "little":
+			# Little endiand
+			for flag in flags:
+				mask = 0x00 << self.length - (flag.position + flag.length)
 			
-			cnt = flag.position + flag.length - 1
-			for i in range(flag.length):
-				#print "<< %d" % cnt
-				mask |= 1 << cnt
-				cnt -= 1
+				cnt = flag.position + flag.length - 1
+				for i in range(flag.length):
+					#print "<< %d" % cnt
+					mask |= 1 << cnt
+					cnt -= 1
 			
-			#print "Mask:",repr(mask)
-			flagValue = flag.getValue()
-			try:
-				flagValue = long(flagValue)
-			except:
-				flagValue = 0
+				#print "Mask:",repr(mask)
+				flagValue = flag.getValue()
+				try:
+					flagValue = long(flagValue)
+				except:
+					flagValue = 0
+				
+				ret |= mask & (int(flagValue) << flag.position)
+
+		else:
+			#print "------"
 			
-			ret |= mask & (int(flagValue) << flag.position)
+			# Big endiand
+			for flag in flags:
+				mask = 0x00 << self.length - (flag.position + flag.length)
+				
+				cnt = (self.length - flag.position) - 1
+				for i in range(flag.length):
+					mask |= 1 << cnt
+					cnt -= 1
+				
+				flagValue = flag.getValue()
+				try:
+					flagValue = long(flagValue)
+				except:
+					flagValue = 0
+				
+				ret |= mask & (int(flagValue) << ((self.length - flag.position)-1))
+				
+				#print "flag.pos: %d flag.length: %d" % (flag.position, flag.length)
+				#print "ret: %s mask: %s value: %s" % (
+				#	self.binaryFormatter(ret, self.length),
+				#	self.binaryFormatter(mask, self.length),
+				#	self.binaryFormatter(flagValue, flag.length)
+				#	)
+			
 		
 		# 4. do we fixup?
 		
@@ -2708,8 +2827,8 @@ class Flags(DataElement):
 		# 2. Get our transformer
 		isSigned = 0
 		isLittleEndian = 0
-		if self.endian == 'little':
-			isLittleEndian = 1
+		#if self.endian == 'little':
+		#	isLittleEndian = 1
 		
 		if self.length == 8:
 			trans = Transformers.type.AsInt8(isSigned, isLittleEndian)
@@ -2899,6 +3018,16 @@ class Blob(DataElement):
 		self.length = None
 		self.lengthCalc = None
 
+	def asCType(self):
+		
+		value = self.getValue()
+		ret = ctypes.c_ubyte * len(value)
+		
+		for i in xrange(len(value)):
+			ret[i] = value[i]
+		
+		return ret
+		
 	def getInternalValue(self, sout = None):
 		'''
 		Return the internal value of this date element.  This
@@ -3438,6 +3567,16 @@ class Custom(DataElement):
 	def getRawValue(self, sout = None):
 		return self.getInternalValue(sout)
 		
+
+if sys.version.find("AMD64") == -1:
+	import psyco
+	psyco.bind(DataElement)
+	psyco.bind(Relation)
+	psyco.bind(String)
+	psyco.bind(Number)
+	psyco.bind(Template)
+	psyco.bind(Block)
+	psyco.bind(Choice)
 
 # ###################################################################
 
