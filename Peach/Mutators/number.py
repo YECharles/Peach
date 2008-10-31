@@ -38,14 +38,14 @@ from Peach.Generators.block import *
 from Peach.Generators.data import *
 from Peach.Generators.dictionary import *
 from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate, _StaticCurrentValueFromDom
+from Peach.Generators.static import Static, _StaticAlwaysNone, _StaticCurrentValueFromDom
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Generators.block import *
 from Peach.Generators.data import *
 from Peach.Generators.dictionary import *
 from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate
+from Peach.Generators.static import Static, _StaticAlwaysNone
 from Peach.Transformers.encode import WideChar
 from Peach.mutator import *
 from Peach.group import *
@@ -147,8 +147,8 @@ class NumericalVarianceMutator(Mutator):
 		if self._countThread != None and self._countThread.hasCountEvent.isSet():
 			self._count = self._countThread.count
 			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
+			#self._countGroup = None
+			#self._countGeneratorMap = None
 		
 		return self._count
 
@@ -219,13 +219,13 @@ class NumericalVarianceMutator(Mutator):
 				n = self._getN(e)
 				
 				gen = NumberVariance(None, long(value), n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
 				
 				group = Group()
 				gen = NumberVariance(None, long(value), n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
 			
@@ -233,7 +233,9 @@ class NumericalVarianceMutator(Mutator):
 		
 		# Set values
 		for name in self._generatorMap[action].keys():
-			self._getElementByName(action.template, name).setValue(self._generatorMap[action][name].getValue())
+			value = self._generatorMap[action][name].getValue()
+			if value != None:
+				self._getElementByName(action.template, name).setValue(None)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -368,8 +370,8 @@ class NumericalEdgeCaseMutator(Mutator):
 		if self._countThread != None and self._countThread.hasCountEvent.isSet():
 			self._count = self._countThread.count
 			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
+			#self._countGroup = None
+			#self._countGeneratorMap = None
 		
 		return self._count
 
@@ -445,7 +447,7 @@ class NumericalEdgeCaseMutator(Mutator):
 				else:
 					gen = BadNumbers(None, n)
 				
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
@@ -463,7 +465,7 @@ class NumericalEdgeCaseMutator(Mutator):
 				else:
 					gen = BadNumbers(None, n)
 				
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
@@ -473,7 +475,9 @@ class NumericalEdgeCaseMutator(Mutator):
 		# Set values
 		for key in self._generatorMap[action].keys():
 			try:
-				self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+				value = self._generatorMap[action][key].getValue()
+				if value != None:
+					self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
 			except:
 				print "Caught exception on _getElementByName looking for [%s]" % key
 				raise
@@ -683,8 +687,8 @@ class FiniteRandomNumbersMutator(Mutator):
 		if self._countThread != None and self._countThread.hasCountEvent.isSet():
 			self._count = self._countThread.count
 			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
+			#self._countGroup = None
+			#self._countGeneratorMap = None
 		
 		return self._count
 

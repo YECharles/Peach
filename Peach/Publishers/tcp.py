@@ -37,19 +37,21 @@ Default included TCP publishers.
 
 import socket, time, sys
 from Peach.Engine.common import SoftException
-from Peach.publisher import *
+from Peach.publisher import Publisher
+from Peach.publisher import Timeout
+from Peach.publisher import PublisherSoftException
 import Peach
 
 def Debug(msg):
 	if Peach.Engine.engine.Engine.debug:
 		print msg
 
-class Timeout(SoftException):
-	def __init__(self, msg):
-		self.msg = msg
-	
-	def __str__(self):
-		return self.msg
+#class Timeout(SoftException):
+#	def __init__(self, msg):
+#		self.msg = msg
+#	
+#	def __str__(self):
+#		return self.msg
 
 class Tcp(Publisher):
 	'''

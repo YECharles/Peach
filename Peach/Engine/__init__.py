@@ -31,12 +31,9 @@
 
 # $Id$
 
-# Removing this import line seemed to fix a number of issues.
-#import engine, parser, incoming, peachshark, dom, state
+## Circular dependencies were caused by this file!
 
-import common, engine, parser, incoming, peachshark, dom, state
-
-__all__ = [ "engine", "parser", "incoming", "peachshark", "dom", "state", "common" ]
-
+#import engine, parser, incoming, peachshark, dom, state, common
+#__all__ = [ "engine", "parser", "incoming", "peachshark", "dom", "state", "common" ]
 
 # end

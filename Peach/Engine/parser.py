@@ -1125,7 +1125,7 @@ class ParseTemplate:
 			elif child.nodeName == 'Choice':
 				self.HandleChoice(child, parent)
 			elif child.nodeName == 'Transformer':
-				block.transformer = self.HandleTransformer(child, parent)
+				parent.transformer = self.HandleTransformer(child, parent)
 			elif child.nodeName == 'Relation':
 				relation = self.HandleRelation(child, parent)
 				parent.relations.append(relation)
@@ -1206,7 +1206,6 @@ class ParseTemplate:
 			block.ref = None
 			
 		block.elementType = 'choice'
-		#block.node = node
 		
 		# length (in bytes)
 
@@ -1260,7 +1259,6 @@ class ParseTemplate:
 			name = None
 
 		string = String(name, parent)
-		#string.node = node
 		
 		# value
 		
@@ -1357,7 +1355,6 @@ class ParseTemplate:
 			name = None
 
 		number = Number(name, parent)
-		#number.node = node
 		
 		# value
 		
@@ -1373,6 +1370,9 @@ class ParseTemplate:
 		# size (bits)
 		
 		size = self._getAttribute(node, 'size')
+		if size == None:
+			raise PeachException("Number element %s is missing the 'size' attribute which is required." % number.name)
+		
 		number.size = int(size)
 		
 		if not number.size in number._allowedSizes:
@@ -1718,7 +1718,6 @@ class ParseTemplate:
 		field.value = PeachStr(self.GetValueFromNode(node))
 		field.valueType = self._getValueType(node)
 		parent.append(field)
-		#field.node = node
 		
 		return field
 
@@ -2096,6 +2095,7 @@ class ParseTemplate:
 			if child.nodeName == 'Test':
 				
 				#test = self.HandleTest(child, self)
+				test = None
 				if child.hasAttributeNS(None, 'ref'):
 					test = self.GetRef( self._getAttribute(child, 'ref') , None, 'tests')
 				

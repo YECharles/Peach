@@ -34,6 +34,33 @@ Base Publisher object implementation.
 
 # $Id$
 
+from Peach.Engine.common import SoftException
+
+class PublisherStartError(Exception):
+	'''
+	Exception thrown if error occurs during start call
+	'''
+	pass
+
+class PublisherStopError(Exception):
+	'''
+	Exception thrown if error occurs during stop call
+	'''
+	pass
+
+class PublisherSoftException(SoftException):
+	'''
+	Recoverable exception occured in the Publisher.
+	'''
+	pass
+
+class Timeout(SoftException):
+	def __init__(self, msg):
+		self.msg = msg
+	
+	def __str__(self):
+		return self.msg
+
 class Publisher:
 	'''
 	The Publisher object(s) implement a way to send and/or receave
@@ -165,32 +192,5 @@ class Publisher:
 		'''
 		raise PeachException("Action 'close' not supported by publisher")
 
-
-class PublisherStartError(Exception):
-	'''
-	Exception thrown if error occurs during start call
-	'''
-	pass
-
-class PublisherStopError(Exception):
-	'''
-	Exception thrown if error occurs during stop call
-	'''
-	pass
-
-from Peach.Engine.common import SoftException
-
-class PublisherSoftException(SoftException):
-	'''
-	Recoverable exception occured in the Publisher.
-	'''
-	pass
-
-class Timeout(SoftException):
-	def __init__(self, msg):
-		self.msg = msg
-	
-	def __str__(self):
-		return self.msg
 
 # end

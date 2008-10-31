@@ -38,12 +38,12 @@ from Peach.Generators.block import *
 from Peach.Generators.data import *
 from Peach.Generators.dictionary import *
 from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate, _StaticCurrentValueFromDom
+from Peach.Generators.static import Static, _StaticAlwaysNone, _StaticCurrentValueFromDom
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Generators.data import *
 from Peach.Generators.flipper import *
-from Peach.Generators.static import _StaticFromTemplate
+from Peach.Generators.static import _StaticAlwaysNone
 from Peach.mutator import *
 from Peach.group import *
 from Peach.Engine.common import *
@@ -198,13 +198,13 @@ class DWORDSliderMutator(Mutator):
 			for e in stringElements:
 				group = Group()
 				gen = SequentialDWORDSlider(None, e.getValue())
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
 				
 				group = Group()
 				gen = SequentialDWORDSlider(None, e.getValue())
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
 			
@@ -212,7 +212,9 @@ class DWORDSliderMutator(Mutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -424,10 +426,9 @@ class BitFlipperMutator(Mutator):
 				else:
 					gen = PartialFlipper(None, e.getValue())
 					
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
-				
 				
 				# Counter
 				
@@ -438,7 +439,7 @@ class BitFlipperMutator(Mutator):
 				else:
 					gen = PartialFlipper(None, e.getValue())
 					
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
 			
@@ -446,7 +447,9 @@ class BitFlipperMutator(Mutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()

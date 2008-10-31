@@ -681,8 +681,13 @@ class DataCracker:
 			
 			# Remove node and increase rating.
 			Debug(1, "Rating was poor and minOccurs == 0, remoing element and upping rating.")
-			node.parent.__delitem__(node.name)
 			
+			# Remove relation (else we get errors)
+			for relation in node.getRelationsOfThisElement():
+				relation.parent.relations.remove(relation)
+				relation.parent.__delitem__(relation.name)
+			
+			node.parent.__delitem__(node.name)
 			rating = 2
 			pos = origPos
 		

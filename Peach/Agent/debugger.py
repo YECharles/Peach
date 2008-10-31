@@ -1094,6 +1094,6 @@ try:
 			self._StopDebugger()
 
 except:
-	raise
+	pass
 
 # end

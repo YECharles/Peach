@@ -21,6 +21,7 @@ def suite():
 	suite.addTest(Flags4TestCase())
 	suite.addTest(Flags5TestCase())
 	suite.addTest(Flags6TestCase())
+	suite.addTest(Flags7TestCase())
 	return suite
 
 class FlagsInputTestCase(utils.PeachSendAndRecvTestCase):
@@ -109,6 +110,17 @@ class Flags6TestCase(utils.PeachTcpTestCase):
 		ret = struct.unpack("B", str(self.peachUtils.GetListenerData()))[0]
 		
 		assert ret == 2, 'flags6.xml failed, instead [%s]' % repr(ret)
+
+class Flags7TestCase(utils.PeachTcpTestCase):
+	
+	def runTest(self):
+		# Test
+		
+		self.peachUtils.RunPeachXml("flags7.xml")
+		ret = self.peachUtils.GetListenerData()
+		
+		assert ret == "\x28\x00\x28\x05\x8e\x01", 'flags7.xml failed, instead [%s]' % repr(ret)
+		#assert ret == "\x28\x00", 'flags7.xml failed, instead [%s]' % repr(ret)
 
 
 if __name__ == "__main__":

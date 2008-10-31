@@ -14,6 +14,7 @@ def suite():
 	suite.addTest(Data5TestCase())
 	suite.addTest(Data6TestCase())
 	suite.addTest(Data7TestCase())
+	suite.addTest(Data8TestCase())
 	suite.addTest(DataFile1TestCase())
 	suite.addTest(DataExpression1TestCase())
 	return suite
@@ -59,6 +60,12 @@ class Data7TestCase(utils.PeachTcpTestCase):
 		self.peachUtils.RunPeachXml("data7.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == 'Return\nOther', 'data7.xml failed, instead got [%s]' % repr(ret)
+
+class Data8TestCase(utils.PeachTcpTestCase):
+	def runTest(self):
+		self.peachUtils.RunPeachXml("data8.xml")
+		ret = self.peachUtils.GetListenerData()
+		assert ret == '\x03man\x06fuzzed\x02me\x00', 'data8.xml failed, instead got [%s]' % repr(ret)
 
 class DataFile1TestCase(utils.PeachTcpTestCase):
 	def runTest(self):

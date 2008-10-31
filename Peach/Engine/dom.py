@@ -619,94 +619,6 @@ class ElementWithChildren(Element):
 			for child in node.childNodes:
 				dict[child].updateFromXmlDom(child, dict)
 	
-	def setDefaults(self, data, dontCrack = False):
-		'''
-		Set data elements defaultValue based on a Data object.
-		'''
-		
-		if data.fileName != None:
-			
-			if dontCrack:
-				return
-			
-			print "[*] Cracking data from %s into %s" % (data.fileName, self.name)
-			
-			fd = open(data.fileName, "rb")
-			stuff = fd.read()
-			fd.close()
-			
-			parent = self.parent
-			while parent.parent != None: parent = parent.parent
-			
-			cracker = PeachModule.Engine.incoming.DataCracker(parent)
-			cracker.haveAllData = True
-			
-			if PROFILE:
-				profile.runctx("cracker.crackData(self, stuff, \"setDefaultValue\")",
-							   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
-			else:
-				startTime = time.time()
-				cracker.crackData(self, stuff, "setDefaultValue")
-				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
-				
-				### Some debugging code
-				### Use deepcopy and findby name
-				#cnt = 0
-				#while(1):
-					#cnt += 1
-					#cpy = self.copy(self.parent)
-					#for c in cpy:
-						#c.getRelationOfThisElement('count')
-						##cPeach.getRootOfDataMap(c)
-					
-					#cpy.findDataElementByName("FileSize")
-
-					#if cnt % 500 == 0:
-						#print "."
-				
-				
-				print "[*] Building relation cache"
-				self.BuildRelationCache()
-			
-			return
-		
-		if data.expression != None:
-			
-			stuff = peachEval(data.expression)
-			
-			parent = self.parent
-			while parent.parent != None: parent = parent.parent
-			
-			cracker = PeachModule.Engine.incoming.DataCracker(parent)
-			cracker.haveAllData = True
-			cracker.crackData(self, stuff, "setDefaultValue")
-			
-			return
-		
-		for field in data:
-			obj = self
-			
-			for name in field.name.split('.'):
-				
-				if hasattr(obj.children, name):
-					obj = getattr(obj.children, name)
-				
-				else:
-					raise str("setDefaults(): Unable to locate field %s" % field.name)
-			
-			obj.currentValue = field.value
-	
-	#def getDefaultRawValue(self):
-	#	
-	#	if self.defaultValue != None:
-	#		return self.defaultValue
-	#	
-	#	ret = ''
-	#	for child in self._children:
-	#		ret += child.getDefaultValue()
-	#	
-	#	return ret
-	
 	def append(self, obj):
 		if obj in self._children:
 			raise Exception("object already child of element")
@@ -940,6 +852,161 @@ class DataElement(Mutatable):
 		'''
 		
 		raise Exception("Error: asCType method not implemented yet!")
+	
+	def setDefaults(self, data, dontCrack = False):
+		'''
+		Set data elements defaultValue based on a Data object.
+		'''
+		
+		if data.fileName != None:
+			
+			if dontCrack:
+				return
+			
+			print "[*] Cracking data from %s into %s" % (data.fileName, self.name)
+			
+			fd = open(data.fileName, "rb")
+			stuff = fd.read()
+			fd.close()
+			
+			parent = self.parent
+			while parent.parent != None: parent = parent.parent
+			
+			cracker = PeachModule.Engine.incoming.DataCracker(parent)
+			cracker.haveAllData = True
+			
+			if PROFILE:
+				profile.runctx("cracker.crackData(self, stuff, \"setDefaultValue\")",
+							   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
+			else:
+				startTime = time.time()
+				cracker.crackData(self, stuff, "setDefaultValue")
+				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
+				print "[*] Building relation cache"
+				self.BuildRelationCache()
+			
+			return
+		
+		if data.expression != None:
+			
+			stuff = peachEval(data.expression)
+			
+			parent = self.parent
+			while parent.parent != None: parent = parent.parent
+			
+			cracker = PeachModule.Engine.incoming.DataCracker(parent)
+			cracker.haveAllData = True
+			cracker.crackData(self, stuff, "setDefaultValue")
+			
+			return
+		
+		for field in data:
+			obj = self
+			
+			for name in field.name.split('.'):
+				
+				# See if we have an array index "name[n]"
+				m = re.search(r"(.*)\[(-?\d+)\]$", name)
+				if m != None:
+					name = m.group(1)
+					idx = int(m.group(2))
+					
+					if hasattr(obj.children, name):
+						obj = getattr(obj.children, name)
+					elif hasattr(obj.children, name + "-0"):
+						obj = getattr(obj.children, name + "-0")
+					else:
+						raise PeachException("Error: Unable to locate field %s" % field.name)
+					
+					if idx == -1:
+						# Negative index will cause
+						# array to be removed
+						relations = obj.getRelationsOfThisElement()
+						del obj.parent[obj.name]
+						
+						# Remove any relations pointing to our
+						# removed array.
+						for r in relations:
+							del r.parent[r.name]
+							if r in r.parent.relations:
+								r.parent.relations.remove(r)
+						
+						break
+					
+					if obj.maxOccurs > 1 and idx >= 0:
+						# Convert first element to array
+						
+						orig = obj.copy(obj.parent)
+						obj.origional = orig
+						
+						index = obj.parent.index(obj)
+						del obj.parent[obj.name]
+						
+						obj.array = obj.name
+						obj.name = obj.name + "-0"
+						obj.arrayPosition = 0
+						obj.arrayMinOccurs = obj.minOccurs
+						obj.arrayMaxOccurs = obj.maxOccurs
+						obj.minOccurs = 1
+						obj.maxOccurs = 1
+						
+						obj.parent.insert(index, obj)
+					
+					if obj.array != None:
+						
+						# Check and see if we need to expand
+						arrayCount = obj.getArrayCount()
+						if arrayCount == idx:
+							
+							# Expand object
+							newobj = obj.origional.copy(obj.parent)
+							newobj.name = "%s-%d" % (obj.array, arrayCount)
+							newobj.array = obj.array
+							newobj.arrayPosition = arrayCount
+							newobj.arrayMinOccurs = obj.arrayMinOccurs
+							newobj.arrayMaxOccurs = obj.arrayMaxOccurs
+							newobj.minOccurs = 1
+							newobj.maxOccurs = 1
+							
+							lastobj = obj.getArrayElementAt(newobj.arrayPosition - 1)
+							index = obj.parent.index(lastobj)
+							obj.parent.insert(index+1, newobj)
+							obj = newobj
+						
+						# Are we trying to expand by more then 1?
+						elif arrayCount < idx:
+							raise PeachException("Error: Attempting to expand array by more then one element. [%s]" % field.name)
+						
+						# Already expanded, just get correct index
+						else:
+							obj = obj.getArrayElementAt(idx)
+					
+					else:
+						raise PeachException("Error: Attempting to use non-array element as array. [%s]" % field.name)
+				
+				else:
+					if hasattr(obj.children, name):
+						obj = getattr(obj.children, name)
+				
+					else:
+						raise PeachException("Error: Unable to locate field %s" % field.name)
+				
+				# Was parent a choice?  If so select this element.
+				if isinstance(obj.parent, Choice):
+					obj.parent.currentElement = obj
+					
+					# Removing other children.  This is what incoming
+					# cracker does, so lets match that behaviour.
+					remove = []
+					for child in obj.parent:
+						if isinstance(child, DataElement) and child != obj:
+							remove.append(child)
+					
+					for child in remove:
+						del obj.parent[child.name]
+			
+			obj.setDefaultValue(field.value)
+		
 	
 	def BuildFullNameCache(self):
 		'''
@@ -1475,7 +1542,7 @@ class DataElement(Mutatable):
 			return relations
 		
 		if self.relationCache != None:
-			print "Using relation cache!"
+			#print "Using relation cache!"
 			root = self.getRootOfDataMap()
 			name = self.getFullnameInDataModel()
 			
@@ -1483,7 +1550,7 @@ class DataElement(Mutatable):
 				for r in root.relationOfCache[name]:
 					r = self.find(r)
 					if r != None:
-						return relations.append(r)
+						relations.append(r)
 			
 			return relations
 		
@@ -2751,7 +2818,7 @@ class Flags(DataElement):
 		'''
 		# 1. Init our value
 		
-		ret = 0
+		ret = 0 << self.length
 		
 		# 3. Build our flags up
 		
@@ -2798,15 +2865,20 @@ class Flags(DataElement):
 				except:
 					flagValue = 0
 				
-				ret |= mask & (int(flagValue) << ((self.length - flag.position)-1))
+				premask = flagValue << ((self.length - flag.position) - flag.length)
+				#print "premask: %s" % self.binaryFormatter(premask, self.length)
+				
+				ret |= (mask & premask)
 				
 				#print "flag.pos: %d flag.length: %d" % (flag.position, flag.length)
-				#print "ret: %s mask: %s value: %s" % (
+				#print "ret: %s mask: %s value: %s\n" % (
 				#	self.binaryFormatter(ret, self.length),
 				#	self.binaryFormatter(mask, self.length),
 				#	self.binaryFormatter(flagValue, flag.length)
 				#	)
 			
+		
+		#print "FINAL: %s" % self.binaryFormatter(ret, 8)
 		
 		# 4. do we fixup?
 		
@@ -2830,11 +2902,11 @@ class Flags(DataElement):
 		
 	def getRawValue(self, sout = None):
 		
-		# 2. Get our transformer
+		## 2. Get our transformer
 		isSigned = 0
 		isLittleEndian = 0
-		#if self.endian == 'little':
-		#	isLittleEndian = 1
+		##if self.endian == 'little':
+		##	isLittleEndian = 1
 		
 		if self.length == 8:
 			trans = Transformers.type.AsInt8(isSigned, isLittleEndian)
@@ -2851,9 +2923,11 @@ class Flags(DataElement):
 		
 		ret = self.getInternalValue()
 		
-		if ret != '':
+		if ret != '' and ret != None:
 			ret = trans.encode(ret)
 		
+		#print "AFTERPACK:", repr(ret)
+			
 		# 7. Return value
 		
 		if sout != None:
@@ -3314,6 +3388,8 @@ class Field(ElementWithChildren):
 		self.value = value
 		#: Indicates type of value. ['string', 'literal', 'hex'] supported.
 		self.valueType = None
+		#: Indicates an array expantion
+		self.array = None
 
 
 class Logger(ElementWithChildren):
@@ -3583,6 +3659,7 @@ if sys.version.find("AMD64") == -1:
 	psyco.bind(Template)
 	psyco.bind(Block)
 	psyco.bind(Choice)
+	psyco.bind(deepcopy)
 
 # ###################################################################
 

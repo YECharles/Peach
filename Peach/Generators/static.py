@@ -112,6 +112,22 @@ class _StaticFromTemplate(Static):
 		node = self.action.template.findDataElementByName(self.elementName)
 		return node.getValue()
 
+
+class _StaticAlwaysNone(Static):
+	def __init__(self):
+		Static.__init__(self, None)
+		
+	def getRawValue(self):
+		'''
+		Get the "raw" value which will then get run threw any transformers
+		associated with this Generator.
+		
+		However, since we are getting the value of a DataElement we don't
+		want to get the internal value, we want the actual value.
+		'''
+		return None
+
+
 class _StaticCurrentValueFromDom(Static):
 	'''
 	This Static is for use with Peach 2.0.  The value

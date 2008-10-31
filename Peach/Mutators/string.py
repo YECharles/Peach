@@ -39,11 +39,11 @@ from Peach.Generators.block import *
 from Peach.Generators.data import *
 from Peach.Generators.dictionary import *
 from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate, _StaticCurrentValueFromDom
+from Peach.Generators.static import Static, _StaticAlwaysNone, _StaticCurrentValueFromDom
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Generators.data import *
-from Peach.Generators.static import _StaticFromTemplate
+from Peach.Generators.static import _StaticAlwaysNone
 from Peach.Generators.xmlstuff import *
 from Peach.mutator import *
 from Peach.group import *
@@ -195,13 +195,13 @@ class StringTokenMutator(Mutator):
 			for e in stringElements:
 				group = Group()
 				gen = StringTokenFuzzer(None, e.getValue())
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
 				
 				group = Group()
 				gen = StringTokenFuzzer(None, e.getValue())
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
 			
@@ -209,7 +209,9 @@ class StringTokenMutator(Mutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -396,13 +398,13 @@ class _SimpleHintMutator(Mutator):
 			for e in stringElements:
 				group = Group()
 				gen = XmlParserTests()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.name] = gen
 				
 				group = Group()
 				gen = XmlParserTests()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.name] = gen
 			
@@ -410,7 +412,9 @@ class _SimpleHintMutator(Mutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -515,13 +519,13 @@ class XmlW3CMutator(_SimpleHintMutator):
 			for e in stringElements:
 				group = Group()
 				gen = XmlParserTests(None)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.name] = gen
 				
 				group = Group()
 				gen = XmlParserTests(None)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.name] = gen
 			
@@ -529,7 +533,9 @@ class XmlW3CMutator(_SimpleHintMutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -583,13 +589,13 @@ class PathMutator(_SimpleHintMutator):
 			for e in stringElements:
 				group = Group()
 				gen = BadPath()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.name] = gen
 				
 				group = Group()
 				gen = BadPath()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.name] = gen
 			
@@ -597,7 +603,9 @@ class PathMutator(_SimpleHintMutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -652,13 +660,13 @@ class HostnameMutator(_SimpleHintMutator):
 			for e in stringElements:
 				group = Group()
 				gen = BadHostname()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.name] = gen
 				
 				group = Group()
 				gen = BadHostname()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.name] = gen
 			
@@ -666,7 +674,9 @@ class HostnameMutator(_SimpleHintMutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()
@@ -721,13 +731,13 @@ class FilenameMutator(_SimpleHintMutator):
 			for e in stringElements:
 				group = Group()
 				gen = BadFilename()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.name] = gen
 				
 				group = Group()
 				gen = BadFilename()
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
+				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.name] = gen
 			
@@ -735,7 +745,9 @@ class FilenameMutator(_SimpleHintMutator):
 		
 		# Set values
 		for key in self._generatorMap[action].keys():
-			self._getElementByName(action.template, key).setValue(self._generatorMap[action][key].getValue())
+			value = self._generatorMap[action][key].getValue()
+			if value != None:
+				self._getElementByName(action.template, key).setValue(value)
 		
 		if action.template.modelHasOffsetRelation:
 			stringBuffer = StreamBuffer()

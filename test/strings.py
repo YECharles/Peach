@@ -17,6 +17,8 @@ def suite():
 	suite.addTest(StringWideTestCase())
 	suite.addTest(StringWide2TestCase())
 	suite.addTest(StringLiteralTestCase())
+	suite.addTest(StringArraysTestCase())
+	
 	return suite
 
 class IncomingString1TestCase(utils.PeachSendAndRecvTestCase):
@@ -99,6 +101,14 @@ class StringLiteralTestCase(utils.PeachTcpTestCase):
 		self.peachUtils.RunPeachXml("stringsLiteral.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == 'Peach', 'stringsLiteral.xml failed, instead [%s]' % repr(ret)
+		
+class StringArraysTestCase(utils.PeachTcpTestCase):
+	
+	def runTest(self):
+		# Test
+		self.peachUtils.RunPeachXml("stringsArrays.xml")
+		ret = self.peachUtils.GetListenerData()
+		assert ret == '1.0\n1.1\n1.2\n2.0\n2.1\n2.2\n3.0.1\n3.0.2\n3.1.1\n3.1.2\n3.2.1\n3.2.2\n4.0.1\n4.0.2\n4.1.1\n4.1.2\n4.2.1\n4.2.2\n', 'stringsArrays.xml failed, instead [%s]' % repr(ret)
 		
 		
 if __name__ == "__main__":
