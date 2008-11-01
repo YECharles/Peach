@@ -579,10 +579,6 @@ class ParseTemplate:
 		
 		if node.hasAttributeNS(None, 'value'):
 			value = self._getAttribute(node, 'value')
-			#value = value.replace("\r", "")
-			#value = value.replace("\n", "")
-			
-			#print "FROM VALUE: " + value
 			
 			# Convert variouse forms of hex into a binary string
 			if type == 'hex':
@@ -600,7 +596,6 @@ class ParseTemplate:
 				
 				return ret
 		
-		#print "GetValueFromNode"
 		if value != None and (self._getAttribute(node, 'valueType') == 'string' or not node.hasAttributeNS(None, 'valueType')):
 			value = re.sub(r"([^\\])\\n", r"\1\n", value)
 			value = re.sub(r"([^\\])\\r", r"\1\r", value)
@@ -649,12 +644,6 @@ class ParseTemplate:
 			elif type == 'literal':
 				value = eval(value)
 			
-		#if value != None and (self._getAttribute(node, 'valueType') or not node.hasAttributeNS(None, 'valueType')):
-		#	value = value.replace("\\r", "\r")
-		#	value = value.replace("\\n", "\n")
-		#	value = value.replace("\\t", "\t")
-		#	value = value.replace("\\\\", "\\")
-		
 		return value
 		
 	# Handlers for Template ###################################################
@@ -887,14 +876,9 @@ class ParseTemplate:
 		relation.of = of
 		relation.From = From
 		relation.type = type
-		#relation.node = node
 		relation.when = when
 		relation.expressionGet = expressionGet
 		relation.expressionSet = expressionSet
-		
-		# Logic checks
-		#if type == 'size' and of == None:
-		#	raise PeachException("Size relation only supports of attribute, not from.")
 		
 		return relation
 	
