@@ -2808,6 +2808,39 @@ class Flags(DataElement):
 		assert len(ret) == bits
 		return ret
 	
+	def flipBitsByByte(self, num, size):
+		
+		ret = 0
+		for n in self.splitIntoBytes(num, size):
+			ret = ret << 8
+			ret += n
+		
+		return ret
+		
+	def splitIntoBytes(self, num, size):
+		
+		ret = []
+		for i in range(size/8):
+			ret.append( num & 0xFF )
+			num = num >> 8
+		
+		return ret
+		
+	def flipBits(self, num, size):
+		'''
+		Reverse the bits
+		'''
+		
+		ret = 0x00 << size
+		for i in range(size):
+			b = 0x01 & (num >> i)
+			ret += b << (size - i) - 1
+		
+		print "flipBits: pre %s post %s" % (self.binaryFormatter(num,size),
+											self.binaryFormatter(ret,size))
+		
+		return ret
+	
 	def getInternalValue(self, sout = None):
 		'''
 		Return the internal value of this date element.  This
@@ -2827,58 +2860,44 @@ class Flags(DataElement):
 			if n.elementType == 'flag':
 				flags.append(n)
 		
-		if self.endian == "little":
-			# Little endiand
-			for flag in flags:
-				mask = 0x00 << self.length - (flag.position + flag.length)
 			
-				cnt = flag.position + flag.length - 1
-				for i in range(flag.length):
-					#print "<< %d" % cnt
-					mask |= 1 << cnt
-					cnt -= 1
+		for flag in flags:
 			
-				#print "Mask:",repr(mask)
-				flagValue = flag.getValue()
-				try:
-					flagValue = long(flagValue)
-				except:
-					flagValue = 0
+			if self.endian == "little":
+				flagPosition = (self.length - flag.position) - flag.length
+			else:
+				flagPosition = flag.position
 				
-				ret |= mask & (int(flagValue) << flag.position)
+			#print "Flag from %d to %d" % (flag.position, flagPosition)
+			flagLength = flag.length
 
-		else:
-			#print "------"
+			mask = 0x00 << self.length - (flagPosition + flag.length)
 			
-			# Big endiand
-			for flag in flags:
-				mask = 0x00 << self.length - (flag.position + flag.length)
+			cnt = (self.length - flagPosition) - 1
+			for i in range(flag.length):
+				mask |= 1 << cnt
+				cnt -= 1
 				
-				cnt = (self.length - flag.position) - 1
-				for i in range(flag.length):
-					mask |= 1 << cnt
-					cnt -= 1
+			flagValue = flag.getValue()
+			try:
+				flagValue = long(flagValue)
+			except:
+				flagValue = 0
 				
-				flagValue = flag.getValue()
-				try:
-					flagValue = long(flagValue)
-				except:
-					flagValue = 0
+			premask = flagValue << ((self.length - flagPosition) - flag.length)
+			#print "premask: %s" % self.binaryFormatter(premask, self.length)
 				
-				premask = flagValue << ((self.length - flag.position) - flag.length)
-				#print "premask: %s" % self.binaryFormatter(premask, self.length)
+			ret |= (mask & premask)
 				
-				ret |= (mask & premask)
-				
-				#print "flag.pos: %d flag.length: %d" % (flag.position, flag.length)
-				#print "ret: %s mask: %s value: %s\n" % (
-				#	self.binaryFormatter(ret, self.length),
-				#	self.binaryFormatter(mask, self.length),
-				#	self.binaryFormatter(flagValue, flag.length)
-				#	)
+			#print "flag.pos: %d flag.length: %d" % (flagPosition, flag.length)
+			#print "ret: %s mask: %s value: %s\n" % (
+			#	self.binaryFormatter(ret, self.length),
+			#	self.binaryFormatter(mask, self.length),
+			#	self.binaryFormatter(flagValue, flag.length)
+			#	)
 			
-		
-		#print "FINAL: %s" % self.binaryFormatter(ret, 8)
+		if self.endian == "little":
+			ret = self.flipBitsByByte(ret, self.length)
 		
 		# 4. do we fixup?
 		

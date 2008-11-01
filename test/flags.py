@@ -22,6 +22,7 @@ def suite():
 	suite.addTest(Flags5TestCase())
 	suite.addTest(Flags6TestCase())
 	suite.addTest(Flags7TestCase())
+	suite.addTest(Flags8TestCase())
 	return suite
 
 class FlagsInputTestCase(utils.PeachSendAndRecvTestCase):
