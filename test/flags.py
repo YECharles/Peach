@@ -121,7 +121,16 @@ class Flags7TestCase(utils.PeachTcpTestCase):
 		ret = self.peachUtils.GetListenerData()
 		
 		assert ret == "\x28\x00\x28\x05\x8e\x01", 'flags7.xml failed, instead [%s]' % repr(ret)
-		#assert ret == "\x28\x00", 'flags7.xml failed, instead [%s]' % repr(ret)
+
+class Flags8TestCase(utils.PeachTcpTestCase):
+	
+	def runTest(self):
+		# Test
+		
+		self.peachUtils.RunPeachXml("flags8.xml")
+		ret = self.peachUtils.GetListenerData()
+		
+		assert ret == "\x0a\x00\x0a\x50\x63\x10", 'flags8.xml failed, instead [%s]' % repr(ret)
 
 
 if __name__ == "__main__":
