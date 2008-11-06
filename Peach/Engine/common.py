@@ -224,6 +224,8 @@ class StreamBuffer:
 		self.data = ""
 		#: History of data locations
 		self.positions = {}
+		#: History of data length
+		self.lengths = {}
 		
 		if data != None:
 			self.data = data

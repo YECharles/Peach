@@ -95,7 +95,10 @@ class Udp(Publisher):
 		@type	data: string
 		@param	data: Data to send
 		'''
-		self._socket.sendall(data)
+		try:
+			self._socket.sendall(data)
+		except socket.error:
+			pass
 	
 	def receive(self, size = None):
 		
@@ -155,13 +158,14 @@ class UdpListener(Publisher):
 		@type	data: string
 		@param	data: Data to send
 		'''
-		print "sending to:", self.addr
-		self._socket.sendto(data, self.addr)
+		try:
+			self._socket.sendto(data, self.addr)
+		
+		except socket.error:
+			pass
 	
 	def receive(self, size = None):
-		print "receiving data..."
 		data,self.addr = self._socket.recvfrom(65000)
-		print "Addr:",self.addr
 		return data
 		
 # end

@@ -66,7 +66,7 @@ try:
 			
 			if args.has_key("Checks"):
 				self.checks = args["Checks"].replace("'''", "").split(",")
-				for i in self.range(checks):
+				for i in range(len(self.checks)):
 					self.checks[i] = self.checks[i].strip()
 			
 			if args.has_key("Stops"):
@@ -104,7 +104,10 @@ try:
 					stops = self.stops[check.Name]
 					for stop in check.Stops:
 						if str(stop.StopCode) in stops:
+							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
 							stop.Active = False
+						else:
+							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
 		
 		def _DisableImage(self, image):
 			try:

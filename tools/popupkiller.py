@@ -46,7 +46,7 @@ popUps = [
 #	[ 'Microsoft Visual C++ Debug Library',				'isctype.c',		'Ignore',				False ],
 #	[ 'Microsoft Visual C++ Debug Library', 			'Run-Time Check',	'Ignore',				True ],
 #	[ '[JavaScript Application]',					None,			None,					False ],
-	[ 'C:\audits\briefcase\working',			None,			None,					False ],
+	[ 'Visual Studio Just-In-Time',			None,			'No',					False ],
 #	[ 'Adobe Reader',	'Adobe Reader could not open',			'OK',					False ],
 	]
 

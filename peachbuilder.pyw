@@ -36,9 +36,9 @@ No-console window wrapper for PeachGui
 import sys,os
 
 # SPEED ME UP SCOTTY!
-if sys.version.find("AMD64") == -1:
-	import psyco
-	psyco.full()
+#if sys.version.find("AMD64") == -1:
+#	import psyco
+#	psyco.full()
 
 from Peach.Gui import PeachGui
 
