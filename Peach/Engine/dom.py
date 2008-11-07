@@ -252,16 +252,7 @@ class Element:
 		if hasattr(self, 'ref') and self.ref != None:
 			self._setXmlAttribute(node, "ref", self.ref)
 		
-		if hasattr(self, 'defaultValue') and self.defaultValue != None:
-			self._setXmlAttribute(node, "defaultValue", self.defaultValue)
-		
-		if hasattr(self, 'currentValue') and self.currentValue != None:
-			self._setXmlAttribute(node, "currentValue", self.currentValue)
-		elif isinstance(self, DataElement) and self.defaultValue != None:
-			self._setXmlAttribute(node, "currentValue", self.getInternalValue())
-		
-		if hasattr(self, 'value') and self.value != None:
-			self._setXmlAttribute(node, "value", self.value)
+		self._setXmlAttribute(node, "fullName", self.getFullname())
 		
 		dict[node] = self
 		dict[self] = node
@@ -290,6 +281,8 @@ class Element:
 		
 		if hasattr(self, 'ref') and self.ref != None:
 			self._setXmlAttribute(node, "ref", self.ref)
+		
+		self._setXmlAttribute(node, "fullName", self.getFullname())
 		
 		dict[node] = self
 		dict[self] = node
@@ -541,6 +534,26 @@ class ElementWithChildren(Element):
 		self.hasChildren = True
 	
 		
+	def getByName(self, name):
+		'''
+		Internal helper method, not for use!
+		'''
+		
+		names = name.split(".")
+		node = self.getRoot()
+		
+		if node.name != names[0]:
+			return None
+		
+		obj = node
+		for i in range(1, len(names)):
+			if not obj.has_key(names[i]):
+				return None
+			
+			obj = obj[names[i]]
+		
+		return obj
+	
 	def getElementsByType(self, type, ret = None):
 		'''
 		Will return array of a specific type
@@ -591,14 +604,9 @@ class ElementWithChildren(Element):
 		Convert to an XML DOM boject tree for use in xpath queries.
 		'''
 		
-		# Make sure there is a value to get
-		if isinstance(self, DataElement):
-			self.getValue()
-		
 		node = Element.toXmlDom(self, parent, dict)
 		
 		for child in self._children:
-			#print ">> toXmlDom child: ", child
 			child.toXmlDom(node, dict)
 		
 		return node
@@ -608,14 +616,9 @@ class ElementWithChildren(Element):
 		Convert to an XML DOM boject tree for use in xpath queries.
 		'''
 		
-		# Make sure there is a value to get
-		if isinstance(self, DataElement):
-			self.getValue()
-		
 		node = Element.toXmlDomLight(self, parent, dict)
 		
 		for child in self._children:
-			#print ">> toXmlDom child: ", child
 			child.toXmlDomLight(node, dict)
 		
 		return node

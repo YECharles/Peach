@@ -69,15 +69,44 @@ class StateEngine:
 		publisher - Publisher to use
 		'''
 		
+		#: Engine reference
 		self.engine = engine
+		
+		#: State model we are using
 		self.stateMachine = stateMachine
+		
+		#: Publisher we are using
 		self.publisher = publisher
+		
 		self.f = peachPrint
 		
-		'''
-		pathFinder -- to describe the path
-		'''
+		#: pathFinder -- to describe the path
 		self.pathFinder = PathFinder(stateMachine)
+		
+		#: Cache of generated XML
+		self.cachedXml = None
+	
+	def getXml(self):
+		'''
+		Get the XML document representation of this
+		DOM for use by slurp, etc.  For speed we will
+		cache the generated XML until an operation
+		occurs to dirty the cache.
+		'''
+		
+		if self.cachedXml == None:
+			dict = {}
+			doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
+			self.stateMachine.toXmlDom(doc.rootNode.firstChild, dict)
+			self.cachedXml = doc
+			
+		return self.cachedXml
+	
+	def dirtyXmlCache(self):
+		'''
+		Mark XML cache as dirty.
+		'''
+		self.cachedXml = None
 	
 	def run(self, mutator):
 		'''
@@ -339,7 +368,9 @@ class StateEngine:
 				buff.read(size)
 			except:
 				pass
-					
+			
+			self.dirtyXmlCache()
+			
 			cracker = DataCracker(self.engine.peach)
 			(rating, pos) = cracker.crackData(action.template, buff, "setDefaultValue")
 						
@@ -412,6 +443,8 @@ class StateEngine:
 			# look for and set return
 			for c in action:
 				if c.elementType == 'actionresult':
+					self.dirtyXmlCache()
+			
 					cracker = DataCracker(self.engine.peach)
 					#cracker.haveAllData = True
 					(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,ret))
@@ -436,6 +469,8 @@ class StateEngine:
 			
 			self.actionValues.append( [ action.name, 'getprop', property, data ] )
 			
+			self.dirtyXmlCache()
+			
 			cracker = DataCracker(self.engine.peach)
 			(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,data))
 			if rating > 2:
@@ -446,14 +481,8 @@ class StateEngine:
 			action.value = action.template.getValue()
 			
 			if Peach.Engine.engine.Engine.debug:
-				### Test CODE
-				dict = {}
-				doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
-				
-				stateMachine = action.parent.parent
-				stateMachineNode = stateMachine.toXmlDom(doc.rootNode.firstChild, dict)
-				
 				print "*******POST GETPROP***********"
+				doc = self.getXml()
 				PrettyPrint(doc, asHtml=1)
 				print "******************"
 			
@@ -495,72 +524,46 @@ class StateEngine:
 			
 			startTime = time.time()
 			
-			dict = {}
-			doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
-			
-			stateMachine = action.parent.parent
-			stateMachineNode = stateMachine.toXmlDom(doc.rootNode.firstChild, dict)
-			
-			if Peach.Engine.engine.Engine.debug:
-				print "****** PRE SLURP ************"
-				PrettyPrint(doc, asHtml=1)
-				print "******************"
-			
+			doc = self.getXml()
 			setNodes = doc.xpath(action.setXpath)
 			if len(setNodes) == 0:
 				raise Exception("StateEngine._runAction(xpath): setXpath did not return a node")
 			
+			# Only do this once :)
+			valueElement = None
+			if action.valueXpath != None:
+				valueNodes = doc.xpath(action.valueXpath)
+				if len(valueNodes) == 0:
+					raise Exception("StateEngine._runAction(xpath): valueXpath did not return a node")
+				
+				valueNode = valueNodes[0]
+				valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
+				
 			for node in setNodes:
 				
-				if action.valueXpath != None:
-					valueNodes = doc.xpath(action.valueXpath)
-					if len(valueNodes) == 0:
-						raise Exception("StateEngine._runAction(xpath): valueXpath did not return a node")
-					
-					valueNode = valueNodes[0]
-					
-					if valueNode.hasAttributeNS(None, "currentValue"):
-						Debug(1, "Setting currentValue: [%s]" % str(valueNode.getAttributeNS(None, 'currentValue')))
-						node.setAttributeNS(None, 'currentValue', valueNode.getAttributeNS(None, 'currentValue'))
-						
-						if valueNode.hasAttributeNS(None, 'currentValue-Encoded'):
-							node.setAttributeNS(None, 'currentValue-Encoded',
-												valueNode.getAttributeNS(None, 'currentValue-Encoded'))
-					
-					elif valueNode.hasAttributeNS(None, 'value'):
-						Debug(1, "Setting value: [%s]" % str(valueNode.getAttributeNS(None, 'value')))
-						node.setAttributeNS(None, 'currentValue', valueNode.getAttributeNS(None, 'value'))
-						
-						if valueNode.hasAttributeNS(None, 'value-Encoded'):
-							node.setAttributeNS(None, 'currentValue-Encoded',
-												valueNode.getAttributeNS(None, 'value-Encoded'))
+				setElement = action.getRoot().getByName(str(node.getAttributeNS(None, "fullName")))
 				
-					elif valueNode.hasAttributeNS(None, 'defaultValue'):
-						Debug(1, "Setting defaultValue: [%s]" % str(valueNode.getAttributeNS(None, 'defaultValue')))
-						node.setAttributeNS(None, 'defaultValue', valueNode.getAttributeNS(None, 'defaultValue'))
-						
-						if valueNode.hasAttributeNS(None, 'defaultValue-Encoded'):
-							node.setAttributeNS(None, 'defaultValue-Encoded',
-												valueNode.getAttributeNS(None, 'defaultValue-Encoded'))
+				if valueElement != None:
+					
+					Debug(1, "Action-Slurp: Setting %s from %s" % (
+						str(valueNode.getAttributeNS(None, "fullName")),
+						str(node.getAttributeNS(None, "fullName"))
+						))
+					
+					setElement.currentValue = valueElement.currentValue
+					setElement.value = valueElement.value
+					setElement.defaultValue = valueElement.defaultValue
 				
 				else:
-					Debug(1, "Setting currentValue: [%s]" % str(action.valueLiteral))
-					try:
-						node.setAttributeNS(None, 'currentValue', action.valueLiteral)
 					
-					except UnicodeDecodeError:
-						node.setAttributeNS(None, "currentValue-Encoded", "base64")
-						node.setAttributeNS(None, 'currentValue', base64.b64encode(action.valueLiteral))
+					Debug(1, "Action-Slurp: Setting %s to %s" % (
+						str(valueNode.getAttributeNS(None, "fullName")),
+						repr(action.valueLiteral)
+						))
+					
+					setElement.setDefaultValue(action.valueLiteral)
 			
-			
-			if Peach.Engine.engine.Engine.debug:
-				print "****** POST SLURP ************"
-				PrettyPrint(doc, asHtml=1)
-				print "******************"
-			
-			stateMachine.updateFromXmlDom(stateMachineNode, dict)
-			dict = None
-			#print " - Total time to slurp data: %.2f" % (time.time() - startTime)
+			print " - Total time to slurp data: %.2f" % (time.time() - startTime)
 		
 		elif action.type == 'connect':
 			if not self.publisher.hasBeenStarted:
