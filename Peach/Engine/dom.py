@@ -46,6 +46,7 @@ from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
 from Peach.Engine.engine import Engine
+from Peach.publisher import PublisherBuffer
 import Peach
 PeachModule = Peach
 import Ft.Xml.Domlette
@@ -250,10 +251,15 @@ class Element:
 		
 		if hasattr(self, 'ref') and self.ref != None:
 			self._setXmlAttribute(node, "ref", self.ref)
+		
 		if hasattr(self, 'defaultValue') and self.defaultValue != None:
 			self._setXmlAttribute(node, "defaultValue", self.defaultValue)
+		
 		if hasattr(self, 'currentValue') and self.currentValue != None:
 			self._setXmlAttribute(node, "currentValue", self.currentValue)
+		elif isinstance(self, DataElement) and self.defaultValue != None:
+			self._setXmlAttribute(node, "currentValue", self.getInternalValue())
+		
 		if hasattr(self, 'value') and self.value != None:
 			self._setXmlAttribute(node, "value", self.value)
 		
@@ -298,12 +304,16 @@ class Element:
 		'''
 		
 		try:
-			value = str(value)
-			node.setAttributeNS(None, key, value)
+			node.setAttributeNS(None, key, str(value))
+			value = str(node.getAttributeNS(None, key))
+		
+		except UnicodeEncodeError:
+			node.setAttributeNS(None, "%s-Encoded" % key, "base64")
+			node.setAttributeNS(None, key, base64.b64encode(str(value)))
 		
 		except UnicodeDecodeError:
 			node.setAttributeNS(None, "%s-Encoded" % key, "base64")
-			node.setAttributeNS(None, key, base64.b64encode(value))
+			node.setAttributeNS(None, key, base64.b64encode(str(value)))
 	
 	def _getXmlAttribute(self, node, key):
 		'''
@@ -313,9 +323,12 @@ class Element:
 		if not node.hasAttributeNS(None, key):
 			return None
 		
-		value = str(node.getAttributeNS(None, key))
 		if node.hasAttributeNS(None, "%s-Encoded" % key):
+			value = node.getAttributeNS(None, key)
 			value = base64.b64decode(value)
+		
+		else:
+			value = str(node.getAttributeNS(None, key))
 		
 		return value
 	
@@ -869,18 +882,20 @@ class DataElement(Mutatable):
 			stuff = fd.read()
 			fd.close()
 			
+			buff = PublisherBuffer(None, stuff)
+			
 			parent = self.parent
 			while parent.parent != None: parent = parent.parent
 			
 			cracker = PeachModule.Engine.incoming.DataCracker(parent)
-			cracker.haveAllData = True
+			#cracker.haveAllData = True
 			
 			if PROFILE:
-				profile.runctx("cracker.crackData(self, stuff, \"setDefaultValue\")",
+				profile.runctx("cracker.crackData(self, buff, \"setDefaultValue\")",
 							   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
 			else:
 				startTime = time.time()
-				cracker.crackData(self, stuff, "setDefaultValue")
+				cracker.crackData(self, buff, "setDefaultValue")
 				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
 				print "[*] Building relation cache"
 				self.BuildRelationCache()
@@ -891,12 +906,14 @@ class DataElement(Mutatable):
 			
 			stuff = peachEval(data.expression)
 			
+			buff = PublisherBuffer(None, stuff)
+			
 			parent = self.parent
 			while parent.parent != None: parent = parent.parent
 			
 			cracker = PeachModule.Engine.incoming.DataCracker(parent)
 			cracker.haveAllData = True
-			cracker.crackData(self, stuff, "setDefaultValue")
+			cracker.crackData(self, buff, "setDefaultValue")
 			
 			return
 		
@@ -927,7 +944,11 @@ class DataElement(Mutatable):
 						# Remove any relations pointing to our
 						# removed array.
 						for r in relations:
-							del r.parent[r.name]
+							try:
+								del r.parent[r.name]
+							except:
+								pass
+							
 							if r in r.parent.relations:
 								r.parent.relations.remove(r)
 						

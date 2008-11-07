@@ -59,6 +59,7 @@ import wx
 import wx.propgrid as wxpg
 import re, pickle
 
+from Peach.publisher import PublisherBuffer
 from Peach.Engine import parser, engine, incoming, dom
 from Peach.Engine.dom import *
 import Peach
@@ -278,7 +279,7 @@ class PeachValidatorGui(gui.PeachValidation):
 			cracker = incoming.DataCracker(self.peach)
 			cracker.haveAllData = True
 			self.template = self.template.copy(None)
-			(rating, pos) = cracker.crackData(self.template, data, "setDefaultValue")
+			(rating, pos) = cracker.crackData(self.template, PublisherBuffer(None,data), "setDefaultValue")
 			if pos < len(data)-1:
 				# not everything was parsed!
 				self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)

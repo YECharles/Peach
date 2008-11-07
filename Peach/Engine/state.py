@@ -46,6 +46,7 @@ from Peach.Engine.parser import *
 from Peach.Engine.path import *
 from Peach.Engine.common import *
 from Peach.Engine.incoming import *
+from Peach.publisher import PublisherBuffer
 
 import Peach
 
@@ -328,98 +329,25 @@ class StateEngine:
 			size = cracker.getInitialReadSize(action.template)
 			Debug(1, "StateEngine._runAction(input): Found initial read size of %s" % size)
 			
-			data = ""			# Data Buffer
-			timeout = False		# Have we hit a timeout exception?
-			haveAllData = False	# Do we have all the data?
+			# Make a fresh copy of the template
+			action.__delitem__(action.template.name)
+			action.template = action.origionalTemplate.copy(action)
+			action.append(action.template)
 			
-			while True:
-				try:
-					Debug(2, ">> STATE IS CALLING RECEIVE FOR %d BYTES" % size)
+			buff = PublisherBuffer(self.publisher)
+			try:
+				buff.read(size)
+			except:
+				pass
 					
-					# Did we get asked for all the data?
-					if size == -1:
-						try:
-							# Read everything in
-							haveAllData = True
-							data += self.publisher.receive()
+			cracker = DataCracker(self.engine.peach)
+			(rating, pos) = cracker.crackData(action.template, buff, "setDefaultValue")
 						
-						except Peach.publisher.Timeout, e:
-							# Timeout is okay here
-							pass
-						except Peach.Publishers.tcp.Timeout:
-							pass
-					
-					# Else try and read wanted size
-					else:
-						try:
-							data += self.publisher.receive(size)
-							timeout = False
-						
-						except Peach.publisher.Timeout, e:
-							
-							# Retry after a timeout
-							if timeout:
-								raise
-							
-							timeout = True
-							haveAllData = True
-						
-						except Peach.Publishers.tcp.Timeout:
-							# Retry after a timeout
-							if timeout:
-								raise
-							
-							timeout = True
-							haveAllData = True
-					
-					# Make a fresh copy of the template
-					action.__delitem__(action.template.name)
-					action.template = action.origionalTemplate.copy(action)
-					action.append(action.template)
-					
-					# Try and crack the data
-					Debug(1, "\n\n\n\n### cracker.crackData(%d) ##############################################" % len(data))
-					if haveAllData:
-						Debug(1, "### HAVE ALL DATA!!!!!! ##############################################")
-						
-					cracker = DataCracker(self.engine.peach)
-					cracker.haveAllData = haveAllData
-					(rating, pos) = cracker.crackData(action.template, data)
-					if rating > 2:
-						raise SoftException("Was unble to crack incoming data into %s data model." % action.template.name)
-					
-					# If no exception, it worked
-					break
-				
-				except NeedMoreData, e:
-					size = e.amount
-					Debug(2, ">> Going back for: %d" % size)
-					Debug(2, ">> Tab Level: %d" % DataCracker._tabLevel)
-					if DataCracker._tabLevel > 0:
-						size = 0
-					
-					#Debug(2, ">> Currently Have:")
-					#Debug(2, "><><><><><><><><><><><><><><><><><><")
-					#Debug(2, data)
-					#Debug(2, "><><><><><><><><><><><><><><><><><><")
+			if rating > 2:
+				raise SoftException("Was unble to crack incoming data into %s data model." % action.template.name)
 			
 			action.value = action.template.getValue()
 			
-			#print "VALUE: %s" % repr(action.value)
-			
-			#print ">>> action.template.gatValue(): " + action.template.getValue()
-			#print ">>> action.template", action.template
-			if Peach.Engine.engine.Engine.debug:
-				dict = {}
-				doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
-				
-				stateMachine = action.parent.parent
-				stateMachineNode = stateMachine.toXmlDom(doc.rootNode.firstChild, dict)
-				
-				print "*****POST INPUT*************"
-				PrettyPrint(doc, asHtml=1)
-				print "******************"
-		
 		elif action.type == 'output':
 			
 			if not self.publisher.hasBeenStarted:
@@ -485,8 +413,8 @@ class StateEngine:
 			for c in action:
 				if c.elementType == 'actionresult':
 					cracker = DataCracker(self.engine.peach)
-					cracker.haveAllData = True
-					(rating, pos) = cracker.crackData(action.template, ret)
+					#cracker.haveAllData = True
+					(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,ret))
 					if rating > 2:
 						raise SoftException("Was unble to crack result data into %s data model." % action.template.name)
 			
@@ -509,8 +437,7 @@ class StateEngine:
 			self.actionValues.append( [ action.name, 'getprop', property, data ] )
 			
 			cracker = DataCracker(self.engine.peach)
-			cracker.haveAllData = True
-			(rating, pos) = cracker.crackData(action.template, data)
+			(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,data))
 			if rating > 2:
 				raise SoftException("Was unble to crack getprop data into %s data model." % action.template.name)
 			
@@ -566,6 +493,8 @@ class StateEngine:
 		elif action.type == 'slurp':
 			action.value = None
 			
+			startTime = time.time()
+			
 			dict = {}
 			doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
 			
@@ -606,6 +535,14 @@ class StateEngine:
 							node.setAttributeNS(None, 'currentValue-Encoded',
 												valueNode.getAttributeNS(None, 'value-Encoded'))
 				
+					elif valueNode.hasAttributeNS(None, 'defaultValue'):
+						Debug(1, "Setting defaultValue: [%s]" % str(valueNode.getAttributeNS(None, 'defaultValue')))
+						node.setAttributeNS(None, 'defaultValue', valueNode.getAttributeNS(None, 'defaultValue'))
+						
+						if valueNode.hasAttributeNS(None, 'defaultValue-Encoded'):
+							node.setAttributeNS(None, 'defaultValue-Encoded',
+												valueNode.getAttributeNS(None, 'defaultValue-Encoded'))
+				
 				else:
 					Debug(1, "Setting currentValue: [%s]" % str(action.valueLiteral))
 					try:
@@ -623,6 +560,7 @@ class StateEngine:
 			
 			stateMachine.updateFromXmlDom(stateMachineNode, dict)
 			dict = None
+			#print " - Total time to slurp data: %.2f" % (time.time() - startTime)
 		
 		elif action.type == 'connect':
 			if not self.publisher.hasBeenStarted:

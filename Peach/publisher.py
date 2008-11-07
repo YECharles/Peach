@@ -61,6 +61,74 @@ class Timeout(SoftException):
 	def __str__(self):
 		return self.msg
 
+class PublisherBuffer:
+	'''
+	An IO buffer.
+	'''
+	
+	def __init__(self, publisher, data = None):
+		
+		#: Publisher associated with buffer
+		self.publisher = publisher
+		
+		#: Data buffer of currently read bytes
+		self.data = ""
+		
+		#: Do we have all the data?
+		self.haveAllData = False
+		
+		if data != None:
+			self.data = data
+			self.haveAllData = True
+	
+	def read(self, size = 1):
+		'''
+		Read additional data into IO buffer.
+		'''
+		
+		if self.haveAllData:
+			return
+		
+		ret = ""
+		timeout = False
+		try:
+			if size != None:
+				while(len(ret) < size):
+					try:
+						ret += self.publisher.receive(size)
+					
+					except Timeout, e:
+						# Retry after a timeout
+						if timeout:
+							raise
+						
+						timeout = True
+						self.haveAllData = True
+			else:
+				try:
+					self.haveAllData = True
+					ret += self.publisher.receive(size)
+					
+				except Timeout, e:
+					pass
+		
+		finally:
+			self.data += ret
+	
+	def readAll(self):
+		'''
+		Read all data
+		'''
+		
+		if self.haveAllData:
+			return
+		
+		try:
+			self.read(None)
+		
+		finally:
+			self.haveAllData = True
+
 class Publisher:
 	'''
 	The Publisher object(s) implement a way to send and/or receave

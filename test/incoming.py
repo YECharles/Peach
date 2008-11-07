@@ -81,6 +81,7 @@ class IncomingNumber1TestCase(utils.PeachSendAndRecvTestCase):
 		# Test
 		self.peachUtils.SetSendAndReceiveData(pack('<b', 100))
 		self.peachUtils.RunPeachXml("incomingNumber1.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingNumber1.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == pack('<b', 100), 'incomingNumber1.xml failed, instead [%s]' % repr(ret)
 
@@ -201,6 +202,8 @@ class IncomingBlob1TestCase(utils.PeachSendAndRecvTestCase):
 		value = '1234567890'
 		self.peachUtils.SetSendAndReceiveData(value)
 		self.peachUtils.RunPeachXml("incomingBlob1.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingBlob1.xml")
+		
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value, 'incomingBlob1.xml failed, instead [%s]' % repr(ret)
 
@@ -221,6 +224,7 @@ class IncomingWhen1ATestCase(utils.PeachSendAndRecvTestCase):
 		value = 'A12345'
 		self.peachUtils.SetSendAndReceiveData(value)
 		self.peachUtils.RunPeachXml("incomingWhen1.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingWhen1.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value[1:], 'incomingWhen1.xml failed, instead [%s]' % repr(ret)
 
@@ -231,6 +235,7 @@ class IncomingWhen1BTestCase(utils.PeachSendAndRecvTestCase):
 		value = 'B1234567890'
 		self.peachUtils.SetSendAndReceiveData(value)
 		self.peachUtils.RunPeachXml("incomingWhen1.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingWhen1.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value[1:], 'incomingWhen1.xml failed, instead [%s]' % repr(ret)
 
@@ -241,6 +246,7 @@ class IncomingWhen2ATestCase(utils.PeachSendAndRecvTestCase):
 		value = 'A12345'
 		self.peachUtils.SetSendAndReceiveData(value)
 		self.peachUtils.RunPeachXml("incomingWhen2.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingWhen2.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value[1:], 'incomingWhen2.xml failed, instead [%s]' % repr(ret)
 
@@ -251,6 +257,7 @@ class IncomingWhen2BTestCase(utils.PeachSendAndRecvTestCase):
 		value = 'B1234567890'
 		self.peachUtils.SetSendAndReceiveData(value)
 		self.peachUtils.RunPeachXml("incomingWhen2.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingWhen2.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value[1:], 'incomingWhen2.xml failed, instead [%s]' % repr(ret)
 

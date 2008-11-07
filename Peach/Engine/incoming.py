@@ -72,8 +72,8 @@ class DataCracker:
 		#: Are we looking ahead?
 		self.lookAhead = False
 		
-		#: Do we have all the data?
-		self.haveAllData = False
+		##: Do we have all the data?
+		#buff.haveAllData = False
 		
 		#: Stop when we real the goal node (inclusive)
 		self.nodeGoal = None
@@ -84,23 +84,26 @@ class DataCracker:
 		if not inner:
 			DataCracker._tabLevel = 0
 	
-	def internalCrackData(self, template, data, method = 'setValue'):
+	def internalCrackData(self, template, buff, method = 'setValue'):
 		'''
 		This is the internal method called when we recurse into
 		crackData.  It will not perform certain operations that should
 		be performed on the entire data model instead of sub-portions.
 		'''
 		
+		if not isinstance(buff, PublisherBuffer):
+			raise Exception("Error: buff is not a PublisherBuffer")
+		
 		self.method = method
-		(rating, pos) = self._handleNode(template, data, 0, None) #, self.dom)
-		Debug(1, "RATING: %d - POS: %d - LEN(DATA): %d" % (rating, self.parentPos+pos, len(data)))
-		if pos < len(data)-1:
+		(rating, pos) = self._handleNode(template, buff, 0, None) #, self.dom)
+		Debug(1, "RATING: %d - POS: %d - LEN(DATA): %d" % (rating, self.parentPos+pos, len(buff.data)))
+		if pos < len(buff.data)-1:
 			Debug(1, "WARNING: Did not consume all data!!!")
 		
 		Debug(1, "Done cracking stuff")
 		return (rating, pos)
 	
-	def crackData(self, template, data, method = 'setValue'):
+	def crackData(self, template, buff, method = 'setValue'):
 		'''
 		Crack data based on template.  Set values into data tree.
 		
@@ -109,6 +112,9 @@ class DataCracker:
 		trying to re-crack the data.
 		'''
 		
+		if not isinstance(buff, PublisherBuffer):
+			raise Exception("Error: buff is not a PublisherBuffer")
+		
 		# Reset all values in tree
 		# NOTE: Do not change setValue to method.  We NEEVER want
 		#       to run this with setDefaultValue or else DEATH AND DOOM TO U!
@@ -116,9 +122,9 @@ class DataCracker:
 		
 		#self.method = 'setValue'
 		self.method = method
-		(rating, pos) = self._handleNode(template, data, 0, None) #, self.dom)
-		Debug(1, "RATING: %d - POS: %d - LEN(DATA): %d" % (rating, self.parentPos+pos, len(data)))
-		if pos < len(data)-1:
+		(rating, pos) = self._handleNode(template, buff, 0, None) #, self.dom)
+		Debug(1, "RATING: %d - POS: %d - LEN(DATA): %d" % (rating, self.parentPos+pos, len(buff.data)))
+		if pos < len(buff.data)-1:
 			Debug(1, "WARNING: Did not consume all data!!!")
 		
 		# Find all our placements and shift elements around.
@@ -265,7 +271,7 @@ class DataCracker:
 		
 		return -1
 	
-	def _handleNodeSize(self, node, data, pos, parent):
+	def _handleNodeSize(self, node, buff, pos, parent):
 		'''
 		Try and determine size of a node.
 		
@@ -282,22 +288,22 @@ class DataCracker:
 			raise Exception("Node is None, bailing!")
 		
 		if node.elementType == 'string':
-			(rating, size) = self._handleStringSize(node, data, pos, parent)
+			(rating, size) = self._handleStringSize(node, buff, pos, parent)
 			
 		elif node.elementType == 'number':
-			(rating, size) = self._handleNumberSize(node, data, pos, parent)
+			(rating, size) = self._handleNumberSize(node, buff, pos, parent)
 			
 		elif node.elementType == 'block' or node.elementType == 'template':
-			(rating, size) = self._handleBlockSize(node, data, pos, parent)
+			(rating, size) = self._handleBlockSize(node, buff, pos, parent)
 			
 		elif node.elementType == 'blob':
-			(rating, size) = self._handleBlobSize(node, data, pos, parent)
+			(rating, size) = self._handleBlobSize(node, buff, pos, parent)
 		
 		elif node.elementType == 'custom':
-			(rating, size) = self._handleCustomSize(node, data, pos, parent)
+			(rating, size) = self._handleCustomSize(node, buff, pos, parent)
 		
 		elif node.elementType == 'flags':
-			(rating, size) = self._handleFlagsSize(node, data, pos, parent)
+			(rating, size) = self._handleFlagsSize(node, buff, pos, parent)
 		
 		elif node.elementType == 'choice':
 			rating = 1
@@ -308,7 +314,7 @@ class DataCracker:
 	
 		return (rating, size)
 	
-	def _handleStringSize(self, node, data, pos, parent):
+	def _handleStringSize(self, node, buff, pos, parent):
 		
 		Debug(1, "_handleStringSize(%s)" % node.name)
 		
@@ -325,7 +331,7 @@ class DataCracker:
 		
 		return (2, 1)
 	
-	def _handleBlobSize(self, node, data, pos, parent):
+	def _handleBlobSize(self, node, buff, pos, parent):
 		
 		Debug(1, "_handleBlobSize(%s)" % node.name)
 		
@@ -343,13 +349,13 @@ class DataCracker:
 		
 		return (2, 1)
 	
-	def _handleNumberSize(self, node, data, pos, parent):
+	def _handleNumberSize(self, node, buff, pos, parent):
 		return (1, node.size / 8)
 	
-	def _handleFlagsSize(self, node, data, pos, parent):
+	def _handleFlagsSize(self, node, buff, pos, parent):
 		return (1, node.length / 8)
 	
-	def _handleBlockSize(self, node, data, pos, parent):
+	def _handleBlockSize(self, node, buff, pos, parent):
 		
 		## TODO: Handle maxOccurs!
 		
@@ -363,7 +369,7 @@ class DataCracker:
 			if not isinstance(child, DataElement):
 				continue
 			
-			(rating, size) = self._handleNodeSize(child, data, pos, node)
+			(rating, size) = self._handleNodeSize(child, buff, pos, node)
 			if rating < 3:
 				curSize += size
 				curRating = rating
@@ -451,13 +457,13 @@ class DataCracker:
 		#print "_unFixRealParent(): Found fake root: ", root.name
 		root.parent = None
 	
-	def _handleNode(self, node, data, pos, parent = None, doingMinMax = False):
+	def _handleNode(self, node, buff, pos, parent = None, doingMinMax = False):
 		
 		Debug(1, "_handleNode(%s): %s >>Enter" % (node.name, node.elementType))
-		
+
 		# 0. Are we okay?
 		
-		if pos > len(data):
+		if pos > len(buff.data):
 			raise Exception("Running past data!")
 		
 		# 1. do we have a node?
@@ -480,7 +486,7 @@ class DataCracker:
 				#'Peach' : self.engine.peach,
 				'self' : node,
 				'pos' : pos,
-				'data' : data
+				'data' : buff.data
 				}
 			
 			Debug(1, "_handleNode: When: Running expression")
@@ -510,7 +516,7 @@ class DataCracker:
 					popPosition = pos
 					pos = int(relation.getValue(True))
 					Debug(1, "Changed position to %d" % (self.parentPos+pos))
-			
+					
 				except:
 					raise
 		
@@ -544,10 +550,10 @@ class DataCracker:
 		# 4. do the crazy!
 		
 		if node.elementType == 'string':
-			(rating, pos) = self._handleString(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleString(node, buff, pos, parent, doingMinMax)
 		
 		elif node.elementType == 'number':
-			(rating, pos) = self._handleNumber(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleNumber(node, buff, pos, parent, doingMinMax)
 		
 		elif node.elementType in ['block', 'template', 'choice']:
 			
@@ -567,7 +573,7 @@ class DataCracker:
 					
 					#length = relation.getValue()
 					Debug(1, "Size-of Length: %s" % length)
-
+					
 					# Verify we are not inside the "of" portion
 					if fullName.find(node.getFullname()+".") == 0:
 						length = None
@@ -586,23 +592,28 @@ class DataCracker:
 			# situation.
 			if length != None and node.parent != None:
 				# Make sure we have the data
-				if len(data) < (pos+length):
-					if not self.haveAllData:
+				if len(buff.data) < (pos+length):
+					if not buff.haveAllData:
 						node.relationOf = None
-						raise NeedMoreData(length, "")
+						try:
+							buff.read((pos+length) - len(buff.data))
+							#raise NeedMoreData(length, "")
+						except:
+							rating = 4
+							pos = pos + length
 					
 					else:
 						rating = 4
 						pos = pos + length
 				
-				else:
+				if len(buff.data) >= (pos+length):
 					Debug(1, "---- About to Crack internal Block ----")
 					
 					# Parse this node on it's own
 					cracker = DataCracker(self.peach, True)
 					cracker.haveAllData = True
 					cracker.parentPos = pos+self.parentPos
-					data = data[pos:pos+length]
+					data = buff.data[pos:pos+length]
 					
 					# Do we have a transformer, if so decode the data
 					if node.transformer != None:
@@ -621,7 +632,8 @@ class DataCracker:
 					node.realParent = parent
 					
 					try:
-						(rating, crackpos) = cracker.internalCrackData(node, data, self.method)
+						newBuff = PublisherBuffer(None, data)
+						(rating, crackpos) = cracker.internalCrackData(node, newBuff, self.method)
 						if rating == 0:
 							rating = 1
 						
@@ -652,20 +664,20 @@ class DataCracker:
 			
 			else:
 				if node.elementType == 'choice':
-					(rating, pos) = self._handleChoice(node, data, pos, parent, doingMinMax)
+					(rating, pos) = self._handleChoice(node, buff, pos, parent, doingMinMax)
 				else:
-					(rating, pos) = self._handleBlock(node, data, pos, parent, doingMinMax)
+					(rating, pos) = self._handleBlock(node, buff, pos, parent, doingMinMax)
 		
 		elif node.elementType == 'blob':
-			(rating, pos) = self._handleBlob(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleBlob(node, buff, pos, parent, doingMinMax)
 			Debug(1, "---] pos = %d" % (self.parentPos+pos))
 		elif node.elementType == 'custom':
-			(rating, pos) = self._handleCustom(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleCustom(node, buff, pos, parent, doingMinMax)
 			Debug(1, "---] pos = %d" % (self.parentPos+pos))
 		elif node.elementType == 'flags':
-			(rating, pos) = self._handleFlags(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleFlags(node, buff, pos, parent, doingMinMax)
 		elif node.elementType == 'seek':
-			(rating, pos) = self._handleSeek(node, data, pos, parent, doingMinMax)
+			(rating, pos) = self._handleSeek(node, buff, pos, parent, doingMinMax)
 		
 		else:
 			raise str("Unknown elementType: %s" % node.elementType)
@@ -735,11 +747,11 @@ class DataCracker:
 					Debug(1, "@@@ In While, newCurPos=%d" % (self.parentPos+newCurPos))
 					
 					# 0. Are we out at end of stream?
-					if self.haveAllData and newCurPos >= len(data):
+					if buff.haveAllData and newCurPos >= len(buff.data):
 						Debug(1, "@ Exiting while loop, end of data! YAY!")
 						break
 					else:
-						Debug(1, "@ Have enough data to try again: %d < %d" % (newCurPos, len(data)))
+						Debug(1, "@ Have enough data to try again: %d < %d" % (newCurPos, len(buff.data)))
 					
 					# 1. Make a copy so we don't overwrite
 					#    existing node
@@ -757,7 +769,7 @@ class DataCracker:
 							print "Child:", c.name
 						
 						raise
-
+					
 					# 1.2. Run onArrayNext
 					
 					if DataCracker._tabLevel == 0 and nodeCopy.onArrayNext != None:
@@ -769,7 +781,7 @@ class DataCracker:
 						Debug(1, "*** >> nodeCopy.name: %s" % nodeCopy.name)
 						Debug(1, "*** >> LookAhead")
 						
-						newRating = self._lookAhead(nodeCopy, data, newCurPos, None, False)
+						newRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
 						Debug(1, "*** << LookAhead [%d]" % newRating)
 						
 						# If look ahead was good, save and check later.
@@ -781,13 +793,13 @@ class DataCracker:
 					Debug(1, "*** >> DOING ACTUAL HANDLENODE")
 					
 					origNewCurPos = newCurPos
-					(newRating, newCurPos) = self._handleNode(nodeCopy, data, newCurPos, None, True)
+					(newRating, newCurPos) = self._handleNode(nodeCopy, buff, newCurPos, None, True)
 					if newCurPos < origNewCurPos:
 						raise Exception("WHoa!  We shouldn't have moved back in position there... [%d:%d]" % origNewCurPos, newCurPos)
 					
 					# Verify we didn't break a good lookahead
 					if not hasCountRelation and newRating < 3 and not self.lookAhead and goodLookAhead != None:
-						lookAheadRating = self._lookAhead(nodeCopy, data, newCurPos, None, False)
+						lookAheadRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
 						if lookAheadRating >= 3:
 							del node.parent[nodeCopy.name]
 							Debug(1, "*** Exiting min/max: We broke a good lookAhead!")
@@ -846,7 +858,7 @@ class DataCracker:
 				Debug(1, "@@@ Returning a curpos=%d, pos=%d, newCurPos=%d, occuurs=%d" %(self.parentPos+curpos, self.parentPos+pos, self.parentPos+newCurPos, occurs))
 				node.relationOf = None
 				return (rating, curpos)
-		
+			
 		if popPosition != None:
 			pos = popPosition
 			Debug(1, "Popping position back to %d" % (self.parentPos+pos))
@@ -855,7 +867,7 @@ class DataCracker:
 		node.relationOf = None
 		return (rating, pos)
 	
-	def _lookAhead(self, node, data, pos, parent, minMax = True):
+	def _lookAhead(self, node, buff, pos, parent, minMax = True):
 		'''
 		Look ahead one step and get the next rating.  Looking ahead
 		from a current node is more complex than it might first seem.
@@ -869,7 +881,7 @@ class DataCracker:
 		if node == None:
 			return 1
 		
-		if pos > len(data):
+		if pos > len(buff.data):
 			Debug(1, "_lookAhead(): pos > len(data), no lookahead")
 			return 4
 		
@@ -921,27 +933,27 @@ class DataCracker:
 		if node.maxOccurs > 1 and minMax:
 			Debug(1, "_lookAhead(): look ahead for node")
 			
-			try:
-				(rating, pos) = self._handleNode(node, data, pos, parent)
+			#try:
+			(rating, pos) = self._handleNode(node, buff, pos, parent)
+			
+			# If we have a good rating return it
+			if rating < 3:
 				
-				# If we have a good rating return it
-				if rating < 3:
-					
-					self.lookAheadDepth -= 1
-					if self.lookAheadDepth == 0:
-						self.lookAhead = False
-					
-					self.lookAhead = False
-					DataCracker._tabLevel -= 1
-					return rating
-				
-			except NeedMoreData:
 				self.lookAheadDepth -= 1
 				if self.lookAheadDepth == 0:
 					self.lookAhead = False
 				
+				self.lookAhead = False
 				DataCracker._tabLevel -= 1
-				return 4
+				return rating
+				
+			#except NeedMoreData:
+			#	self.lookAheadDepth -= 1
+			#	if self.lookAheadDepth == 0:
+			#		self.lookAhead = False
+			#	
+			#	DataCracker._tabLevel -= 1
+			#	return 4
 		
 		## Now lets try that sibling if we can
 		
@@ -956,7 +968,7 @@ class DataCracker:
 			
 			try:
 				Debug(1, "_lookAhead(): look ahead for node.Sibling(): %s->%s" % (node.name,sibling.name))
-				(rating, pos) = self._handleNode(sibling, data, pos, parent)
+				(rating, pos) = self._handleNode(sibling, buff, pos, parent)
 			
 			except ReachedGoalNode, e:
 				self.nodeGoal = None
@@ -964,9 +976,9 @@ class DataCracker:
 				pos = r.pos
 				print "lookAhead: Found goal [%s]: %d" % (self.nodeGoal, rating)
 				
-			except NeedMoreData:
-				rating = 4
-				
+			#except NeedMoreData:
+			#	rating = 4
+		
 		self.nodeGoal = origionalGoal
 		
 		self.lookAheadDepth -= 1
@@ -974,12 +986,12 @@ class DataCracker:
 			self.lookAhead = False
 		
 		DataCracker._tabLevel -= 1
-		if pos < len(data):
+		if pos < len(buff.data):
 			return rating + 1
 		
 		else:
 			return rating
-		
+	
 	def _isTokenNext(self, node):
 		'''
 		Determine if a token node follows.  Other sized
@@ -1025,7 +1037,7 @@ class DataCracker:
 			length += s
 		
 		return length
-
+	
 	def _hasSize(self, node):
 		'''
 		Determin if data element has a size
@@ -1036,7 +1048,7 @@ class DataCracker:
 		#  - Relations
 		#  - Blocks
 		#  - Side cases
-			
+		
 		if isinstance(node, String) or isinstance(node, Blob):
 			if node.length != None:
 				return node.length
@@ -1128,7 +1140,7 @@ class DataCracker:
 		
 		return rating
 		
-	def _handleChoice(self, node, data, pos, parent, doingMinMax = False):
+	def _handleChoice(self, node, buff, pos, parent, doingMinMax = False):
 		Debug(1, "---> %s (%d)" % (node.name,self.parentPos+pos))
 		
 		# Default is failure
@@ -1156,7 +1168,7 @@ class DataCracker:
 			
 			Debug(1, "_handleChoice(): Tring child [%s]" % child.name)
 			
-			(childRating, newpos) = self._handleNode(child, data, curpos)
+			(childRating, newpos) = self._handleNode(child, buff, curpos)
 			if child.currentValue != None and len(child.currentValue) > 30:
 				Debug(1, "_handleChoice(): Rating: (%d) [%s]: %s = [%s]" % (childRating, repr(child.defaultValue), child.name, child.currentValue[:30]))
 			else:
@@ -1192,7 +1204,7 @@ class DataCracker:
 			
 		return (rating, curpos)
 	
-	def _handleBlock(self, node, data, pos, parent, doingMinMax = False):
+	def _handleBlock(self, node, buff, pos, parent, doingMinMax = False):
 		
 		# Not going to handle alignment right now :)
 		
@@ -1224,7 +1236,7 @@ class DataCracker:
 			
 			ratingCnt += 1
 			
-			(childRating, newpos) = self._handleNode(child, data, curpos)
+			(childRating, newpos) = self._handleNode(child, buff, curpos)
 			if child != None and child.currentValue != None and len(child.currentValue) > 30:
 				if child.defaultValue != None and len(repr(child.defaultValue)) > 30:
 					Debug(1, "_handleBlock(%s): Rating: (%d) [%s]: %s = [%s]" % (node.name, childRating, repr(child.defaultValue)[:30], child.name, child.currentValue[:30]))
@@ -1235,7 +1247,7 @@ class DataCracker:
 					Debug(1, "_handleBlock(%s): Rating: (%d) [%s]: %s = [%s]" % (node.name, childRating, repr(child.defaultValue)[:30], child.name, repr(child.currentValue)))
 				else:
 					Debug(1, "_handleBlock(%s): Rating: (%d) [%s]: %s = [%s]" % (node.name, childRating, repr(child.defaultValue), child.name, repr(child.currentValue)))
-
+			
 			if childRating > 2:
 				Debug(1, "_handleBlock(%s): Child rating sucks, exiting" % node.name)
 				rating = childRating
@@ -1246,7 +1258,7 @@ class DataCracker:
 				rating = childRating
 			
 			curpos = newpos
-		
+			
 		
 		Debug(1, "BLOCK RATING: %d" % rating)
 		Debug(1, "<--- %s (%d)" % (node.name,self.parentPos+pos))
@@ -1274,7 +1286,7 @@ class DataCracker:
 		
 		return obj[obj.name]
 	
-	def _handleString(self, node, data, pos, parent, doingMinMax = False):
+	def _handleString(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is
 		how well we matched.
@@ -1336,20 +1348,27 @@ class DataCracker:
 				if node.type == 'wchar':
 					length = length * 2
 				
-				if len(data) < (pos + length):
-					if not self.haveAllData:
-						raise NeedMoreData((pos + length) - len(data), "")
+				if len(buff.data) < (pos + length):
+					if not buff.haveAllData:
+						try:
+							buff.read((pos + length) - len(buff.data))
+						except:
+							rating = 4
+							value = ""
+							newpos = pos + length
+							Debug(1, "_handleString: Want %d, have %d" % ((pos+length), len(buff.data)))
+							break
 					
 					else:
 						rating = 4
 						value = ""
 						newpos = pos + length
-						Debug(1, "_handleString: Want %d, have %d" % ((pos+length), len(data)))
+						Debug(1, "_handleString: Want %d, have %d" % ((pos+length), len(buff.data)))
 						break
 				
-				else:
+				if len(buff.data) >= (pos + length):
 					
-					value = data[pos:pos+length]
+					value = buff.data[pos:pos+length]
 					newpos = pos + length
 					defaultValue = node.defaultValue
 					rating = 2
@@ -1358,7 +1377,7 @@ class DataCracker:
 						if node.type == 'wchar':
 							# convert to ascii string
 							defaultValue = node.defaultValue.decode("utf-16le")
-					
+						
 						if value != defaultValue and node.isStatic:
 							Debug(1, "%s_handleString: %s: Bad match, static, but default didn't match [%s != %s]" % ('\t'*self.deepString, node.name, repr(value), repr(defaultValue)))
 							rating = 4
@@ -1377,36 +1396,59 @@ class DataCracker:
 				rating = 666
 				
 				if node.type != 'wchar':
-					newpos = data.find('\0', pos)
+					newpos = -1
+					while True:
+						newpos = buff.data.find('\0', pos)
 					
-					if newpos == -1:
-						if self.haveAllData:
-							rating = 4
-							value = ''
-							newpos = pos
+						if newpos == -1:
+							if buff.haveAllData:
+								rating = 4
+								value = ''
+								newpos = pos
+								break
+						
+							else:
+								try:
+									buff.read(1)
+								except:
+									rating = 4
+									value = ''
+									newpos = pos
+									break
 						
 						else:
-							raise NeedMoreData(1, "Looking for string null terminator")
+							break
 					
-					newpos += 1	# find leaves us a position down, need to add one to get the null
-					value = data[pos:newpos]
-					rating = 2
+					if rating == 666:
+						newpos += 1	# find leaves us a position down, need to add one to get the null
+						value = buff.data[pos:newpos]
+						rating = 2
+					
 					break
 				
 				elif node.type == 'wchar':
 					
-					newpos = data.find("\0\0", pos)
-					if newpos == -1:
-						if self.haveAllData:
+					newpos = buff.data.find("\0\0", pos)
+					while newpos == -1:
+						
+						if not buff.haveAllData:
+							try:
+								buff.read(1)
+							except:
+								pass
+							
+						elif buff.haveAllData:
 							rating = 4
 							newpos = pos
 							value = ''
 							Debug(1, "data.find(00) returned -1, pos: %d" % pos)
 							break
-						
-						else:
-							raise NeedMoreData(1, "Looking for string null terminator")
+			
+						newpos = buff.data.find("\0\0", pos)
 					
+					if rating != 666:
+						break
+
 					if newpos == pos:
 						Debug(1, "Found empty terminated wchar string: [%s]" % repr(value))
 						value = ""
@@ -1415,7 +1457,7 @@ class DataCracker:
 						break
 					
 					newpos += 3 # find leaves us a position down, need to add one to get the null
-					value = data[pos:newpos-2]
+					value = buff.data[pos:newpos-2]
 					rating = 2
 					
 					if len(value) % 2 != 0:
@@ -1437,7 +1479,7 @@ class DataCracker:
 					Debug(1, "pos: %d; newpos: %d" % (pos, newpos))
 					
 					break
-				
+			
 			elif node.isStatic:
 				
 				# first, look for our defaultValue
@@ -1453,14 +1495,14 @@ class DataCracker:
 					defaultValue = node.defaultValue
 				
 				newpos = pos+len(defaultValue)
-				value = data[pos:newpos]
+				value = buff.data[pos:newpos]
 				if value == defaultValue:
 						rating = 2
 						break
 				
 				else:
 						rating = 4
-						Debug(1, "%s_handleString: %s: No match [%s == %s] @ %d" % ('\t'*self.deepString, node.name, repr(data[newpos:newpos+len(defaultValue)]), repr(defaultValue), pos))
+						Debug(1, "%s_handleString: %s: No match [%s == %s] @ %d" % ('\t'*self.deepString, node.name, repr(buff.data[newpos:newpos+len(defaultValue)]), repr(defaultValue), pos))
 						break
 				
 			else:
@@ -1471,30 +1513,26 @@ class DataCracker:
 					
 				# Are we the last data element?
 				if self._nextNode(node) == None:
-					if not self.haveAllData:
-						#self.haveAllData = True
-						raise NeedMoreData(-1, "")
+					if not buff.haveAllData:
+						buff.readAll()
 					
-					else:
-						# Keep all the data :)
-						Debug(1, "_handleString: Have all data, keeping it for me :)")
-						value = data[pos:]
-						newpos = len(data)
-						rating = 1
-						#break
-						
+					# Keep all the data :)
+					Debug(1, "_handleString: Have all data, keeping it for me :)")
+					value = buff.data[pos:]
+					newpos = len(buff.data)
+					rating = 1
+				
 				elif self._isLastUnsizedNode(node) != None:
 					# Are all other nodes of deterministic size?
 					
 					Debug(1, "_handleString: self._isLastUnsizedNode(node)")
 					
-					if not self.haveAllData:
-						#self.haveAllData = True
-						raise NeedMoreData(-1, "")
+					if not buff.haveAllData:
+						buff.readAll()
 					
 					length = self._isLastUnsizedNode(node)
-					newpos = len(data) - length
-					value = data[pos:newpos]
+					newpos = len(buff.data) - length
+					value = buff.data[pos:newpos]
 					rating = 1
 				
 				elif self._isTokenNext(node) != None:
@@ -1506,25 +1544,35 @@ class DataCracker:
 					
 					# 1. Locate staticNode position
 					val = staticNode.getValue()
-					Debug(1, "Looking for [%s][%s]" % (repr(val), repr(data[pos:])))
-					valPos = data[pos:].find(val)
-					if valPos == -1:
-						if self.haveAllData:
+					Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
+					valPos = buff.data[pos:].find(val)
+					while valPos == -1:
+						if buff.haveAllData:
 							newpos = pos
 							value = ""
 							rating = 4
 							Debug(1, " :( Have all data")
 							break
 						
-						else:
-							Debug(1, " --- NEED MORE DATA ---")
-							raise NeedMoreData(1, "")
+						try:
+							buff.read(1)
+						except:
+							newpos = pos
+							value = ""
+							rating = 4
+							Debug(1, " :( Have all data")
+							break
+						
+						valPos = buff.data[pos:].find(val)
+					
+					if rating == 4:
+						break
 					
 					# 2. Subtract length
 					newpos = (pos+valPos) - length
 					
 					# 3. Yuppie!
-					value = data[pos:newpos]
+					value = buff.data[pos:newpos]
 					rating = 1
 					
 					Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
@@ -1539,7 +1587,7 @@ class DataCracker:
 					
 					lookRating = 666
 					newpos = pos
-					dataLen = len(data)
+					dataLen = len(buff.data)
 					
 					# If we have a following static just scan
 					# for it instead of calling lookAhead.
@@ -1548,16 +1596,26 @@ class DataCracker:
 						nextValue = nextNode.getValue()
 						nextValueLen = len(nextValue)
 						
-						newpos = data.find(nextValue, pos)
-						if newpos == -1:
-							if self.haveAllData:
+						newpos = buff.data.find(nextValue, pos)
+						while newpos == -1:
+							if buff.haveAllData:
 								value = ""
 								rating = 4
 								break
-							else:
-								raise NeedMoreData(1, "Couldn't locate nextValue [%s] in [%s]" % (repr(nextValue), repr(data[pos:])))
+							
+							try:
+								buff.read(1)
+							except:
+								value = ""
+								rating = 4
+								break
+								
+							newpos = buff.data.find(nextValue, pos)
 						
-						value = data[pos:newpos]
+						if rating == 4:
+							break
+						
+						value = buff.data[pos:newpos]
 						rating = 2
 						break
 					
@@ -1565,9 +1623,9 @@ class DataCracker:
 					# We should try a reading at least 2-5 chars at once.
 					while lookRating > 2 and newpos < dataLen:
 						newpos += 1
-						lookRating = self._lookAhead(node, data, newpos, parent)
+						lookRating = self._lookAhead(node, buff, newpos, parent)
 					
-					value = data[pos:newpos]
+					value = buff.data[pos:newpos]
 					
 					if lookRating > 2:
 						rating = 3
@@ -1616,7 +1674,7 @@ class DataCracker:
 			#
 			# Note2: maxOccurs can lie if we are doingMinMax!
 			#
-			if newpos < len(data) and node.maxOccurs == 1 and (node.parent == None or node.parent.maxOccurs == 1) and not doingMinMax:
+			if newpos < len(buff.data) and node.maxOccurs == 1 and (node.parent == None or node.parent.maxOccurs == 1) and not doingMinMax:
 				# We didn't use it all up, sad for us!
 				Debug(1, "--- Didn't use all data, rating == 4")
 				rating = 4
@@ -1632,7 +1690,7 @@ class DataCracker:
 		self.deepString -= 1
 		return (rating, newpos)
 	
-	def _handleNumber(self, node, data, pos, parent, doingMinMax = False):
+	def _handleNumber(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Handle Number.  Return (rating, newpos, value) in tuple.
 		
@@ -1652,17 +1710,20 @@ class DataCracker:
 		
 		# See if we have enough data
 		
-		if (pos+length) > len(data):
-			# need more 
-			if not self.haveAllData:
-				raise NeedMoreData((pos+length) - len(data), node.name)
-			else:
+		if (pos+length) > len(buff.data):
+			# need more
+			try:
+				buff.read((pos+length) - len(buff.data))
+			except:
+				pass
+			
+			if (pos+length) > len(buff.data):
 				node.rating = None
 				return (4, pos)
 		
 		# Get value based on element length
 		
-		value = data[pos:pos+length]
+		value = buff.data[pos:pos+length]
 		newpos = pos + length
 		
 		# Build format string
@@ -1728,7 +1789,7 @@ class DataCracker:
 		Debug(1, "<--- %s (%d, %d-%d)" % (node.name, node.rating, self.parentPos+pos, self.parentPos+newpos))
 		return (node.rating, newpos)
 	
-	def _handleFlags(self, node, data, pos, parent, doingMinMax = False):
+	def _handleFlags(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is
 		how well we matched.
@@ -1746,12 +1807,18 @@ class DataCracker:
 		rating = 0
 		length = node.length/8
 		
-		if (pos+length) > len(data):
+		if (pos+length) > len(buff.data):
 			# need more
-			#print "_handleFlags(): We need %d we have total %d and are at pos %d" % (length, len(data), pos)
-			raise NeedMoreData((pos+length) - len(data), node.name)
+			try:
+				buff.read((pos+length) - len(buff.data))
+			except:
+				pass
+			
+			if (pos+length) > len(buff.data):
+				node.rating = None
+				return (4, pos)
 		
-		value = data[pos:pos+length]
+		value = buff.data[pos:pos+length]
 		newpos = pos + length
 		
 		#print "prepack value: %s pos: %d" % (repr(value), pos)
@@ -1785,7 +1852,7 @@ class DataCracker:
 				mask = 0
 				for i in range(0, child.length):
 					mask += 1 << i
-			
+				
 				#print "_handleFlags(): %d, %d, %d" % (childValue, mask, childValue & mask)
 				childValue = childValue & mask
 			
@@ -1845,7 +1912,7 @@ class DataCracker:
 		return ret
 	
 
-	def _handleSeek(self, node, data, pos, parent, doingMinMax = False):
+	def _handleSeek(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Handle a Seek element
 		'''
@@ -1854,20 +1921,23 @@ class DataCracker:
 		
 		# 1. Get the position to jump to
 		
-		newpos = node.getPosition(pos, len(data), data)
+		newpos = node.getPosition(pos, len(buff.data), buff.data)
 		
 		# 2. Can we jump there?
 		
-		if newpos > data:
+		if newpos > buff.data:
 			
 			# a. Do we have all the data?
-			if not self.haveAllData:
+			if not buff.haveAllData:
 				# Request more
-				raise NeedMoreData((pos+newpos) - len(data), "")
+				try:
+					buff.read((pos+newpos) - len(buff.data))
+				except:
+					pass
 			
-			else:
+			if newpos > buff.data:
 				# Bad rating
-				Debug(1, "<--- SEEK TO %d FAILED, ONLY HAVE %d" % (newpos, len(data)))
+				Debug(1, "<--- SEEK TO %d FAILED, ONLY HAVE %d" % (newpos, len(buff.data)))
 				return (4, pos)
 		
 		elif newpos < 0:
@@ -1879,12 +1949,12 @@ class DataCracker:
 		Debug(1, "<--- SEEK TO %d" % newpos)
 		return (1, newpos)
 	
-	def _handleCustomSize(self, node, data, pos, parent):
+	def _handleCustomSize(self, node, buff, pos, parent):
 		Debug(1, "_handleCustomSize(%s)" % node.name)
 		
-		return node.handleIncomingSize(node, data, pos, parent)
+		return node.handleIncomingSize(node, buff, pos, parent)
 		
-	def _handleCustom(self, node, data, pos, parent, doingMinMax = False):
+	def _handleCustom(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is
 		how well we matched.
@@ -1899,13 +1969,13 @@ class DataCracker:
 		
 		Debug(1, "---> %s (%d)" % (node.name, self.parentPos+pos))
 		
-		rating, newpos = node.handleIncoming(self, data, pos, parent, doingMinMax)
+		rating, newpos = node.handleIncoming(self, buff, pos, parent, doingMinMax)
 		
 		# contraint
 		if node.constraint != None and rating < 3:
 			env = {
 				"self":node,
-				"data":data,
+				"data":buff.data,
 				"pos":pos,
 				"newpos":newpos,
 				}
@@ -1924,7 +1994,7 @@ class DataCracker:
 		Debug(1, "<--- %s (%d)" % (node.name, self.parentPos+newpos))
 		return (rating, newpos)
 		
-	def _handleBlob(self, node, data, pos, parent, doingMinMax = False):
+	def _handleBlob(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is
 		how well we matched.
@@ -1973,22 +2043,29 @@ class DataCracker:
 			if length == None:
 				length = node.getLength()
 			
-			value = data[pos:pos + length]
-			newpos = pos + length
-			rating = 2
-			
-			if value == node.defaultValue:
-				rating = 1
-			elif node.isStatic:
+			if (pos+length) > len(buff.data):
+				if not buff.haveAllData:
+					try:
+						buff.read((pos+length) - len(buff.data))
+					except:
+						pass
+				
+			if (pos+length) > len(buff.data):
+				Debug(1, "_handleBlob: Not enough data, rating = 4: %d left" % (len(buff.data)-pos))
 				rating = 4
 			
-			if (pos+length) > len(data):
-				if not self.haveAllData:
-					raise NeedMoreData((pos+length) - len(data), "")
-				else:
-					Debug(1, "_handleBlob: Not enough data, rating = 4: %d left" % (len(data)-pos))
+			else:
+				
+				value = buff.data[pos:pos + length]
+				newpos = pos + length
+				rating = 2
+				
+				if value == node.defaultValue:
+					rating = 1
+				
+				elif node.isStatic:
 					rating = 4
-		
+			
 		else:
 			# If we don't have a sizeof relation, we try for a best fit
 			# by adjusting the position until our look ahead has a rating
@@ -1998,28 +2075,20 @@ class DataCracker:
 			if self._nextNode(node) == None:
 				#print "--- Last element, snafing it all :)"
 				
-				if not self.haveAllData:
-					self.haveAllData = True
-					raise NeedMoreData(-1, "")
-				
-				else:
-					# Keep all the data :)
-					value = data[pos:]
-					newpos = len(data)
-					rating = 1
+				buff.readAll()
+				value = buff.data[pos:]
+				newpos = len(buff.data)
+				rating = 1
 			
 			elif self._isLastUnsizedNode(node) != None:
 				# Are all other nodes of deterministic size?
 				
 				Debug(1, "_handleBlob: self._isLastUnsizedNode(node)")
 				
-				if not self.haveAllData:
-					#self.haveAllData = True
-					raise NeedMoreData(-1, "")
-				
+				buff.readAll()
 				length = self._isLastUnsizedNode(node)
-				newpos = len(data) - length
-				value = data[pos:newpos]
+				newpos = len(buff.data) - length
+				value = buff.data[pos:newpos]
 				rating = 1
 			
 			elif self._isTokenNext(node) != None:
@@ -2031,31 +2100,37 @@ class DataCracker:
 				
 				# 1. Locate staticNode position
 				val = staticNode.getValue()
-				Debug(1, "Looking for [%s][%s]" % (repr(val), repr(data[pos:])))
-				valPos = data[pos:].find(val)
-				if valPos == -1:
-					if self.haveAllData:
+				Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
+				
+				valPos = buff.data[pos:].find(val)
+				while valPos == -1:
+					if buff.haveAllData:
 						newpos = pos
 						value = ""
 						rating = 4
 						Debug(1, " :( Have all data")
+						break
 					
-					else:
-						Debug(1, " --- NEED MORE DATA ---")
-						raise NeedMoreData(1, "")
+					try:
+						buff.read(1)
+						
+					except:
+						pass
+					
+					valPos = buff.data[pos:].find(val)
 				
-				else:
+				if valPos != -1:
 					# 2. Subtract length
 					newpos = (pos+valPos) - length
 					
 					# 3. Yuppie!
-					value = data[pos:newpos]
+					value = buff.data[pos:newpos]
 					rating = 1
 					
 					Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
 				
 			else:
-				#if self.haveAllData:
+				#if buff.haveAllData:
 				#	print "--- Was not last node"
 				
 				lookRating = 666
@@ -2068,32 +2143,43 @@ class DataCracker:
 					nextValue = nextNode.getValue()
 					nextValueLen = len(nextValue)
 					
-					newpos = data.find(nextValue, pos)
-					if newpos == -1:
-						raise NeedMoreData(1, "Couldn't locate nextValue(%s) [%s]" % (nextNode.getFullnameInDataModel(), nextValue))
+					newpos = buff.data.find(nextValue, pos)
+					while newpos != -1:
+						if buff.haveAllData:
+							rating = 4
+							value = ""
+							newpos = pos
+							break
+						
+						try:
+							buff.read(1)
+						except:
+							pass
+						newpos = buff.data.find(nextValue, pos)
 					
-					value = data[pos:newpos]
-					rating = 2
+					if newpos != -1:
+						value = buff.data[pos:newpos]
+						rating = 2
 				
 				else:
 					
-					while lookRating > 2 and newpos < len(data):
+					while lookRating > 2 and newpos < len(buff.data):
 						#Debug(1, ".")
 						newpos += 1
-						lookRating = self._lookAhead(node, data, newpos, parent)
+						lookRating = self._lookAhead(node, buff, newpos, parent)
 						#Debug(1, "newpos: %d lookRating: %d data: %d" % (newpos, lookRating, len(data)))
 					
-					while lookRating <= 2 and newpos < len(data):
+					while lookRating <= 2 and newpos < len(buff.data):
 						#Debug(1, ",")
 						newpos += 1
-						lookRating = self._lookAhead(node, data, newpos, parent)
+						lookRating = self._lookAhead(node, buff, newpos, parent)
 						#Debug(1, "newpos: %d lookRating: %d data: %d" % (newpos, lookRating, len(data)))
 					
 					#if newpos >= len(data):
 					#	newpos -= 1
 					#	#raise str("Unable to parse out blob %s" % node.name)
 					
-					value = data[pos:newpos]
+					value = buff.data[pos:newpos]
 					rating = 2
 				
 				#print "Found blob: [%s]" % value

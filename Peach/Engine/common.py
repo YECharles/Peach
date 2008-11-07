@@ -307,6 +307,7 @@ class StreamBuffer:
 		if name != None:
 			#print "write: %s: %s" % (name, repr(data))
 			self.storePosition(name)
+			self.lengths[name] = len(data)
 		
 		dataLen = len(data)
 		ourDataLen = len(self.data)
