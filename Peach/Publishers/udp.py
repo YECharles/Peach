@@ -101,9 +101,16 @@ class Udp(Publisher):
 			pass
 	
 	def receive(self, size = None):
-		
-		data,addr = self._socket.recvfrom(65565)
-		return data
+		try:
+			self._socket.settimeout(self._timeout)
+			data,addr = self._socket.recvfrom(65565)
+			
+			if hasattr(self, "publisherBuffer"):
+				publisherBuffer.haveAllData = True
+				
+			return data
+		except:
+			raise Timeout("")
 		
 class UdpListener(Publisher):
 	'''
@@ -165,7 +172,11 @@ class UdpListener(Publisher):
 			pass
 	
 	def receive(self, size = None):
-		data,self.addr = self._socket.recvfrom(65000)
+		data,addr = self._socket.recvfrom(65565)
+		
+		if hasattr(self, "publisherBuffer"):
+			publisherBuffer.haveAllData = True
+			
 		return data
 		
 # end

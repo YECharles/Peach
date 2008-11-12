@@ -192,15 +192,26 @@ class _AsNumber(Transformer):
 			packStr += self._packFormat.lower()
 		else:
 			packStr += self._packFormat.upper()
+			
+		# Prevent silly deprication warnings from Python
+		if packStr[1] == 'b' and data > 0xfe:
+			data = 0
+		elif packStr[1] == 'B' and data > 0xff:
+			data = 0
+		elif packStr[1] == 'h' and data > 0xfffe:
+			data = 0
+		elif packStr[1] == 'H' and data > 0xffff:
+			data = 0
+		elif packStr[1] == 'i' and data > 0xfffffffe:
+			data = 0
+		elif packStr[1] == 'L' and data > 0xffffffff:
+			data = 0
+		elif packStr[1] == 'q' and data > 0xfffffffffffffffe:
+			data = 0
+		elif packStr[1] == 'Q' and data > 0xffffffffffffffff:
+			data = 0
 		
-		#if long(data) < -182229420:
-		#	raise Exception("Data wacked out")
-		try:
-			#print packStr, data
-			return struct.pack(packStr, long(data))
-		except:
-			#raise
-			return struct.pack(packStr, 0)
+		return struct.pack(packStr, long(data))
 		
 	def realDecode(self, data):
 		

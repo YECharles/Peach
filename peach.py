@@ -204,7 +204,7 @@ for i in range(len(optlist)):
 	if optlist[i][0] == '--shark' or optlist[i][0] == '-s':
 		
 		# Do the shark!
-		from Peach.Engine import *
+		from Peach.Engine import peachshark
 		from Peach.Engine.common import *
 		
 		if len(args) == 2:

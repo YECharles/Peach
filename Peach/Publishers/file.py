@@ -511,14 +511,16 @@ try:
 			for a in args:
 				realArgs.append(a)
 			
+			proc = None
 			try:
 				proc = subprocess.Popen(realArgs, shell=True)
+			
 			except:
-				print "Warning: Exception thrown creating process"
+				print "Error: Exception thrown creating process"
+				raise
 			
 			# Wait 5 seconds
 			time.sleep(self.waitTime)
-			#time.sleep(0.5)
 			
 			self.closeApp(proc, self._windowName)
 	

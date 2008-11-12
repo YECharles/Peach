@@ -21,7 +21,9 @@
 				<DataModel ref="TestCase" />
 			</Action>
 			
-			<Action type="slurp" name="SlurpData" valueXpath="//GetData//data" setXpath="//EchoData//data" />
+			<Action type="slurp" name="SlurpData1" valueXpath="//GetData//data" setXpath="//EchoData//data" />
+			<Action type="slurp" name="SlurpData2" valueXpath="//GetData//data" setXpath="//EchoData//data" />
+			<Action type="slurp" name="SlurpData3" valueXpath="//GetData//data" setXpath="//EchoData//data" />
 			
 			<Action type="output" name="EchoData">
 				<DataModel ref="TestCase" />

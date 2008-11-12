@@ -71,6 +71,9 @@ class PublisherBuffer:
 		#: Publisher associated with buffer
 		self.publisher = publisher
 		
+		if self.publisher != None:
+			self.publisher.publisherBuffer = self
+		
 		#: Data buffer of currently read bytes
 		self.data = ""
 		

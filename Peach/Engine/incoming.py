@@ -706,7 +706,7 @@ class DataCracker:
 		## 5. Handle maxOccurs > 1
 		
 		elif rating < 3 and node.maxOccurs > 1 and not doingMinMax:
-			Debug(1, "*** NOde Occures more then once!")
+			Debug(1, "*** Node Occures more then once!")
 			occurs = 1
 			newRating = rating
 			newCurPos = pos

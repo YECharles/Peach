@@ -1045,16 +1045,21 @@ class DataElement(Mutatable):
 		'''
 		Build the relation cache for this data element and it's children.
 		'''
+
+		root = self.getRootOfDataMap()
+		if root != self:
+			root.BuildRelationCache()
+			return
 		
 		# 0. Build the fullname cache first
 		if self.fullName == None or self.fullNameDataModel == None:
 			self.BuildFullNameCache()
 
 		# Update modelHasOffsetRelation when not using cache
-		if self.modelHasOffsetRelation == None and PeachModule.Engine.engine.Engine.relationsNew:
+		if self.modelHasOffsetRelation == None:
 			relations = self._getAllRelationsInDataModel(self, False)
 			for r in relations:
-				if r.type == 'count':
+				if r.type == 'offset':
 					self.modelHasOffsetRelation = True
 					break
 			
@@ -2513,7 +2518,7 @@ class Number(DataElement):
 		max = long('FF'*(self.size/8), 16)
 		return 0 - max
 	
-	def getMaxValue(self):
+	def getMaxValue(self,):
 		'''
 		Get the maximum value for this number.
 		'''
@@ -2632,7 +2637,7 @@ class Number(DataElement):
 		
 		return 0
 	
-	def getRawValue(self, sout):
+	def getRawValue(self, sout = None):
 		value = self.getInternalValue()
 		if value == '':
 			return ''

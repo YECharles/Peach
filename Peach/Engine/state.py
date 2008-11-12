@@ -546,8 +546,8 @@ class StateEngine:
 				if valueElement != None:
 					
 					Debug(1, "Action-Slurp: Setting %s from %s" % (
-						str(valueNode.getAttributeNS(None, "fullName")),
-						str(node.getAttributeNS(None, "fullName"))
+						str(node.getAttributeNS(None, "fullName")),
+						str(valueNode.getAttributeNS(None, "fullName"))
 						))
 					
 					setElement.currentValue = valueElement.currentValue
@@ -557,13 +557,13 @@ class StateEngine:
 				else:
 					
 					Debug(1, "Action-Slurp: Setting %s to %s" % (
-						str(valueNode.getAttributeNS(None, "fullName")),
+						str(node.getAttributeNS(None, "fullName")),
 						repr(action.valueLiteral)
 						))
 					
 					setElement.setDefaultValue(action.valueLiteral)
 			
-			print " - Total time to slurp data: %.2f" % (time.time() - startTime)
+			#print " - Total time to slurp data: %.2f" % (time.time() - startTime)
 		
 		elif action.type == 'connect':
 			if not self.publisher.hasBeenStarted:

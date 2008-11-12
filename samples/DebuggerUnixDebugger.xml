@@ -48,7 +48,7 @@
 	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
 		<Monitor class="debugger.UnixDebugger">
 			<Param name="Command"
-		value="/home/dd/peach/samples/UnixCrashServer/unixcrash" />
+		value="/Volumes/Untitled/peach/samples/UnixCrashServer/unixcrash" />
 			<Param name="Params" value="" />
 		</Monitor>
 	</Agent>
