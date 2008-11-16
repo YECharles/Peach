@@ -48,6 +48,7 @@ class IncomingArray2TestCase(utils.PeachSendAndRecvTestCase):
 		# Test
 		self.peachUtils.SetSendAndReceiveData("1234567890ABCDE")
 		self.peachUtils.RunPeachXml("incomingArray2.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingArray2.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == "ABCDE", 'incomingArray2.xml failed, instead [%s]' % repr(ret)
 
@@ -70,8 +71,8 @@ class IncomingPngTestCase(utils.PeachSendAndRecvTestCase):
 		fd.close()
 		
 		self.peachUtils.SetSendAndReceiveData(data)
-		self.peachUtils.RunPeachXml("incomingPng.xml")
-		#self.peachUtils.RunDebugPeachXml("incomingPng.xml")
+		#self.peachUtils.RunPeachXml("incomingPng.xml")
+		self.peachUtils.RunDebugPeachXml("incomingPng.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == data, 'incomingPng.xml failed. %s' % repr(ret)
 

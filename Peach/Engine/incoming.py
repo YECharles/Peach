@@ -457,27 +457,229 @@ class DataCracker:
 		#print "_unFixRealParent(): Found fake root: ", root.name
 		root.parent = None
 	
+	def _handleArray(self, node, buff, pos, parent = None, doingMinMax = False):
+		'''
+		This method is used when an array has been located (an element with
+		minOccurs or maxOccurs set).
+		
+		Note: This code was moved out of _handleNode() on 11/16/08
+		
+		Todo: This array handling code has gotten out of hand.  It needs
+		      some re-working and cleaning up.
+		'''
+		
+		Debug(1, "_handleArray(%s): %s >>Enter" % (node.name, node.elementType))
+
+		Debug(1, "*** Node Occures more then once!")
+		occurs = 1
+		rating = newRating = 1
+		newCurPos = pos
+		dom = None
+		curpos = None
+		maxOccurs = node.maxOccurs
+		name = node.name
+		goodLookAhead = None
+		hasCountRelation = False
+		isDeterministic = self._doesNodeHaveStatic(node)
+		origionalNode = node.copy(node.parent)
+
+		## Locate any count restrictions and update maxCount to match
+		
+		Debug(1, "-- Looking for Count relation...")
+		relation = node.getRelationOfThisElement('count')
+		if relation != None and relation.type == 'count' and node.parent != None:
+			try:
+				maxOccurs = int(relation.getValue(True))
+				Debug(1, "@@@ Found count relation [%d]" % maxOccurs)
+				hasCountRelation = True
+				
+				## Check for count relation, verify > 0
+				if maxOccurs == 0:
+					# Remove element
+					node.parent.__delitem__(node.name)
+					
+					# Remove relation (else we get errors)
+					relation.parent.relations.remove(relation)
+					relation.parent.__delitem__(relation.name)
+					
+					# We passed muster...I think :)
+					rating = 2
+					pos = origPos
+					
+					Debug(1, "_handleArray(%s): Zero count on array, removed <<EXIT")
+					return (rating, pos)
+			
+			except:
+				pass
+		
+		## Hack for fixed length arrays to remove lookAheads
+		
+		if hasCountRelation == False and node.occurs != None:
+			maxOccurs = node.occurs
+			hasCountRelation = True
+		
+		## Handle maxOccurs > 1
+		
+		try:
+			node.relationOf = None
+			Debug(1, "@@@ Entering while loop")
+			for occurs in range(maxOccurs):
+				Debug(1, "@@@ In While, newCurPos=%d" % (self.parentPos+newCurPos))
+				
+				## Are we out at end of stream?
+				if buff.haveAllData and newCurPos >= len(buff.data):
+					Debug(1, "@ Exiting while loop, end of data! YAY!")
+					break
+				else:
+					Debug(1, "@ Have enough data to try again: %d < %d" % (newCurPos, len(buff.data)))
+				
+				## Make a copy so we don't overwrite existing node
+				if occurs > 0:
+					
+					nodeCopy = origionalNode.copy(node.parent)
+					nodeCopy.name = name + "-%d" % occurs
+					
+					## Add to parent
+					node.parent.insert(node.parent.index(node)+occurs, nodeCopy)
+					
+				else:
+					## If we are on the first element
+					nodeCopy = node
+				
+				## Run onArrayNext
+				if DataCracker._tabLevel == 0 and nodeCopy.onArrayNext != None:
+					evalEvent( node.onArrayNext, { 'node' : nodeCopy }, node )
+				
+				## Check out look-ahead (unless we have count relation)
+				if (not isDeterministic) and (not hasCountRelation) and self._nextNode(nodeCopy) != None:
+					Debug(1, "*** >> node.name: %s" % node.name)
+					Debug(1, "*** >> nodeCopy.name: %s" % nodeCopy.name)
+					Debug(1, "*** >> LookAhead")
+					
+					newRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
+					Debug(1, "*** << LookAhead [%d]" % newRating)
+					
+					# If look ahead was good, save and check later.
+					if newRating < 3:
+						goodLookAhead = newRating
+					
+				## Do actual
+				Debug(1, "*** >> nodeCopy.name: %s" % nodeCopy.name)
+				Debug(1, "*** >> DOING ACTUAL HANDLENODE")
+				
+				origNewCurPos = newCurPos
+				(newRating, newCurPos) = self._handleNode(nodeCopy, buff, newCurPos, None, True)
+				if newCurPos < origNewCurPos:
+					raise Exception("WHoa!  We shouldn't have moved back in position there... [%d:%d]" % origNewCurPos, newCurPos)
+				
+				## Handle minOccurs == 0
+				if occurs == 0 and newRating >= 3 and node.minOccurs == 0:
+					
+					# Remove node and increase rating.
+					Debug(1, "Firt element rating was poor and minOccurs == 0, remoing element and upping rating.")
+					
+					# Remove relation (else we get errors)
+					for relation in node.getRelationsOfThisElement():
+						relation.parent.relations.remove(relation)
+						relation.parent.__delitem__(relation.name)
+					
+					# Delete our copy
+					del node.parent[nodeCopy.name]
+					
+					# Delete orig
+					node.parent.__delitem__(node.name)
+					rating = 2
+					curpos = pos = origPos
+					break
+				
+				## Verify we didn't break a good lookahead
+				if not hasCountRelation and newRating < 3 and not self.lookAhead and goodLookAhead != None:
+					lookAheadRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
+					if lookAheadRating >= 3:
+						del node.parent[nodeCopy.name]
+						Debug(1, "*** Exiting min/max: We broke a good lookAhead!")
+						break
+				
+				## Verify high enough rating
+				if newRating < 3 and not self.lookAhead:
+					Debug(1, "*** That worked out!")
+					pos = curpos = newCurPos
+					rating = newRating
+					
+					# First time through convert position 0 node
+					if occurs == 0:
+						
+						## First fix up our first node
+						index = node.parent.index(node)
+						del node.parent[node.name]
+						
+						node.array = node.name
+						node.name = node.name + "-0"
+						node.arrayPosition = 0
+						node.arrayMinOccurs = node.minOccurs
+						node.arrayMaxOccurs = node.maxOccurs
+						node.minOccurs = 1
+						node.maxOccurs = 1
+						
+						node.parent.insert(index, node)
+					
+					else:
+						# Next fix up our copied node
+						nodeCopy.array = node.array
+						nodeCopy.arrayPosition = occurs
+						nodeCopy.arrayMinOccurs = node.arrayMinOccurs
+						nodeCopy.arrayMaxOccurs = node.arrayMaxOccurs
+						nodeCopy.minOccurs = 1
+						nodeCopy.maxOccurs = 1
+					
+				else:
+					Debug(1, "*** Didn't work out!")
+					node.parent.__delitem__(nodeCopy.name)
+					break
+				
+				occurs += 1
+				
+				Debug(1, "@@@ Looping, occurs=%d, rating=%d" % (occurs, rating))
+		
+			Debug(1, "@@@ Exiting While Loop")
+			
+		except:
+			#pass
+			raise
+		
+		### Do a quick dump of parent's children:
+		#print "------"
+		#for c in node.parent:
+		#	if isinstance(c, DataElement):
+		#		print c.name
+		#print "------"
+		
+		if curpos != None:
+			Debug(1, "@@@ Returning a curpos=%d, pos=%d, newCurPos=%d, occuurs=%d" %(self.parentPos+curpos, self.parentPos+pos, self.parentPos+newCurPos, occurs))
+			node.relationOf = None
+			return (rating, curpos)
+		
+		Debug(1, "_handleArray(%s): type=%s, realpos=%d, pos=%d, rating=%d <<EXIT" % (node.name, node.elementType, self.parentPos+pos, pos, rating))
+		node.relationOf = None
+		return (rating, pos)
+	
 	def _handleNode(self, node, buff, pos, parent = None, doingMinMax = False):
 		
-		Debug(1, "_handleNode(%s): %s >>Enter" % (node.name, node.elementType))
+		Debug(1, "_handleNode(%s): %s pos(%d) >>Enter" % (node.name, node.elementType, pos))
 
-		# 0. Are we okay?
+		## Sanity checking
 		
 		if pos > len(buff.data):
 			raise Exception("Running past data!")
 		
-		# 1. do we have a node?
-		
 		if node == None:
 			raise Exception("Node is None, bailing!")
 		
+		## Save off origional position
+		
 		origPos = pos
 		
-		# Cache of relations
-		#print "Caching relation"
-		#node.relationOf = node.getRelationOfThisElement()
-		
-		# 2. check for when relation
+		## check for when relation
 		
 		if node.HasWhenRelation():
 			rel = node.GetWhenRelation()
@@ -504,7 +706,8 @@ class DataCracker:
 			self._unFixRealParent(node)
 			Debug(1, "_handleNode: When: Returned True.")
 		
-		# 3.1. Skipp around if we have an offset relations
+		## Skipp around if we have an offset relations
+		
 		popPosition = None
 		if isinstance(node, DataElement):
 			relation = node.getRelationOfThisElement('offset')
@@ -520,36 +723,20 @@ class DataCracker:
 				except:
 					raise
 		
-		# Would be nice to have our current pos in scripting :)
+		## Would be nice to have our current pos in scripting :)
 		node.possiblePos = pos
 		
-		## Check for count relation, verify > 0
-		if node.minOccurs == 0:
-			relation = node.getRelationOfThisElement('count')
-			if relation != None and node.parent != None:
-				occurs = int(relation.getValue(True))
-				if occurs == 0:
-					# Remove element
-					node.parent.__delitem__(node.name)
-					
-					# Remove relation (else we get errors)
-					relation.parent.relations.remove(relation)
-					relation.parent.__delitem__(relation.name)
-					
-					# We passed muster...I think :)
-					rating = 2
-					pos = origPos
-					
-					Debug(1, "_handleNode(%s): Zero count on array, removed <<EXIT")
-					return (rating, pos)
-		
-		# 3.5. Save origional copy
+		## Save origional copy
 		
 		origionalNode = node.copy(node.parent)
 		
-		# 4. do the crazy!
+		## Do the crazy! (aka call specific crack handler)
 		
-		if node.elementType == 'string':
+		# Array handling *MUST* always be first!
+		if not doingMinMax and (node.minOccurs < 1 or node.maxOccurs > 1):
+			(rating, pos) = self._handleArray(node, buff, pos, parent, doingMinMax)
+		
+		elif node.elementType == 'string':
 			(rating, pos) = self._handleString(node, buff, pos, parent, doingMinMax)
 		
 		elif node.elementType == 'number':
@@ -688,177 +875,6 @@ class DataCracker:
 			# Throw the required exception :)
 			raise ReachedGoalNode(raiting, pos, node)
 		
-		## Handle minOccurs == 0
-		elif rating >= 3 and node.minOccurs == 0 and not doingMinMax:
-			
-			# Remove node and increase rating.
-			Debug(1, "Rating was poor and minOccurs == 0, remoing element and upping rating.")
-			
-			# Remove relation (else we get errors)
-			for relation in node.getRelationsOfThisElement():
-				relation.parent.relations.remove(relation)
-				relation.parent.__delitem__(relation.name)
-			
-			node.parent.__delitem__(node.name)
-			rating = 2
-			pos = origPos
-		
-		## 5. Handle maxOccurs > 1
-		
-		elif rating < 3 and node.maxOccurs > 1 and not doingMinMax:
-			Debug(1, "*** Node Occures more then once!")
-			occurs = 1
-			newRating = rating
-			newCurPos = pos
-			dom = None
-			curpos = None
-			maxOccurs = node.maxOccurs
-			name = node.name
-			goodLookAhead = None
-			hasCountRelation = False
-			isDeterministic = self._doesNodeHaveStatic(node)
-			
-			try:
-				
-				# Locate any count restrictions and update maxCount to match
-				
-				Debug(1, "-- Looking for Count relation...")
-				relation = node.getRelationOfThisElement('count')
-				if relation != None and relation.type == 'count' and node.parent != None:
-					try:
-						maxOccurs = int(relation.getValue(True))
-						Debug(1, "@@@ Found count relation [%d]" % maxOccurs)
-						hasCountRelation = True
-					
-					except:
-						pass
-				
-				# Hack for fixed length arrays to remove lookAheads
-				if node.occurs != None:
-					maxOccurs = node.occurs
-					hasCountRelation = True
-				
-				node.relationOf = None
-				Debug(1, "@@@ Entering while loop")
-				while occurs < maxOccurs and rating < 3:
-					if popPosition != None:
-						print "@@@ Note: popPosition is not null!"
-					
-					Debug(1, "@@@ In While, newCurPos=%d" % (self.parentPos+newCurPos))
-					
-					# 0. Are we out at end of stream?
-					if buff.haveAllData and newCurPos >= len(buff.data):
-						Debug(1, "@ Exiting while loop, end of data! YAY!")
-						break
-					else:
-						Debug(1, "@ Have enough data to try again: %d < %d" % (newCurPos, len(buff.data)))
-					
-					# 1. Make a copy so we don't overwrite
-					#    existing node
-					nodeCopy = origionalNode.copy(node.parent)
-					nodeCopy.name = name + "-%d" % occurs
-					
-					# 1.1 Add to parent
-					try:
-						node.parent.insert(node.parent.index(node)+occurs, nodeCopy)
-					except:
-						print "Node:", node.name
-						print "Node.parent:", node.parent.name
-						
-						for c in node.parent:
-							print "Child:", c.name
-						
-						raise
-					
-					# 1.2. Run onArrayNext
-					
-					if DataCracker._tabLevel == 0 and nodeCopy.onArrayNext != None:
-						evalEvent( node.onArrayNext, { 'node' : nodeCopy }, node )
-					
-					# 2. Check out look-ahead (unless we have count relation)
-					if (not isDeterministic) and (not hasCountRelation) and self._nextNode(nodeCopy) != None:
-						Debug(1, "*** >> node.name: %s" % node.name)
-						Debug(1, "*** >> nodeCopy.name: %s" % nodeCopy.name)
-						Debug(1, "*** >> LookAhead")
-						
-						newRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
-						Debug(1, "*** << LookAhead [%d]" % newRating)
-						
-						# If look ahead was good, save and check later.
-						if newRating < 3:
-							goodLookAhead = newRating
-						
-					# 3. Do actual
-					Debug(1, "*** >> nodeCopy.name: %s" % nodeCopy.name)
-					Debug(1, "*** >> DOING ACTUAL HANDLENODE")
-					
-					origNewCurPos = newCurPos
-					(newRating, newCurPos) = self._handleNode(nodeCopy, buff, newCurPos, None, True)
-					if newCurPos < origNewCurPos:
-						raise Exception("WHoa!  We shouldn't have moved back in position there... [%d:%d]" % origNewCurPos, newCurPos)
-					
-					# Verify we didn't break a good lookahead
-					if not hasCountRelation and newRating < 3 and not self.lookAhead and goodLookAhead != None:
-						lookAheadRating = self._lookAhead(nodeCopy, buff, newCurPos, None, False)
-						if lookAheadRating >= 3:
-							del node.parent[nodeCopy.name]
-							Debug(1, "*** Exiting min/max: We broke a good lookAhead!")
-							break
-					
-					# 4. Verify high enough rating
-					if newRating < 3 and not self.lookAhead:
-						Debug(1, "*** That worked out!")
-						pos = curpos = newCurPos
-						rating = newRating
-						
-						# First time through convert position 0 node
-						if occurs == 1:
-							# First fix up our first node
-							index = node.parent.index(node)
-							del node.parent[node.name]
-							
-							node.array = node.name
-							node.name = node.name + "-0"
-							node.arrayPosition = 0
-							node.arrayMinOccurs = node.minOccurs
-							node.arrayMaxOccurs = node.maxOccurs
-							node.minOccurs = 1
-							node.maxOccurs = 1
-						
-							node.parent.insert(index, node)
-						
-						# Next fix up our copied node
-						nodeCopy.array = node.array
-						nodeCopy.arrayPosition = occurs
-						nodeCopy.arrayMinOccurs = node.arrayMinOccurs
-						nodeCopy.arrayMaxOccurs = node.arrayMaxOccurs
-						nodeCopy.minOccurs = 1
-						nodeCopy.maxOccurs = 1
-						
-					else:
-						Debug(1, "*** Didn't work out!")
-						node.parent.__delitem__(nodeCopy.name)
-						break
-					
-					occurs += 1
-					
-					Debug(1, "@@@ Looping, occurs=%d, rating=%d" % (occurs, rating))
-			
-				Debug(1, "@@@ Exiting While Loop")
-				
-			except:
-				#pass
-				raise
-			
-			if curpos != None:
-				if popPosition != None:
-					pos = popPosition
-					Debug(1, "Popping position back to %d" % (self.parentPos+pos))
-				
-				Debug(1, "@@@ Returning a curpos=%d, pos=%d, newCurPos=%d, occuurs=%d" %(self.parentPos+curpos, self.parentPos+pos, self.parentPos+newCurPos, occurs))
-				node.relationOf = None
-				return (rating, curpos)
-			
 		if popPosition != None:
 			pos = popPosition
 			Debug(1, "Popping position back to %d" % (self.parentPos+pos))
@@ -1118,7 +1134,7 @@ class DataCracker:
 			return None
 		
 		# Try and escape Choice blocks.
-		if node.parent != None and node.parent.elementType == 'choice':
+		while node.parent != None and node.parent.elementType == 'choice':
 			node = node.parent
 		
 		nextNode = node.nextSibling()
@@ -1126,8 +1142,10 @@ class DataCracker:
 			nextNode = nextNode.nextSibling()
 		
 		if nextNode != None and isinstance(nextNode, Peach.Engine.dom.DataElement):	
+			Debug(1, "_nextNode(): Found: %s" % nextNode.name)
 			return nextNode
 		
+		Debug(1, "_nextNode(): Calling _nextNode on parent!")
 		return self._nextNode(node.parent)
 
 	def _adjustRating(self, rating, lookAheadRating):
