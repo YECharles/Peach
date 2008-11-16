@@ -344,9 +344,8 @@ class DataCracker:
 		'''
 		
 		Debug(1, "_handleArray(%s): %s >>Enter" % (node.name, node.elementType))
-
+		
 		Debug(1, "*** Node Occures more then once!")
-		occurs = 1
 		rating = newRating = 1
 		newCurPos = pos
 		dom = None
@@ -1851,8 +1850,8 @@ class DataCracker:
 		
 		1 - BEST	If our default matched and look ahead is 1
 		2 - GOOD	If our default matched and look ahead is 2
-		3 - OK		If our look ahead is 1 or 2
-		4 - MPH		If look ahead is 3 or 4
+		3 - BAD
+		4 - BAD
 		'''
 		
 		Debug(1, "---> %s (%d)" % (node.name, self.parentPos+pos))
@@ -2099,9 +2098,6 @@ class DataCracker:
 
 class NeedMoreData:
 	def __init__(self, amount, msg):
-		#Debug(1, "NeedMoreData: amount = %d" % amount)
-		#print "NeedMoreData: amount = %d" % amount
-		#print "NeedMoreData: tab level = %d" % DataCracker._tabLevel
 		self.amount = amount
 		self.msg = "[%d] %s]" % (amount, msg)
 	

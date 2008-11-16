@@ -286,24 +286,6 @@ class StateEngine:
 			if not stopFuzzing:
 				self._runState(e.state, mutator)
 		
-	
-	#def _execEvent(self, code, environment):
-	#	'''
-	#	exec python code, no result.
-	#	
-	#	code - String
-	#	environment - Dictionary, keys are variables to place in local scope
-	#	'''
-	#	
-	#	#print globals()
-	#	scope = { '__builtins__' : globals()['__builtins__'] }
-	#	for k in environment.keys():
-	#		scope[k] = environment[k]
-	#	
-	#	ret = exec(code, scope, scope)
-	#	
-	#	return ret
-	
 	def _runAction(self, action, mutator):
 		
 		Debug(1, "StateEngine._runAction: %s" % action.name)
