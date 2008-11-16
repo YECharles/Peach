@@ -260,131 +260,6 @@ class DataCracker:
 				self._resetDataElementValues(child, method)
 		
 		
-	def getInitialReadSize(self, template):
-		'''
-		Determin the initial read size for this template.
-		'''
-		
-		(rating, size) = self._handleBlockSize(template, None, None, None)
-		if rating < 4:
-			return size
-		
-		return -1
-	
-	def _handleNodeSize(self, node, buff, pos, parent):
-		'''
-		Try and determine size of a node.
-		
-		Rating of:
-		
-		  1 - Exact
-		  2 - Exact, but not everything
-		  3 - Not complete to block yet
-		  4 - Nadda
-		
-		'''
-		
-		if node == None:
-			raise Exception("Node is None, bailing!")
-		
-		if node.elementType == 'string':
-			(rating, size) = self._handleStringSize(node, buff, pos, parent)
-			
-		elif node.elementType == 'number':
-			(rating, size) = self._handleNumberSize(node, buff, pos, parent)
-			
-		elif node.elementType == 'block' or node.elementType == 'template':
-			(rating, size) = self._handleBlockSize(node, buff, pos, parent)
-			
-		elif node.elementType == 'blob':
-			(rating, size) = self._handleBlobSize(node, buff, pos, parent)
-		
-		elif node.elementType == 'custom':
-			(rating, size) = self._handleCustomSize(node, buff, pos, parent)
-		
-		elif node.elementType == 'flags':
-			(rating, size) = self._handleFlagsSize(node, buff, pos, parent)
-		
-		elif node.elementType == 'choice':
-			rating = 1
-			size = 1
-		
-		else:
-			raise Exception("Unknown elementType: %s" % node.elementType)
-	
-		return (rating, size)
-	
-	def _handleStringSize(self, node, buff, pos, parent):
-		
-		Debug(1, "_handleStringSize(%s)" % node.name)
-		
-		## TODO: Handle size relation!
-		
-		if node.defaultValue != None and node.isStatic:
-			node.length = len(node.defaultValue)
-		
-		if node.length != None:
-			return (1, int(node.length))
-		
-		if node.defaultValue != None:
-			return (2, len(node.defaultValue))
-		
-		return (2, 1)
-	
-	def _handleBlobSize(self, node, buff, pos, parent):
-		
-		Debug(1, "_handleBlobSize(%s)" % node.name)
-		
-		## TODO: Handle size relation!
-		
-		if node.defaultValue != None and node.isStatic:
-			node.length = len(node.defaultValue)
-		
-		if node.length != None:
-			return (1, int(node.length))
-		
-		# This probably isn't a good idea, so lets not do it :)
-		#if node.defaultValue != None:
-		#	return (2, len(node.defaultValue))
-		
-		return (2, 1)
-	
-	def _handleNumberSize(self, node, buff, pos, parent):
-		return (1, node.size / 8)
-	
-	def _handleFlagsSize(self, node, buff, pos, parent):
-		return (1, node.length / 8)
-	
-	def _handleBlockSize(self, node, buff, pos, parent):
-		
-		## TODO: Handle maxOccurs!
-		
-		Debug(1, "_handleBlockSize(%s)" % node.name)
-		
-		curSize = 0
-		curRating = 0
-		
-		for child in node._children:
-			
-			if not isinstance(child, DataElement):
-				continue
-			
-			(rating, size) = self._handleNodeSize(child, buff, pos, node)
-			if rating < 3:
-				curSize += size
-				curRating = rating
-			
-			elif rating == 3:
-				curSize += size
-				curRating = rating
-				break
-			
-			else:
-				curRating = 3
-				break
-		
-		return (curRating, curSize)
-	
 	def _GetTemplateByName(self, str):
 		'''
 		Get the object indicated by ref.  Currently the object must have
@@ -726,14 +601,14 @@ class DataCracker:
 		## Would be nice to have our current pos in scripting :)
 		node.possiblePos = pos
 		
-		## Save origional copy
-		
-		origionalNode = node.copy(node.parent)
-		
 		## Do the crazy! (aka call specific crack handler)
 		
 		# Array handling *MUST* always be first!
 		if not doingMinMax and (node.minOccurs < 1 or node.maxOccurs > 1):
+			
+			if popPosition != None:
+				raise PeachException("Error: Found an offset relation to an array, this is not allowed!")
+			
 			(rating, pos) = self._handleArray(node, buff, pos, parent, doingMinMax)
 		
 		elif node.elementType == 'string':
@@ -1967,11 +1842,6 @@ class DataCracker:
 		Debug(1, "<--- SEEK TO %d" % newpos)
 		return (1, newpos)
 	
-	def _handleCustomSize(self, node, buff, pos, parent):
-		Debug(1, "_handleCustomSize(%s)" % node.name)
-		
-		return node.handleIncomingSize(node, buff, pos, parent)
-		
 	def _handleCustom(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is

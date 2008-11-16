@@ -353,24 +353,16 @@ class StateEngine:
 				self.publisher.connect()
 				self.publisher.hasBeenConnected = True
 			
-			# Determine initial read size
-			cracker = DataCracker(self.engine.peach)
-			size = cracker.getInitialReadSize(action.template)
-			Debug(1, "StateEngine._runAction(input): Found initial read size of %s" % size)
-			
 			# Make a fresh copy of the template
 			action.__delitem__(action.template.name)
 			action.template = action.origionalTemplate.copy(action)
 			action.append(action.template)
 			
+			# Create buffer
 			buff = PublisherBuffer(self.publisher)
-			try:
-				buff.read(size)
-			except:
-				pass
-			
 			self.dirtyXmlCache()
 			
+			# Crack data
 			cracker = DataCracker(self.engine.peach)
 			(rating, pos) = cracker.crackData(action.template, buff, "setDefaultValue")
 						
