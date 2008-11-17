@@ -250,10 +250,10 @@ class DataCracker:
 		eval("node.%s(None)" % method)
 		
 		if hasattr(node, 'rating'):
-			delattr(node, 'rating')
+			node.rating = None
 		
 		if hasattr(node, 'pos'):
-			delattr(node, 'pos')
+			node.pos = None
 		
 		for child in node._children:
 			if isinstance(child, Peach.Engine.dom.DataElement):

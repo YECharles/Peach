@@ -846,7 +846,8 @@ class DataElement(Mutatable):
 		self.arrayMaxOccurs = None	#: The max occurences in the array
 		
 		#: Position in data stream item was parsed at
-		self.pos = None
+		self._pos = None
+		self._possiblePos = None
 		#: Parse rating for element
 		self.rating = None
 	
@@ -859,8 +860,53 @@ class DataElement(Mutatable):
 		#: Fullname in data model
 		self.fullNameDataModel = None
 	
-	#def __getinitargs__(self):
-	#	return (self.name, None)
+	def get_pos(self):
+		'''
+		Getter for pos property.  If we have a string buffer
+		associated with the root node, use that for the correct
+		position.
+		'''
+		
+		root = self.getRootOfDataMap()
+		if root.relationStringBuffer != None:
+			value = root.relationStringBuffer.getPosition(self.getFullDataName())
+			if value != None:
+				return value
+			else:
+				return 0
+		
+		return self._pos
+	def set_pos(self, value):
+		'''
+		Setter for pos property
+		'''
+		self._pos = value
+		return self._pos
+	pos = property(get_pos, set_pos, None)
+	
+	def get_possiblePos(self):
+		'''
+		Getter for pos property.  If we have a string buffer
+		associated with the root node, use that for the correct
+		position.
+		'''
+		
+		root = self.getRootOfDataMap()
+		if root.relationStringBuffer != None:
+			value = root.relationStringBuffer.getPosition(self.getFullDataName())
+			if value != None:
+				return value
+			else:
+				return 0
+		
+		return self._possiblePos
+	def set_possiblePos(self, value):
+		'''
+		Setter for pos property
+		'''
+		self._possiblePos = value
+		return self._possiblePos
+	possiblePos = property(get_possiblePos, set_possiblePos, None)
 	
 	def asCType(self):
 		'''
