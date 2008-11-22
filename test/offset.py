@@ -12,6 +12,7 @@ def suite():
 	suite.addTest(Offset3TestCase())
 	suite.addTest(Offset4TestCase())
 	suite.addTest(Offset5TestCase())
+	suite.addTest(Offset6TestCase())
 	return suite
 
 class Offset1TestCase(utils.PeachTcpTestCase):
@@ -52,7 +53,15 @@ class Offset5TestCase(utils.PeachTcpTestCase):
 		# Test
 		self.peachUtils.RunPeachXml("offset5.xml")
 		ret = self.peachUtils.GetListenerData()
-		assert ret == '24  24  37  41  58  45  CRAZY STRING!X\x02\x00\x00aslkdjalskdjasdlaFoo Me!\x00', 'offset3.xml failed, instead [%s]' % repr(ret)
+		assert ret == '24  24  37  41  58  45  CRAZY STRING!X\x02\x00\x00aslkdjalskdjasdlaFoo Me!\x00', 'offset5.xml failed, instead [%s]' % repr(ret)
+
+class Offset6TestCase(utils.PeachTcpTestCase):
+	
+	def runTest(self):
+		# Test
+		self.peachUtils.RunPeachXml("offset6.xml")
+		ret = self.peachUtils.GetListenerData()
+		assert ret == '24  24  37  41  58  45  CRAZY STRING!X\x02\x00\x00aslkdjalskdjasdlaFoo Me!\x00', 'offset6.xml failed, instead [%s]' % repr(ret)
 
 
 if __name__ == "__main__":

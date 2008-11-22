@@ -207,12 +207,11 @@ class PartialFlipper(SimpleGenerator):
 	
 		if maxRounds != None:
 			self._maxRounds = maxRounds
-		
 	
 	def next(self):
 		self._round += 1
 		
-		if self._round > self._maxRounds:
+		if self._round > self._maxRounds or (len(self._data)-1) < 1:
 			raise GeneratorCompleted("all don here")
 		
 		self._position = random.randint(0, len(self._data)-1)

@@ -399,16 +399,15 @@ for i in range(len(optlist)):
 from Peach.Engine import *
 from Peach.Engine.common import *
 
-try:
-	if args[0][:5] != 'file:':
-		args[0] = 'file:' + args[0]
-except:
-	print "Error, did you supply the Peach Pit file?"
-
 engine = engine.Engine()
 watcher = None
 
 try:
+	try:
+		if args[0][:5] != 'file:':
+			args[0] = 'file:' + args[0]
+	except:
+		raise PeachException("Error, did you supply the Peach Pit file?")
 	
 	if webWatcher == True:
 		from Peach.Engine.webwatcher import PeachWebWatcher

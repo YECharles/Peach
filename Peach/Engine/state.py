@@ -124,7 +124,11 @@ class StateEngine:
 		mutator.onStateMachineStart(self)
 		
 		try:
-			self._runState(self._getStateByName(self.stateMachine.initialState), mutator)
+			obj = self._getStateByName(self.stateMachine.initialState)
+			if obj == None:
+				raise PeachException("Unable to locate initial state \"%s\"." % self.stateMachine.initialState)
+			
+			self._runState(obj, mutator)
 		
 		except SoftException:
 			

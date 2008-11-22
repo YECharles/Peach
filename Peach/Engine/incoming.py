@@ -583,7 +583,7 @@ class DataCracker:
 		## Skipp around if we have an offset relations
 		
 		popPosition = None
-		if isinstance(node, DataElement):
+		if isinstance(node, DataElement) and not (not doingMinMax and (node.minOccurs < 1 or node.maxOccurs > 1)):
 			relation = node.getRelationOfThisElement('offset')
 			if relation != None and relation.type == 'offset':
 				# We need to move this show!

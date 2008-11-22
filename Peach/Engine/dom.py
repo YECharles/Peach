@@ -152,7 +152,7 @@ def PeachDeepCopy(self, memo):
 	
 	return e
 
-class Element:
+class Element(object):
 	'''
 	Element in our template tree.
 	'''
@@ -1817,9 +1817,17 @@ class DataElement(Mutatable):
 				self._inInternalValue = True
 				relation = self._GetOffsetRelation(self)
 				ofElement = relation.getOfElement()
-				newValue = self.getRootOfDataMap().relationStringBuffer.getPosition(ofElement.getFullDataName())
-				#print "OFFSET REALTION %s of %s: " % (relation.parent.name, relation.of), newValue
+				#newValue = self.getRootOfDataMap().relationStringBuffer.getPosition(ofElement.getFullDataName())
 				
+				# Look for the nearest relationStringBuffer
+				of = self.getRootOfDataMap().find(ofElement.getFullDataName())
+				obj = of
+				while obj.relationStringBuffer == None:
+					obj = obj.parent
+				
+				newValue = obj.relationStringBuffer.getPosition(ofElement.getFullDataName())
+				
+				# Set value
 				if newValue != None:
 					value = relation.setValue(newValue)
 			
@@ -1827,7 +1835,6 @@ class DataElement(Mutatable):
 				self._inInternalValue = False
 		
 		return value
-	#getRelationValue = profile(getRelationValue)
 	
 	def getRawValue(self, sout = None):
 		'''
@@ -1919,8 +1926,7 @@ class DataElement(Mutatable):
 		
 		# 2. Check if has a realParent
 		
-		if hasattr(root, 'realParent'):
-			#print "_fixRealParent(): Found fake root: ", root.name
+		if hasattr(root, 'realParent') and root.realParent != None:
 			root.parent = root.realParent
 		
 		# done!
@@ -1934,8 +1940,9 @@ class DataElement(Mutatable):
 			root = root.parent
 		
 		# 2. Remove parent link
-		#print "_unFixRealParent(): Found fake root: ", root.name
-		root.parent = None
+		
+		if hasattr(root, 'realParent') and root.realParent != None:
+			root.parent = None
 
 	def	calcLength(self):
 		'''
@@ -2122,7 +2129,6 @@ class Monitor(ElementWithChildren):
 		self.classStr = None
 		self.params = {}
 
-
 #############################################################################
 ## Data Generating Elements
 
@@ -2177,7 +2183,10 @@ class Template(DataElement):
 		Template needs a custom getValue method!
 		'''
 		try:
-			self.relationStringBuffer = sout
+			# Sometimes a Template becomes a Block
+			if self.elementType == 'template':
+				self.relationStringBuffer = sout
+			
 			return DataElement.getValue(self, sout)
 			
 		finally:
@@ -2225,7 +2234,6 @@ class Template(DataElement):
 					print "value: [%s]" % repr(value)
 					print "c.name: %s" % c.name
 					print "c.type: %s" % c.elementType
-					#print "c.getValue(): ", c.getValue()
 					raise
 		
 		# 3. Fixup
@@ -2250,45 +2258,6 @@ class Template(DataElement):
 			
 		return self.getInternalValue(sout)
 		
-	#def getValue(self, sout = None):
-	#	'''
-	#	Get value for this data element.
-	#	
-	#	Performs any needed transforms to produce
-	#	value.
-	#	'''
-	#	
-	#	try:
-	#		self.relationStringBuffer = sout
-	#	
-	#		self.value = ""
-	#	
-	#		if self.currentValue != None:
-	#			# override children
-	#			self.value = self.currentValue
-	#	
-	#		else:
-	#			if self.transformer != None:
-	#				childSout = None
-	#			else:
-	#				childSout = sout
-	#
-	#			for c in self:
-	#				if isinstance(c, DataElement):
-	#					if self.transformer == None:
-	#						self.value += c.getValue(childSout)
-	#					else:
-	#						self.value += c.getValue(childSout)
-	#		
-	#		if self.transformer != None:
-	#			self.value = self.transformer.transformer.encode(self.value)
-	#			sout.write(self.value)
-	#		
-	#		return self.value
-	#	
-	#	finally:
-	#		self.relationStringBuffer = None
-	
 	def setValue(self, value):
 		'''
 		Override value created via children.
@@ -2476,20 +2445,51 @@ class Block(DataElement):
 		
 		# 2. Get value from children
 		
-		for c in self:
-			if isinstance(c, DataElement):
-				try:
-					if self.fixup != None or self.transformer != None:
-						value += c.getValue()
-					
-					else:
+		if self.transformer == None and self.fixup == None:
+			for c in self:
+				if isinstance(c, DataElement):
+					try:
 						value += c.getValue(sout)
-				
-				except:
-					print "value: [%s]" % repr(value)
-					print "c.name: %s" % c.name
-					print "c.getValue(): ", c.getValue()
-					raise
+					
+					except:
+						print "value: [%s]" % repr(value)
+						print "c.name: %s" % c.name
+						print "---------------"
+						raise
+		
+		else:
+			
+			# To support offset relations in children we will
+			# get the value twice using our own stringBuffer
+			
+			stringBuffer = StreamBuffer()
+			self.relationStringBuffer = stringBuffer
+			
+			for c in self:
+				if isinstance(c, DataElement):
+					try:
+						value += c.getValue(stringBuffer)
+					
+					except:
+						print "value: [%s]" % repr(value)
+						print "c.name: %s" % c.name
+						print "---------------"
+						raise
+			
+			stringBuffer.setValue("")
+			stringBuffer.seekFromStart(0)
+			value = ""
+			
+			for c in self:
+				if isinstance(c, DataElement):
+					try:
+						value += c.getValue(stringBuffer)
+					
+					except:
+						print "value: [%s]" % repr(value)
+						print "c.name: %s" % c.name
+						print "---------------"
+						raise
 		
 		# 3. Fixup
 		
@@ -2701,6 +2701,98 @@ class Number(DataElement):
 		
 		return ret
 
+
+class XmlElement(DataElement):
+	'''
+	An XML Element
+	'''
+	
+	def __init__(self, name, parent):
+		DataElement.__init__(self, name, parent)
+		self.elementType = 'number'
+		self.currentValue = None
+		self.generatedValue = None
+		self.insideRelation = False
+		self.elementName = None
+	
+	def asCType(self):
+		raise Exception("This DataElement (XmlElement) does not support asCType()!")
+	
+	def getInternalValue(self, sout = None, parent = None):
+		'''
+		Return the internal value of this date element.  This
+		value comes before any modifications such as packing,
+		padding, truncating, etc.
+		
+		For Numbers this is the python int value.
+		'''
+		
+		if parent == None:
+			parent  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
+		
+		node = parent.createElementNS(None, self.elementName)
+		parent.appendChild(node)
+		
+		for c in self:
+			if isinstance(c, XmlAttribte):
+				c.getInternalValue(None, node)
+			
+			elif isinstance(c, XmlElement):
+				c.getInternalValue(None, node)
+				
+			elif isinstance(c, DataElement):
+				node.appendChild(node.createTextNode(c.getValue()))
+		
+		if parent == None:
+			import cStringIO
+			buff = cStringIO.StringIO()
+			Print(node, stream=buff, encoding="utf8")
+			buff.close()
+			return buff.getValue()
+		
+		return None
+	
+	def getRawValue(self, sout = None, parent = None):
+		return self.getInternalValue(sout, parent)
+
+class XmlAttribute(DataElement):
+	'''
+	An XML Element
+	'''
+	
+	def __init__(self, name, parent):
+		DataElement.__init__(self, name, parent)
+		self.elementType = 'number'
+		self.currentValue = None
+		self.generatedValue = None
+		self.insideRelation = False
+		self.attributeName = None
+		self.xmlNamespace = None
+	
+	def asCType(self):
+		raise Exception("This DataElement (XmlElement) does not support asCType()!")
+	
+	def getInternalValue(self, sout, parent):
+		'''
+		Return the internal value of this date element.  This
+		value comes before any modifications such as packing,
+		padding, truncating, etc.
+		
+		For Numbers this is the python int value.
+		'''
+		
+		value = ""
+		for c in self:
+			if isinstance(c, DataElement):
+				value = c.getValue()
+				break
+		
+		parent.setAttributeNS(self.xmlNamespace, self.attributeName, value)
+		
+		return None
+	
+	def getRawValue(self, sout = None, parent = None):
+		return self.getInternalValue(sout, parent)
 
 class String(DataElement):
 	'''
@@ -3278,6 +3370,9 @@ class Relation(Element):
 		#: Reference to matching of relation
 		self.From = None
 		
+		#: Relative relation
+		self.relative = False
+		
 		#: Parent of this object
 		self.parent = parent
 		#: Expression to apply to relation when getting value
@@ -3356,6 +3451,10 @@ class Relation(Element):
 			else:
 				value = int(self.parent.getInternalValue())
 			
+			# Handle Relative Relation
+			if self.relative:
+				value = value + self.parent.possiblePos
+			
 			environment = {
 				'self' : self.parent,
 				'offset' : value,
@@ -3402,6 +3501,11 @@ class Relation(Element):
 				}
 			
 		elif self.type == 'offset':
+			
+			# Handle Relative Relation
+			if self.relative:
+				value = value - self.parent.possiblePos
+			
 			environment = {
 				'of' : self.getOfElement(),
 				'self' : self.parent,

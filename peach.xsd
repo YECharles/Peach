@@ -474,6 +474,11 @@
 						count -- The count from of ref, length -- the length from of ref.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name="relative" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Offset relation is relative to current element.  Defaults to false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Flags">

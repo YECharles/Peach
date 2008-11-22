@@ -865,6 +865,7 @@ class ParseTemplate:
 		when = self._getAttribute(node, "when")
 		expressionGet = self._getAttribute(node, "expressionGet")
 		expressionSet = self._getAttribute(node, "expressionSet")
+		relative = self._getAttribute(node, "relative")
 		
 		if of == None and From == None and when == None:
 			raise PeachException("Relation element does not have of, from, or when attribute.")
@@ -879,6 +880,14 @@ class ParseTemplate:
 		relation.when = when
 		relation.expressionGet = expressionGet
 		relation.expressionSet = expressionSet
+		
+		if relative != None:
+			if relative.lower() in ["true", "1"]:
+				relation.relative = True
+			elif relative.lower() in ["false", "0"]:
+				relation.relative = False
+			else:
+				raise PeachException("Error: Value of Relation relative attribute is not true or false.")
 		
 		return relation
 	
