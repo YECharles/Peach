@@ -72,12 +72,6 @@ class DataCracker:
 		#: Are we looking ahead?
 		self.lookAhead = False
 		
-		##: Do we have all the data?
-		#buff.haveAllData = False
-		
-		#: Stop when we real the goal node (inclusive)
-		self.nodeGoal = None
-		
 		#: Parent position (if any)
 		self.parentPos = 0
 		
@@ -743,12 +737,6 @@ class DataCracker:
 		else:
 			raise str("Unknown elementType: %s" % node.elementType)
 		
-		## Check our goal, want todo this before we parse an array (if any)
-		
-		if self.nodeGoal != None and self.nodeGoal == node.getFullDataName():
-			# Throw the required exception :)
-			raise ReachedGoalNode(raiting, pos, node)
-		
 		if popPosition != None:
 			pos = popPosition
 			Debug(1, "Popping position back to %d" % (self.parentPos+pos))
@@ -784,22 +772,6 @@ class DataCracker:
 		
 		origNode = node
 		origParent = parent
-		
-		## Locate our goal (first static node)
-		
-		# If we can locate a static node we will only look
-		# ahead to that node instead of the entire data model
-		# this will hopefully keep the flexability of the look
-		# ahead based parsing, but remove the major speed
-		# issues.
-		
-		origionalGoal = self.nodeGoal
-		#goal = self._nextStaticNode(node)
-		#if goal != None:
-		#	self.nodeGoal = goal.getFullDataName()
-		#	print "lookAhead: Goal of [%s]" % self.nodeGoal
-		#else:
-		#	print "lookAhead: No goal in sight :("
 		
 		## First lets copy the data model
 		
@@ -856,20 +828,8 @@ class DataCracker:
 		
 		else:
 			
-			try:
-				Debug(1, "_lookAhead(): look ahead for node.Sibling(): %s->%s" % (node.name,sibling.name))
-				(rating, pos) = self._handleNode(sibling, buff, pos, parent)
-			
-			except ReachedGoalNode, e:
-				self.nodeGoal = None
-				rating = r.rating
-				pos = r.pos
-				print "lookAhead: Found goal [%s]: %d" % (self.nodeGoal, rating)
-				
-			#except NeedMoreData:
-			#	rating = 4
-		
-		self.nodeGoal = origionalGoal
+			Debug(1, "_lookAhead(): look ahead for node.Sibling(): %s->%s" % (node.name,sibling.name))
+			(rating, pos) = self._handleNode(sibling, buff, pos, parent)
 		
 		self.lookAheadDepth -= 1
 		if self.lookAheadDepth == 0:
@@ -2103,16 +2063,6 @@ class NeedMoreData:
 	
 	def __str__(self):
 		return self.msg
-
-class ReachedGoalNode:
-	'''
-	Thrown when we reach our target node goal.
-	'''
-	
-	def __init__(self, rating, pos, node):
-		self.rating = rating
-		self.pos = pos
-		self.node = node
 
 def printDom(node, level = 0):
 	
