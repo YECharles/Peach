@@ -69,7 +69,12 @@ class Pack(Transformer):
 	def realEncode(self, data):
 		'''Run pack on data'''
 		
-		return struct.pack(self._packFormat, data)
+		try:
+			return struct.pack(self._packFormat, data)
+		
+		except:
+			print "Pack.realEncode: Warning: Value not correct for pack."
+			return struct.pack(self._packFormat, 0)
 
 
 class NumberToString(Transformer):
@@ -196,19 +201,19 @@ class _AsNumber(Transformer):
 		# Prevent silly deprication warnings from Python
 		if packStr[1] == 'b' and data > 0xfe:
 			data = 0
-		elif packStr[1] == 'B' and data > 0xff:
+		elif packStr[1] == 'B' and (data > 0xff or data < 0):
 			data = 0
 		elif packStr[1] == 'h' and data > 0xfffe:
 			data = 0
-		elif packStr[1] == 'H' and data > 0xffff:
+		elif packStr[1] == 'H' and (data > 0xffff or data < 0):
 			data = 0
 		elif packStr[1] == 'i' and data > 0xfffffffe:
 			data = 0
-		elif packStr[1] == 'L' and data > 0xffffffff:
+		elif packStr[1] == 'L' and (data > 0xffffffff or data < 0):
 			data = 0
 		elif packStr[1] == 'q' and data > 0xfffffffffffffffe:
 			data = 0
-		elif packStr[1] == 'Q' and data > 0xffffffffffffffff:
+		elif packStr[1] == 'Q' and (data > 0xffffffffffffffff or data < 0):
 			data = 0
 		
 		return struct.pack(packStr, long(data))
