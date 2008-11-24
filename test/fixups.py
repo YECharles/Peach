@@ -18,7 +18,7 @@ class FixupTest1(utils.PeachTcpTestCase):
 		# Test
 		self.peachUtils.RunPeachXml("fixups1.xml")
 		ret = self.peachUtils.GetListenerData()
-		data = "DAAAAAAAAAAyMzkwODIwMzk4NDVrO2cp"
+		data = "DAAAAAAAAAAyMzkwODIwMzk4NDVYewZM"
 		assert ret == data, 'fixups1.xml failed. [%s]' % ret
 
 class FixupTest2(utils.PeachTcpTestCase):
@@ -26,7 +26,7 @@ class FixupTest2(utils.PeachTcpTestCase):
 		# Test
 		self.peachUtils.RunPeachXml("fixups2.xml")
 		ret = self.peachUtils.GetListenerData()
-		data = "FAAAAAAAAAAyMzkwODIwMzk4NDVrO2cp"
+		data = "FAAAAAAAAAAyMzkwODIwMzk4NDVYewZM"
 		assert ret == data, 'fixups2.xml failed. [%s]' % ret
 	
 class FixupTest3(utils.PeachTcpTestCase):

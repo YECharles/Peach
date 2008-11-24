@@ -109,7 +109,7 @@ class SwfCountTestCase(utils.PeachTestCaseNoAgent):
 		
 		assert not goNext, "Not everything counted okay"
 		
-		assert count == 80609, "Count did not match, %d != %d" % (count, 80609)
+		assert count == 88994, "Count did not match, %d != %d" % (count, 88994)
 
 class PngCountTestCase(utils.PeachTestCaseNoAgent):
 	def runTest(self):
@@ -170,7 +170,7 @@ class PngCountTestCase(utils.PeachTestCaseNoAgent):
 		
 		assert not goNext, "Not everything counted okay"
 		
-		assert count == 53380, "Count did not match, %d != %d" % (count, 53380)
+		assert count == 56232, "Count did not match, %d != %d" % (count, 56232)
 
 class MiscRef1TestCase(utils.PeachTestCaseNoAgent):
 	def runTest(self):

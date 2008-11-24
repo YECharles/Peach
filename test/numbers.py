@@ -33,7 +33,7 @@ class Number16TestCase(utils.PeachTcpTestCase):
 		# Test
 		self.peachUtils.RunPeachXml("numbers16.xml")
 		ret = self.peachUtils.GetListenerData()
-		assert ret == pack('<h', 0xffff), 'numbers16.xml failed, instead [%s]' % repr(ret)
+		assert ret == pack('<H', 0xffff), 'numbers16.xml failed, instead [%s]' % repr(ret)
 
 class Number32TestCase(utils.PeachTcpTestCase):
 	

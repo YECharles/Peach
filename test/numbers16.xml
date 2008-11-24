@@ -7,20 +7,14 @@
 	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="TestTemplate">
-		<Number isStatic="true"  size="16" valueType="hex" value="FFFF" endian="little" signed="true" />
+		<Number size="16" valueType="hex" value="FFFF" endian="little" signed="false" />
 	</DataModel>
 	
 	<StateModel name="TestState" initialState="Initial">
 		<State name="Initial">
-			<Action type="start" />
-			<Action type="connect" />
-			
 			<Action type="output" name="SendTest">
 				<DataModel ref="TestTemplate" />
 			</Action>			
-			
-			<Action type="close" />
-			<Action type="stop" />
 		</State>
 	</StateModel>
 	
