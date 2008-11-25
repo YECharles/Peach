@@ -60,6 +60,11 @@ try:
 		def __init__(self, args):
 			self._image = str(args['Application']).replace("'''", "")
 			
+			if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
+				self._manual = True
+			else:
+				self._manual = False
+			
 			self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
 			self.stops = {}
 			# self.stops = {"COM":["10","1032"]}
@@ -88,30 +93,34 @@ try:
 			
 			self._RemoveImageLogs(self._image)
 			self._DisableImage(self._image)
+			self._EnableImage(self._image)
 		
 		def _EnableImage(self, image):
 			'''
 			Enables the default checks for an image (exe).
 			'''
-			image = self._appManager.Images.Add(image)
-			for check in image.Checks:
-				if check.Name in self.checks:
-					check.Enabled = True
-				else:
-					check.Enabled = False
 				
-				if self.stops.has_key(check.Name):
-					stops = self.stops[check.Name]
-					for stop in check.Stops:
-						if str(stop.StopCode) in stops:
-							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-							stop.Active = False
-						else:
-							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+			if not self._manual:
+				image = self._appManager.Images.Add(image)
+				for check in image.Checks:
+					if check.Name in self.checks:
+						check.Enabled = True
+					else:
+						check.Enabled = False
+					
+					if self.stops.has_key(check.Name):
+						stops = self.stops[check.Name]
+						for stop in check.Stops:
+							if str(stop.StopCode) in stops:
+								print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+								stop.Active = False
+							else:
+								print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
 		
 		def _DisableImage(self, image):
 			try:
-				self._appManager.Images.Remove(image)
+				if not self._manual:
+					self._appManager.Images.Remove(image)
 			except:
 				pass
 		
@@ -156,13 +165,21 @@ try:
 			'''
 			Called right before start of test.
 			'''
-			self._EnableImage(self._image)
+			
+			# We should not do this on every test
+			# instead just on startup.
+			#self._EnableImage(self._image)
+			pass
 		
 		def OnTestFinished(self):
 			'''
 			Called right after a test.
 			'''
-			self._DisableImage(self._image)
+			
+			# We should not do this on every test
+			# instead just on shutdown.
+			#self._DisableImage(self._image)
+			pass
 		
 		def GetMonitorData(self):
 			'''
@@ -172,10 +189,6 @@ try:
 			count = 0
 			logs = self.imageLogs
 			
-			#print "WindowsAppVerifier.GetMonitorData: Waiting for data to come in"
-			#while logs == None or len(logs) < 1:
-			#	time.sleep(0.25)
-			#	logs = self.imageLogs = self._GetImageLogs(self._image)
 			if logs == None:
 				logs = self.imageLogs = self._GetImageLogs(self._image)
 			
