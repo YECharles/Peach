@@ -2564,7 +2564,7 @@ class Number(DataElement):
 		max = long('FF'*(self.size/8), 16)
 		return 0 - max
 	
-	def getMaxValue(self,):
+	def getMaxValue(self):
 		'''
 		Get the maximum value for this number.
 		'''
@@ -3542,6 +3542,8 @@ class Relation(Element):
 			obj = self.parent.findArrayByName(self.of)
 		
 		if obj == None:
+			print "DataRoot:", self.parent.getRootOfDataMap()
+			print "DataRoot.parent:", self.parent.getRootOfDataMap().parent
 			print "Fullname:", self.getFullDataName()
 			print "Couldn't locate [%s]" % self.of
 			raise Exception("Couldn't locate [%s]" % self.of)
