@@ -69,12 +69,7 @@ class Pack(Transformer):
 	def realEncode(self, data):
 		'''Run pack on data'''
 		
-		try:
-			return struct.pack(self._packFormat, data)
-		
-		except:
-			print "Pack.realEncode: Warning: Value not correct for pack."
-			return struct.pack(self._packFormat, 0)
+		return struct.pack(self._packFormat, data)
 
 
 class NumberToString(Transformer):

@@ -392,9 +392,8 @@ for i in range(len(optlist)):
 		usage()
 
 #if PSYCO:
-#	import psyco
-#	# 300MB
-#	psyco.full(memory=307200)
+#import psyco
+#psyco.full()
 
 from Peach.Engine import *
 from Peach.Engine.common import *

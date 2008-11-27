@@ -71,8 +71,8 @@ class IncomingPngTestCase(utils.PeachSendAndRecvTestCase):
 		fd.close()
 		
 		self.peachUtils.SetSendAndReceiveData(data)
-		#self.peachUtils.RunPeachXml("incomingPng.xml")
-		self.peachUtils.RunDebugPeachXml("incomingPng.xml")
+		self.peachUtils.RunPeachXml("incomingPng.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingPng.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == data, 'incomingPng.xml failed. %s' % repr(ret)
 

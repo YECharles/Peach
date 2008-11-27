@@ -884,8 +884,10 @@ class ParseTemplate:
 		if relative != None:
 			if relative.lower() in ["true", "1"]:
 				relation.relative = True
+				relation.relativeTo = self._getAttribute(node, "relativeTo")
 			elif relative.lower() in ["false", "0"]:
 				relation.relative = False
+				relation.relativeTo = None
 			else:
 				raise PeachException("Error: Value of Relation relative attribute is not true or false.")
 		

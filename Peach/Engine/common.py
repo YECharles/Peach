@@ -168,7 +168,14 @@ def evalEvent(code, environment, node = None):
 		globalScope[k] = environment[k]
 		localScope[k] = environment[k]
 	
-	ret = eval(code, globalScope, localScope)
+	try:
+		ret = eval(code, globalScope, localScope)
+	except:
+		print "Code: [%s]" % code
+		print "Environment:"
+		for k in environment.keys():
+			print "  [%s] = [%s]" % (k, repr(environment[k]))
+		raise
 	
 	return ret
 

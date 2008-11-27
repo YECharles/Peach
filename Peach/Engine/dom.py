@@ -41,7 +41,7 @@ if PROFILE:
 	print " --- INCOMING PROFILING ENABLED ---- "
 	import profile
 
-import sys, re, types, new, base64, time, ctypes
+import sys, re, types, new, base64, time, ctypes, traceback
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
@@ -271,10 +271,10 @@ class Element(object):
 		if owner == None:
 			owner = parent
 		
-		if hasattr(self, 'ref') and self.ref != None:
-			node = owner.createElementNS(None, self.ref)
-		else:
-			node = owner.createElementNS(None, self.name)
+		#if hasattr(self, 'ref') and self.ref != None:
+		#	node = owner.createElementNS(None, self.ref)
+		#else:
+		node = owner.createElementNS(None, self.name)
 		
 		node.setAttributeNS(None, "elementType", self.elementType)
 		node.setAttributeNS(None, "name", self.name)
@@ -392,18 +392,9 @@ class Element(object):
 		return True
 	
 	def copy(self, parent):
-		## For testing purposes only
-		#newSelf2 = copy.deepcopy(self)
-		#self._FixParents(newSelf2, parent)
-		#newSelf = newSelf2
 		
 		newSelf = deepcopy(self)
 		self._FixParents(newSelf, parent)
-		
-		## For testing purposes only
-		#gc.collect()
-		#if not self.compareTree(self, newSelf):
-		#	raise Exception("Copy didn't match")
 		
 		return newSelf
 	
@@ -411,12 +402,6 @@ class Element(object):
 		'''
 		Walk down from start and fix parent settings on children
 		'''
-		#if hasattr(start, 'name'):
-		#	print "--> _FixParents(%s)" % start.name
-		#else:
-		#	print "--> _FixParents(%s)" % repr(start)
-		
-		#print "_FixParents(%s): %s" % (start.name, parent.name)
 		
 		if start == None:
 			start = self
@@ -425,8 +410,6 @@ class Element(object):
 			start.parent = parent
 		
 		if isinstance(start, ElementWithChildren):
-			#for child in start._children:
-			#	print "Child: ", repr(child)
 			for child in start._children:
 				self._FixParents(child, start)
 		
@@ -867,9 +850,12 @@ class DataElement(Mutatable):
 		position.
 		'''
 		
-		root = self.getRootOfDataMap()
-		if root.relationStringBuffer != None:
-			value = root.relationStringBuffer.getPosition(self.getFullDataName())
+		obj = self
+		while obj.parent != None and (not hasattr(obj, "relationStringBuffer") or obj.relationStringBuffer == None):
+			obj = obj.parent
+		
+		if hasattr(obj, "relationStringBuffer") and obj.relationStringBuffer != None:
+			value = obj.relationStringBuffer.getPosition(self.getFullDataName())
 			if value != None:
 				return value
 			else:
@@ -891,9 +877,12 @@ class DataElement(Mutatable):
 		position.
 		'''
 		
-		root = self.getRootOfDataMap()
-		if root.relationStringBuffer != None:
-			value = root.relationStringBuffer.getPosition(self.getFullDataName())
+		obj = self
+		while obj.parent != None and (not hasattr(obj, "relationStringBuffer") or obj.relationStringBuffer == None):
+			obj = obj.parent
+		
+		if hasattr(obj, "relationStringBuffer") and obj.relationStringBuffer != None:
+			value = obj.relationStringBuffer.getPosition(self.getFullDataName())
 			if value != None:
 				return value
 			else:
@@ -2345,6 +2334,7 @@ class Choice(DataElement):
 						break
 			
 			value = self.currentElement.getValue(sout)
+			
 			if value == None:
 				print "Choice.getRawValue: value is null!"
 				print "Choice.getRawValue: ", self.currentElement.getFullname()
@@ -3372,6 +3362,8 @@ class Relation(Element):
 		
 		#: Relative relation
 		self.relative = False
+		#: Relative to this element (string)
+		self.relativeTo = None
 		
 		#: Parent of this object
 		self.parent = parent
@@ -3453,7 +3445,14 @@ class Relation(Element):
 			
 			# Handle Relative Relation
 			if self.relative:
-				value = value + self.parent.possiblePos
+				
+				# Are we relative to another element?
+				if self.relativeTo == None:
+					value = value + self.parent.possiblePos
+					
+				else:
+					obj = self.parent.find(self.relativeTo)
+					value = value + obj.possiblePos
 			
 			environment = {
 				'self' : self.parent,
@@ -3504,7 +3503,13 @@ class Relation(Element):
 			
 			# Handle Relative Relation
 			if self.relative:
-				value = value - self.parent.possiblePos
+				
+				# Are we relative to another element?
+				if self.relativeTo == None:
+					value = value - self.parent.possiblePos
+				else:
+					obj = self.parent.find(self.relativeTo)
+					value = value - obj.possiblePos
 			
 			environment = {
 				'of' : self.getOfElement(),

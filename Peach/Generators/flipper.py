@@ -211,6 +211,8 @@ class PartialFlipper(SimpleGenerator):
 	def next(self):
 		self._round += 1
 		
+		# Exit if we are completed with rounds, or have no data
+		# to flip
 		if self._round > self._maxRounds or (len(self._data)-1) < 1:
 			raise GeneratorCompleted("all don here")
 		

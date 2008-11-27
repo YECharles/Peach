@@ -479,6 +479,11 @@
 					<xs:documentation>Offset relation is relative to current element.  Defaults to false.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name="relativeTo" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Offset relation is relative to specified element.  Defaults to current element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Flags">

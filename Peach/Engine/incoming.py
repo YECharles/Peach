@@ -138,18 +138,27 @@ class DataCracker:
 			
 			Debug(1, "Get all relations")
 			for relation in placement.parent.getRelationsOfThisElement():
+				if relation.type == 'when':
+					continue
+				
 				relations.append([relation, placement.parent])
 				relationsHold.append(relation)
 			
 			for child in placement.parent.getAllChildDataElements():
 				for relation in child.getRelationsOfThisElement():
-					if relation not in relationsHold:
+					if relation not in relationsHold and relation.type != 'when':
 						relations.append([relation, child])
 						relationsHold.append(relation)
 			
 			for relation in placement.parent._getAllRelationsInDataModel(placement.parent):
-				if relation not in relationsHold:
-					relations.append([relation, relation.getOfElement()])
+				if relation not in relationsHold and relation.type != 'when':
+					obj = relation.getOfElement()
+					if obj == None:
+						print "relation:", relation.getFullname()
+						print "of: ", relation.of
+						
+						raise Exception("obj is null")
+					relations.append([relation, obj])
 					relationsHold.append(relation)
 			
 			# ----
@@ -163,8 +172,11 @@ class DataCracker:
 				Debug(1, "  Pre-name: %s" % placement.parent.getFullDataName())
 				Debug(1, "  Found %d relations" % len(relationsHold))
 				
-				# Do we need to rename our Element?
+				# Remove from old place
 				placement.parent.origName = placement.parent.name
+				placement.parent.parent.__delitem__(placement.parent.origName)
+				
+				# Do we need to rename our Element?
 				if after.parent.has_key(placement.parent.name):
 					# Yes... :)
 					cnt = 0
@@ -176,9 +188,6 @@ class DataCracker:
 				
 				# Insert after after
 				after.parent.insert(after.parent.index(after)+1, placement.parent)
-				
-				# Remove from old place
-				placement.parent.parent.__delitem__(placement.parent.origName)
 				
 				# Update parent
 				placement.parent.parent = after.parent
@@ -195,8 +204,11 @@ class DataCracker:
 				Debug(1, "  Pre-name: %s" % placement.parent.getFullDataName())
 				Debug(1, "  Found %d relations" % len(relationsHold))
 				
-				# Do we need to rename our Element?
+				# Remove from old place
 				placement.parent.origName = placement.parent.name
+				placement.parent.parent.__delitem__(placement.parent.origName)
+				
+				# Do we need to rename our Element?
 				if before.parent.has_key(placement.parent.name):
 					# Yes... :)
 					cnt = 0
@@ -208,9 +220,6 @@ class DataCracker:
 				
 				# Insert after after
 				before.parent.insert(before.parent.index(before), placement.parent)
-				
-				# Remove from old place
-				placement.parent.parent.__delitem__(placement.parent.origName)
 				
 				# Update parent
 				placement.parent.parent = before.parent
@@ -565,9 +574,17 @@ class DataCracker:
 			if not evalEvent(rel.when, environment, node):
 				# Remove this node from data tree
 				self._unFixRealParent(node)
+				
+				# Locate relations and kill 'em off
+				for r in node.getRelationsOfThisElement():
+					r.parent.__delitem__(r.name)
+					if r in r.parent.relations:
+						r.parent.relations.remove(r)
+				
 				node.parent.__delitem__(node.name)
 				
-				Debug(1, "_handleNode: When: Returned False. Returning 1.")
+				Debug(1, "_handleNode: When: Returned False.  Removing and returning 1.")
+				
 				node.relationOf = None
 				return (1, pos)
 		
@@ -713,7 +730,9 @@ class DataCracker:
 					# Verify we used all the data
 					if crackpos != len(data):
 						Debug(1, "---- Crackpos != len(data): %d != %d ----" % (self.parentPos+crackpos, len(data)))
-						rating = 4
+						#rating = 4
+						## !!! NEED TO REMOVE THIS !!!
+						#print "WARNING: Ignoring fact that crackpos != len(data)!!!"
 					
 					Debug(1, "---- Finished with internal block (%d:%d) ----" % (rating, self.parentPos+pos))
 			
