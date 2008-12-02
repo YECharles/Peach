@@ -211,7 +211,11 @@ class _AsNumber(Transformer):
 		elif packStr[1] == 'Q' and (data > 0xffffffffffffffff or data < 0):
 			data = 0
 		
-		return struct.pack(packStr, long(data))
+		try:
+			return struct.pack(packStr, long(data))
+		
+		except:
+			return struct.pack(packStr, 0)
 		
 	def realDecode(self, data):
 		

@@ -194,8 +194,15 @@ class Element(object):
 		return ret
 	
 	def getUniqueName():
+		'''
+		Provide a unique default name for elements.
 		
-		name = "Unknown Element %d" % Element.__CurNameNum
+		Note: Some graphs can get very large (500K nodes)
+		  at which point this name can eat up alot of memeory.  So
+		  lets keep it simple/small.
+		'''
+		
+		name = "Named_%d" % Element.__CurNameNum
 		Element.__CurNameNum += 1
 		
 		return name
@@ -2211,6 +2218,7 @@ class Template(DataElement):
 		# 2. Get value from children
 		
 		for c in self:
+			
 			if isinstance(c, DataElement):
 				try:
 					if self.fixup != None or self.transformer != None:
@@ -2223,6 +2231,8 @@ class Template(DataElement):
 					print "value: [%s]" % repr(value)
 					print "c.name: %s" % c.name
 					print "c.type: %s" % c.elementType
+					#print "c.getValue(): ", c.getValue()
+					print "---------------"
 					raise
 		
 		# 3. Fixup

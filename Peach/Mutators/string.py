@@ -193,14 +193,20 @@ class StringTokenMutator(Mutator):
 			self._countGeneratorMap[action] = {}
 			
 			for e in stringElements:
+				tokens = None
+				if e.tokens != None:
+					tokens = []
+					for c in tokens:
+						tokens.append(c)
+				
 				group = Group()
-				gen = StringTokenFuzzer(None, e.getValue())
+				gen = StringTokenFuzzer(None, e.getValue(), tokens)
 				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._masterGroup.append(group)
 				self._generatorMap[action][e.getFullnameInDataModel()] = gen
 				
 				group = Group()
-				gen = StringTokenFuzzer(None, e.getValue())
+				gen = StringTokenFuzzer(None, e.getValue(), tokens)
 				gen = WithDefault(group, _StaticAlwaysNone(), gen)
 				self._countGroup.append(group)
 				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
