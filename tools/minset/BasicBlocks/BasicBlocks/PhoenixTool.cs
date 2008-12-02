@@ -19,7 +19,6 @@ using System.Collections;
 #endregion
 
 using System.Collections.Generic;
-using System.IO;
 
 namespace BasicBlocks
 {
@@ -118,7 +117,8 @@ namespace BasicBlocks
 			// TODO: Do your static analysis of this unit here
 			functionUnit.BuildFlowGraph();
 			// 4194304 == base address
-			int funcOffset = functionUnit.EncodedIR.PrimaryDataInstruction.ByteOffset + 4194304;
+			// 4784128 -- Other base address (vista)
+			int funcOffset = functionUnit.EncodedIR.PrimaryDataInstruction.ByteOffset; // +4784128;
 
 			foreach (Phx.Graphs.BasicBlock b in functionUnit.FlowGraph.BasicBlocks)
 			{

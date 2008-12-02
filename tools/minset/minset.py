@@ -43,7 +43,7 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 import sys, os, threading, glob, pydbg
 
 print ""
-print "] Peach Minset Finder v0.2"
+print "] Peach Minset Finder v0.3"
 print "] Copyright (c) Michael Eddington\n"
 
 if len(sys.argv) < 4:
@@ -101,8 +101,19 @@ print "[*] Found %d basic blocks and %d sample files" % (len(offsets),len(sample
 
 def handleAccessViolation(dbg):
 	if dbg.first_breakpoint:
+		
+		# Locate base offset
+		baseoffset = None
+		for module in dbg.enumerate_modules():
+			if module[0] == 'tracerpt.exe':
+				baseoffset = module[1]
+		
+		# Set breakpoints
+		for offset in dbg.peachOffsets:
+			dbg.bp_set(baseoffset + offset)
+		
 		return pydbg.defines.DBG_CONTINUE
-
+	
 	addr = dbg.dbg.u.Exception.ExceptionRecord.ExceptionAddress
 	if addr in dbg.peachOffsets and addr not in dbg.peachBlocks:
 		dbg.peachBlocks.append(addr)
@@ -128,9 +139,6 @@ for sampleFile in sampleFiles:
 	
 	dbg.peachOffsets = offsets
 	dbg.peachBlocks = bblocks[sampleFile]
-	
-	for addr in offsets:
-		dbg.bp_set(addr)
 	
 	dbg.debug_event_loop()
 	
