@@ -28,6 +28,7 @@ A few standard fixups.
 # Authors:
 #   Michael Eddington (mike@phed.org)
 #   Adam Cecchetti (adam@cecchetti.com)
+#
 # $Id$
 
 import zlib, hashlib, struct, binascii, array
