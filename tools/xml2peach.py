@@ -234,7 +234,18 @@ class Xml2Peach(object):
 	
 
 import sys
-Xml2Peach().xml2Peach(sys.argv[1])
+
+if len(sys.argv) < 2:
+	print """
+] Create Fuzzer from XML Document v0.1
+] Copyright (c) Michael Eddington
+
+Syntax: xml2peach.py file.xml > fuzzer.xml
+
+"""
+	sys.exit(0)
+
+Xml2Peach().xml2Peach("file:"+sys.argv[1])
 
 # end
 
