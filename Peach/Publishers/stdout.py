@@ -92,4 +92,34 @@ class Null(Publisher):
 	def call(self, method, args):
 		return ''
 
+class StdoutCtypes(Publisher):
+	'''
+	
+	'''
+	
+	#: Indicates which method should be called.
+	withNode = True
+	
+	def connect(self):
+		pass
+	
+	def sendWithNode(self, data, dataNode):
+		'''
+		Publish some data
+		
+		@type	data: string
+		@param	data: Data to publish
+		@type   dataNode: DataElement
+		@param  dataNode: Root of data model that produced data
+		'''
+		value = dataNode.asCType()
+		print value
+		print dir(value)
+	
+	def close(self):
+		'''
+		Close current stream/connection.
+		'''
+		pass
+
 # end

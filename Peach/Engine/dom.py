@@ -76,6 +76,10 @@ except:
 class Empty:
 	pass
 
+class _DefaultStructure(ctypes.Structure):
+	pass
+
+
 def PeachDeepCopy(self, memo):
 	'''
 	Copying objects in our DOM is a crazy business.  Here we
@@ -2153,7 +2157,7 @@ class Template(DataElement):
 			if isinstance(c, DataElement):
 				cValue = c.asCType()
 				ret._fields_.append( (c.name, type(cValue) ) )
-				ret[c.name] = cValue
+				setattr(ret, c.name, cValue)
 		
 		return ret
 	
@@ -2366,9 +2370,6 @@ def BlockToXml(self, parent):
 	
 	return node
 
-class _DefaultStructure(ctypes.Structure):
-	pass
-
 class Block(DataElement):
 	'''
 	Block or sequence of other data types.
@@ -2392,7 +2393,7 @@ class Block(DataElement):
 			if isinstance(c, DataElement):
 				cValue = c.asCType()
 				ret._fields_.append( (c.name, type(cValue) ) )
-				ret[c.name] = cValue
+				setattr(ret, c.name, cValue)
 		
 		return ret
 	

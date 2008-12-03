@@ -373,7 +373,7 @@ class StateEngine:
 			if not self.publisher.withNode:
 				self.publisher.send(action.value)
 			else:
-				self.publisher.sendWithNode(action.template)
+				self.publisher.sendWithNode(action.value, action.template)
 			
 			self.actionValues.append( [ action.name, 'output', action.value ] )
 			
