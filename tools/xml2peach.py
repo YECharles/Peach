@@ -166,30 +166,33 @@ class Xml2Peach(object):
 		doc = parent.ownerDocument
 		if doc == None:
 			doc = parent
+
+		#print "--- Attributes ---"
+		#if node.attributes != None:
+		#	for attrib in node.attributes:
+		#		print attrib, node.attributes[attrib]
+		#print "------------------"
 		
-		# 1. Element
+		## Element
 		
 		element = doc.createElementNS(None, "XmlElement")
 		element.setAttributeNS(None, "elementName", node.nodeName)
 		parent.appendChild(element)
 		
-		# 3. Element attributes
+		if node.namespaceURI != None:
+			element.setAttributeNS(None, "ns", node.namespaceURI)
+		
+		## Element attributes
 		
 		if node.attributes != None:
-			for attrib in node.attributes.keys():
-				if attrib[1] == None:
-					# This is actually our xml namespace!
-					element.setAttributeNS(None, "ns", attrib[0])
-					
-				else:
-					attribElement = self.handleAttribute(attrib, node.attributes[attrib], element)
-					element.appendChild(attribElement)
+			for attrib in node.attributes:
+				attribElement = self.handleAttribute(attrib, node.attributes[attrib], element)
+				element.appendChild(attribElement)
 		
-		# 4. Element children
+		## Element children
 		
 		for child in node.childNodes:
 			if child.nodeName == "#text":
-				
 				if len(child.nodeValue.strip('\n\r\t\x10 ')) > 0:
 					# This is node's value!
 					string = doc.createElementNS(None, "String")
@@ -213,13 +216,15 @@ class Xml2Peach(object):
 		if doc == None:
 			doc = parent
 		
-		# 1. Element
+		## Attribute
 		
 		element = doc.createElementNS(None, "XmlAttribute")
+		element.setAttributeNS(None, "attributeName", attribObj.name)
+		
 		if attrib[0] != None:
 			element.setAttributeNS(None, "ns", attrib[0])
 		
-		element.setAttributeNS(None, "attributeName", attrib[1])
+		## Attribute value
 		
 		string = doc.createElementNS(None, "String")
 		string.setAttributeNS(None, "value", attribObj.value)
