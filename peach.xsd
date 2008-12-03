@@ -138,6 +138,8 @@
 			<xs:element ref="Seek" minOccurs="0" />
 			<xs:element ref="Choice" minOccurs="0" />
 			<xs:element ref="Custom" minOccurs="0" />
+			<xs:element ref="XmlElement" minOccurs="0" />
+			<xs:element ref="XmlAttribute" minOccurs="0" />
 			<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		<xs:attributeGroup ref="peachCommonAttributes" />
@@ -234,6 +236,8 @@
 				<xs:element ref="Seek" minOccurs="0" />
 				<xs:element ref="Choice" minOccurs="0" />
 				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
 				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
 			</xs:choice>
 			<xs:attributeGroup ref="peachCommonAttributes" />
@@ -243,6 +247,71 @@
 			<xs:selector xpath="." />
 			<xs:field xpath="@name" />
 		</xs:unique>
+	</xs:element>
+	<xs:element name="XmlElement">
+		<xs:annotation>
+			<xs:documentation>Represents an XML element.  XmlElement's can contain XmlAttribute children 
+				and one other data element for the node value.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Block" minOccurs="0" />
+				<xs:element ref="Number" minOccurs="0" />
+				<xs:element ref="String" minOccurs="0" />
+				<xs:element ref="Flags" minOccurs="0" />
+				<xs:element ref="Blob" minOccurs="0" />
+				<xs:element ref="Seek" minOccurs="0" />
+				<xs:element ref="Choice" minOccurs="0" />
+				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="elementName" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ns">
+				<xs:annotation>
+					<xs:documentation>	XML Namespace of the element (optional)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="XmlAttribute">
+		<xs:annotation>
+			<xs:documentation>Represents an XML Attribute</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Block" minOccurs="0" />
+				<xs:element ref="Number" minOccurs="0" />
+				<xs:element ref="String" minOccurs="0" />
+				<xs:element ref="Flags" minOccurs="0" />
+				<xs:element ref="Blob" minOccurs="0" />
+				<xs:element ref="Seek" minOccurs="0" />
+				<xs:element ref="Choice" minOccurs="0" />
+				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="attributeName" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ns">
+				<xs:annotation>
+					<xs:documentation>	XML Namespace of the attribute (optional)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
 	</xs:element>
 	<xs:element name="String">
 		<xs:annotation>
@@ -383,6 +452,8 @@
 			<xs:element ref="Seek" minOccurs="0" />
 			<xs:element ref="Choice" minOccurs="0" />
 			<xs:element ref="Custom" minOccurs="0" />
+			<xs:element ref="XmlElement" minOccurs="0" />
+			<xs:element ref="XmlAttribute" minOccurs="0" />
 		</xs:choice>
 	</xs:group>
 	<xs:attributeGroup name="peachCommonAttributes">

@@ -12,6 +12,9 @@ try:
 	from Ft.Xml import Parse
 	from Ft.Xml.Sax import DomBuilder
 	from Ft.Xml import Sax, CreateInputSource
+	from Ft.Xml import EMPTY_NAMESPACE
+	from Ft.Xml.Domlette import Print, PrettyPrint
+
 except:
 	raise PeachException("Error loading 4Suite XML library.  This library\ncan be installed from the dependencies folder or\ndownloaded from http://4suite.org/.\n\n")
 
@@ -89,8 +92,7 @@ class PeachResolver(SchemeRegistryResolver):
 
 class Xml2Peach(object):
 	
-	XmlContainer = """
-<?xml version="1.0" encoding="utf-8"?>
+	XmlContainer = """<?xml version="1.0" encoding="utf-8"?>
 <Peach xmlns="http://phed.org/2008/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://phed.org/2008/Peach /peach/peach.xsd">
 	
@@ -106,6 +108,9 @@ class Xml2Peach(object):
 	<StateModel name="TheState" initialState="Initial">
 		
 		<State name="Initial">
+			<Action type="output">
+				<DataModel ref="TheDataModel" />
+			</Action>
 		</State>
 		
 	</StateModel>
@@ -121,7 +126,7 @@ class Xml2Peach(object):
 		<StateModel ref="TheState"/>
 		
 		<!-- TODO: Complete publisher -->
-		<Publisher />
+		<Publisher class="stdout.Stdout" />
 	</Test>
 	
 	<!-- Configure a single run -->
@@ -137,10 +142,20 @@ class Xml2Peach(object):
 	
 	def xml2Peach(self, url):
 		factory = InputSourceFactory(resolver=PeachResolver(), catalog=GetDefaultCatalog())
-		isrc = factory.fromUri(uri)
+		isrc = factory.fromUri(url)
 		doc = Ft.Xml.Domlette.NonvalidatingReader.parse(isrc)
 		
-		innerPit = ""
+		peachDoc = Ft.Xml.Domlette.implementation.createDocument(EMPTY_NAMESPACE, None, None)
+		self.handleElement(doc.firstChild, peachDoc)
+		
+		# Get the string representation
+		import cStringIO
+		buff = cStringIO.StringIO()
+		PrettyPrint(peachDoc.firstChild, stream=buff, encoding="utf8")
+		value = buff.getvalue()
+		buff.close()
+		
+		print self.XmlContainer % value
 		
 	def handleElement(self, node, parent):
 		'''
@@ -148,27 +163,44 @@ class Xml2Peach(object):
 		Returns an XmlElement object.
 		'''
 		
+		doc = parent.ownerDocument
+		if doc == None:
+			doc = parent
+		
 		# 1. Element
 		
-		element = parent.createElementNS(None, "XmlElement")
-		element.setAttributeNS(None, "value", node.nodeName)
-		
-		# 2. Element value
-		
-		string = element.createElementNS(None, "String")
-		string.setAttributeNS(None, "value", node.nodeValue)
+		element = doc.createElementNS(None, "XmlElement")
+		element.setAttributeNS(None, "elementName", node.nodeName)
+		parent.appendChild(element)
 		
 		# 3. Element attributes
 		
-		for attrib in node.attributes.keys():
-			attribElement = self.handleAttribute(attrib, node.attributes[attrib], element)
-			element.appendChild(attribElement)
+		if node.attributes != None:
+			for attrib in node.attributes.keys():
+				if attrib[1] == None:
+					# This is actually our xml namespace!
+					element.setAttributeNS(None, "ns", attrib[0])
+					
+				else:
+					attribElement = self.handleAttribute(attrib, node.attributes[attrib], element)
+					element.appendChild(attribElement)
 		
 		# 4. Element children
 		
 		for child in node.childNodes:
-			childElement = self.handleElement(child, element)
-			element.appendChild(childElement)
+			if child.nodeName == "#text":
+				
+				if len(child.nodeValue.strip('\n\r\t\x10 ')) > 0:
+					# This is node's value!
+					string = doc.createElementNS(None, "String")
+					string.setAttributeNS(None, "value", child.nodeValue)
+					element.appendChild(string)
+				
+			elif child.nodeName == "#comment":
+				# xml comment
+				pass
+			else:
+				childElement = self.handleElement(child, element)
 		
 		return element
 	
@@ -177,21 +209,27 @@ class Xml2Peach(object):
 		Handle an XML attribute.   Returns an XmlAttribute object.
 		'''
 		
+		doc = parent.ownerDocument
+		if doc == None:
+			doc = parent
+		
 		# 1. Element
 		
-		element = parent.createElementNS(None, "XmlAttribute")
+		element = doc.createElementNS(None, "XmlAttribute")
 		if attrib[0] != None:
 			element.setAttributeNS(None, "ns", attrib[0])
 		
-		element.setAttributeNS(None, "value", attrib[1])
+		element.setAttributeNS(None, "attributeName", attrib[1])
 		
-		string = element.createElementNS(None, "String")
+		string = doc.createElementNS(None, "String")
 		string.setAttributeNS(None, "value", attribObj.value)
-		
 		element.appendChild(string)
 		
 		return element
 	
+
+import sys
+Xml2Peach().xml2Peach(sys.argv[1])
 
 # end
 

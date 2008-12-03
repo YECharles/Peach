@@ -65,6 +65,8 @@ try:
 	from Ft.Lib.Resolvers import SchemeRegistryResolver
 	from Ft.Lib import Uri
 	from Ft.Xml import Parse
+	from Ft.Xml import EMPTY_NAMESPACE
+
 except:
 	print "\nError loading 4Suite XML library.  This library"
 	print "can be installed from the dependencies folder or"
@@ -2218,7 +2220,6 @@ class Template(DataElement):
 		# 2. Get value from children
 		
 		for c in self:
-			
 			if isinstance(c, DataElement):
 				try:
 					if self.fixup != None or self.transformer != None:
@@ -2231,8 +2232,6 @@ class Template(DataElement):
 					print "value: [%s]" % repr(value)
 					print "c.name: %s" % c.name
 					print "c.type: %s" % c.elementType
-					#print "c.getValue(): ", c.getValue()
-					print "---------------"
 					raise
 		
 		# 3. Fixup
@@ -2709,13 +2708,15 @@ class XmlElement(DataElement):
 	
 	def __init__(self, name, parent):
 		DataElement.__init__(self, name, parent)
-		self.elementType = 'number'
+		self.elementType = 'xmlelement'
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
 		self.elementName = None
+		self.xmlNamespace = None
 	
 	def asCType(self):
+		# TODO: Should support Ctype, return a string or something...
 		raise Exception("This DataElement (XmlElement) does not support asCType()!")
 	
 	def getInternalValue(self, sout = None, parent = None):
@@ -2728,27 +2729,34 @@ class XmlElement(DataElement):
 		'''
 		
 		if parent == None:
-			parent  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
+			haveParent = False
+			#parent  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
+			parent = Ft.Xml.Domlette.implementation.createDocument(EMPTY_NAMESPACE, None, None)
+			doc = parent
+		else:
+			haveParent = True
+			doc = parent.ownerDocument
 		
-		node = parent.createElementNS(None, self.elementName)
+		node = doc.createElementNS(self.xmlNamespace, self.elementName)
 		parent.appendChild(node)
 		
 		for c in self:
-			if isinstance(c, XmlAttribte):
+			if isinstance(c, XmlAttribute):
 				c.getInternalValue(None, node)
 			
 			elif isinstance(c, XmlElement):
 				c.getInternalValue(None, node)
 				
 			elif isinstance(c, DataElement):
-				node.appendChild(node.createTextNode(c.getValue()))
+				node.appendChild(doc.createTextNode(c.getValue()))
 		
-		if parent == None:
+		if not haveParent:
 			import cStringIO
 			buff = cStringIO.StringIO()
 			Print(node, stream=buff, encoding="utf8")
+			value = buff.getvalue()
 			buff.close()
-			return buff.getValue()
+			return value
 		
 		return None
 	
@@ -2762,7 +2770,7 @@ class XmlAttribute(DataElement):
 	
 	def __init__(self, name, parent):
 		DataElement.__init__(self, name, parent)
-		self.elementType = 'number'
+		self.elementType = 'xmlattribute'
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
@@ -2770,7 +2778,7 @@ class XmlAttribute(DataElement):
 		self.xmlNamespace = None
 	
 	def asCType(self):
-		raise Exception("This DataElement (XmlElement) does not support asCType()!")
+		raise Exception("This DataElement (XmlAttribute) does not support asCType()!")
 	
 	def getInternalValue(self, sout, parent):
 		'''
@@ -2781,13 +2789,16 @@ class XmlAttribute(DataElement):
 		For Numbers this is the python int value.
 		'''
 		
+		if parent == None:
+			return ""
+		
 		value = ""
 		for c in self:
 			if isinstance(c, DataElement):
 				value = c.getValue()
 				break
 		
-		parent.setAttributeNS(self.xmlNamespace, self.attributeName, value)
+		parent.setAttributeNS(self.xmlNamespace, self.attributeName, value.decode('latin-1').encode('utf8'))
 		
 		return None
 	

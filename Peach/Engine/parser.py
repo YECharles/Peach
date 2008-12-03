@@ -1135,6 +1135,10 @@ class ParseTemplate:
 				self.HandleSeek(child, parent)
 			elif child.nodeName == 'Custom':
 				self.HandleCustom(child, parent)
+			elif child.nodeName == 'XmlElement':
+				self.HandleXmlElement(child, parent)
+			elif child.nodeName == 'XmlAttribute':
+				self.HandleXmlAttribute(child, parent)
 			
 			elif errorOnUnknown:
 				raise PeachException(PeachStr("found unexpected node in Element: %s" % node.nodeName))
@@ -1226,6 +1230,98 @@ class ParseTemplate:
 		if parent.ref == None and parent.has_key(block.name):
 			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
 
+		parent.append(block)
+		return block
+
+	def HandleXmlElement(self, node, parent):
+
+		# name
+
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+
+		block = XmlElement(name, parent)
+		
+		# elementName
+		
+		block.elementName = self._getAttribute(node, "elementName")
+		
+		# ns
+		
+		block.xmlNamespace = self._getAttribute(node, "ns")
+		
+		# length (in bytes)
+		
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			block.lengthType = self._getAttribute(node, 'lengthType')
+			block.lengthCalc = self._getAttribute(node, 'length')
+			block.length = -1
+		
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length != None and len(length) != 0:
+				block.length = int(length)
+			else:
+				block.length = None
+		
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, block)
+
+		# children
+		self.HandleDataContainerChildren(node, block)
+		
+		if parent.ref == None and parent.has_key(block.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
+		
+		parent.append(block)
+		return block
+
+	def HandleXmlAttribute(self, node, parent):
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		block = XmlAttribute(name, parent)
+		
+		# elementName
+		
+		block.attributeName = self._getAttribute(node, "attributeName")
+		
+		# ns
+		
+		block.xmlNamespace = self._getAttribute(node, "ns")
+		
+		# length (in bytes)
+		
+		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
+			block.lengthType = self._getAttribute(node, 'lengthType')
+			block.lengthCalc = self._getAttribute(node, 'length')
+			block.length = -1
+		
+		elif node.hasAttributeNS(None, 'length'):
+			length = self._getAttribute(node, 'length')
+			if length != None and len(length) != 0:
+				block.length = int(length)
+			else:
+				block.length = None
+		
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, block)
+
+		# children
+		self.HandleDataContainerChildren(node, block)
+		
+		if parent.ref == None and parent.has_key(block.name):
+			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
+		
 		parent.append(block)
 		return block
 
