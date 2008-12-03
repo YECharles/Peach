@@ -2749,7 +2749,7 @@ class XmlElement(DataElement):
 				c.getInternalValue(None, node)
 				
 			elif isinstance(c, DataElement):
-				node.appendChild(doc.createTextNode(c.getValue()))
+				node.appendChild(doc.createTextNode(c.getValue().decode('latin-1').encode('utf8')))
 		
 		if not haveParent:
 			import cStringIO
