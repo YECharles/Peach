@@ -1771,6 +1771,36 @@
 						</xs:simpleType>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
+								<xs:enumeration value="checksums.MD5Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard MD5</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="checksums.SHA1Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA1</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="checksums.SHA224Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA224</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="checksums.SHA256Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA256</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="checksums.SHA384Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA384</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="checksums.SHA512Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA512</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
 								<xs:enumeration value="checksums.Crc32Fixup">
 									<xs:annotation>
 										<xs:documentation>Standard CRC32 as defined in ISO 3309.  Used by PNG, ZIP, etc.</xs:documentation>

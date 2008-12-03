@@ -27,10 +27,10 @@ A few standard fixups.
 
 # Authors:
 #   Michael Eddington (mike@phed.org)
-
+#   Adam Cecchetti (adam@cecchetti.com)
 # $Id$
 
-import zlib, struct, binascii, array
+import zlib, hashlib, struct, binascii, array
 from Peach.fixup import Fixup
 from Peach.Engine.common import *
 
@@ -52,8 +52,86 @@ class ExpressionFixup(Fixup):
 			raise Exception("Error: ExpressionFixup was unable to locate [%s]" % self.ref)
 		
 		return evalEvent(self.expression, { "self" : self, "ref" : ref, "data" : stuff  }, self)
-	
 
+class SHA224Fixup(Fixup):
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+			def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: SHA1Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.sha224()
+		h.update(stuff)
+		return h.digest()
+	
+class SHA256Fixup(Fixup):
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+			def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: SHA256Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.sha256()
+		h.update(stuff)
+		return h.digest()
+	
+class SHA384Fixup(Fixup):
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+			def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: SHA384Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.sha384()
+		h.update(stuff)
+		return h.digest() 
+
+class SHA512Fixup(Fixup):
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+		
+	def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: SHA512Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.sha512()
+		h.update(stuff)
+		return h.digest()
+	class SHA1Fixup(Fixup):
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+		
+	def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: SHA1Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.sha1()
+		h.update(stuff)
+		return h.digest() 
+	class MD5Fixup(Fixup):
+	def __init__(self, ref):
+		
+		Fixup.__init__(self)
+		self.ref = ref
+			def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		if stuff == None:
+			raise Exception("Error: MD5Fixup was unable to locate [%s]" % self.ref)
+		h = hashlib.md5()
+		h.update(stuff)
+		return h.digest() 
+	
 class Crc32Fixup(Fixup):
 	'''
 	Standard CRC32 as defined by ISO 3309.  Used by PNG, zip, etc.
