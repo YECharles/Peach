@@ -32,7 +32,7 @@ namespace BasicBlocks
 
 	public class StaticAnalysisPhase : Phx.Phases.Phase
 	{
-		public static List<int> BasicBlockAddresses = new List<int>();
+		public static List<uint> BasicBlockAddresses = new List<uint>();
 
 #if (PHX_DEBUG_SUPPORT)
         private static Phx.Controls.ComponentControl StaticAnalysisPhaseCtrl;
@@ -116,14 +116,13 @@ namespace BasicBlocks
 
 			// TODO: Do your static analysis of this unit here
 			functionUnit.BuildFlowGraph();
-			// 4194304 == base address
-			// 4784128 -- Other base address (vista)
-			int funcOffset = functionUnit.EncodedIR.PrimaryDataInstruction.ByteOffset; // +4784128;
+            int funcOffset = 0;
+            uint i;
 
 			foreach (Phx.Graphs.BasicBlock b in functionUnit.FlowGraph.BasicBlocks)
 			{
-				int i = b.FirstInstruction.OriginalInstructionByteOffset + funcOffset;
-				if (i == 0)
+                i = b.FirstInstruction.OriginalRva;
+                if (i == 0)
 				{
 					continue;
 				}
@@ -132,7 +131,7 @@ namespace BasicBlocks
 				switch (b.FirstInstruction.Opcode.Id)
 				{
 					case 101:	// LABEL
-						i = b.FirstInstruction.Next.OriginalInstructionByteOffset + funcOffset;
+                        i = b.FirstInstruction.Next.OriginalRva;
 						if (!BasicBlockAddresses.Contains(i))
 							BasicBlockAddresses.Add(i);
 						break;
@@ -423,16 +422,21 @@ namespace BasicBlocks
 
 			//System.Console.WriteLine("All basic blocks");
 
-			FileStream fout = new FileStream("bblocks.txt", FileMode.CreateNew, FileAccess.Write);
-			StreamWriter tout = new StreamWriter(fout);
-			foreach (int addr in StaticAnalysisPhase.BasicBlockAddresses)
-			{
-				//System.Console.WriteLine("bblock addr: " + addr);
-				tout.WriteLine(addr.ToString());
-			}
+            FileInfo f = new FileInfo("bblocks.txt");
+            f.Delete();
 
-			tout.Close();
-			fout.Close();
+            using (FileStream fout = new FileStream("bblocks.txt", FileMode.CreateNew, FileAccess.Write))
+            {
+                StreamWriter tout = new StreamWriter(fout);
+                foreach (int addr in StaticAnalysisPhase.BasicBlockAddresses)
+                {
+                    //System.Console.WriteLine("bblock addr: " + addr);
+                    tout.WriteLine(addr.ToString());
+                }
+
+                tout.Close();
+                fout.Close();
+            }
 
 			return (termMode == Phx.Term.Mode.Normal ? 0 : 1);
 		}

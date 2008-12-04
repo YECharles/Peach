@@ -184,10 +184,11 @@ class Missing:
 			data = fd.read()
 			fd.close()
 			
+			buff = PublisherBuffer(None, data)
 			cracker = incoming.DataCracker(self.peach)
 			cracker.haveAllData = True
 			model = self.masterModel.copy(None)
-			(rating, pos) = cracker.crackData(model, data, "setDefaultValue")
+			(rating, pos) = cracker.crackData(model, buff, "setDefaultValue")
 			
 			if rating > 2:
 				raise Exception("Unable to crack file [%s], rating was [%d]" % (file, rating))

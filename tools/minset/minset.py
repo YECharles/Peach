@@ -74,7 +74,7 @@ commandLine = sys.argv[3]
 commandArgs = sys.argv[4]
 
 print "[*] Finding all basic blocks in [%s]" % bbTarget
-os.system("BasicBlocks\\BasicBlocks\\bin\\Debug\\basicblocks.exe /in %s" % bbTarget)
+os.system("BasicBlocks\\BasicBlocks\\bin\\debug\\basicblocks.exe /in %s" % bbTarget)
 
 fd = open("bblocks.txt", "rb+")
 strOffsets = fd.read().split("\n")
@@ -107,6 +107,7 @@ def handleAccessViolation(dbg):
 		for module in dbg.enumerate_modules():
 			if module[0] == 'tracerpt.exe':
 				baseoffset = module[1]
+		print "Using %d as base offset" % baseoffset
 		
 		# Set breakpoints
 		for offset in dbg.peachOffsets:
