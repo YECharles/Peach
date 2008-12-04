@@ -2168,6 +2168,8 @@ class ParseTemplate:
 	
 	def HandleRun(self, node, parent):
 				
+		haveLogger = False
+
 		# name
 		
 		name = None
@@ -2185,7 +2187,6 @@ class ParseTemplate:
 			
 			if child.nodeName == 'Test':
 				
-				#test = self.HandleTest(child, self)
 				test = None
 				if child.hasAttributeNS(None, 'ref'):
 					test = self.GetRef( self._getAttribute(child, 'ref') , None, 'tests')
@@ -2199,8 +2200,8 @@ class ParseTemplate:
 				
 			elif child.nodeName == 'Logger':
 				logger = self.HandleLogger(child, run)
-				#logger.node = child
 				run.append(logger)
+				haveLogger = True
 				
 			else:
 				raise PeachException("Found unexpected child of Run element")
@@ -2208,6 +2209,9 @@ class ParseTemplate:
 		if len(run.tests) == 0:
 			raise PeachException(PeachStr("Run %s does not have any tests defined!" % name))
 		
+		if not haveLogger:
+			print "Warning: Run '%s' does not have logging configured!" % name
+
 		return run
 	
 	

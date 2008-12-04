@@ -36,6 +36,7 @@ TODO: Locate when relations!
 # $Id$
 
 import os, sys, glob
+sys.path.append("c:/peach")
 sys.path.append("../..")
 sys.path.append(os.getcwd() + "\\..\\..\\")
 
@@ -227,36 +228,52 @@ class Missing:
 			if isinstance(node, Choice):
 				self.choices.append(node)
 	
+	def getEveryOccurenceOf(self, fullName, model):
+		'''
+		Return every occurence of the element.
+		'''
+		
+		names = fullName.split('.')
+		if len(names) == 1:
+			if model.name == names[0]:
+				return [model]
+			
+			return [model[names[0]]]
+		
+		topName = names[-1]
+		rootName = ".".join(names[0:-1])
+		
+		roots = self.getEveryOccurenceOf(rootName, model)
+		occurs = []
+		
+		for root in roots:
+			if root.has_key(topName):
+				occurs.append(root[topName])
+			
+			elif root.has_key(topName+"-0"):
+				obj = root[topName+"-0"]
+				for i in range(obj.getArrayCount()):
+					occurs.append(obj.getArrayElementAt(i))
+		
+		return occurs
+	
 	def checkChoices(self):
 		
 		# check each choice
 		for choice in self.choices:
-			fullName = choice.name
+			fullName = choice.getFullDataName()
 			foundChoices = []
 			
 			# find every choice selection
 			for model in self.crackedModels.values():
-				choice2 = model.find(fullName)
+				choices = self.getEveryOccurenceOf(fullName, model)
+				if len(choices) == 0:
+					print "[-] Warning can't locate [%s] in [%s]" % (fullName, model.name)
+					continue
 				
-				if choice2 == None:
-					# Could it be an array?
-					choice2 = model.findArrayByName(fullName)
-					if choice2 == None:
-						print "[-] Warning can't locate [%s][%s]" % (fullName, model.name)
-						continue
-					
-					for i in range(choice2.getArrayCount()):
-						obj = choice2.getArrayElementAt(i)
-				
-						for child in obj:
-							if isinstance(child, DataElement):
-								if child.name not in foundChoices:
-									foundChoices.append(child.name)
-				else:
-					for child in choice2:
-						if isinstance(child, DataElement):
-							if child.name not in foundChoices:
-								foundChoices.append(child.name)
+				for choice2 in choices:
+					#print "Found: ", choice2.getFullDataName()
+					foundChoices.append(choice2.currentElement.name)
 				
 			# now check the master
 			for child in choice:
@@ -267,7 +284,6 @@ class Missing:
 		# done
 				
 	
-
 print ""
 print "] Peach Choice Coverage Check"
 print "] Copyright (c) Michael Eddington"

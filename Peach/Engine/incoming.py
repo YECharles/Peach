@@ -406,7 +406,31 @@ class DataCracker:
 				## Are we out at end of stream?
 				if buff.haveAllData and newCurPos >= len(buff.data):
 					Debug(1, "@ Exiting while loop, end of data! YAY!")
+					if occurs == 0:
+						Debug(1, "@ Exiting while on first loop")
+						if node.minOccurs > 0:
+							Debug(1, "@ minOccurs != 0, changing rating to 4")
+							rating = 4
+							
+						else:
+							# This code is duplicated lower down.
+							
+							# Remove node and increase rating.
+							Debug(1, "@ minOccurs == 0, removing node")
+							
+							# Remove relation (else we get errors)
+							for relation in node.getRelationsOfThisElement():
+								relation.parent.relations.remove(relation)
+								relation.parent.__delitem__(relation.name)
+							
+							# Delete node from parent
+							del node.parent[node.name]
+							
+							# Fix up our rating
+							rating = 2
+							curpos = pos
 					break
+				
 				else:
 					Debug(1, "@ Have enough data to try again: %d < %d" % (newCurPos, len(buff.data)))
 				
@@ -451,6 +475,7 @@ class DataCracker:
 				
 				## Handle minOccurs == 0
 				if occurs == 0 and newRating >= 3 and node.minOccurs == 0:
+					# This code is duplicated higher up
 					
 					# Remove node and increase rating.
 					Debug(1, "Firt element rating was poor and minOccurs == 0, remoing element and upping rating.")
@@ -915,7 +940,7 @@ class DataCracker:
 		
 		# TODO:
 		#  - Relations
-		#  - Blocks
+		#  - Custom types?
 		#  - Side cases
 		
 		if isinstance(node, String) or isinstance(node, Blob):
@@ -929,10 +954,27 @@ class DataCracker:
 			return int(node.size) / 8
 		
 		elif isinstance(node, Block):
-			return None
+			# Check each child
+			size = 0
+			for child in node:
+				if isinstance(child, DataElement):
+					ret = self._hasSize(child)
+					if ret == None:
+						return None
+					size += ret
+			
+			return size
 		
 		elif isinstance(node, Flags):
 			return int(node.size) / 8
+	
+		elif isinstance(node, Choice):
+			# Until choice is run we
+			# will not know which element
+			# was selected.
+			return None
+		
+		return None
 	
 	def _doesNodeHaveStatic(self, node):
 		'''

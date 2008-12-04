@@ -170,7 +170,7 @@ class DWORDSliderMutator(Mutator):
 		elements = []
 		
 		for e in node._children:
-			if e.elementType == 'blob':
+			if e.elementType == 'blob' and e.isMutable:
 				elements.append(e)
 				for child in e:
 					if isinstance(child, Hint) and child.name == 'DWORDSliderMutator' and child.value == 'off':
