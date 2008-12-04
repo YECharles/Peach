@@ -108,40 +108,35 @@ namespace BasicBlocks
 		protected override void Execute(Phx.Unit unit)
 		{
 			if (!unit.IsFunctionUnit)
-			{
 				return;
-			}
 
 			Phx.FunctionUnit functionUnit = unit.AsFunctionUnit;
 
 			// TODO: Do your static analysis of this unit here
 			functionUnit.BuildFlowGraph();
-            int funcOffset = 0;
-            uint i;
+			uint offset;
 
 			foreach (Phx.Graphs.BasicBlock b in functionUnit.FlowGraph.BasicBlocks)
 			{
-                i = b.FirstInstruction.OriginalRva;
-                if (i == 0)
-				{
+				offset = b.FirstInstruction.OriginalRva;
+				if (offset == 0)
 					continue;
-				}
-
+				
 				// LABEL's are cuasing issues, so skip...
 				switch (b.FirstInstruction.Opcode.Id)
 				{
 					case 101:	// LABEL
-                        i = b.FirstInstruction.Next.OriginalRva;
-						if (!BasicBlockAddresses.Contains(i))
-							BasicBlockAddresses.Add(i);
+						offset = b.FirstInstruction.Next.OriginalRva;
+						if (!BasicBlockAddresses.Contains(offset))
+							BasicBlockAddresses.Add(offset);
 						break;
 
 					case 122:	// END
 						continue;
 					
 					default:
-						if (!BasicBlockAddresses.Contains(i))
-							BasicBlockAddresses.Add(i);
+						if (!BasicBlockAddresses.Contains(offset))
+							BasicBlockAddresses.Add(offset);
 
 						break;
 				}
@@ -301,10 +296,12 @@ namespace BasicBlocks
 		{
 			// Setup targets available in the RDK.
 
+			// x86/32bit
 			Phx.Targets.Architectures.Architecture x86Arch =
 				Phx.Targets.Architectures.X86.Architecture.New();
 			Phx.Targets.Runtimes.Runtime win32x86Runtime =
 				Phx.Targets.Runtimes.Vccrt.Win32.X86.Runtime.New(x86Arch);
+
 			Phx.GlobalData.RegisterTargetArchitecture(x86Arch);
 			Phx.GlobalData.RegisterTargetRuntime(win32x86Runtime);
 
@@ -314,6 +311,18 @@ namespace BasicBlocks
 				Phx.Targets.Runtimes.Vccrt.Win.Msil.Runtime.New(msilArch);
 			Phx.GlobalData.RegisterTargetArchitecture(msilArch);
 			Phx.GlobalData.RegisterTargetRuntime(win32MSILRuntime);
+
+			// amd64/64bit
+			//Phx.Targets.Architectures.Architecture amd64Arch =
+			//    Phx.Targets.Architectures.Amd64.Architecture.New();
+			//Phx.Targets.Runtimes.Runtime amd64x64Runtime =
+			//    Phx.Targets.Runtimes.Vccrt.Win64.Amd64.Runtime.New(amd64Arch);
+			//Phx.Targets.Runtimes.Runtime amd64x32Runtime =
+			//    Phx.Targets.Runtimes.Vccrt.Win64.Amd64.Runtime.New(x86Arch);
+
+			//Phx.GlobalData.RegisterTargetArchitecture(amd64Arch);
+			//Phx.GlobalData.RegisterTargetRuntime(amd64x64Runtime);
+			//Phx.GlobalData.RegisterTargetRuntime(amd64x32Runtime);
 		}
 
 		//---------------------------------------------------------------------
