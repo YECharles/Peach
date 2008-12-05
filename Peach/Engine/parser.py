@@ -155,7 +155,9 @@ class ParseTemplate:
 		isrc = factory.fromUri(uri)
 		doc = Ft.Xml.Domlette.NonvalidatingReader.parse(isrc)
 		
-		return self.HandleDocument(doc)
+		obj = self.HandleDocument(doc, uri)
+		
+		return obj
 	
 	def parseString(self, xml):
 		'''
@@ -182,7 +184,7 @@ class ParseTemplate:
 		
 		return classes
 	
-	def HandleDocument(self, doc):
+	def HandleDocument(self, doc, uri = ""):
 		
 		self.StripComments(doc)
 		self.StripText(doc)
@@ -190,6 +192,7 @@ class ParseTemplate:
 		ePeach = doc.firstChild
 		
 		peach = dom.Peach()
+		peach.peachPitUri = uri
 		#peach.node = doc
 		self.context = peach
 		peach.mutators = None
@@ -2678,8 +2681,8 @@ class ParseTemplate:
 
 # ###########################################################################
 
-if sys.version.find("AMD64") == -1:
-	import psyco
-	psyco.bind(ParseTemplate)
+#if sys.version.find("AMD64") == -1:
+#	import psyco
+#	psyco.bind(ParseTemplate)
 
 # end

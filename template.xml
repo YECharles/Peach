@@ -35,6 +35,11 @@
 	<!-- Configure a single run -->
 	<Run name="DefaultRun">
 		
+		<!-- TODO: Change log path if needed -->
+		<Logger class="logger.Filesystem">
+			<Param name="path" value="logs"/>
+		</Logger>
+		
 		<Test ref="TheTest" />
 		
 	</Run>

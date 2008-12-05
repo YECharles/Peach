@@ -35,7 +35,7 @@ TODO: Locate when relations!
 
 # $Id$
 
-import os, sys, glob
+import os, sys, glob, cPickle
 sys.path.append("c:/peach")
 sys.path.append("../..")
 sys.path.append(os.getcwd() + "\\..\\..\\")
@@ -58,6 +58,7 @@ except:
 
 from Peach.Engine import parser, engine, incoming, dom
 from Peach.Engine.dom import *
+from Peach.Engine.dom import PeachDeepCopy
 import Peach
 
 class PeachResolver(SchemeRegistryResolver):
@@ -145,6 +146,7 @@ class Missing:
 		self.peach = None
 		self.masterModel = None
 		self.sampleFiles = []
+		self.pitFilename = None
 	
 	def getSampleFiles(self, folder):
 		'''
@@ -160,6 +162,7 @@ class Missing:
 		
 		print "[*] Parsing pit file:", pitFilename
 		
+		self.pitFilename = pitFilename
 		p = parser.ParseTemplate()
 		p.dontCrack = True
 		self.peach = p.parse("file:"+pitFilename)
@@ -172,6 +175,71 @@ class Missing:
 		if self.masterModel == None:
 			raise Exception("Could not locate model named [%s]" % modelName)
 	
+	def pickleModel(self, model):
+		newModel = model.copy(None)
+		newModel.parent = None
+		
+		self.pickleRemoveInstanceMethods(newModel)
+		
+		return cPickle.dumps(newModel)
+	
+	def unpickleModel(self, dump):
+		model = cPickle.loads(dump)
+		self.pickleAddInstanceMethods(model)
+		
+		return model
+		
+	def pickleAddInstanceMethods(self, model):
+		'''
+		Add back in the non-pickleable instancemethods.
+		'''
+		
+		if not hasattr(model, "__deepcopy__"):
+			model.__deepcopy__ = new.instancemethod(PeachDeepCopy, model, model.__class__)
+		
+		if model.elementType == 'block':
+			model.toXml = new.instancemethod(BlockToXml, model, model.__class__)
+		
+		elif model.elementType == 'namespace':
+			model.toXml = new.instancemethod(NamespaceToXml, model, model.__class__)
+		
+		for c in dir(model):
+			if c == 'parent':
+				continue
+			
+			obj = getattr(model, c)
+			if isinstance(obj, Element):
+				self.pickleAddInstanceMethods(obj)
+		
+		if isinstance(model, ElementWithChildren):
+			for c in model:
+				if isinstance(c, Element):
+					self.pickleAddInstanceMethods(c)
+	
+	def pickleRemoveInstanceMethods(self, model):
+		'''
+		Remove any instance methods.
+		'''
+		
+		if hasattr(model, "__deepcopy__"):
+			delattr(model, "__deepcopy__")
+		
+		if hasattr(model, "toXml") and (model.elementType == 'block' or model.elementType == 'namespace'):
+			delattr(model, "toXml")
+		
+		for c in dir(model):
+			if c == 'parent':
+				continue
+			
+			obj = getattr(model, c)
+			if isinstance(obj, Element):
+				self.pickleRemoveInstanceMethods(obj)
+		
+		if isinstance(model, ElementWithChildren):
+			for c in model:
+				if isinstance(c, Element):
+					self.pickleRemoveInstanceMethods(c)
+	
 	def crackAllSampleFiles(self):
 		'''
 		Crack sample files into self.crackedModels[file]
@@ -179,21 +247,47 @@ class Missing:
 		
 		for file in self.sampleFiles:
 			
-			print "[*] Cracking file: %s" % file
+			statPeach = None
+			try:
+				statPeach = os.stat(file+".peach")
+				statFile = os.stat(file)
+				statPit = os.stat(self.pitFilename)
+			except:
+				pass
 			
-			fd = open(file, "rb+")
-			data = fd.read()
-			fd.close()
+			if statPeach != None and statPeach.st_mtime > statFile.st_mtime and statPeach.st_mtime > statPit.st_mtime:
+				# Load pre-parsed peach file
+				print "[*] Loading model for: %s" % file
+				
+				fd = open(file+".peach", "rb+")
+				data = fd.read()
+				fd.close()
+				
+				model = self.unpickleModel(data)
+				
+			else:
+				# Reparse file
+				print "[*] Cracking file: %s" % file
+				
+				fd = open(file, "rb+")
+				data = fd.read()
+				fd.close()
+				
+				buff = PublisherBuffer(None, data)
+				cracker = incoming.DataCracker(self.peach)
+				cracker.haveAllData = True
+				model = self.masterModel.copy(None)
+				(rating, pos) = cracker.crackData(model, buff, "setDefaultValue")
+				
+				if rating > 2:
+					raise Exception("Unable to crack file [%s], rating was [%d]" % (file, rating))
+				
+				# Pickle model
+				fd = open(file + ".peach", "wb+")
+				fd.write(self.pickleModel(model))
+				fd.close()
 			
-			buff = PublisherBuffer(None, data)
-			cracker = incoming.DataCracker(self.peach)
-			cracker.haveAllData = True
-			model = self.masterModel.copy(None)
-			(rating, pos) = cracker.crackData(model, buff, "setDefaultValue")
-			
-			if rating > 2:
-				raise Exception("Unable to crack file [%s], rating was [%d]" % (file, rating))
-			
+			# Save model
 			self.crackedModels[file] = model
 
 	def setDefaultsOnPit(self, pitFilename):
@@ -274,16 +368,16 @@ class Missing:
 				for choice2 in choices:
 					#print "Found: ", choice2.getFullDataName()
 					foundChoices.append(choice2.currentElement.name)
-				
+			
 			# now check the master
 			for child in choice:
 				if isinstance(child, DataElement):
 					if child.name not in foundChoices:
 						print "[!] Missing: %s" % child.getFullDataName()
-							
+						
 		# done
-				
 	
+
 print ""
 print "] Peach Choice Coverage Check"
 print "] Copyright (c) Michael Eddington"

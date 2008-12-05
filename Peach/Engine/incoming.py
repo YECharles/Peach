@@ -2140,8 +2140,8 @@ def printDom(node, level = 0):
 	except:
 		pass
 
-if sys.version.find("AMD64") == -1:
-	import psyco
-	psyco.bind(DataCracker)
+#if sys.version.find("AMD64") == -1:
+#	import psyco
+#	psyco.bind(DataCracker)
 
 # end

@@ -172,7 +172,7 @@ class DataTreeRemoveMutator(Mutator):
 		cnt = 0
 		
 		for n in node._children:
-			if n not in self.dataTypes:
+			if n.elementType not in self.dataTypes:
 				continue;
 			cnt += 1
 			cnt += self._countDataNodes(n)
@@ -382,7 +382,7 @@ class DataTreeDuplicateMutator(Mutator):
 		cnt = 2
 		
 		for n in node._children:
-			if n not in self.dataTypes:
+			if n.elementType not in self.dataTypes:
 				continue;
 			cnt += 1
 			cnt += self._countDataNodes(n)
@@ -602,7 +602,7 @@ class DataTreeSwapNearNodesMutator(Mutator):
 		cnt = 0
 		
 		for n in node._children:
-			if n not in self.dataTypes:
+			if n.elementType not in self.dataTypes:
 				continue;
 			cnt += 1
 			cnt += self._countDataNodes(n)

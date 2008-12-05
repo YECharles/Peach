@@ -41,7 +41,7 @@ if PROFILE:
 	print " --- INCOMING PROFILING ENABLED ---- "
 	import profile
 
-import sys, re, types, new, base64, time, ctypes, traceback
+import sys, re, types, new, base64, time, ctypes, traceback, os, cPickle
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
@@ -917,6 +917,71 @@ class DataElement(Mutatable):
 		
 		raise Exception("Error: asCType method not implemented yet!")
 	
+	def pickleModel(self, model):
+		newModel = model.copy(None)
+		newModel.parent = None
+		
+		self._pickleRemoveInstanceMethods(newModel)
+		
+		return cPickle.dumps(newModel)
+	
+	def unpickleModel(self, dump):
+		model = cPickle.loads(dump)
+		self._pickleAddInstanceMethods(model)
+		
+		return model
+		
+	def _pickleAddInstanceMethods(self, model):
+		'''
+		Add back in the non-pickleable instancemethods.
+		'''
+		
+		if not hasattr(model, "__deepcopy__"):
+			model.__deepcopy__ = new.instancemethod(PeachDeepCopy, model, model.__class__)
+		
+		if model.elementType == 'block':
+			model.toXml = new.instancemethod(BlockToXml, model, model.__class__)
+		
+		elif model.elementType == 'namespace':
+			model.toXml = new.instancemethod(NamespaceToXml, model, model.__class__)
+		
+		for c in dir(model):
+			if c == 'parent':
+				continue
+			
+			obj = getattr(model, c)
+			if isinstance(obj, Element):
+				self._pickleAddInstanceMethods(obj)
+		
+		if isinstance(model, ElementWithChildren):
+			for c in model:
+				if isinstance(c, Element):
+					self._pickleAddInstanceMethods(c)
+	
+	def _pickleRemoveInstanceMethods(self, model):
+		'''
+		Remove any instance methods.
+		'''
+		
+		if hasattr(model, "__deepcopy__"):
+			delattr(model, "__deepcopy__")
+		
+		if hasattr(model, "toXml") and (model.elementType == 'block' or model.elementType == 'namespace'):
+			delattr(model, "toXml")
+		
+		for c in dir(model):
+			if c == 'parent':
+				continue
+			
+			obj = getattr(model, c)
+			if isinstance(obj, Element):
+				self._pickleRemoveInstanceMethods(obj)
+		
+		if isinstance(model, ElementWithChildren):
+			for c in model:
+				if isinstance(c, Element):
+					self._pickleRemoveInstanceMethods(c)
+	
 	def setDefaults(self, data, dontCrack = False):
 		'''
 		Set data elements defaultValue based on a Data object.
@@ -927,29 +992,68 @@ class DataElement(Mutatable):
 			if dontCrack:
 				return
 			
-			print "[*] Cracking data from %s into %s" % (data.fileName, self.name)
+			statPeach = None
+			try:
+				if self.getRoot().peachPitUri[:5] == 'file:':
+					statPit = os.stat(self.getRoot().peachPitUri[5:])
+					statFile = os.stat(data.fileName)
 			
-			fd = open(data.fileName, "rb")
-			stuff = fd.read()
-			fd.close()
+					# Always do this one last
+					statPeach = os.stat(data.fileName+".peach")
+			except:
+				pass
 			
-			buff = PublisherBuffer(None, stuff)
+			if statPeach != None and statPeach.st_mtime > statFile.st_mtime and statPeach.st_mtime > statPit.st_mtime:
+				# Load pre-parsed peach file
+				print "[*] Loading model for: %s" % data.fileName
+				
+				fd = open(data.fileName+".peach", "rb+")
+				data = fd.read()
+				fd.close()
 			
-			parent = self.parent
-			while parent.parent != None: parent = parent.parent
+				model = self.unpickleModel(data)
+				model.parent = self.parent
 			
-			cracker = PeachModule.Engine.incoming.DataCracker(parent)
-			#cracker.haveAllData = True
+				# Remove self and insert model
+				index = self.parent.index(self)
+				del self.parent[self.name]
+				self.parent.insert(index, model)
 			
-			if PROFILE:
-				profile.runctx("cracker.crackData(self, buff, \"setDefaultValue\")",
-							   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
 			else:
-				startTime = time.time()
-				cracker.crackData(self, buff, "setDefaultValue")
-				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
-				print "[*] Building relation cache"
-				self.BuildRelationCache()
+				print "[*] Cracking data from %s into %s" % (data.fileName, self.name)
+				
+				fd = open(data.fileName, "rb")
+				stuff = fd.read()
+				fd.close()
+				
+				buff = PublisherBuffer(None, stuff)
+				
+				parent = self.parent
+				while parent.parent != None: parent = parent.parent
+				
+				cracker = PeachModule.Engine.incoming.DataCracker(parent)
+				#cracker.haveAllData = True
+				
+				if PROFILE:
+					profile.runctx("cracker.crackData(self, buff, \"setDefaultValue\")",
+								   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
+				else:
+					startTime = time.time()
+					cracker.crackData(self, buff, "setDefaultValue")
+					print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
+					print "[*] Building relation cache"
+					self.BuildRelationCache()
+				
+				# Pickle model
+				try:
+					fd = open(data.fileName + ".peach", "wb+")
+					fd.write(self.pickleModel(self))
+					fd.close()
+				except:
+					try:
+						os.unlink(data.fileName+".peach")
+					except:
+						pass
 			
 			return
 		
@@ -3877,16 +3981,16 @@ class Custom(DataElement):
 		return self.getInternalValue(sout)
 		
 
-if sys.version.find("AMD64") == -1:
-	import psyco
-	psyco.bind(DataElement)
-	psyco.bind(Relation)
-	psyco.bind(String)
-	psyco.bind(Number)
-	psyco.bind(Template)
-	psyco.bind(Block)
-	psyco.bind(Choice)
-	psyco.bind(deepcopy)
+#if sys.version.find("AMD64") == -1:
+#	import psyco
+#	psyco.bind(DataElement)
+#	psyco.bind(Relation)
+#	psyco.bind(String)
+#	psyco.bind(Number)
+#	psyco.bind(Template)
+#	psyco.bind(Block)
+#	psyco.bind(Choice)
+#	psyco.bind(deepcopy)
 
 # ###################################################################
 
