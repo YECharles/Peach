@@ -1248,8 +1248,13 @@ class ArrayVariance(Generator):
 			# Add some items
 			headIndex = arrayHead.parent.index(arrayHead)
 			obj = arrayHead.getArrayElementAt(arrayHead.getArrayCount()-1)
-			obj.currentValue = obj.getValue() * (n - self.arrayCount)
-			obj.arrayPosition = n
+			
+			try:
+				obj.currentValue = obj.getValue() * (n - self.arrayCount)
+				obj.arrayPosition = n
+			except MemoryError:
+				# Catch out of memory errors
+				pass
 			
 			#for i in xrange(self.arrayCount, n):
 			#	obj = arrayHead.copy(arrayHead.parent)

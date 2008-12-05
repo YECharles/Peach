@@ -416,7 +416,7 @@ class StateEngine:
 			if not self.publisher.withNode:
 				ret = self.publisher.call(method, argValues)
 			else:
-				ret = self.publisher.callWithNode(method, argValues, argValues)
+				ret = self.publisher.callWithNode(method, argValues, argNodes)
 			
 			# look for and set return
 			for c in action:

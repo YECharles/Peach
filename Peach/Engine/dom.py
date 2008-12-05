@@ -992,16 +992,19 @@ class DataElement(Mutatable):
 			if dontCrack:
 				return
 			
-			statPeach = None
-			try:
-				if self.getRoot().peachPitUri[:5] == 'file:':
-					statPit = os.stat(self.getRoot().peachPitUri[5:])
-					statFile = os.stat(data.fileName)
+			## Node: We are not ready to use the .peach files yet
+			## still problems to work out!
 			
-					# Always do this one last
-					statPeach = os.stat(data.fileName+".peach")
-			except:
-				pass
+			statPeach = None
+			#try:
+			#	if self.getRoot().peachPitUri[:5] == 'file:':
+			#		statPit = os.stat(self.getRoot().peachPitUri[5:])
+			#		statFile = os.stat(data.fileName)
+			#		
+			#		# Always do this one last
+			#		statPeach = os.stat(data.fileName+".peach")
+			#except:
+			#	pass
 			
 			if statPeach != None and statPeach.st_mtime > statFile.st_mtime and statPeach.st_mtime > statPit.st_mtime:
 				# Load pre-parsed peach file
@@ -2245,6 +2248,8 @@ class Template(DataElement):
 	TODO: Refactor this to DataModel
 	'''
 	
+	ctypeClassName = 0
+	
 	def __init__(self, name):
 		DataElement.__init__(self, name, None)
 		self.elementType = 'template'
@@ -2254,14 +2259,29 @@ class Template(DataElement):
 	
 	def asCType(self):
 		
-		ret = _DefaultStructure()
-		ret._fields_ = []
+		Template.ctypeClassName += 1
+		ctypeClassName = Template.ctypeClassName
 		
+		exec("""class TemplateTempClass%d(ctypes.Structure):
+	pass
+""" % ctypeClassName)
+		
+		values = []
+		fields = []
 		for c in self:
 			if isinstance(c, DataElement):
 				cValue = c.asCType()
-				ret._fields_.append( (c.name, type(cValue) ) )
-				setattr(ret, c.name, cValue)
+				fields.append( (c.name, type(cValue) ) )
+				values.append((c.name, cValue))
+		
+		exec("TemplateTempClass%d._fields_ = fields" % ctypeClassName)
+		exec("ret = TemplateTempClass%d()" % ctypeClassName)
+		for c in values:
+			setattr(ret, c[0], c[1])
+		
+		# Are we a pointer?
+		if self.isPointer:
+			ret = ctypes.pointer(ret)
 		
 		return ret
 	
@@ -2478,6 +2498,9 @@ class Block(DataElement):
 	'''
 	Block or sequence of other data types.
 	'''
+	
+	ctypeClassName = 0
+	
 	def __init__(self, name, parent):
 		'''
 		Don't put too much logic here.  See HandleBlock in the parser.
@@ -2490,14 +2513,30 @@ class Block(DataElement):
 	
 	def asCType(self):
 		
-		ret = _DefaultStructure()
-		ret._fields_ = []
+		Block.ctypeClassName += 1
+		ctypeClassName = Block.ctypeClassName
 		
+		exec("""class BlockTempClass%d(ctypes.Structure):
+	pass
+""" % ctypeClassName)
+		
+		values = []
+		fields = []
 		for c in self:
 			if isinstance(c, DataElement):
 				cValue = c.asCType()
-				ret._fields_.append( (c.name, type(cValue) ) )
-				setattr(ret, c.name, cValue)
+				fields.append( (c.name, type(cValue) ) )
+				values.append((c.name, cValue))
+		
+		exec("BlockTempClass%d._fields_ = fields" % ctypeClassName)
+		exec("ret = BlockTempClass%d()" % ctypeClassName)
+		
+		for c in values:
+			setattr(ret, c[0], c[1])
+		
+		# Are we a pointer?
+		if self.isPointer:
+			ret = ctypes.pointer(ret)
 		
 		return ret
 	
@@ -2649,11 +2688,11 @@ class Number(DataElement):
 		ret = None
 		
 		if self.signed:
-			evalString = "ret = ctypes.c_int%d(value)" % (self.size)
+			evalString = "ctypes.c_int%d(value)" % (self.size)
 		else:
-			evalString = "ret = ctypes.c_uint%d(value)" % (self.size)
+			evalString = "ctypes.c_uint%d(value)" % (self.size)
 		
-		eval(evalString)
+		ret = eval(evalString)
 		
 		return ret
 	
@@ -3074,8 +3113,8 @@ class Flags(DataElement):
 		value = int(self.getInternalValue())
 		ret = None
 		
-		evalString = "ret = ctypes.c_uint%d(value)" % (self.size)
-		eval(evalString)
+		evalString = "ctypes.c_uint%d(value)" % (self.size)
+		ret = eval(evalString)
 		
 		return ret
 

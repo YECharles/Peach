@@ -692,6 +692,22 @@ class ParseTemplate:
 		template.elementType = 'template'
 		#template.node = node
 		
+		# pointer
+		
+		pointer = self._getAttribute(node, 'pointer')
+		if pointer == None:
+			pass
+		
+		elif pointer.lower() == 'true':
+			template.isPointer = True
+			print "setting to true"
+			
+		elif pointer.lower() == 'false':
+			template.isPointer = False
+		
+		else:
+			raise PeachException("Attribute 'pointer' has unexpected value [%s], only 'true' and 'false' are supported." % pointer)
+		
 		# children
 		
 		self.HandleDataContainerChildren(node, template)
@@ -952,8 +968,8 @@ class ParseTemplate:
 		# pointer
 		
 		pointer = self._getAttribute(node, 'pointer')
-		if pointer == None or len(pointer) == 0:
-			element.isPointer = True
+		if pointer == None:
+			pass
 		
 		elif pointer.lower() == 'true':
 			element.isPointer = True

@@ -35,10 +35,12 @@ Collection of default included Publishers
 # $Id$
 
 
-import file, sql, stdout, tcp, udp, com, process, http, icmp, raw, remote
+import file, sql, stdout, tcp, udp, com, process, http, icmp, raw, remote, dll
 
 __all__ = ["file", "sql", "stdout", 
-	"tcp", "udp", "com", "process", "http", "icmp", "raw", "remote"]
+	"tcp", "udp", "com", "process",
+	"http", "icmp", "raw", "remote",
+	"dll"]
 
 # end
 
