@@ -706,7 +706,7 @@ class AgentClient:
 		
 		if agentUri == "LocalAgent":
 			# Swan up our own agent instance!
-			self._agentUri = "http://127.0.0.1:9000"
+			agentUri = self._agentUri = "http://127.0.0.1:9000"
 			
 			if sys.platform == "win32":
 				# Figure out were Peach is!
