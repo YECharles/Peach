@@ -1,14 +1,13 @@
 
 '''
-Windows COM/DCOM/COM+ publishers.
+Shared library publisher.
 
 @author: Michael Eddington
-@version: $Id: com.py 1064 2008-07-23 07:03:21Z meddingt $
+@version: $Id$
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
-# Copyright (c) 2004-2005 IOActive Inc.
+# Copyright (c) 2008 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +31,7 @@ Windows COM/DCOM/COM+ publishers.
 # Authors:
 #   Michael Eddington (mike@phed.org)
 
-# $Id: com.py 1064 2008-07-23 07:03:21Z meddingt $
+# $Id$
 
 import time, sys, ctypes, signal, os
 from Peach.publisher import Publisher
@@ -42,11 +41,11 @@ class Dll(Publisher):
 	Shared library publisher using ctypes
 	"""
 	
-	withNode = True
-	
 	def __init__(self, library):
+		Publisher.__init__(self)
 		self.library = library
 		self.dll = None
+		self.withNode = True
 	
 	def start(self):
 		try:
@@ -73,6 +72,7 @@ class Dll(Publisher):
 		
 		#ct = argNodes[0].asCType()
 		#print ct
+		#print ct.contents
 		#print ct._fields_
 		#print ct.Named_37
 		#print ct.Named_38

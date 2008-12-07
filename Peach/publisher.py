@@ -148,9 +148,10 @@ class Publisher:
 	Note: A publisher can support both stream and call based publishing.
 	'''
 	
-	#: Indicates which method should be called.
-	withNode = False
-	
+	def __init__(self):
+		#: Indicates which method should be called.
+		self.withNode = False
+		
 	def start(self):
 		'''
 		Change state such that send/receave will work.  For Tcp this

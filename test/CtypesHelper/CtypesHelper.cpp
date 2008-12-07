@@ -68,4 +68,17 @@ CTYPESHELPER_API int TestCase4(struct TestCase4 value)
 	return 0;
 }
 
+CTYPESHELPER_API int TestCase4_1(struct TestCase4** value)
+{
+	if((*value)->byte1 == (char)0xfe && (*value)->byte2 == (char)0xef && 
+		(*value)->case1->Val1 == (short)0xffe && (*value)->case1->Val2 == (int)0xfffffe)
+	{
+		printf("TestCase4_1 Passed\n");
+		return 1;
+	}
+
+	printf("TestCase4_1 Failed %d %d %d %d\n", (*value)->byte1, (*value)->byte2, (*value)->case1->Val1, (*value)->case1->Val2);
+	return 0;
+}
+
 // end

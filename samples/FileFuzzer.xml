@@ -38,11 +38,6 @@
 		<String value="Hello World!" />
 	</DataModel>
 	
-	<!-- A template to hold the filename -->
-	<DataModel name="FileName">
-		<String isStatic="true" value="fuzzfile.bin" />
-	</DataModel>
-	
 	<!-- Define a simple state machine that will write the file and 
 		then launch a program using the FileWriterLauncher publisher -->
 	<StateModel name="State" initialState="Initial">
@@ -56,21 +51,24 @@
 			<Action type="close" />
 			
 			<!-- Launch the file consumer -->
-			<Action type="call" method="c:\windows\system32\notepad.exe">
-				<Param type="in" name="filename">
-					<DataModel ref="FileName"/>
-				</Param>
-			</Action>
+			<Action type="call" method="notepad.exe"/>
+			
 		</State>
 	</StateModel>
 	
 	<!-- Setup a local agent that will monitor for faults -->
-	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
-		<!-- For file fuzzing were the application will be launched and closed 
-			a number of times we will use Microsofts Application Verifier to 
-			monitor the process for faults.  -->
-		<Monitor class="debugger.WindowsAppVerifier">
-			<Param name="Application" value="notepad.exe" />
+	<Agent name="LocalAgent">
+		<Monitor class="debugger.WindowsDebugEngine">
+			
+			<!-- The command line to run.  Notice the filename provided matched up 
+				to what is provided below in the Publisher configuration -->
+			<Param name="CommandLine" value="c:\windows\system32\notepad.exe fuzzfile.bin" />
+			
+			<!-- This parameter will cause the debugger to wait for an action-call in
+				the state model with a method="notepad.exe" before running
+				program.  -->
+			<Param name="StartOnCall" value="notepad.exe" />
+			
 		</Monitor>
 		
 		<!-- Enable heap debugging on our process as well. -->
@@ -87,6 +85,7 @@
 		<!-- Configure our publisher with correct filename to write too -->
 		<Publisher class="file.FileWriterLauncher">
 			<Param name="fileName" value="fuzzfile.bin" />
+			<Param name="debugger" value="true"/>
 		</Publisher>
 	</Test>
 	

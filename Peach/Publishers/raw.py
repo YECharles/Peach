@@ -43,8 +43,6 @@ class Raw(Publisher):
 	A simple Raw publisher.
 	'''
 	
-	_host = None
-	_socket = None
 	
 	def __init__(self, interface, timeout = 0.1):
 		'''
@@ -53,6 +51,9 @@ class Raw(Publisher):
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
 		'''
+		Publisher.__init__(self)
+		self._host = None
+		self._socket = None
 		self._interface = interface
 		self._timeout = float(timeout)
 	

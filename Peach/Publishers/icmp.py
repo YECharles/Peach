@@ -55,6 +55,7 @@ class Icmp(Publisher):
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
 		'''
+		Publisher.__init__(self)
 		self._host = host
 		self._timeout = float(timeout)
 		

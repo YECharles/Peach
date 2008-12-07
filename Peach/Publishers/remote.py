@@ -42,6 +42,7 @@ class RemotePublisher(Publisher):
 	'''
 	
 	def __init__(self, agentName, name, cls, *args):
+		Publisher.__init__(self)
 		self._agentName = agentName
 		self._name = name
 		self._cls = cls

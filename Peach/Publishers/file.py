@@ -35,6 +35,7 @@ Some default file publishers.  Output generated data to a file, etc.
 # $Id$
 
 import os, sys, time
+from Peach.Engine.engine import Engine
 from Peach.publisher import Publisher
 
 class FileWriter(Publisher):
@@ -43,15 +44,15 @@ class FileWriter(Publisher):
 	yet.
 	'''
 	
-	_filename = None
-	_fd = None
-	_state = 0	# 0 -stoped; 1 -started
-	
 	def __init__(self, filename):
 		'''
 		@type	filename: string
 		@param	filename: Filename to write to
 		'''
+		Publisher.__init__(self)
+		self._filename = None
+		self._fd = None
+		self._state = 0	# 0 -stoped; 1 -started
 		self.setFilename(filename)
 	
 	def getFilename(self):
@@ -130,15 +131,16 @@ class FileReader(Publisher):
 	yet.
 	'''
 	
-	_filename = None
-	_fd = None
-	_state = 0	# 0 -stoped; 1 -started
-	
 	def __init__(self, filename):
 		'''
 		@type	filename: string
 		@param	filename: Filename to write to
 		'''
+		Publisher.__init__(self)
+		self._filename = None
+		self._fd = None
+		self._state = 0	# 0 -stoped; 1 -started
+	
 		self.setFilename(filename)
 	
 	def getFilename(self):
@@ -240,19 +242,22 @@ class FileWriterLauncher(Publisher):
 	stream publisher.  Close, than call a program (or two).
 	'''
 	
-	_filename = None
-	_fd = None
-	_state = 0	# 0 -stoped; 1 -started
-	
-	def __init__(self, filename, waitTime = 180):
+	def __init__(self, filename, debugger = "False", waitTime = 180):
 		'''
 		@type	filename: string
 		@param	filename: Filename to write to
 		@type	waitTime: integer
 		@param	waitTime: Time in seconds to wait before killing process
 		'''
+		Publisher.__init__(self)
+		self._filename = None
+		self._fd = None
+		self._state = 0	# 0 -stoped; 1 -started
 		self.setFilename(filename)
 		self.waitTime = waitTime
+		self.debugger = False
+		if debugger.lower() == "true":
+			self.debugger = True
 	
 	def getFilename(self):
 		'''
@@ -334,26 +339,39 @@ class FileWriterLauncher(Publisher):
 		@param	args: Arguments to pass
 		'''
 		
-		realArgs = [method, "/c", method]
-		for a in args:
-			realArgs.append(a)
+		## Make sure we close the file first :)
 		
-		print "Spawning %s" % method
-		pid = os.spawnv(os.P_NOWAIT, os.path.join( os.getenv('SystemRoot'), 'system32','cmd.exe'), realArgs)
+		self.close()
 		
-		# Give it some time before we KILL!
-		for i in range(self.waitTime/0.25):
-			if win32process.GetExitCodeProcess(pid) != win32con.STILL_ACTIVE:
-				# Process exited already
-				return
+		## Figure out how we are calling the program
+		
+		if self.debugger:
+			# Launch via agent
 			
-			time.sleep(0.25)
+			Engine.context.agent.OnPublisherCall(method)
 		
-		try:
-			# Kill application
-			win32process.TerminateProcess(pid, 0)
-		except:
-			pass
+		else:
+			# Launch via spawn
+			
+			realArgs = [method, "/c", method]
+			for a in args:
+				realArgs.append(a)
+			
+			pid = os.spawnv(os.P_NOWAIT, os.path.join( os.getenv('SystemRoot'), 'system32','cmd.exe'), realArgs)
+			
+			# Give it some time before we KILL!
+			for i in range(self.waitTime/0.25):
+				if win32process.GetExitCodeProcess(pid) != win32con.STILL_ACTIVE:
+					# Process exited already
+					return
+				
+				time.sleep(0.25)
+			
+			try:
+				# Kill application
+				win32process.TerminateProcess(pid, 0)
+			except:
+				pass
 
 try:
 	import win32gui, win32con, win32process, win32event, win32api
@@ -382,20 +400,23 @@ try:
 		stream publisher.  Close, than call a program (or two).
 		'''
 		
-		_filename = None
-		_fd = None
-		_state = 0	# 0 -stoped; 1 -started
-		
-		def __init__(self, filename, windowname, waitTime = 3):
+		def __init__(self, filename, windowname, debugger = "false", waitTime = 3):
 			'''
 			@type	filename: string
 			@param	filename: Filename to write to
 			@type   windowname: string
 			@param  windowname: Partial window name to locate and kill
 			'''
+			Publisher.__init__(self)
+			self._filename = None
+			self._fd = None
+			self._state = 0	# 0 -stoped; 1 -started
 			self.setFilename(filename)
 			self._windowName = windowname
 			self.waitTime = float(waitTime)
+			self.debugger = False
+			if debugger.lower() == "true":
+				self.debugger = True
 		
 		def getFilename(self):
 			'''
@@ -507,17 +528,24 @@ try:
 			@param	args: Arguments to pass
 			'''
 			
-			realArgs = [method]
-			for a in args:
-				realArgs.append(a)
-			
 			proc = None
-			try:
-				proc = subprocess.Popen(realArgs, shell=True)
+			if self.debugger:
+				# Launch via agent
+				
+				Engine.context.agent.OnPublisherCall(method)
 			
-			except:
-				print "Error: Exception thrown creating process"
-				raise
+			else:
+				realArgs = [method]
+				for a in args:
+					realArgs.append(a)
+				
+				proc = None
+				try:
+					proc = subprocess.Popen(realArgs, shell=True)
+				
+				except:
+					print "Error: Exception thrown creating process"
+					raise
 			
 			# Wait 5 seconds
 			time.sleep(self.waitTime)
@@ -556,7 +584,7 @@ try:
 			for p in self.genProcesses():
 				if p.th32ParentProcessID == parentPid:
 					yield p.th32ProcessID
-			
+		
 		def genProcesses(self):
 			
 			CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
@@ -584,15 +612,16 @@ try:
 			'''
 			win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, [proc, title])
 			
-			win32event.WaitForSingleObject(int(proc._handle), 5*1000)
-			
-			for pid in self.genChildProcesses(proc):
-				try:
-					handle = win32api.OpenProcess(1, False, pid)
-					win32process.TerminateProcess(handle, -1)
-					win32api.CloseHandle(handle)
-				except:
-					pass
+			if proc:
+				win32event.WaitForSingleObject(int(proc._handle), 5*1000)
+				
+				for pid in self.genChildProcesses(proc):
+					try:
+						handle = win32api.OpenProcess(1, False, pid)
+						win32process.TerminateProcess(handle, -1)
+						win32api.CloseHandle(handle)
+					except:
+						pass
 		
 except:
 	pass

@@ -50,6 +50,7 @@ class HttpDigestAuth(Publisher):
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
 		'''
+		Publisher.__init__(self)
 		self._url = url
 		self._realm = realm
 		self._username = username
@@ -124,6 +125,7 @@ class HttpBasicAuth(Publisher):
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
 		'''
+		Publisher.__init__(self)
 		self._url = url
 		self._realm = realm
 		self._username = username

@@ -2347,10 +2347,10 @@
 					<xs:documentation>Password to the remote agent if needed.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="location" use="required">
+			<xs:attribute name="location">
 				<xs:annotation>
-					<xs:documentation>Specify location of agent. Value is &quot;local&quot; or the
-						hostname/ipaddress of the agent.</xs:documentation>
+					<xs:documentation>Specify location of agent. Value is &quot;LocalAgent&quot; or the
+						hostname/ipaddress of the agent (defaults to LocalAgent)</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:union>

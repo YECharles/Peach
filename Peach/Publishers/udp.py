@@ -54,6 +54,7 @@ class Udp(Publisher):
 		@type	port: number
 		@param	port: Remote port
 		'''
+		Publisher.__init__(self)
 		self._host = host
 		self._port = port
 		self._timeout = timeout
@@ -124,6 +125,7 @@ class UdpListener(Publisher):
 		@type	port: number
 		@param	port: Remote port
 		'''
+		Publisher.__init__(self)
 		self._host = host
 		self._port = port
 		self._timeout = timeout

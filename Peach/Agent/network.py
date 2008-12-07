@@ -66,7 +66,7 @@ try:
 		print "Warning: pypcap not found, disabling network monitor."
 
 except:
-	print "Warning: pypcap not found, disabling network monitor."
+	#print "Warning: pypcap not found, disabling network monitor."
 	pass
 
 

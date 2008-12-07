@@ -67,6 +67,7 @@ class Tcp(Publisher):
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
 		'''
+		Publisher.__init__(self)
 		self._host = host
 		
 		try:

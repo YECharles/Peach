@@ -2271,17 +2271,22 @@ class Template(DataElement):
 		for c in self:
 			if isinstance(c, DataElement):
 				cValue = c.asCType()
-				fields.append( (c.name, type(cValue) ) )
+				fields.append((c.name, type(cValue)))
 				values.append((c.name, cValue))
 		
 		exec("TemplateTempClass%d._fields_ = fields" % ctypeClassName)
 		exec("ret = TemplateTempClass%d()" % ctypeClassName)
+		
 		for c in values:
 			setattr(ret, c[0], c[1])
 		
 		# Are we a pointer?
 		if self.isPointer:
-			ret = ctypes.pointer(ret)
+			if self.pointerDepth != None:
+				for i in range(int(self.pointerDepth)):
+					ret = ctypes.pointer(ret)
+			else:
+				ret = ctypes.pointer(ret)
 		
 		return ret
 	
@@ -2536,7 +2541,11 @@ class Block(DataElement):
 		
 		# Are we a pointer?
 		if self.isPointer:
-			ret = ctypes.pointer(ret)
+			if self.pointerDepth != None:
+				for i in range(int(self.pointerDepth)):
+					ret = ctypes.pointer(ret)
+			else:
+				ret = ctypes.pointer(ret)
 		
 		return ret
 	

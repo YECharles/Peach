@@ -700,13 +700,17 @@ class ParseTemplate:
 		
 		elif pointer.lower() == 'true':
 			template.isPointer = True
-			print "setting to true"
 			
 		elif pointer.lower() == 'false':
 			template.isPointer = False
 		
 		else:
 			raise PeachException("Attribute 'pointer' has unexpected value [%s], only 'true' and 'false' are supported." % pointer)
+		
+		# pointerDepth
+		
+		if node.hasAttributeNS(None, "pointerDepth"):
+			template.pointerDepth = self._getAttribute(node, 'pointerDepth')
 		
 		# children
 		
@@ -979,6 +983,11 @@ class ParseTemplate:
 		
 		else:
 			raise PeachException("Attribute 'pointer' has unexpected value [%s], only 'true' and 'false' are supported." % pointer)
+		
+		# pointerDepth
+		
+		if node.hasAttributeNS(None, "pointerDepth"):
+			element.pointerDepth = self._getAttribute(node, 'pointerDepth')
 		
 		# constraint
 		
@@ -1860,7 +1869,8 @@ class ParseTemplate:
 		agent.description = self._getAttribute(node, 'description')
 		agent.location = self._getAttribute(node, 'location')
 		if agent.location == None or len(agent.location) == 0:
-			raise PeachException("Error: Agent definition must include location attribute.")
+			agent.location = "LocalAgent"
+			#raise PeachException("Error: Agent definition must include location attribute.")
 		
 		agent.password = self._getAttribute(node, 'password')
 		if agent.password != None and len(agent.password) == 0:

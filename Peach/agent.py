@@ -39,7 +39,8 @@ actions such as restart a vm.
 # $Id$
 
 import sys, os, time, uuid, re
-import socket, pickle, types
+import socket, types
+import cPickle as pickle
 from twisted.web import xmlrpc, server
 from xmlrpclib import ServerProxy, Error
 from Peach.Publishers import *
@@ -55,6 +56,15 @@ def PeachStr(s):
 		return None
 	
 	return str(s)
+
+class FaultInfo(object):
+	'''
+	Contians information about fault.
+	'''
+	
+	def __init__(self):
+		#: All faults with same BucketString will be groupped together
+		self.BucketString = None
 
 class Monitor:
 	'''
@@ -119,6 +129,17 @@ class Monitor:
 		occurs.
 		'''
 		return False
+	
+	def PublisherCall(self, method):
+		'''
+		Called when a call action is being performed.  Call
+		actions are used to launch programs, this gives the
+		monitor a chance to determin if it should be running
+		the program under a debugger instead.
+		
+		Note: This is a bit of a hack to get this working
+		'''
+		pass
 
 
 # Need to define Monitor before we do this include!
@@ -161,8 +182,8 @@ class _MsgType:
 	PublisherAccept = 23
 	PublisherConnect = 24
 	PublisherClose = 25
-	PublisherCall = 26
-	PublisherProperty = 27
+	PublisherCall = 26		#: Notify that we are running a call action
+	PublisherProperty = 27	#: Notify that we are running a property action
 	PublisherSend = 28
 	PublisherReceive = 29
 	
@@ -417,7 +438,22 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 			m.OnTestStarting()
 		
 		return pickle.dumps(_Msg(None, _MsgType.Ack))
-	
+
+	def xmlrpc_onPublisherCall(self, msg):
+		msg = pickle.loads(msg)
+		if self._id == None or msg.id != self._id:
+			return pickle.dumps(_Msg(None, _MsgType.Nack))
+		
+		if msg.type != _MsgType.PublisherCall:
+			return pickle.dumps(_Msg(None, _MsgType.Nack))
+		
+		print "Agent: onPublisherCall()"
+		
+		for m in self._monitors:
+			m.PublisherCall(msg.method)
+		
+		return pickle.dumps(_Msg(None, _MsgType.Ack))
+
 	def _stopAllMonitors(self):
 		'''
 		Stop all monitors.  Part of resetting
@@ -663,17 +699,27 @@ class AgentClient:
 		self._pythonPaths = pythonPaths
 		self._imports = imports
 		self._password = password
-		self._agentUri = agentUri
 		self._monitors = []
+		self._id = None
+		self._agent = None
+		self._agentUri = agentUri
 		
+		if agentUri == "LocalAgent":
+			# Swan up our own agent instance!
+			self._agentUri = "http://127.0.0.1:9000"
+			
+			if sys.platform == "win32":
+				# Figure out were Peach is!
+				os.system("start %s c:\\peach\\peach.py -a" % (sys.executable))
+			else:
+				raise PeachException("Sorry, we only support auto starting agents on Windows.  Please configure all agents with location uris and pre-launch any Agent processes.")
+			
+		# Connect to remote agent
 		try:
 			m = re.search(r"://([^/]*)", agentUri)
 			self._name = m.group(1)
 		except:
 			raise PeachException("Please make sure your agent location string is a valid http URL.")
-		
-		self._id = None
-		self._agent = None
 		
 		self.Connect()
 	
@@ -763,6 +809,20 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during OnTestStarting call." % self._name)
+	
+	def OnPublisherCall(self, method):
+		msg = _Msg(self._id, _MsgType.PublisherCall)
+		msg.method = method
+		
+		try:
+			msg = pickle.loads(self._agent.onPublisherCall(pickle.dumps(msg)))
+		
+		except:
+			self.Reconnect()
+			raise RedoTestException("Communication error with Agent %s" % self._name)
+		
+		if msg.type != _MsgType.Ack:
+			raise PeachException("Lost connection to Agent %s during OnPublisherCall call." % self._name)
 	
 	def OnTestFinished(self):
 		'''
@@ -945,6 +1005,10 @@ class AgentPlexer:
 		for name in self._agents.keys():
 			self._agents[name].OnTestStarting()
 	
+	def OnPublisherCall(self, method):
+		for name in self._agents.keys():
+			self._agents[name].OnPublisherCall(method)
+			
 	def OnTestFinished(self):
 		'''
 		Called right after a test.

@@ -157,11 +157,38 @@ class Filesystem(Logger):
 	def OnFault(self, run, test, variationCount, monitorData, actionValues):
 		self._writeMsg("Fault was detected on test %d" % variationCount)
 		
-		path = os.path.join(self.faultPath,str(variationCount))
+		# Look for Bucket information
+		bucketInfo = None
+		for key in monitorData.keys():
+			if key.find("_Bucket") > -1:
+				bucketInfo = monitorData[key]
+				break
+		
+		# Build folder structure
 		try:
 			os.mkdir(self.faultPath)
 		except:
 			pass
+		
+		if bucketInfo != None:
+			print "BucketInfo:", bucketInfo
+			
+			try:
+				path = os.path.join(self.faultPath,bucketInfo)
+				os.mkdir(path)
+			except:
+				pass
+			
+			path = os.path.join(self.faultPath,bucketInfo,str(variationCount))
+		else:
+			try:
+				path = os.path.join(self.faultPath,"Unknown")
+				os.mkdir(path)
+			except:
+				pass
+			
+			path = os.path.join(self.faultPath,"Unknown",str(variationCount))
+		
 		try:
 			os.mkdir(path)
 		except:
@@ -182,9 +209,10 @@ class Filesystem(Logger):
 				fout.close()
 		
 		for key in monitorData.keys():
-			fout = open(os.path.join(path,key), "wb")
-			fout.write(monitorData[key])
-			fout.close()
+			if key.find("_Bucket") == -1:
+				fout = open(os.path.join(path,key), "wb")
+				fout.write(monitorData[key])
+				fout.close()
 	
 	def OnStopRun(self, run, test, variationCount, monitorData, value):
 		self._writeMsg("")

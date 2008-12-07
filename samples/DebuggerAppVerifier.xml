@@ -46,16 +46,11 @@
 	</StateModel>
 
 	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
+		<Monitor class="debugger.WindowsDebugEngine">
+			<Param name="CommandLine" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4242" />
+		</Monitor>
 		<Monitor class="debugger.WindowsAppVerifier">
 			<Param name="Application" value="CrashableServer.exe" />
-			<Param name="Stops" value="Heaps:10" />
-		</Monitor>
-		<Monitor class="process.Process">
-			<Param name="Command" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4242"/>
-			<Param name="FaultOnEarlyExit" value="false"/>
-		</Monitor>
-		<Monitor class="process.PageHeap">
-			<Param name="Executable" value="CrashableServer.exe"/>
 		</Monitor>
 	</Agent>
 

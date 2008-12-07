@@ -39,16 +39,19 @@ import struct, sys, time
 from threading import Thread, Event, Lock
 from Peach.agent import Monitor
 
-import struct, sys, time,os
+import struct, sys, time,os, re
 
 try:
-	import pydbg, win32process, win32api, win32pdhutil, win32con
+	#import win32process, win32api, win32pdhutil, win32con
 	import comtypes
 	from ctypes import *
 	from comtypes import HRESULT, COMError
 	from comtypes.client import CreateObject, GetEvents, PumpEvents#, ReleaseEvents
 	from comtypes.hresult import S_OK, E_FAIL, E_UNEXPECTED, E_INVALIDARG
 	from comtypes.automation import IID
+	import PyDbgEng
+	from comtypes.gen import DbgEng
+
 	
 	class WindowsAppVerifier(Monitor):
 		'''
@@ -233,318 +236,11 @@ try:
 				self._DisableImage(self._image)
 			except:
 				pass
-	
-	
-	def handleAccessViolation(dbg):
-		#print "!!!!!!!!! AV !!!!!!!!!!!!!!!"
-		crash_bin = crash_binning()
-		crash_bin.record_crash(dbg)
-		
-		WindowsDebugger.lock.acquire()
-		WindowsDebugger.crashInfo = crash_bin.crash_synopsis()
-		WindowsDebugger.fault = True
-		WindowsDebugger.lock.release()
-		
-		dbg.terminate_process()
-	
-	class WindowsDebuggerThread(Thread):
-		def run(self):
-			print "WindowsDebuggerThread: Starting process"
-			self.dbg = pydbg.pydbg()
-			self.dbg.set_callback(pydbg.EXCEPTION_ACCESS_VIOLATION, handleAccessViolation)
-			
-			if self._command != None:
-				self.dbg.load(self._command, self._params)
-			else:
-				self.dbg.attach(self._pid)
-			
-			WindowsDebugger.started.set()
-			self.dbg.debug_event_loop()
-	
-	class WindowsDebugger(Monitor, Thread):
-		'''
-		Windows debugger monitor.  Uses PaiMei pydbg module
-		'''
-		def __init__(self, args):
-			Thread.__init__(self)
-			
-			self._stopRun = False
-			WindowsDebugger.started = Event()
-			WindowsDebugger.lock = Lock()
-			WindowsDebugger.crashInfo = None
-			WindowsDebugger.fault = False
-			WindowsDebugger.started.clear()
-			
-			if args.has_key('Command'):
-				self._command = str(args['Command']).replace("'''", "\"")
-				self._params = str(args['Params']).replace("'''", "\"")
-				self._pid = None
-				print "Command: [%s]" % self._command
-			
-			elif args.has_key('ProcessName'):
-				self._command = None
-				self._params = None
-				self._pid = self.GetProcessIdByName(str(args['ProcessName']).replace("'''", ""))
-			
-			else:
-				raise Exception("Unable to create WindowsDebugger!  Error in params!")
-			
-			self._StartDebugger()
-		
-		def _StartDebugger(self):
-			WindowsDebugger.crashInfo = None
-			WindowsDebugger.fault = False
-			WindowsDebugger.started.clear()
-			
-			self.thread = WindowsDebuggerThread()
-			
-			self.thread._command = self._command
-			self.thread._params = self._params
-			self.thread._pid = self._pid
-			
-			self.thread.start()
-			WindowsDebugger.started.wait()
-		
-		def _StopDebugger(self):
-			if self.thread.isAlive():
-				try:
-					win32process.TerminateProcess(self.thread.dbg.h_process, 0)
-				except:
-					pass
-			
-			self.thread.join()
-		
-		def GetProcessIdByName(self, str):
-			'''
-			Try and get pid for a process by name.
-			'''
-			
-			try:
-				win32pdhutil.GetPerformanceAttributes('Process','ID Process',str)
-			except:
-				sys.stdout.write("WindowsDebugger: Unable to locate process [%s]\n" % str)
-				raise
-			
-			pids = win32pdhutil.FindPerformanceAttributesByName(str)
-			
-			# If _my_ pid in there, remove it!
-			try:
-				pids.remove(win32api.GetCurrentProcessId())
-			except ValueError:
-				pass
-			
-			return pids[0]
-		
-		def OnTestStarting(self):
-			'''
-			Called right before start of test.
-			'''
-			if not self.thread.isAlive():
-				self.thread.join()
-				self._StartDebugger()
-		
-		def OnTestFinished(self):
-			'''
-			Called right after a test.
-			'''
-			pass
-		
-		def GetMonitorData(self):
-			'''
-			Get any monitored data.
-			'''
-			WindowsDebugger.lock.acquire()
-			if WindowsDebugger.crashInfo != None:
-				ret = WindowsDebugger.crashInfo
-				WindowsDebugger.crashInfo = None
-				WindowsDebugger.lock.release()
-				return { 'StackTrace.txt' : ret }
-			
-			WindowsDebugger.lock.release()
-			return None
-		
-		def DetectedFault(self):
-			'''
-			Check if a fault was detected.
-			'''
-			time.sleep(0.1)
-			WindowsDebugger.lock.acquire()
-			if WindowsDebugger.fault or not self.thread.isAlive():
-				print ">>>>>> RETURNING FAULT <<<<<<<<<"
-				WindowsDebugger.fault = False
-				WindowsDebugger.lock.release()
-				return True
-			
-			WindowsDebugger.lock.release()
-			return False
-		
-		def OnFault(self):
-			'''
-			Called when a fault was detected.
-			'''
-			self._StopDebugger()
-			
-			# If we are attaching we cannot restart
-			if self._pid != None:
-				self._stopRun = True
-			
-		def OnShutdown(self):
-			'''
-			Called when Agent is shutting down.
-			'''
-			self._StopDebugger()
-			
-		def StopRun(self):
-			return self._stopRun
-	
-	## ############################################################################
-	## ############################################################################
-	## ############################################################################
-	
-	##
-	## The following code from here 
-	## is taken verbatum from PaiMei v1.1 rev122 and is licensed
-	## using the GNU General Public License 2.0 or later
-	##
-	
-	'''
-	@author:       Pedram Amini
-	@license:      GNU General Public License 2.0 or later
-	@contact:      pedram.amini@gmail.com
-	@organization: www.openrce.org
-	'''
-	
-	class __crash_bin_struct__:
-		exception_address   = 0
-		write_violation     = 0
-		violation_address   = 0
-		violation_thread_id = 0
-		context             = None
-		context_dump        = None
-		disasm              = None
-		disasm_around       = []
-		stack_unwind        = []
-		seh_unwind          = []
-		extra               = None
-	
-	
-	class crash_binning:
-		'''
-		@todo: Add persistant data support (disk / MySQL)
-		'''
-	
-		bins       = {}
-		last_crash = None
-		pydbg      = None
-	
-		####################################################################################################################
-		def __init__ (self):
-			'''
-			'''
-	
-			self.bins       = {}
-			self.last_crash = None
-			self.pydbg      = None
-	
-	
-		####################################################################################################################
-		def record_crash (self, pydbg, extra=None):
-			'''
-			Given a PyDbg instantiation that at the current time is assumed to have "crashed" (access violation for example)
-			record various details such as the disassemly around the violating address, the ID of the offending thread, the
-			call stack and the SEH unwind. Store the recorded data in an internal dictionary, binning them by the exception
-			address.
-	
-			@type  pydbg: pydbg
-			@param pydbg: Instance of pydbg
-			@type  extra: Mixed
-			@param extra: (Optional, Def=None) Whatever extra data you want to store with this bin
-			'''
-	
-			self.pydbg = pydbg
-			crash = __crash_bin_struct__()
-	
-			crash.exception_address   = pydbg.dbg.u.Exception.ExceptionRecord.ExceptionAddress
-			crash.write_violation     = pydbg.dbg.u.Exception.ExceptionRecord.ExceptionInformation[0]
-			crash.violation_address   = pydbg.dbg.u.Exception.ExceptionRecord.ExceptionInformation[1]
-			crash.violation_thread_id = pydbg.dbg.dwThreadId
-			crash.context             = pydbg.context
-			crash.context_dump        = pydbg.dump_context(pydbg.context, print_dots=False)
-			crash.disasm              = pydbg.disasm(crash.exception_address)
-			crash.disasm_around       = pydbg.disasm_around(crash.exception_address)
-			crash.stack_unwind        = pydbg.stack_unwind()
-			crash.seh_unwind          = pydbg.seh_unwind()
-			crash.extra               = extra
-	
-			if not self.bins.has_key(crash.exception_address):
-				self.bins[crash.exception_address] = []
-	
-			self.bins[crash.exception_address].append(crash)
-			self.last_crash = crash
-	
-	
-		####################################################################################################################
-		def crash_synopsis (self):
-			'''
-			For the last recorded crash, generate and return a report containing the disassemly around the violating
-			address, the ID of the offending thread, the call stack and the SEH unwind.
-			'''
-	
-			if self.last_crash.write_violation:
-				direction = "write to"
-			else:
-				direction = "read from"
-	
-			synopsis = "0x%08x %s from thread %d caused access violation\nwhen attempting to %s 0x%08x\n\n" % \
-				(
-					self.last_crash.exception_address,      \
-					self.last_crash.disasm,                 \
-					self.last_crash.violation_thread_id,    \
-					direction,                              \
-					self.last_crash.violation_address       \
-				)
-	
-			synopsis += self.last_crash.context_dump
-	
-			synopsis += "\ndisasm around:\n"
-			for (ea, inst) in self.last_crash.disasm_around:
-				synopsis += "\t0x%08x %s\n" % (ea, inst)
-	
-			if len(self.last_crash.stack_unwind):
-				synopsis += "\nstack unwind:\n"
-				for addr in self.last_crash.stack_unwind:
-					synopsis += "\t%08x\n" % addr
-	
-			if len(self.last_crash.seh_unwind):
-				synopsis += "\nSEH unwind:\n"
-				for (addr, handler) in self.last_crash.seh_unwind:
-					try:
-						disasm = self.pydbg.disasm(handler)
-					except:
-						disasm = "[INVALID]"
-	
-					synopsis +=  "\t%08x -> %08x: %s\n" % (addr, handler, disasm)
-	
-			return synopsis + "\n"
 
-except:
-	pass
-	
-try:
-	
 	# ###############################################################################################
 	# ###############################################################################################
 	# ###############################################################################################
 	# ###############################################################################################
-
-	import PyDbgEng
-	import comtypes
-	from ctypes import *
-	from comtypes import HRESULT, COMError
-	from comtypes.client import CreateObject, GetEvents, PumpEvents#, ReleaseEvents
-	from comtypes.hresult import S_OK
-	from comtypes.automation import IID
-	from comtypes.gen import DbgEng
 
 	class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
 		
@@ -642,7 +338,24 @@ try:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff, 'MiniDump.dmp' : minidump }
 				else:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff }
+
+				# Build bucket string
+				bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(_DbgEventHandler.buff).group(1)
+				exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
+				exceptionCode = re.compile("ExceptionCode: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
 				
+				exceptionType = "AV"
+				if re.compile("READ_ADDRESS").search(_DbgEventHandler.buff) != None:
+					exceptionType = "ReadAV"
+				elif re.compile("WRITE_ADDRESS").search(_DbgEventHandler.buff) != None:
+					exceptionType = "WriteAV"
+				
+				bucket = "%s_at_%s" % (exceptionType, exceptionAddress)
+				
+				print "BUCKET: %s" % bucket
+				WindowsDebugEngine.crashInfo["Bucket"] = bucket
+				
+				# Done
 				WindowsDebugEngine.fault = True
 				WindowsDebugEngine.lock.release()
 				
@@ -781,6 +494,13 @@ try:
 			else:
 				self.SymbolsPath = "SRV*http://msdl.microsoft.com/download/symbols"
 			
+			if args.has_key("StartOnCall"):
+				self.StartOnCall = True
+				self.OnCallMethod = str(args['StartOnCall']).replace("'''", "").lower()
+				
+			else:
+				self.StartOnCall = False
+			
 			if self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
 				raise Exception("Unable to create WindowsDebugger Instance!!!!!")
 			
@@ -829,8 +549,22 @@ try:
 			'''
 			Called right before start of test.
 			'''
-			if not self._IsDebuggerAlive():
+			if not self.StartOnCall and not self._IsDebuggerAlive():
 				self._StartDebugger()
+		
+		def PublisherCall(self, method):
+			
+			if not self.StartOnCall:
+				return
+			
+			if self.OnCallMethod == method.lower():
+				self._StartDebugger()
+		
+		def OnTestFinished(self):
+			if not self.StartOnCall or not self._IsDebuggerAlive():
+				return
+			
+			self._StopDebugger()
 		
 		def GetMonitorData(self):
 			'''
@@ -948,12 +682,12 @@ try:
 			print buff
 			
 			UnixDebugger.lock.acquire()
-			UnixDebugger.crashInfo = { 'DebuggerOutput.txt' : buff }
+			UnixDebugger.crashInfo = { 'DebuggerOutput.txt' : buff, 'Bucket' : "AV_at_%d" % addr }
 			UnixDebugger.fault = True
 			UnixDebugger.lock.release()
 			UnixDebugger.handledFault.set()
 			
-			
+		
 		def bestName(self, trace, address):
 			"""
 			Return a string representing the best known name for
@@ -961,7 +695,7 @@ try:
 			"""
 			if not address:
 				return "NULL"
-
+			
 			match = trace.getSymByAddr(address)
 			if match != None:
 				if long(match) == address:

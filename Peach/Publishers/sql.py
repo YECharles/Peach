@@ -64,6 +64,7 @@ class Odbc(Publisher):
 		@type	dsn: string
 		@param	dsn: DSN must be in format of "dsn/user/password" where DSN is a DSN name.
 		'''
+		Publisher.__init__(self)
 		self._dsn = dsn
 		self._sql = None
 		self._cursor = None

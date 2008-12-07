@@ -61,7 +61,7 @@ class Com(Publisher):
 		@type	clsid: string
 		@param	clsid: CLSID of COM object in {...} format
 		"""
-		
+		Publisher.__init__(self)
 		self._clsid = clsid
 	
 	def start(self):

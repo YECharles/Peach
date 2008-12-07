@@ -39,6 +39,13 @@
 		<Number size="8" valueType="hex" value="ef" />
 	</DataModel>
 	
+	<DataModel name="TestCase4_1" pointer="true" pointerDepth="2">
+		<Number size="8" valueType="hex" value="fe" />
+		<Block ref="TestCase2" pointer="true" />
+		<Block ref="TestCase1" pointer="true" />
+		<Number size="8" valueType="hex" value="ef" />
+	</DataModel>
+
 	<!-- TODO: Create state model -->
 	<StateModel name="TheState" initialState="Initial">
 		<State name="Initial">
@@ -70,6 +77,12 @@
 			<Action type="call" method="TestCase4">
 				<Param name="value" type="in">
 					<DataModel ref="TestCase4"/>
+				</Param>
+			</Action>
+			
+			<Action type="call" method="TestCase4_1">
+				<Param name="value" type="in">
+					<DataModel ref="TestCase4_1"/>
 				</Param>
 			</Action>
 		</State>
