@@ -57,15 +57,6 @@ def PeachStr(s):
 	
 	return str(s)
 
-class FaultInfo(object):
-	'''
-	Contians information about fault.
-	'''
-	
-	def __init__(self):
-		#: All faults with same BucketString will be groupped together
-		self.BucketString = None
-
 class Monitor:
 	'''
 	Extend from this to implement a Monitor.  Monitors are
