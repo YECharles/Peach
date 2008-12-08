@@ -42,11 +42,11 @@ from Peach.agent import Monitor
 import struct, sys, time,os, re
 
 try:
-	#import win32process, win32api, win32pdhutil, win32con
+
 	import comtypes
 	from ctypes import *
 	from comtypes import HRESULT, COMError
-	from comtypes.client import CreateObject, GetEvents, PumpEvents#, ReleaseEvents
+	from comtypes.client import CreateObject, GetEvents, PumpEvents
 	from comtypes.hresult import S_OK, E_FAIL, E_UNEXPECTED, E_INVALIDARG
 	from comtypes.automation import IID
 	import PyDbgEng
@@ -616,8 +616,7 @@ try:
 			self._StopDebugger()
 
 except:
-	#spass
-	raise
+	pass
 
 try:
 	
