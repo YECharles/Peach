@@ -251,7 +251,7 @@ class Engine:
 	#: Use the new matched relation method (faster)
 	relationsNew = False
 	#: Use the native cDeepCopy
-	nativeDeepCopy = False
+	nativeDeepCopy = True
 	
 	def __init__(self):
 		self.noCount = True

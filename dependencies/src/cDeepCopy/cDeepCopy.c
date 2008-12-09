@@ -94,16 +94,31 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 	{
 		//args = deepcopy(args, memo)
 		args = _deepcopy(args, memo);	// NEW REF
-		if(!args)
+		if(!args || PyErr_Occurred())
 		{
 			err = "_reconstruct(): args = _deepcopy(args,memo);!";
-			fprintf(stderr, "_reconstruct(): args = _deepcopy(args,memo);\n");
+			fprintf(stderr, "_reconstruct(): Error: args = _deepcopy(args,memo);\n");
 			goto L0;
 		}
 	}
 
 	//y = callable(*args)
 	y = PyObject_CallObject(callable, args);	// NEW REF
+
+	if(!y || PyErr_Occurred())
+	{
+		fprintf(stderr, "\n\n");
+		PyErr_Print();
+		fprintf(stderr, "\n\n");
+
+		err = "_reconstruct(): y = PyObject_CallObject(callable, args); Failed";
+		fprintf(stderr, "_reconstruct(): y = PyObject_CallObject(callable, args); Failed\n");
+		fprintf(stderr, "_reconstruct(): callable = [%s], args = [%s]\n", PyString_AsString(PyObject_Repr(callable)),
+			PyString_AsString(PyObject_Repr(args)));
+		Py_XDECREF(y);
+		y = NULL;
+		goto L0;
+	}
 
 	//memo[id(x)] = y
 	tmp = PyLong_FromVoidPtr(x);	// NEW REF
@@ -143,6 +158,11 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 		}
 	}
 
+	if(PyErr_Occurred())
+	{
+		fprintf(stderr, "_reconstruct(): Something in listiter failed\n");
+	}
+
 	if(dictiter && PyObject_IsTrue(dictiter))
 	{
 		PyObject* item;
@@ -165,9 +185,17 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 			{
 				//key = deepcopy(key, memo)
 				key = _deepcopy(key, memo);	// NEW REF
+				if(!key || PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): key = _deepcopy(key, memo); Failed\n");
+				}
 
 				//value = deepcopy(value, memo)
 				value = _deepcopy(value, memo);	// NEW REF
+				if(!value || PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): value = _deepcopy(value, memo); Failed\n");
+				}
 			}
 
 			//y[key] = value
@@ -183,6 +211,11 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 		Py_XDECREF(items);	// DEC REF
 	}
 
+	if(PyErr_Occurred())
+	{
+		fprintf(stderr, "_reconstruct(): Something in dictiter failed\n");
+	}
+
 	//if state:
 	if(y && PyObject_IsTrue(state))
 	{
@@ -192,18 +225,29 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 			//state = deepcopy(state, memo)
 			state = _deepcopy(tmp=state, memo);	// NEW REF
 			Py_XDECREF(tmp);
+
+			if(!state || PyErr_Occurred())
+			{
+				fprintf(stderr, "_reconstruct(): state = _deepcopy(tmp=state, memo); Failed\n");
+			}
 		}
 
 		//if hasattr(y, '__setstate__'):
-		if(tmp = PyObject_GetAttrString(y, "__setstate__"))	// NEW REF
+		if(PyObject_HasAttrString(y, "__setstate__"))
 		{
 			PyObject* tmp2;
 			//y.__setstate__(state)
+			tmp = PyObject_GetAttrString(y, "__setstate__"); // NEW REF
 			tmp2 = Py_BuildValue("(O)", state);	// NEW REF
 			PyObject_CallObject(tmp, tmp2);
 
 			Py_XDECREF(tmp);	// DEC REF
 			Py_XDECREF(tmp2);	// DEC REF
+
+			if(PyErr_Occurred())
+			{
+				fprintf(stderr, "_reconstruct(): Calling __setstate__ Failed\n");
+			}
 		}
 		else
 		{
@@ -217,10 +261,20 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 
 				Py_XDECREF(tmp);	// DEC REF
 				Py_XINCREF(state);	// INC REF
+
+				if(PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): Something in state failed 3\n");
+				}
 			}
 			//else:
 			else
 			{
+				if(PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): if(PyObject_IsInstance(state, (PyObject*) &PyTuple_Type) && PyTuple_Size(state) == 2) FAILED\n");
+				}
+
 				//slotstate = None
 				slotstate = NULL;
 			}
@@ -229,6 +283,12 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 			{
 				//y.__dict__.update(state)
 				tmp = PyObject_GetAttrString(y, "__dict__");	// NEW REF
+				if(!tmp || PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): tmp = PyObject_GetAttrString(y, \"__dict__\"); Failed\n");
+					fprintf(stderr, "_reconstruct(): y = [%s]\n", PyString_AsString(PyObject_Repr(y)));
+				}
+
 				PyDict_Update(tmp, state);
 				
 				Py_XDECREF(tmp);	// DEC REF
@@ -257,9 +317,17 @@ L0:		PyErr_SetString(PyExc_AssertionError,err);
 				}
 
 				Py_XDECREF(items);	// DEC REF
+
+				if(PyErr_Occurred())
+				{
+					fprintf(stderr, "_reconstruct(): Something in state failed 1\n");
+				}
+
 			}
+
 		}
 	}
+
 
 	// This will need to change?
 L1:	if(deep)
@@ -269,7 +337,13 @@ L1:	if(deep)
 
 	Py_XDECREF(state);
 
-	if(!y)
+	if(PyErr_Occurred())
+	{
+		fprintf(stderr, "_reconstruct(): PyErr_Occurred\n");
+		Py_XDECREF(y);
+		y = NULL;
+	}
+	else if(!y)
 	{
 		fprintf(stderr, "_reconstruct(): Why is y null!?\n");
 	}
@@ -294,6 +368,8 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 		*copier = NULL,
 		*reductor = NULL,
 		*rv = NULL;
+
+	//fprintf(stderr, "_deepcopy(): %s\n", PyString_AsString(PyObject_Repr(x)));
 
 	// if memo is None:
 	if(!memo || !PyDict_Check(memo))
@@ -346,9 +422,21 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 			goto L_exit;
 		}
 		
+		PyErr_Clear();
 		y = PyObject_CallObject(copier, t);	// NEW REF
 		if(!y)
-			fprintf(stderr, "_deepcopy(): y = PyObject_CallObject(copier, t); failed\n");
+		{
+			fprintf(stderr, "_deepcopy(): (1) y = PyObject_CallObject(copier, t); failed\n");
+			fprintf(stderr, "_deepcopy(): (1) x[%s] cls[%s] copier[%s]\n", 
+				PyString_AsString(PyObject_Repr(x)), 
+				PyString_AsString(PyObject_Repr(cls)), 
+				PyString_AsString(PyObject_Repr(copier)));
+			PyErr_Print();
+			fprintf(stderr, "\n");
+
+			Py_XDECREF(t);	// DEC REF
+			goto L_exit;
+		}
 
 		Py_XDECREF(t);	// DEC REF
 	}
@@ -371,9 +459,10 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 		}
 		else
 		{
-			if(copier = PyObject_GetAttrString(x, "__deepcopy__"))	// NEW REF
+			if(PyObject_HasAttrString(x, "__deepcopy__dont_use__") == 0 && PyObject_HasAttrString(x, "__deepcopy__") == 1)
 			{
 				// y = copier(memo)
+				copier = PyObject_GetAttrString(x, "__deepcopy__");	// NEW REF
 				if(PyErr_Occurred())
 				{
 					fprintf(stderr, "_deepcopy(): copier = PyObject_GetAttrString(x, \"__deepcopy__\") failed\n");
@@ -391,7 +480,15 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 
 				y = PyObject_CallObject(copier, t);	// NEW REF
 				if(!y)
-					fprintf(stderr, "_deepcopy(): y = PyObject_CallObject(copier, t); failed\n");
+				{
+					fprintf(stderr, "_deepcopy(): (2) y = PyObject_CallObject(copier, t); failed\n");
+					PyErr_Print();
+					fprintf(stderr, "\n");
+
+					Py_XDECREF(t);		// DEC REF
+					Py_XDECREF(copier);	// DEC REF
+					goto L_exit;
+				}
 
 				Py_XDECREF(t);		// DEC REF
 				Py_XDECREF(copier);	// DEC REF
@@ -427,9 +524,10 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 				{
 					//reductor = getattr(x, "__reduce_ex__", None)
 					//if reductor:
-					if(reductor = PyObject_GetAttrString(x,"__reduce_ex__"))	// NEW REF
+					if(PyObject_HasAttrString(x,"__reduce_ex__"))	// NEW REF
 					{
 						//rv = reductor(2)
+						reductor = PyObject_GetAttrString(x,"__reduce_ex__");
 						if(PyErr_Occurred())
 						{
 							fprintf(stderr, "_deepcopy(): reductor = PyObject_GetAttrString(x,\"__reduce_ex__\") failed\n");
@@ -456,9 +554,11 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 
 						//reductor = getattr(x, "__reduce__", None)
 						//if reductor:
-						if(reductor = PyObject_GetAttrString(x,"__reduce__"))	// NEW REF
+						if(PyObject_HasAttrString(x,"__reduce__"))	// NEW REF
 						{
+							//fprintf(stderr, "Building using __reduce__ [%s][%s]\n", PyString_AsString(PyObject_Repr(x)),PyString_AsString(PyObject_Repr(cls)));
 							//rv = reductor()
+							reductor = PyObject_GetAttrString(x,"__reduce__");
 							if(PyErr_Occurred())
 							{
 								fprintf(stderr, "_deepcopy(): reductor = PyObject_GetAttrString(x,\"__reduce__\") failed\n");
@@ -500,6 +600,15 @@ static PyObject* _deepcopy(PyObject* x, PyObject* memo)
 				//y = _reconstruct(x, rv, 1, memo)
 				y = _reconstruct(x, rv, 1, memo);
 				Py_XDECREF(rv);	// DEC REF
+
+				if(PyErr_Occurred())
+				{
+					fprintf(stderr, "_deepcopy(): _reconstruct pyerr_occured\n");
+					Py_XDECREF(y);
+					y = NULL;
+				}
+				else if(!y)
+					fprintf(stderr, "_deepcopy(): _reconstruct returned NULL y!\n");
 			}
 		}
 	}
@@ -508,13 +617,49 @@ L_exit:
 	Py_XDECREF(cls);	// DEC REF
 	Py_XDECREF(memo);	// DEC REF
 
+	if(PyErr_Occurred())
+	{
+		Py_XDECREF(y);
+		y = NULL;
+
+		fprintf(stderr, "_deepcopy(%s): PyErr_Occured()\n", PyString_AsString(PyObject_Repr(x)));
+	}
+
+	if(!y)
+		fprintf(stderr, "_deepcopy(): y is NULL\n");
+
 	return y;
 }
+
+static int InDeepCopy = 0;
 
 static PyObject* deepcopy(PyObject* self, PyObject* args)
 {
 	PyObject	*x, *memo=NULL;
-	return PyArg_ParseTuple(args, "O|O!:deepcopy", &x, &PyDict_Type, &memo) ? _deepcopy(x,memo) : NULL;
+	PyObject* ret;
+
+	//if(InDeepCopy++)
+	//{
+	//	fprintf(stderr, "\n\n------- Recursing -------------------\n\n");
+	//}
+	//else
+	//{
+	//	fprintf(stderr, "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
+	//	InDeepCopy = 1;
+	//}
+
+	ret = PyArg_ParseTuple(args, "O|O!:deepcopy", &x, &PyDict_Type, &memo) ? _deepcopy(x,memo) : NULL;
+
+	//if(--InDeepCopy)
+	//{
+	//	fprintf(stderr, "\n\n------- Exit Recursing -----------------\n\n");
+	//}
+	//else
+	//{
+	//	fprintf(stderr, "\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+	//}
+
+	return ret;
 }
 
 static PyObject* _deepcopy_atomic(PyObject* self, PyObject* args)
@@ -639,7 +784,21 @@ static PyObject* _deepcopy_list(PyObject* self, PyObject* args)
 	{
 		//y.append(deepcopy(a, memo))
 		d = _deepcopy( PyList_GetItem(x, i), memo);	// NEW REF
-		if(!d) break; // should this be an error!?
+		//if(!d) break; // should this be an error!?
+		if(!d)
+		{
+			fprintf(stderr, "_deepcopy_list(): _deepcopy returned NULL\n");
+			fprintf(stderr, "_deepcopy_list(): Returning null y! 3\n");
+			Py_XDECREF(y);	// DEC REF
+			return NULL;
+		}
+		else if(PyErr_Occurred())
+		{
+			fprintf(stderr, "_deepcopy_list(): _deepcopy PyErr_Occurred copying %s\n", PyString_AsString(PyObject_Repr(PyList_GetItem(x, i))));
+			fprintf(stderr, "_deepcopy_list(): Returning null y! 4\n");
+			Py_XDECREF(y);	// DEC REF
+			return NULL;
+		}
 
 		PyList_Append(y, d);
 		Py_XDECREF(d);	// DEC REF
@@ -648,8 +807,7 @@ static PyObject* _deepcopy_list(PyObject* self, PyObject* args)
 	if(PyErr_Occurred())
 	{
 		Py_XDECREF(y);	// DEC REF
-		if(y == NULL)
-			fprintf(stderr, "_deepcopy_list(): Returning null y! 1\n");
+		fprintf(stderr, "_deepcopy_list(): Returning null y! 1\n");
 		return NULL;
 	}
 
@@ -760,17 +918,18 @@ static PyObject* _deepcopy_inst(PyObject* self, PyObject* args)
 
 	if (!PyArg_ParseTuple(args, "O!O!:_deepcopy_inst", &PyInstance_Type, &x, &PyDict_Type, &memo)) return NULL;
 	
-	if (PyObject_HasAttrString(x, "__deepcopy__"))
+	if(PyObject_HasAttrString(x, "__deepcopy__dont_use__") == 0 && PyObject_HasAttrString(x, "__deepcopy__") == 1)
 		return PyObject_CallMethod(x, "__deepcopy__", "O", memo);	// NEW REF
 
 	if (PyObject_HasAttrString(x, "__getinitargs__"))
 	{
+		//fprintf(stderr, "Building using __getinitargs__\n");
 		//args = x.__getinitargs__()
 		y = PyObject_CallMethod(x, "__getinitargs__", NULL);	// NEW REF
 		
 		//args = deepcopy(args, memo)
 		//y = x.__class__(*args)
-		if (!y || !(klass = PyObject_GetAttrString(x, "__class__")))	// NEW REF
+		if (!y || !PyObject_HasAttrString(x, "__class__"))
 		{
 			if(!y)
 			{
@@ -786,6 +945,7 @@ static PyObject* _deepcopy_inst(PyObject* self, PyObject* args)
 			return NULL;
 		}
 
+		klass = PyObject_GetAttrString(x, "__class__");	// NEW REF
 		__keep_alive(y, memo);
 		a = _deepcopy(y, memo);	// NEW REF
 
@@ -814,6 +974,7 @@ static PyObject* _deepcopy_inst(PyObject* self, PyObject* args)
 	}
 	else
 	{
+		//fprintf(stderr, "Building using _EmptyClass\n");
 		//y = _EmptyClass()
 		y = PyInstance_New(_EmptyClass, NULL, NULL);	// NEW REF
 		if(!y)

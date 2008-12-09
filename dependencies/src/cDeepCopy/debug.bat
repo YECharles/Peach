@@ -1,6 +1,6 @@
 @echo off
-setup.py build --debug
-setup.py install
+python setup.py build --debug
+python setup.py install
 
 del c:\Python25\Lib\site-packages\cDeepCopy.*
 move c:\Python25\Lib\site-packages\cDeepCopy_d.pdb c:\Python25\Lib\site-packages\cDeepCopy.pdb

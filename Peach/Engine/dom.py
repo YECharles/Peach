@@ -73,90 +73,12 @@ except:
 	print "downloaded from http://4suite.org/.\n\n"
 	raise
 
-class Empty:
+class Empty(object):
 	pass
 
 class _DefaultStructure(ctypes.Structure):
 	pass
 
-
-def PeachDeepCopy(self, memo):
-	'''
-	Copying objects in our DOM is a crazy business.  Here we
-	try and help out as much as we can.
-	'''
-	
-	# Copy procedures
-	#
-	#  - Only copy children array (_children)
-	#  - Remove array and re-add children via append
-	#  - Set our __deepcopy__ attributes
-	#  - Fixup our toXml functions
-	
-	node = self.node
-	parent = self.parent
-	me = getattr(self, '__deepcopy__')
-	
-	# Only copy _children
-	if isinstance(self, ElementWithChildren):
-		# Save children
-		_childrenHash = self._childrenHash
-		_children = self._children
-		children = self.children
-		
-		# Null out children except for array
-		self._childrenHash = None
-		self.children = None
-	
-	# Null out 4Suite XML node (why do we keep this?)
-	self.node = None
-	self.parent = None
-	delattr(self, '__deepcopy__')
-	
-	if self.elementType == 'block' or self.elementType == 'namespace':
-		toXml = getattr(self, 'toXml')
-		setattr(self, 'toXml', None)
-	
-	e = deepcopy(self, memo)
-	e.__deepcopy__ = new.instancemethod(PeachDeepCopy, e, e.__class__)
-	
-	try:
-		if e.elementType == 'block':
-			e.toXml = new.instancemethod(BlockToXml, e, e.__class__)
-			setattr(self, 'toXml', toXml)
-		
-		elif e.elementType == 'namespace':
-			e.toXml = new.instancemethod(NamespaceToXml, e, e.__class__)
-			setattr(self, 'toXml', toXml)
-	except:
-		print dir(e)
-		raise
-	
-	if isinstance(self, ElementWithChildren):
-		# Don't copy kids yet
-		self._childrenHash = _childrenHash
-		self._children = _children
-		self.children = children
-	
-		# Fixup ElementWithChildren types
-		# We need to try and keep things in order
-		# and not have to many duplicated elements
-		# GAR, this isn't working...
-		children = e._children
-		e._children = []
-		e._childrenHash = {}
-		e.children = Empty()
-		
-		for c in children:
-			if isinstance(c, Element) and not hasattr(c, 'name'):
-				c.name = "The Lost Element"
-			e.append(c)
-	
-	self.node = node
-	self.parent = parent
-	setattr(self, '__deepcopy__', me)
-	
-	return e
 
 class Element(object):
 	'''
@@ -180,11 +102,115 @@ class Element(object):
 		self.node = None	#: Our XML node
 		self.ref = None		#: The reference that made us, or None
 		
-		self.__deepcopy__ = new.instancemethod(PeachDeepCopy, self, self.__class__)
-		
 		if self.name == None or len(self.name) == 0:
 			self.name = self.getUniqueName()
+	
+	def __deepcopy__(self, memo):
+		'''
+		Copying objects in our DOM is a crazy business.  Here we
+		try and help out as much as we can.
 		
+		NOTE: Deepcopy only works with cDeepCopy which is modified to
+			look for __deepcopy__dont_use__ so we can configure our obj
+			then re-call deepcopy.  On the next call deepcopy will
+			ignore our __deepcopy__ method.
+			
+		'''
+		
+		# Copy procedures
+		#
+		#  - Only copy children array (_children)
+		#  - Remove array and re-add children via append
+		#  - Set our __deepcopy__ attributes
+		#  - Fixup our toXml functions
+		
+		#sys.stderr.write("PeachDeepCopy: %s\n" % self)
+		
+		node = self.node
+		parent = self.parent
+		# Null out 4Suite XML node (why do we keep this?)
+		self.node = None
+		self.parent = None
+		
+		# Only copy _children
+		if isinstance(self, ElementWithChildren):
+			# Save children
+			_childrenHash = self._childrenHash
+			_children = self._children
+			children = self.children
+			
+			# Null out children except for array
+			self._childrenHash = None
+			self.children = None
+		
+		
+		if self.elementType == 'block' or self.elementType == 'namespace':
+			toXml = getattr(self, 'toXml')
+			setattr(self, 'toXml', None)
+		
+		#sys.stderr.write("PeachDeepCopy(1): %s\n" % self)
+		setattr(self, '__deepcopy__dont_use__', "true")
+		
+		## Perform actual copy
+		
+		e = deepcopy(self, memo)
+		
+		## Remove attributes
+		
+		delattr(e, '__deepcopy__dont_use__')
+		delattr(self, '__deepcopy__dont_use__')
+		#sys.stderr.write("PeachDeepCopy(2): %s\n" % self)
+		
+		try:
+			if e.elementType == 'block':
+				e.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, e, e.__class__)
+				setattr(self, 'toXml', toXml)
+			
+			#elif e.elementType == 'namespace':
+			#	e.toXml = new.instancemethod(PeachModule.Engine.dom.NamespaceToXml, e, e.__class__)
+			#	setattr(self, 'toXml', toXml)
+		except:
+			#sys.stderr.write("PeachDeepCopy(2.1): %s\n" % self)
+			print dir(e)
+			raise
+		
+		#sys.stderr.write("PeachDeepCopy(2.2): %s\n" % self)
+		if isinstance(self, ElementWithChildren):
+			# Don't copy kids yet
+			self._childrenHash = _childrenHash
+			self._children = _children
+			self.children = children
+		
+			#sys.stderr.write("PeachDeepCopy(2.2.1): %s\n" % self)
+			# Fixup ElementWithChildren types
+			# We need to try and keep things in order
+			# and not have to many duplicated elements
+			# GAR, this isn't working...
+			children = e._children
+			
+			e._children = []
+			e._childrenHash = {}
+			#sys.stderr.write("PeachDeepCopy(2.2.1.1): %s\n" % self)
+			e.children = PeachModule.Engine.engine.Empty()
+			
+			#sys.stderr.write("PeachDeepCopy(2.2.2): %s\n" % children)
+			
+			for c in children:
+				#sys.stderr.write("PeachDeepCopy(2.2.3): %s\n" % self)
+				if not hasattr(c, "name") or c.name == None:
+					c.name = "Lost Element"
+				
+				e.append(c)
+		
+		#sys.stderr.write("PeachDeepCopy(2.3): %s\n" % self)
+		self.node = node
+		self.parent = parent
+		#setattr(self, '__deepcopy__', me)
+		
+		#sys.stderr.write("PeachDeepCopy(3): %s\n" % self)
+		#sys.stderr.write("PeachDeepCopy: Returning: %s\n" % e)
+		return e
+
 	def getElementsByType(self, type, ret = None):
 		'''
 		Will return an array all elements of a specific type
@@ -936,14 +962,14 @@ class DataElement(Mutatable):
 		Add back in the non-pickleable instancemethods.
 		'''
 		
-		if not hasattr(model, "__deepcopy__"):
-			model.__deepcopy__ = new.instancemethod(PeachDeepCopy, model, model.__class__)
+		#if not hasattr(model, "__deepcopy__"):
+		#	model.__deepcopy__ = new.instancemethod(PeachDeepCopy, model, model.__class__)
 		
 		if model.elementType == 'block':
-			model.toXml = new.instancemethod(BlockToXml, model, model.__class__)
+			model.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, model, model.__class__)
 		
-		elif model.elementType == 'namespace':
-			model.toXml = new.instancemethod(NamespaceToXml, model, model.__class__)
+		#elif model.elementType == 'namespace':
+		#	model.toXml = new.instancemethod(PeachModule.Engine.dom.NamespaceToXml, model, model.__class__)
 		
 		for c in dir(model):
 			if c == 'parent':
@@ -963,8 +989,8 @@ class DataElement(Mutatable):
 		Remove any instance methods.
 		'''
 		
-		if hasattr(model, "__deepcopy__"):
-			delattr(model, "__deepcopy__")
+		#if hasattr(model, "__deepcopy__"):
+		#	delattr(model, "__deepcopy__")
 		
 		if hasattr(model, "toXml") and (model.elementType == 'block' or model.elementType == 'namespace'):
 			delattr(model, "toXml")
@@ -2512,7 +2538,7 @@ class Block(DataElement):
 		'''
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'block'
-		self.toXml = new.instancemethod(BlockToXml, self, self.__class__)
+		self.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, self, self.__class__)
 		self.length = None
 		self.lengthType = None
 	
@@ -3789,15 +3815,22 @@ def NamespaceToXml(self, parent):
 	
 	return node
 
-
 class Namespace(Element):
 	def __init__(self):
 		Element.__init__(self, None, None)
 		self.elementType = 'namespace'
 		self.nsName = None
 		self.nsSrc = None
-		self.toXml = new.instancemethod(NamespaceToXml, self, self.__class__)
+		#self.toXml = new.instancemethod(PeachModule.Engine.dom.NamespaceToXml, self, self.__class__)
 
+	def toXml(self, parent):
+		node = parent.rootNode.createElementNS(None, 'Include')
+		parent.appendChild(node)
+		
+		self._setAttribute(node, 'ns', self.nsName)
+		self._setAttribute(node, 'src', self.nsSrc)
+		
+		return node
 
 class PythonPath(Element):
 	def __init__(self):

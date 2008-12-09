@@ -235,7 +235,7 @@ class ParseTemplate:
 				ns.nsName = nsName
 				ns.nsSrc = nsSrc
 				ns.elementType = 'namespace'
-				ns.toXml = new.instancemethod(NamespaceToXml, ns, ns.__class__)
+				ns.toXml = new.instancemethod(PeachModule.Engine.dom.NamespaceToXml, ns, ns.__class__)
 				
 				nss = Namespace()
 				nss.ns = ns
@@ -1062,7 +1062,7 @@ class ParseTemplate:
 			block.ref = self._getAttribute(node, 'ref')
 			
 			# Block may not be a block!
-			block.toXml = new.instancemethod(BlockToXml, block, block.__class__)
+			block.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, block, block.__class__)
 			block.elementType = 'block'
 			
 		else:
