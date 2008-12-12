@@ -186,6 +186,8 @@ class StateEngine:
 						if not hasattr(c, 'origionalTemplate'):
 							c.origionalTemplate = c.template
 							c.origionalTemplate.BuildRelationCache()
+							c.origionalTemplate.resetDataModel()
+							c.origionalTemplate.getValue()
 						
 						# Make a fresh copy of the template
 						c.__delitem__(c.template.name)
@@ -198,6 +200,8 @@ class StateEngine:
 			if not hasattr(action, 'origionalTemplate'):
 				action.origionalTemplate = action.template
 				action.origionalTemplate.BuildRelationCache()
+				action.origionalTemplate.resetDataModel()
+				action.origionalTemplate.getValue()
 			
 			# Make a fresh copy of the template
 			action.__delitem__(action.template.name)

@@ -2115,7 +2115,7 @@ class DataElement(Mutatable):
 		node.reset()
 		
 		for c in node._children:
-			if isinstance(c, DataElement()):
+			if isinstance(c, DataElement):
 				self.resetDataModel(c)
 	
 	def _fixRealParent(self, node):
