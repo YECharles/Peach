@@ -602,9 +602,20 @@ class DataCracker:
 				
 				# Locate relations and kill 'em off
 				for r in node.getRelationsOfThisElement():
-					r.parent.__delitem__(r.name)
+					
+					# With --new we had some issues with
+					# double deleteing.
+					
+					try:
+						r.parent.__delitem__(r.name)
+					except:
+						pass
+					
 					if r in r.parent.relations:
-						r.parent.relations.remove(r)
+						try:
+							r.parent.relations.remove(r)
+						except:
+							pass
 				
 				node.parent.__delitem__(node.name)
 				

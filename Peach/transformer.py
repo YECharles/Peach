@@ -50,6 +50,13 @@ class Transformer:
 		'''
 		self._anotherTransformer = anotherTransformer
 	
+	def changesSize(self):
+		'''
+		Does this transformer return data that could be
+		a different size then seed?
+		'''
+		return True
+	
 	def transform(self, data):
 		'''
 		Transform data in some mannor.  Will then call next

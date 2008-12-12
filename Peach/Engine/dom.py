@@ -924,8 +924,11 @@ class DataElement(Mutatable):
 			value = obj.relationStringBuffer.getPosition(self.getFullDataName())
 			if value != None:
 				return value
-			else:
-				return 0
+			##BUG: Leave this commented out else we introduce a bug in the data cracker
+			## that was run into with opentype.xml used in eot.xml.
+			##else:
+			##	print "get_possiblePos: relationStringBuffer was of no use to us!"
+			##	return 0
 		
 		return self._possiblePos
 	def set_possiblePos(self, value):
@@ -1244,9 +1247,9 @@ class DataElement(Mutatable):
 					self.modelHasOffsetRelation = True
 					break
 			
-		# Exit if we already have a cache, or don't need one
-		if self.relationCache != None or PeachModule.Engine.engine.Engine.relationsNew:
-			return
+		## We always need a cache, it's used around more
+		#if self.relationCache != None or PeachModule.Engine.engine.Engine.relationsNew:
+		#	return
 		
 		# 1. Build list of all relations from here down
 		relations = self._getAllRelationsInDataModel(self, False)
@@ -1256,6 +1259,11 @@ class DataElement(Mutatable):
 		self.relationOfCache = {}
 		
 		for r in relations:
+			
+			# Skip from relations
+			if r.From != None:
+				continue
+			
 			rStr = r.getFullnameInDataModel()
 			
 			# Update modelHasOffsetRelation
@@ -1273,10 +1281,12 @@ class DataElement(Mutatable):
 			if rStr not in self.relationCache:
 				self.relationCache.append(rStr)
 		
-		for child in self._children:
-			
-			if isinstance(child, DataElement):
-				child.BuildRelationCache()
+		## Not sure why we are doing this, but I think we
+		## can skip it.  Certainly speeds up cache building :)
+		#for child in self._children:
+		#	
+		#	if isinstance(child, DataElement):
+		#		child.BuildRelationCache()
 	
 	def get_minOccurs(self):
 		minOccurs = self._minOccurs
@@ -1332,13 +1342,24 @@ class DataElement(Mutatable):
 		
 		return ret
 	
+	def hasRelation(self):
+		'''
+		Does this element have a size, count or offset relation?
+		'''
+		
+		for relation in self.relations:
+			if relation.type in ['size', 'count', 'offset']:
+				return True
+		
+		return False
+		
 	def _HasSizeofRelation(self, node = None):
 		
 		if node == None:
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'size' and relation.of != None:
+			if relation.type == 'size' and relation.of != None and relation.From == None:
 				return True
 		
 		return False
@@ -1349,7 +1370,7 @@ class DataElement(Mutatable):
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'offset' and relation.of != None:
+			if relation.type == 'offset' and relation.of != None and relation.From == None:
 				return True
 		
 		return False
@@ -1360,7 +1381,7 @@ class DataElement(Mutatable):
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'offset' and relation.of != None:
+			if relation.type == 'offset' and relation.of != None and relation.From == None:
 				return relation
 		
 		return False
@@ -1371,7 +1392,7 @@ class DataElement(Mutatable):
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'size' and relation.of != None:
+			if relation.type == 'size' and relation.of != None and relation.From == None:
 				return relation
 		
 		return None
@@ -1404,7 +1425,7 @@ class DataElement(Mutatable):
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'count' and relation.of != None:
+			if relation.type == 'count' and relation.of != None and relation.From == None:
 				return True
 		
 		return False
@@ -1415,7 +1436,7 @@ class DataElement(Mutatable):
 			node = self
 			
 		for relation in node.relations:
-			if relation.type == 'count' and relation.of != None:
+			if relation.type == 'count' and relation.of != None and relation.From == None:
 				return relation
 		
 		return None
@@ -1662,10 +1683,12 @@ class DataElement(Mutatable):
 				
 				if type == None or r.type == type:
 					#print "Found of relation for", self.getFullDataName()
+					self._fixRealParent(self)
 					obj = self.findDataElementByName(r.From)
+					self._unFixRealParent(self)
 					
 					if obj == None:
-						raise Exception("Mismatched relations1???")
+						raise Exception("Mismatched relations? Can't find r.From: '%s'" % r.From)
 					
 					if type != None:
 						for rel in obj.relations:
@@ -1922,7 +1945,8 @@ class DataElement(Mutatable):
 			try:
 				self._inInternalValue = True
 				relation = self._GetSizeofRelation(self)
-				value = len(relation.getOfElement().getValue())
+				#value = len(relation.getOfElement().getValue())
+				value = relation.getOfElement().getSize()
 				value = relation.setValue(value)
 				#print "SIZE REALTION %s of %s: " % (relation.parent.name, relation.of), value
 			
@@ -1938,6 +1962,8 @@ class DataElement(Mutatable):
 				ofElement = relation.getOfElement()
 				
 				# Ask for value before we get the count
+				# Why do we do this?  When could this cause
+				# the element to expand into an array?
 				ofElement.getValue()
 				
 				value = ofElement.getCount()
@@ -1978,10 +2004,43 @@ class DataElement(Mutatable):
 		
 		raise Exception("TODO: Implement me!")
 	
+	def isInvalidated(self):
+		'''
+		Check if we need to reproduce this value.
+		
+		If we have a relation always True.
+		Otherwise False.
+		'''
+		
+		if len(self.relations) > 0:
+			return True
+		
+		return False
+
+	def getSize(self):
+		'''
+		Determine length in bytes of this element.  Please
+		override me and make faster :)
+		'''
+		
+		# Default SLOW version
+		return len(self.getValue())
+
 	def getValue(self, sout = None):
 		'''
 		Get the value of this data element.
 		'''
+		
+		## Check and see if we can just return our value
+		
+		#if self.value != None and not self.isInvalidated():
+		#	if sout != None:
+		#		sout.storePosition(self.getFullDataName())
+		#		sout.write(self.value)
+		#		
+		#	return self.value
+		
+		## Otherwise lets generate and store our value
 		
 		# This method can be called while we are in it.
 		# so lets not use self.value to hold anything.
@@ -1990,10 +2049,18 @@ class DataElement(Mutatable):
 		if sout != None:
 			sout.storePosition(self.getFullDataName())
 		
+		## If we have a cached value for ourselves, use it!
+		if self.elementType not in ['template', 'block', 'choice', 'flags']:
+			if self.value != None and self.currentValue == None and self.fixup == None and not self.hasRelation():
+				if sout != None:
+					sout.write(self.value)
+				
+				return self.value
+		
 		if self.transformer != None:
 			value = self.getRawValue()
 			value = self.transformer.transformer.encode(value)
-		
+			
 			if sout != None:
 				sout.write(value)
 		
@@ -2108,6 +2175,9 @@ class Transformer(ElementWithChildren):
 		
 		# Class string used to create transformer instance
 		self.classStr = None
+	
+	def changesSize(self):
+		return self.transformer.changesSize()
 	
 class Fixup(ElementWithChildren):
 	'''
