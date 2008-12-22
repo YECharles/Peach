@@ -49,13 +49,13 @@ class SizedVaranceMutator(Mutator):
 		#: Is mutator finite?
 		self.isFinite = True
 		
-		self.name = name
+		self.name = "SizedVaranceMutator"
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
 		
-		self._n = self._getN(node, n)
+		self._n = self._getN(node, 50)
 		self._range = range(0 - self._n, self._n)
 		self._currentCount = 0
 	
@@ -128,13 +128,13 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		#: Is mutator finite?
 		self.isFinite = True
 		
-		self.name = name
+		self.name = "SizedNumericalEdgeCasesMutator"
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
 		
-		self._n = self._getN(node, n)
+		self._n = self._getN(node, 50)
 		self._range = self._populateValues(node)
 		self._currentCount = 0
 	
@@ -248,13 +248,13 @@ class SizedDataVaranceMutator(Mutator):
 		#: Is mutator finite?
 		self.isFinite = True
 		
-		self.name = name
+		self.name = "SizedDataVaranceMutator"
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
 		
-		self._n = self._getN(node, n)
+		self._n = self._getN(node, 50)
 		self._range = range(0 - self._n, self._n)
 		self._currentCount = 0
 	
@@ -332,13 +332,13 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 		#: Is mutator finite?
 		self.isFinite = True
 		
-		self.name = name
+		self.name = "SizedDataNumericalEdgeCasesMutator"
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
 		
-		self._n = self._getN(node, n)
+		self._n = self._getN(node, 50)
 		self._range = self._populateValues(node)
 		self._currentCount = 0
 	

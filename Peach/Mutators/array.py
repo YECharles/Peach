@@ -44,7 +44,7 @@ class ArrayVarianceMutator(Mutator):
 	Change the length of arrays to count - N to count + N.
 	'''
 	
-	def __init__(self, peach, node):
+	def __init__(self, peach, node, name = "ArrayVarianceMutator"):
 		Mutator.__init__(self)
 		
 		if not ArrayVarianceMutator.supportedDataElement(node):
@@ -55,7 +55,7 @@ class ArrayVarianceMutator(Mutator):
 		
 		self.name = name
 		self._peach = peach
-		self._n = self._getN(node, n)
+		self._n = self._getN(node, 50)
 		self._arrayCount = node.getArrayCount()
 		self._minCount = self._arrayCount - self._n
 		self._maxCount = self._arrayCount + self._n
@@ -169,14 +169,15 @@ class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 	_counts = None
 	
 	def __init__(self, peach, node):
-		ArrayVarianceMutator.__init__(self, peach, "ArrayNumericalEdgeCasesMutator", node)
+		ArrayVarianceMutator.__init__(self, peach, node, "ArrayNumericalEdgeCasesMutator")
 		
 		if self._counts == None:
 			ArrayNumericalEdgeCasesMutator._counts = []
 			gen = BadPositiveNumbersSmaller()
 			try:
 				while True:
-					self._count.append(int(gen.getValue()))
+					self._counts.append(int(gen.getValue()))
+					gen.next()
 			except:
 				pass
 		
@@ -212,7 +213,7 @@ class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 
 class ArrayReverseOrderMutator(ArrayVarianceMutator):
 	def __init__(self, peach, node):
-		ArrayVarianceMutator.__init__(self, peach, "ArrayReverseOrderMutator", node)
+		ArrayVarianceMutator.__init__(self, peach, node, "ArrayReverseOrderMutator")
 	
 	def next(self):
 		raise MutatorCompleted()
@@ -248,7 +249,7 @@ class ArrayReverseOrderMutator(ArrayVarianceMutator):
 
 class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 	def __init__(self, peach, node):
-		ArrayVarianceMutator.__init__(self, peach, "ArrayRandomizeOrderMutator", node)
+		ArrayVarianceMutator.__init__(self, peach, node, "ArrayRandomizeOrderMutator")
 		self._count = 0
 		
 	def next(self):
