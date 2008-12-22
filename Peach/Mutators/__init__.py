@@ -32,7 +32,6 @@
 
 # $Id$
 
-import default
 import string
 import datatree
 import number
@@ -40,6 +39,6 @@ import blob
 import array
 import size
 
-__all__ = ["default", "string", "datatree", "number", "blob", "array", "size"]
+__all__ = ["string", "datatree", "number", "blob", "array", "size"]
 
 # end

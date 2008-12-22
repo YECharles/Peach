@@ -191,7 +191,7 @@ else:
 
 
 try:
-	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['parallel=','restart=', 'shark',
+	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:a:", ['analyzer=', 'parallel=','restart=',
 																 'test', 'count', 'web', 'agent',
 																 'gui', 'debug', 'new', 'skipto='])
 except:
@@ -201,16 +201,34 @@ if len(optlist) < 1 and len(args) < 1:
 	usage()
 
 for i in range(len(optlist)):
-	if optlist[i][0] == '--shark' or optlist[i][0] == '-s':
+	if optlist[i][0] == '--analyzer' or optlist[i][0] == '-a':
 		
-		# Do the shark!
-		from Peach.Engine import peachshark
-		from Peach.Engine.common import *
+		try:	
+			analyzer = optlist[i][1]
+			if analyzer == None or len(analyzer) == 0:
+				analyzer = args[0]
+			
+			from Peach.Engine.common import *
+			from Peach.Analyzers import *
+			
+			cls = eval("%s()" % analyzer)
+			
+			a = {}
+			
+			for arg in args[1:]:
+				try:
+					k,v = arg.split("=")
+					a[k] = v
+				except:
+					#print arg
+					#raise
+					pass
+			
+			cls.asCommandLine(a)
 		
-		if len(args) == 2:
-			print peachshark.DoTheShark(['', args[0], args[1]])
-		else:
-			print peachshark.DoTheShark(['', args[0]])
+		except PeachException, pe:
+			print ""
+			print pe.msg, "\n"
 			
 		sys.exit(0)
 	

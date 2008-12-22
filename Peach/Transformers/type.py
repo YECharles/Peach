@@ -75,30 +75,25 @@ class Pack(Transformer):
 class NumberToString(Transformer):
 	'''Transforms any type of number (int, long, float) to string.'''
 	
-	def __init__(self, formatString = None):
+	def __init__(self, formatString):
 		'''Create NumberToString Instance.  formatString is a standard 
 		Python string formater (optional).'''
 		Transformer.__init__(self)
 		self._formatString = formatString
 	
 	def realEncode(self, data):
+		return data
+	
+	def realDecode(self, data):
 		'''Convert number to string.  If no formatString was specified
 		in class contructor data type is dynamicly determined and converted
 		using a default formatString of "%d", "%f", or "%d" for Int, Float,
 		and Long respectively.'''
 		
-		if self._formatString == None:
-			retType = type(data)
-			if retType is IntType:
-				return "%d" % data
-			elif retType is FloatType:
-				return "%f" % data
-			elif retType is LongType:
-				return "%d" % data
-			else:
-				return data
+		size = len(data) * 8
+		num = struct.unpack(self._formatString, data)[0]
 		
-		return self._formatString % data
+		return "%d" % num
 
 
 class StringToInt(Transformer):

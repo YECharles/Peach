@@ -1,11 +1,12 @@
 
 '''
+
 @author: Michael Eddington
 @version: $Id$
 '''
 
 #
-# Copyright (c) 2007-2008 Michael Eddington
+# Copyright (c) 2008 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +32,8 @@
 
 # $Id$
 
-## Circular dependencies were caused by this file!
+import path, rand, sequencial
 
-#import engine, parser, incoming, dom, state, common
-#__all__ = [ "engine", "parser", "incoming", "dom", "state", "common" ]
+__all__ = ["path", "rand", "sequencial"]
 
 # end

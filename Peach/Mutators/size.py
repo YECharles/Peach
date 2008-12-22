@@ -34,163 +34,32 @@ Mutators that operate on size-of relations.
 # $Id$
 
 import sys, os, time, random
-from Peach.Generators.block import *
 from Peach.Generators.data import *
-from Peach.Generators.dictionary import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate, _StaticCurrentValueFromDom
-from Peach.Transformers.encode import WideChar
-from Peach import Transformers
-from Peach.Generators.block import *
-from Peach.Generators.data import *
-from Peach.Generators.dictionary import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate
-from Peach.Transformers.encode import WideChar
 from Peach.mutator import *
-from Peach.group import *
 from Peach.Engine.common import *
 
-class _SizedMutator(Mutator):
+class SizedVaranceMutator(Mutator):
 	'''
-	Common baseclass for SizeOf mutators
+	Change the length of sizes to count - N to count + N.
 	'''
 	
-	def __init__(self, peach, name, n = 50):
+	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		
+		#: Is mutator finite?
+		self.isFinite = True
 		
 		self.name = name
 		self._peach = peach
 		
-		self._stateMasterCount = -1
-		self._masterGroup = GroupSequence()
-		self._masterCount = 0
-		self._countThread = None
-		self._countGroup = GroupSequence()
-		self._actions = []
-		self._N = n
-		self._origN = n
+		self._dataElementName = node.getFullname()
+		self._random = random.Random()
 		
-		# All active groups
-		self._activeGroups = []
-		
-		# Hashtable, key is element, value is [group, generator]
-		self._generatorMap = {}
-		self._countGeneratorMap = {}
+		self._n = self._getN(node, n)
+		self._range = range(0 - self._n, self._n)
+		self._currentCount = 0
 	
-	def isFinite(self):
-		'''
-		Some mutators could contine forever, this
-		should indicate.
-		'''
-		return True
-	
-	def reset(self):
-		'''
-		Reset mutator
-		'''
-		
-		self._masterGroup = GroupSequence()
-		self._activeGroups = []
-		self._generatorMap = {}
-		self._masterCount = 0
-		self._actions = []
-	
-	def next(self):
-		'''
-		Goto next mutation.  When this is called
-		the state machine is updated as needed.
-		'''
-		
-		try:
-			# Check if we set our state and need
-			# to skip ahead.  We need todo this in
-			# next() to assure we have all our action
-			# templates added into our masterGroup
-			if self._stateMasterCount > -1:
-				for cnt in xrange(self._masterCount, self._stateMasterCount):
-					self._masterGroup.next()
-					self._masterCount += 1
-				self._stateMasterCount = -1
-			else:
-				self._masterGroup.next()
-				self._masterCount += 1
-		
-		except GroupCompleted:
-			raise MutatorCompleted()
-	
-	def getState(self):
-		'''
-		Return a binary string that contains
-		any information about current state of
-		Mutator.  This state information should be
-		enough to let the same mutator "restart"
-		and continue when setState() is called.
-		'''
-		
-		# Ensure a minor overlap of testing
-		return str(self._masterCount - 2)
-	
-	def setState(self, state):
-		'''
-		Set the state of this object.  Should put us
-		back in the same place as when we said
-		"getState()".
-		'''
-		self._stateMasterCount = int(state)
-		try:
-			self.next()
-		except:
-			pass
-		
-	def getCount(self):
-		if self._countThread != None and self._countThread.hasCountEvent.isSet():
-			self._count = self._countThread.count
-			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
-		
-		return self._count
-
-	def calculateCount(self):
-		
-		count = 0
-		try:
-			while True:
-				count += 1
-				self._countGroup.next()
-			
-		except GroupCompleted:
-			pass
-		
-		return count
-
-	def _getSizedElements(self, node):
-		'''
-		Locate elements that are sized by a size-of relations.  We should
-		beable to use the relation cache for this.
-		'''
-		
-		if node.relationCache == None:
-			raise Exception("relationCache does not exist!")
-		
-		elements = []
-		root = node.getRootOfDataMap()
-		
-		for r in root.relationCache:
-			r = node.find(r)
-			if r != None and r.type == "size":
-				elements.append(r.getOfElement())
-		
-		return elements
-
-	def _getN(self, node):
-		'''
-		Gets N by checking node for hint, or returnign default
-		'''
-		
-		n = self._origN
-		
+	def _getN(self, node, n):
 		for c in node._children:
 			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
 				try:
@@ -199,92 +68,379 @@ class _SizedMutator(Mutator):
 					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
 		
 		return n
+	
+	def next(self):
+		self._currentCount += 1
+		if self._currentCount >= len(self._range):
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return len(self._range)
+	
+	def supportedDataElement(e):
+		if isinstance(e, DataElement) and e._HasSizeofRelation(e) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node, self._range[self._currentCount])
+	
+	def randomMutation(self, node):
+		count = self._random.choice(self._range)
+		self._performMutation(node, count)
+	
+	def _performMutation(self, node, count):
+		'''
+		Perform array mutation using count
+		'''
+		
+		relation = node._GetSizeofRelation()
+		nodeOf = relation.getOfElement()
+		size = long(node.getInternalValue())
+		n = size + count
+		
+		if n == 0:
+			node.currentValue = ""
+		
+		elif n < size:
+			node.currentValue = nodeOf.getValue()[:n]
+			
+		elif size == 0:
+			node.currentValue = "A" * n
+		
+		else:
+			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+		
+		# Verify things worked out okay
+		assert(n == long(node.getInternalValue()))
 
-	#####################################################
-	# Callbacks when Action needs a value
-	
-	def getGenerator(self, e, n):
-		pass
-	
-	def getActionValue(self, action):
-		
-		if action not in self._actions:
-			
-			self._generatorMap[action] = {}
-			self._countGeneratorMap[action] = {}
-			
-			# Walk data tree and locate each string type.
-			numberElements = self._getSizedElements(action.template)
-			
-			for e in numberElements:
-				group = Group()
-				
-				n = self._getN(e)
-				
-				gen = self.getGenerator(e, n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
-				self._masterGroup.append(group)
-				self._generatorMap[action][e.getFullnameInDataModel()] = gen
-				
-				group = Group()
-				gen = self.getGenerator(e, n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
-				self._countGroup.append(group)
-				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
-			
-			self._actions.append(action)
-		
-		# Run Generator, no need to set the value, nothing is produced
-		for name in self._generatorMap[action].keys():
-			self._generatorMap[action][name].getValue()
-		
-		if action.template.modelHasOffsetRelation:
-			stringBuffer = StreamBuffer()
-			action.template.getValue(stringBuffer)
-			stringBuffer.setValue("")
-			stringBuffer.seekFromStart(0)
-			action.template.getValue(stringBuffer)
-		
-			return stringBuffer.getValue()
-		
-		return action.template.getValue()
-	
-	def getActionParamValue(self, action):
-		return self.getActionValue(action)
-	
-	def getActionChangeStateValue(self, action, value):
-		return value
-	
-	
-	#####################################################
-	# Event callbacks for state machine
-	
-	def onStateMachineComplete(self, stateMachine):
-		
-		# Lets calc our count if we haven't already
-		if self._count == -1 and self._countThread == None:
-			self._countThread = MutatorCountCalculator(self)
-			self._countThread.start()
-		
-		elif self._countThread != None:
-			if self._countThread.hasCountEvent.isSet():
-				self._count = self._countThread.count
-				self._countThread = None
-				self._countGroup = None
-				self._countGeneratorMap = None
 
-class SizedVaranceMutator(_SizedMutator):
-	def __init__(self, peach):
-		_SizedMutator.__init__(self, peach, "SizedVaranceMutator", 50)
+class SizedNumericalEdgeCasesMutator(Mutator):
+	'''
+	Change the length of sizes to numerical edge cases
+	'''
 	
-	def getGenerator(self, e, n):
-		return SizeVariance(None, e, n)
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		
+		#: Is mutator finite?
+		self.isFinite = True
+		
+		self.name = name
+		self._peach = peach
+		
+		self._dataElementName = node.getFullname()
+		self._random = random.Random()
+		
+		self._n = self._getN(node, n)
+		self._range = self._populateValues(node)
+		self._currentCount = 0
+	
+	def _populateValues(self, node):
+		if isinstance(node, Number):
+			size = node.size
+		elif isinstance(node, Flag):
+			size = node.length
+			
+			if size < 16:
+				size = 8
+			elif size < 32:
+				size = 16
+			elif size < 64:
+				size = 32
+			else:
+				size = 64
+			
+		else:
+			size = 64 # In the case of strings or blobs
+		
+		nums = []
+		try:
+			
+			if size < 16:
+				gen = BadNumbers8()
+			else:
+				gen = BadNumbers16(None, self._n)
+			
+			## Only if we are testing large memory
+			#gen = BadNumbers24(None, self._n)
+			#gen = BadNumbers32(None, self._n)
+			#gen = BadNumbers(None, self._n)
+			
+			while True:
+				nums.append(int(gen.getValue()))
+				gen.next()
+		except:
+			pass
+		
+		return nums
+		
+	def _getN(self, node, n):
+		for c in node._children:
+			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+				try:
+					n = int(c.value)
+				except:
+					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
+		
+		return n
+	
+	def next(self):
+		self._currentCount += 1
+		if self._currentCount >= len(self._range):
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return len(self._range)
+	
+	def supportedDataElement(e):
+		# This will pick up both numbers or strings, etc that have a size-of relation
+		if isinstance(e, DataElement) and e._HasSizeofRelation(e) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node, self._range[self._currentCount])
+	
+	def randomMutation(self, node):
+		count = self._random.choice(self._range)
+		self._performMutation(node, count)
+	
+	def _performMutation(self, node, count):
+		'''
+		Perform array mutation using count
+		'''
+		
+		relation = node._GetSizeofRelation()
+		nodeOf = relation.getOfElement()
+		size = long(node.getInternalValue())
+		n = count
+		
+		if n == 0:
+			node.currentValue = ""
+		
+		elif n < size:
+			node.currentValue = nodeOf.getValue()[:n]
+			
+		elif size == 0:
+			node.currentValue = "A" * n
+		
+		else:
+			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+		
+		# Verify things worked out okay
+		assert(n == long(node.getInternalValue()))
 
-class SizedNumericalEdgeCasesMutator(_SizedMutator):
-	def __init__(self, peach):
-		_SizedMutator.__init__(self, peach, "SizedNumericalEdgeCasesMutator")
+
+class SizedDataVaranceMutator(Mutator):
+	'''
+	Change the length of sized data to count - N to count + N.
+	Size indicator will stay the same
+	'''
 	
-	def getGenerator(self, e, n):
-		return SizeBadNumbers(None, e, n)
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		
+		#: Is mutator finite?
+		self.isFinite = True
+		
+		self.name = name
+		self._peach = peach
+		
+		self._dataElementName = node.getFullname()
+		self._random = random.Random()
+		
+		self._n = self._getN(node, n)
+		self._range = range(0 - self._n, self._n)
+		self._currentCount = 0
+	
+	def _getN(self, node, n):
+		for c in node._children:
+			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+				try:
+					n = int(c.value)
+				except:
+					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
+		
+		return n
+	
+	def next(self):
+		self._currentCount += 1
+		if self._currentCount >= len(self._range):
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return len(self._range)
+	
+	def supportedDataElement(e):
+		if isinstance(e, DataElement) and e._HasSizeofRelation(node) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node, self._range[self._currentCount])
+	
+	def randomMutation(self, node):
+		count = self._random.choice(self._range)
+		self._performMutation(node, count)
+	
+	def _performMutation(self, node, count):
+		'''
+		Perform array mutation using count
+		'''
+		
+		relation = node._GetSizeofRelation()
+		nodeOf = relation.getOfElement()
+		size = long(node.getInternalValue())
+		
+		# Keep size indicator the same
+		node.currentValue = node.getInternalValue()
+		
+		# Modify data
+		n = size + count
+		
+		if n == 0:
+			node.currentValue = ""
+		
+		elif n < size:
+			node.currentValue = nodeOf.getValue()[:n]
+			
+		elif size == 0:
+			node.currentValue = "A" * n
+		
+		else:
+			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+		
+		# Verify things worked out okay
+		assert(size == long(node.getInternalValue()))
+
+
+class SizedDataNumericalEdgeCasesMutator(Mutator):
+	'''
+	Change the length of sizes to numerical edge cases
+	'''
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		
+		#: Is mutator finite?
+		self.isFinite = True
+		
+		self.name = name
+		self._peach = peach
+		
+		self._dataElementName = node.getFullname()
+		self._random = random.Random()
+		
+		self._n = self._getN(node, n)
+		self._range = self._populateValues(node)
+		self._currentCount = 0
+	
+	def _populateValues(self, node):
+		if isinstance(node, Number):
+			size = node.size
+		elif isinstance(node, Flag):
+			size = node.length
+			
+			if size < 16:
+				size = 8
+			elif size < 32:
+				size = 16
+			elif size < 64:
+				size = 32
+			else:
+				size = 64
+			
+		else:
+			size = 64 # In the case of strings or blobs
+		
+		nums = []
+		try:
+			
+			if size < 16:
+				gen = BadNumbers8()
+			else:
+				gen = BadNumbers16(None, self._n)
+			
+			## Only if we are testing large memory
+			#gen = BadNumbers24(None, self._n)
+			#gen = BadNumbers32(None, self._n)
+			#gen = BadNumbers(None, self._n)
+			
+			while True:
+				nums.append(int(gen.getValue()))
+				gen.next()
+		except:
+			pass
+		
+		return nums
+		
+	def _getN(self, node, n):
+		for c in node._children:
+			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+				try:
+					n = int(c.value)
+				except:
+					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
+		
+		return n
+	
+	def next(self):
+		self._currentCount += 1
+		if self._currentCount >= len(self._range):
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return len(self._range)
+	
+	def supportedDataElement(e):
+		# This will pick up both numbers or strings, etc that have a size-of relation
+		if isinstance(e, DataElement) and e._HasSizeofRelation(node) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node, self._range[self._currentCount])
+	
+	def randomMutation(self, node):
+		count = self._random.choice(self._range)
+		self._performMutation(node, count)
+	
+	def _performMutation(self, node, count):
+		'''
+		Perform array mutation using count
+		'''
+		
+		relation = node._GetSizeofRelation()
+		nodeOf = relation.getOfElement()
+		size = long(node.getInternalValue())
+		
+		# Keep size indicator the same
+		node.currentValue = node.getInternalValue()
+
+		n = count
+		
+		if n == 0:
+			node.currentValue = ""
+		
+		elif n < size:
+			node.currentValue = nodeOf.getValue()[:n]
+			
+		elif size == 0:
+			node.currentValue = "A" * n
+		
+		else:
+			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+		
+		# Verify things worked out okay
+		assert(size == long(node.getInternalValue()))
 
 # end

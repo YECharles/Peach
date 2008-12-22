@@ -1,17 +1,12 @@
-
 '''
-Peach is a fuzzing framework written in Python.
-
-Please see the included README file and the samples folder for more
-information.
+Peach PIT XML Analyzer
 
 @author: Michael Eddington
 @version: $Id$
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
-# Copyright (c) 2004-2005 IOActive Inc.
+# Copyright (c) 2008 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +32,28 @@ information.
 
 # $Id$
 
-import generator, group, publisher, transformer
-import Generators, Publishers, Transformers
-import Engine, Gui, agent, mutator
-import Mutators, mutatestrategies, MutateStrategies
-import logger, Fixups, fixup
+import sys
+from Peach.Engine.parser import *
+from Peach.Engine.common import *
+from Peach.analyzer import *
 
-__all__ = ["generator", "group", "publisher", "transformer",
-		   "Generators", "Publishers", "Transformers", "Engine",
-		   "Gui", "agent", "mutator", "Mutators", "fixup", "Fixups",
-		   "mutatestrategies", "MutateStrategies"]
+class PitXmlAnalyzer(Analyzer):
+	'''
+	Analyzers produce data and state models.  Examples of analyzers would be
+	the parsing of Peach PIT XML files, tokenizing a string, building a data
+	model based on XML file, etc.
+	'''
+	
+	#: Does analyzer support asParser()
+	supportParser = True
+	
+	def asParser(self, uri):
+		'''
+		Called when Analyzer is used as default PIT parser.
+		
+		Should produce a Peach DOM.
+		'''
+		parser = ParseTemplate()
+		return parser.parse(uri)
 
 # end

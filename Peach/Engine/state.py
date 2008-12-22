@@ -121,7 +121,7 @@ class StateEngine:
 		
 		self.actionValues = []
 		
-		mutator.onStateMachineStart(self)
+		mutator.onStateMachineStarting(self)
 		
 		try:
 			obj = self._getStateByName(self.stateMachine.initialState)
@@ -147,7 +147,7 @@ class StateEngine:
 				self.publisher.stop()
 				self.publisher.hasBeenStarted = False
 			
-		mutator.onStateMachineComplete(self)
+		mutator.onStateMachineFinished(self)
 		
 		return self.actionValues
 
@@ -211,7 +211,7 @@ class StateEngine:
 		# Next setup a few things
 		
 		self.actionValues.append( [ state.name, 'state' ] )
-		mutator.onStateStart(state)
+		mutator.onStateStarting(self, state)
 		
 		# EVENT: onEnter
 		if state.onEnter != None:
@@ -271,7 +271,7 @@ class StateEngine:
 				
 				evalEvent(state.onExit, environment, self.engine.peach)
 				
-			mutator.onStateComplete(state)
+			mutator.onStateFinished(self, state)
 			
 		except StateChangeStateException, e:
 			
@@ -288,17 +288,20 @@ class StateEngine:
 				
 				evalEvent(state.onExit, environment, self.engine.peach)
 			
-			mutator.onStateComplete(state)
+			mutator.onStateFinished(self, state)
+			newState = mutator.onStateChange(self, state, e.state)
+			if newState == None:
+				newState = e.state
 			
 			# stop fuzzing next state?
 			if not stopFuzzing:
-				self._runState(e.state, mutator)
+				self._runState(newState, mutator)
 		
 	def _runAction(self, action, mutator):
 		
 		Debug(1, "StateEngine._runAction: %s" % action.name)
 				
-		mutator.onActionStart(action)
+		mutator.onActionStarting(action.parent, action)
 		
 		# EVENT: when
 		if action.when != None:
@@ -370,7 +373,22 @@ class StateEngine:
 				self.publisher.connect()
 				self.publisher.hasBeenConnected = True
 			
-			action.value = mutator.getActionValue(action)
+			# Run mutator
+			mutator.onDataModelGetValue(action, action.template)
+			
+			# Get value
+			if action.template.modelHasOffsetRelation:
+				stringBuffer = StreamBuffer()
+				action.template.getValue(stringBuffer)
+				stringBuffer.setValue("")
+				stringBuffer.seekFromStart(0)
+				action.template.getValue(stringBuffer)
+				
+				action.value = stringBuffer.getValue()
+				
+			else:
+				action.value = action.template.getValue()
+			
 			
 			Debug(1, "Actiong output sending %d bytes" % len(action.value))
 			
@@ -411,7 +429,22 @@ class StateEngine:
 				if p.type == 'out' or p.type == 'inout':
 					raise PeachException("StateEngine: Action of type \"call\" does not yet support out or inout parameters (bug in comtypes)!")
 				
-				p.value = mutator.getActionParamValue(p)
+				# Run mutator
+				mutator.onDataModelGetValue(self, action, p.template)
+				
+				# Get value
+				if p.template.modelHasOffsetRelation:
+					stringBuffer = StreamBuffer()
+					p.template.getValue(stringBuffer)
+					stringBuffer.setValue("")
+					stringBuffer.seekFromStart(0)
+					p.template.getValue(stringBuffer)
+					
+					p.value = stringBuffer.getValue()
+					
+				else:
+					p.value = p.template.getValue()
+
 				argValues.append(p.value)
 				argNodes.append(p.template)
 				
@@ -484,7 +517,22 @@ class StateEngine:
 			valueNode = None
 			for c in action:
 				if c.elementType == 'actionparam' and c.type == "in":
-					value = c.value = mutator.getActionParamValue(c)
+					# Run mutator
+					mutator.onDataModelGetValue(self, action, c.template)
+					
+					# Get value
+					if p.template.modelHasOffsetRelation:
+						stringBuffer = StreamBuffer()
+						c.template.getValue(stringBuffer)
+						stringBuffer.setValue("")
+						stringBuffer.seekFromStart(0)
+						c.template.getValue(stringBuffer)
+						
+						value = c.value = stringBuffer.getValue()
+						
+					else:
+						value = c.value = c.template.getValue()
+					
 					valueNode = c.template
 					break
 			
@@ -498,7 +546,7 @@ class StateEngine:
 		elif action.type == 'changeState':
 			action.value = None
 			self.actionValues.append( [ action.name, 'changeState', action.ref ] )
-			mutator.onActionComplete(action)
+			mutator.onActionFinished(action.parent, action)
 			raise StateChangeStateException(self._getStateByName(action.ref))
 			
 		elif action.type == 'slurp':
@@ -600,7 +648,7 @@ class StateEngine:
 			
 			evalEvent(action.onComplete, environment, self.engine.peach)
 		
-		mutator.onActionComplete(action)
+		mutator.onActionFinished(action.parent, action)
 	
 	def _resetXmlNodes(self, node):
 		'''

@@ -33,17 +33,7 @@ Mutators that operate on blob types.
 
 # $Id$
 
-import sys, os, time
-from Peach.Generators.block import *
-from Peach.Generators.data import *
-from Peach.Generators.dictionary import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticAlwaysNone, _StaticCurrentValueFromDom
-from Peach.Transformers.encode import WideChar
-from Peach import Transformers
-from Peach.Generators.data import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import _StaticAlwaysNone
+import sys, os, time, struct
 from Peach.mutator import *
 from Peach.group import *
 from Peach.Engine.common import *
@@ -55,216 +45,71 @@ class DWORDSliderMutator(Mutator):
 	@author Chris Clark
 	'''
 	
-	def __init__(self, peach):
+	def __init__(self, peach, node):
 		Mutator.__init__(self)
-		                
+		
+		self.isFinite = True
+		
 		self.name = "DWORDSliderMutator"
 		self._peach = peach
+		self._curPos = 0
 		
-		self._stateMasterCount = -1
-		self._masterGroup = GroupSequence()
-		self._masterCount = 0
-		self._countThread = None
-		self._countGroup = GroupSequence()
-		self._actions = []
-		
-		# All active groups
-		self._activeGroups = []
-		
-		# Hashtable, key is element, value is [group, generator]
-		self._generatorMap = {}
-		self._countGeneratorMap = {}
-	
-	def isFinite(self):
-		'''
-		Some mutators could contine forever, this
-		should indicate.
-		'''
-		return True
-	
-	def reset(self):
-		'''
-		Reset mutator
-		'''
-		
-		self._masterGroup = GroupSequence()
-		self._activeGroups = []
-		self._generatorMap = {}
-		self._masterCount = 0
-		self._actions = []
+		self._len = len(node.getValue())
+		self._position = 0		
+		self._dword = 0xFFFFFFFF
+		self._counts = 0
 	
 	def next(self):
-		'''
-		Goto next mutation.  When this is called
-		the state machine is updated as needed.
-		'''
-		
-		try:
-			# Check if we set our state and need
-			# to skip ahead.  We need todo this in
-			# next() to assure we have all our action
-			# templates added into our masterGroup
-			if self._stateMasterCount > -1:
-				for cnt in xrange(self._masterCount, self._stateMasterCount):
-					self._masterGroup.next()
-					self._masterCount += 1
-				self._stateMasterCount = -1
-			else:
-				self._masterGroup.next()
-				self._masterCount += 1
-		
-		except GroupCompleted:
+		self._position += 1
+		if self._position >= self._len:
 			raise MutatorCompleted()
-	
-	def getState(self):
-		'''
-		Return a binary string that contains
-		any information about current state of
-		Mutator.  This state information should be
-		enough to let the same mutator "restart"
-		and continue when setState() is called.
-		'''
-		
-		# Ensure a minor overlap of testing
-		str(self._masterCount - 2)
-		try:
-			self.next()
-		except:
-			pass
-	
-	def setState(self, state):
-		'''
-		Set the state of this object.  Should put us
-		back in the same place as when we said
-		"getState()".
-		'''
-		if state == None:
-			return
-		
-		self._stateMasterCount = int(state)
 		
 	def getCount(self):
-		if self._countThread != None and self._countThread.hasCountEvent.isSet():
-			self._count = self._countThread.count
-			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
-		
-		return self._count
+		return self._len
 
-	def calculateCount(self):
-		
-		count = 0
-		try:
-			while True:
-				count += 1
-				self._countGroup.next()
+	def supportedDataElement(e):
+		if isinstance(e, Blob) and e.isMutable:
+			for child in e:
+				if isinstance(child, Hint) and child.name == 'DWORDSliderMutator' and child.value == 'off':
+					return False
 			
-		except GroupCompleted:
-			pass
+			return True
 		
-		return count
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node, self._position)
+	
+	def randomMutation(self, node):
+		count = self._random.randint(0, self._len-1)
+		self._performMutation(node, count)
 
-	def _getStringElements(self, node):
+	def _performMutation(self, node, position):
 		
-		elements = []
+		data = node.getValue()
+		length = len(data)
 		
-		for e in node._children:
-			if e.elementType == 'blob' and e.isMutable:
-				elements.append(e)
-				for child in e:
-					if isinstance(child, Hint) and child.name == 'DWORDSliderMutator' and child.value == 'off':
-						elements.remove(e)
-						break
-			
-			if e.hasChildren:
-				for ee in self._getStringElements(e):
-					elements.append(ee)
+		if position >= length:
+			return
 		
-		return elements
-
-	#####################################################
-	# Callbacks when Action needs a value
-	
-	def getActionValue(self, action):
+		inject = ''
+		remaining = length - position
 		
-		if action not in self._actions:
-			
-			# Walk data tree and locate each string type.
-			stringElements = self._getStringElements(action.template)
-			self._generatorMap[action] = {}
-			self._countGeneratorMap[action] = {}
-			
-			for e in stringElements:
-				group = Group()
-				gen = SequentialDWORDSlider(None, e.getValue())
-				gen = WithDefault(group, _StaticAlwaysNone(), gen)
-				self._masterGroup.append(group)
-				self._generatorMap[action][e.getFullnameInDataModel()] = gen
-				
-				group = Group()
-				gen = SequentialDWORDSlider(None, e.getValue())
-				gen = WithDefault(group, _StaticAlwaysNone(), gen)
-				self._countGroup.append(group)
-				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
-			
-			self._actions.append(action)
+		if remaining == 1:
+			inject = struct.pack('B', self._dword & 0x000000FF)
 		
-		# Set values
-		for key in self._generatorMap[action].keys():
-			value = self._generatorMap[action][key].getValue()
-			if value != None:
-				self._getElementByName(action.template, key).setValue(value)
+		elif remaining == 2:
+			inject = struct.pack('H', self._dword & 0x0000FFFF) #ushort
 		
-		if action.template.modelHasOffsetRelation:
-			stringBuffer = StreamBuffer()
-			action.template.getValue(stringBuffer)
-			stringBuffer.setValue("")
-			stringBuffer.seekFromStart(0)
-			action.template.getValue(stringBuffer)
+		elif remaining == 3: 
+			inject = struct.pack('B', (self._dword & 0x00FF0000) >> 16) + \
+				struct.pack('>H', self._dword & 0xFFFF)
 		
-			return stringBuffer.getValue()
+		else:
+			inject = struct.pack('L', self._dword)
 		
-		return action.template.getValue()
-	
-	def getActionParamValue(self, action):
-		return self.getActionValue(action)
-	
-	def getActionChangeStateValue(self, action, value):
-		return value
-	
-	
-	#####################################################
-	# Event callbacks for state machine
-	
-	def onStateStart(self, state):
-		pass
-	
-	def onStateComplete(self, state):
-		pass
-	
-	def onActionStart(self, action):
-		pass
-	
-	def onActionComplete(self, action):
-		pass
-	
-	def onStateMachineStart(self, stateMachine):
-		pass
-	
-	def onStateMachineComplete(self, stateMachine):
-		
-		# Lets calc our count if we haven't already
-		if self._count == -1 and self._countThread == None:
-			self._countThread = MutatorCountCalculator(self)
-			self._countThread.start()
-		
-		elif self._countThread != None:
-			if self._countThread.hasCountEvent.isSet():
-				self._count = self._countThread.count
-				self._countThread = None
-				self._countGroup = None
-				self._countGeneratorMap = None
+		node.currentValue = data[:position] + inject + data[position + len(inject):]
 
 
 class BitFlipperMutator(Mutator):
@@ -272,131 +117,23 @@ class BitFlipperMutator(Mutator):
 	Flip a % of total bits in blob.  Default % is 20.
 	'''
 	
-	def __init__(self, peach):
+	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		
+		self.isFinite = True
 		self.name = "BitFlipperMutator"
 		self._peach = peach
-		                
-		self._stateMasterCount = -1
-		self._masterGroup = GroupSequence()
-		self._masterCount = 0
-		self._countThread = None
-		self._countGroup = GroupSequence()
-		self._actions = []
+		self._n = self._getN(node, None)
+		self._current = 0
+		self._len = len(node.getValue())
 		
-		# All active groups
-		self._activeGroups = []
+		if self._n != None:
+			self._count = self._n
 		
-		# Hashtable, key is element, value is [group, generator]
-		self._generatorMap = {}
-		self._countGeneratorMap = {}
+		else:
+			self._count = long((len(node.getValue())*8) * 0.2)
 	
-	def isFinite(self):
-		'''
-		Some mutators could contine forever, this
-		should indicate.
-		'''
-		return True
-	
-	def reset(self):
-		'''
-		Reset mutator
-		'''
-		
-		self._masterGroup = GroupSequence()
-		self._activeGroups = []
-		self._generatorMap = {}
-		self._masterCount = 0
-		self._actions = []
-	
-	def next(self):
-		'''
-		Goto next mutation.  When this is called
-		the state machine is updated as needed.
-		'''
-		
-		try:
-			# Check if we set our state and need
-			# to skip ahead.  We need todo this in
-			# next() to assure we have all our action
-			# templates added into our masterGroup
-			if self._stateMasterCount > -1:
-				for cnt in xrange(self._stateMasterCount):
-					self._masterGroup.next()
-					self._masterCount += 1
-				self._stateMasterCount = -1
-			else:
-				self._masterGroup.next()
-				self._masterCount += 1
-		
-		except GroupCompleted:
-			raise MutatorCompleted()
-	
-	def getState(self):
-		'''
-		Return a binary string that contains
-		any information about current state of
-		Mutator.  This state information should be
-		enough to let the same mutator "restart"
-		and continue when setState() is called.
-		'''
-		
-		# Ensure a minor overlap of testing
-		return str(self._masterCount - 2)
-	
-	def setState(self, state):
-		'''
-		Set the state of this object.  Should put us
-		back in the same place as when we said
-		"getState()".
-		'''
-		self.reset()
-		self._stateMasterCount = int(state)
-		
-	def getCount(self):
-		if self._countThread != None and self._countThread.hasCountEvent.isSet():
-			self._count = self._countThread.count
-			self._countThread = None
-			self._countGroup = GroupSequence()
-			self._countGeneratorMap = {}
-		
-		return self._count
-
-	def calculateCount(self):
-		
-		count = 0
-		try:
-			while True:
-				count += 1
-				self._countGroup.next()
-			
-		except GroupCompleted:
-			pass
-		
-		return count
-
-	def _getStringElements(self, node):
-		
-		elements = []
-		
-		for e in node._children:
-			if e.elementType == 'blob' and e.isMutable:
-				elements.append(e)
-			
-			if e.hasChildren:
-				for ee in self._getStringElements(e):
-					elements.append(ee)
-		
-		return elements
-
-	def _getN(self, node):
-		'''
-		Gets N by checking node for hint, or returnign default
-		'''
-		
-		n = None
-		
+	def _getN(self, node, n):
 		for c in node._children:
 			if isinstance(c, Hint) and c.name == 'BitFlipperMutator-N':
 				try:
@@ -406,100 +143,45 @@ class BitFlipperMutator(Mutator):
 		
 		return n
 	
-	#####################################################
-	# Callbacks when Action needs a value
-	
-	def getActionValue(self, action):
-		
-		if action not in self._actions:
-			
-			# Walk data tree and locate each string type.
-			stringElements = self._getStringElements(action.template)
-			self._generatorMap[action] = {}
-			self._countGeneratorMap[action] = {}
-			
-			for e in stringElements:
-				group = Group()
-				
-				if self._getN(e) != None:
-					gen = PartialFlipper(None, e.getValue(),self._getN(e))
-				else:
-					gen = PartialFlipper(None, e.getValue())
-					
-				gen = WithDefault(group, _StaticAlwaysNone(), gen)
-				self._masterGroup.append(group)
-				self._generatorMap[action][e.getFullnameInDataModel()] = gen
-				
-				# Counter
-				
-				group = Group()
-				
-				if self._getN(e) != None:
-					gen = PartialFlipper(None, e.getValue(),self._getN(e))
-				else:
-					gen = PartialFlipper(None, e.getValue())
-					
-				gen = WithDefault(group, _StaticAlwaysNone(), gen)
-				self._countGroup.append(group)
-				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
-			
-			self._actions.append(action)
-		
-		# Set values
-		for key in self._generatorMap[action].keys():
-			value = self._generatorMap[action][key].getValue()
-			if value != None:
-				self._getElementByName(action.template, key).setValue(value)
-		
-		if action.template.modelHasOffsetRelation:
-			stringBuffer = StreamBuffer()
-			action.template.getValue(stringBuffer)
-			stringBuffer.setValue("")
-			stringBuffer.seekFromStart(0)
-			action.template.getValue(stringBuffer)
-		
-			return stringBuffer.getValue()
-		
-		return action.template.getValue()
-	
-	def getActionParamValue(self, action):
-		return self.getActionValue(action)
-	
-	def getActionChangeStateValue(self, action, value):
-		return value
-	
-	
-	#####################################################
-	# Event callbacks for state machine
-	
-	def onStateStart(self, state):
-		pass
-	
-	def onStateComplete(self, state):
-		pass
-	
-	def onActionStart(self, action):
-		pass
-	
-	def onActionComplete(self, action):
-		pass
-	
-	def onStateMachineStart(self, stateMachine):
-		pass
-	
-	def onStateMachineComplete(self, stateMachine):
-		
-		# Lets calc our count if we haven't already
-		if self._count == -1 and self._countThread == None:
-			self._countThread = MutatorCountCalculator(self)
-			self._countThread.start()
-		
-		elif self._countThread != None:
-			if self._countThread.hasCountEvent.isSet():
-				self._count = self._countThread.count
-				self._countThread = None
-				self._countGroup = None
-				self._countGeneratorMap = None
+	def next(self):
+		self._current += 1
+		if self._current > self._count:
+			raise MutatorCompleted()
 
+	def getCount(self):
+		return self._count
+
+	def supportedDataElement(e):
+		if isinstance(e, Blob) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		for i in range(self._random.randint(0, 10)):
+			count = self._random.randint(0, self._len-1)
+			self._performMutation(node, count)
+	
+	def randomMutation(self, node):
+		for i in range(self._random.randint(0, 10)):
+			count = self._random.randint(0, self._len-1)
+			self._performMutation(node, count)
+	
+	def _performMutation(self, node, position):
+		
+		data = node.getValue()
+		length = len(data)
+		
+		if position >= length:
+			position = length - 1
+		
+		byte = struct.unpack('B', data[position])[0]
+		byte ^= self._random.randint(0, 255)
+		
+		packedup = struct.pack("B", byte)
+		data = data[:position] + packedup + data[position+1:]
+		
+		return data
 
 # end

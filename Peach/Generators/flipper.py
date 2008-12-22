@@ -117,69 +117,6 @@ class SequentialFlipper(SimpleGenerator):
 		
 		return data
 
-class SequentialDWORDSlider(SimpleGenerator):
-	'''
-	Sequencially slides a DWORD through a data blob.  This is for
-	"random" fuzzing.  Usefull brute forcing, codecs, etc.
-	'''
-	
-	_data = None
-	_position = 0
-	
-	def __init__(self, group, data, dword=0xFFFFFFFF):
-		'''
-		@type	data: string
-		@param	data: Binary static blob to slide through
-		@type	dword: ulong
-		@param	dword: The dword to slide through (e.g. 0xBAADFOOD), slides 0XFFFFFFFF by default
-		'''
-		SimpleGenerator.__init__(self, group)
-		
-		self._data = str(data)	# Could be a unicode string.
-		self._len = len(data)
-		self._position = 0		
-		self._dword = dword		
-		self._counts = 0
-	
-	def next(self):
-	
-		if self._counts < 4 and self._counts < self._len:
-			self._counts += 1		
-		elif self._position < self._len:
-			self._position += 1
-		else:
-			raise GeneratorCompleted("DWORD Slider Complete")
-		
-	def reset(self):
-		self._position = 0
-	
-	def getRawValue(self):
-		
-		if self._position >= self._len:
-		    return ""
-		
-		data = self._data
-		
-		inject = ''
-		remaining = self._len - self._position
-		
-		#Need to determine the size of what to inject based on
-		#the end of the data and the beginning
-		if self._counts == 0 or remaining == 1:
-			inject = struct.pack('B', self._dword & 0x000000FF)
-		elif (self._counts == 1 and remaining >= 2) or remaining <= 2:
-			inject = struct.pack('H', self._dword & 0x0000FFFF) #ushort
-		elif (self._counts == 2 and remaining >= 3) or remaining <= 3: 
-			inject = struct.pack('B', (self._dword & 0x00FF0000) >> 16) + \
-			struct.pack('>H', self._dword & 0xFFFF)		    
-		else:
-			inject = struct.pack('L', self._dword)
-		
-		data = data[:self._position] + inject + data[self._position + len(inject):]
-		
-		return data
-
-
 import random
 class PartialFlipper(SimpleGenerator):
 	'''

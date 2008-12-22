@@ -34,162 +34,41 @@ Mutators that operate on arrays and count relations.
 # $Id$
 
 import sys, os, time, random
-from Peach.Generators.block import *
-from Peach.Generators.data import *
-from Peach.Generators.dictionary import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate, _StaticCurrentValueFromDom
-from Peach.Transformers.encode import WideChar
-from Peach import Transformers
-from Peach.Generators.block import *
-from Peach.Generators.data import *
-from Peach.Generators.dictionary import *
-from Peach.Generators.flipper import *
-from Peach.Generators.static import Static, _StaticFromTemplate
-from Peach.Transformers.encode import WideChar
+
+from Peach.Generators.data import BadPositiveNumbersSmaller
 from Peach.mutator import *
-from Peach.group import *
 from Peach.Engine.common import *
 
-class _ArrayMutator(Mutator):
+class ArrayVarianceMutator(Mutator):
 	'''
 	Change the length of arrays to count - N to count + N.
 	'''
 	
-	def __init__(self, peach, name, n = 50):
+	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		
+		if not ArrayVarianceMutator.supportedDataElement(node):
+			raise Exception("Error: ArrayVarianceMutator created with bad node")
+		
+		#: Is mutator finite?
+		self.isFinite = True
 		
 		self.name = name
 		self._peach = peach
+		self._n = self._getN(node, n)
+		self._arrayCount = node.getArrayCount()
+		self._minCount = self._arrayCount - self._n
+		self._maxCount = self._arrayCount + self._n
 		
-		self._stateMasterCount = -1
-		self._masterGroup = GroupSequence()
-		self._masterCount = 0
-		self._countThread = None
-		self._countGroup = GroupSequence()
-		self._actions = []
-		self._N = n
-		self._origN = n
-		
-		# All active groups
-		self._activeGroups = []
-		
-		# Hashtable, key is element, value is [group, generator]
-		self._generatorMap = {}
-		self._countGeneratorMap = {}
-	
-	def isFinite(self):
-		'''
-		Some mutators could contine forever, this
-		should indicate.
-		'''
-		return True
-	
-	def reset(self):
-		'''
-		Reset mutator
-		'''
-		
-		self._masterGroup = GroupSequence()
-		self._activeGroups = []
-		self._generatorMap = {}
-		self._masterCount = 0
-		self._actions = []
-	
-	def next(self):
-		'''
-		Goto next mutation.  When this is called
-		the state machine is updated as needed.
-		'''
-		
-		try:
-			# Check if we set our state and need
-			# to skip ahead.  We need todo this in
-			# next() to assure we have all our action
-			# templates added into our masterGroup
-			if self._stateMasterCount > -1:
-				for cnt in xrange(self._masterCount, self._stateMasterCount):
-					self._masterGroup.next()
-					self._masterCount += 1
-				self._stateMasterCount = -1
-			else:
-				self._masterGroup.next()
-				self._masterCount += 1
-		
-		except GroupCompleted:
-			raise MutatorCompleted()
-	
-	def getState(self):
-		'''
-		Return a binary string that contains
-		any information about current state of
-		Mutator.  This state information should be
-		enough to let the same mutator "restart"
-		and continue when setState() is called.
-		'''
-		
-		# Ensure a minor overlap of testing
-		return str(self._masterCount - 2)
-	
-	def setState(self, state):
-		'''
-		Set the state of this object.  Should put us
-		back in the same place as when we said
-		"getState()".
-		'''
-		self._stateMasterCount = int(state)
-		try:
-			self.next()
-		except:
-			pass
-		
-	def getCount(self):
-		if self._countThread != None and self._countThread.hasCountEvent.isSet():
-			self._count = self._countThread.count
-			self._countThread = None
-			self._countGroup = None
-			self._countGeneratorMap = None
-		
-		return self._count
-
-	def calculateCount(self):
-		
-		count = 0
-		try:
-			while True:
-				count += 1
-				self._countGroup.next()
+		if self._minCount < 0:
+			self._minCount = 0
 			
-		except GroupCompleted:
-			pass
-		
-		return count
-
-	def _getArrayElements(self, node):
-		
-		# NOTE: For now we only find expanded arrays!
-		
-		elements = []
-		
-		for e in node._children:
-			if isinstance(e, DataElement) and e.isArray() and e.isMutable:
-				# Only store element at position 0
-				obj = e.getArrayElementAt(0)
-				if obj not in elements:
-					elements.append(e)
-			
-			if e.hasChildren:
-				for ee in self._getArrayElements(e):
-					elements.append(ee)
-		
-		return elements
-
-	def _getN(self, node):
+		self._currentCount = self._minCount
+	
+	def _getN(self, node, n):
 		'''
 		Gets N by checking node for hint, or returnign default
 		'''
-		
-		n = self._origN
 		
 		for c in node._children:
 			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
@@ -199,154 +78,210 @@ class _ArrayMutator(Mutator):
 					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
 		
 		return n
-
-	#####################################################
-	# Callbacks when Action needs a value
 	
-	def getGenerator(self, e, n):
-		pass
-	
-	def getActionValue(self, action):
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
 		
-		if action not in self._actions:
+		self._currentCount += 1
+		if self._currentCount > self._maxCount:
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		
+		return self._maxCount - self._minCount
+	
+	def supportedDataElement(e):
+		'''
+		Returns true if element is supported by
+		this mutator
+		
+		 * Is a DataElement
+		 * Is an Array
+		 * Is head of array
+		'''
+		
+		if isinstance(e, DataElement) and e.isArray() and e.arrayPosition == 0 and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		'''
+		Perform a sequencial mutation
+		'''
+		
+		self._performMutation(node, self._currentCount)
+	
+	def randomMutation(self, node):
+		'''
+		Perform a random mutation
+		'''
+		
+		count = self._random.randint(self._minCount, self._maxCount)
+		self._performMutation(node, count)
+	
+	def _performMutation(self, node, count):
+		'''
+		Perform array mutation using count
+		'''
+		
+		n = count
+		arrayHead = node
+		
+		if n < self._arrayCount:
+			# Remove some items
+			for i in xrange(n, self._arrayCount):
+				obj = arrayHead.getArrayElementAt(i)
+				if obj == None:
+					raise Exception("Couldn't locate item at pos %d (max of %d)" % (i, self._arrayCount))
+				obj.parent.__delitem__(obj.name)
 			
-			self._generatorMap[action] = {}
-			self._countGeneratorMap[action] = {}
+			#print "count",arrayHead.getArrayCount()
+			#print "n",n
+			assert(arrayHead.getArrayCount() == n)
+		
+		elif n > self._arrayCount:
+			# Add some items
+			headIndex = arrayHead.parent.index(arrayHead)
 			
-			# Walk data tree and locate each string type.
-			numberElements = self._getArrayElements(action.template)
+			## Faster, but array count may be off
+			#obj = arrayHead.getArrayElementAt(arrayHead.getArrayCount()-1)
+			#try:
+			#	obj.currentValue = obj.getValue() * (n - self.arrayCount)
+			#	obj.arrayPosition = n
+			#except MemoryError:
+			#	# Catch out of memory errors
+			#	pass
 			
-			for e in numberElements:
-				group = Group()
-				
-				n = self._getN(e)
-				
-				gen = self.getGenerator(e, n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
-				self._masterGroup.append(group)
-				self._generatorMap[action][e.getFullnameInDataModel()] = gen
-				
-				group = Group()
-				gen = self.getGenerator(e, n)
-				gen = WithDefault(group, _StaticFromTemplate(action, e), gen)
-				self._countGroup.append(group)
-				self._countGeneratorMap[action][e.getFullnameInDataModel()] = gen
+			## Slower but reliable (we hope)
+			for i in xrange(self._arrayCount, n):
+				obj = arrayHead.copy(arrayHead)
+				obj.arrayPosition = i
+				arrayHead.parent.insert(headIndex+i, obj)
 			
-			self._actions.append(action)
-		
-		# Run Generator, no need to set the value, nothing is produced
-		for name in self._generatorMap[action].keys():
-			self._generatorMap[action][name].getValue()
-		
-		if action.template.modelHasOffsetRelation:
-			stringBuffer = StreamBuffer()
-			action.template.getValue(stringBuffer)
-			stringBuffer.setValue("")
-			stringBuffer.seekFromStart(0)
-			action.template.getValue(stringBuffer)
-		
-			return stringBuffer.getValue()
-		
-		return action.template.getValue()
+			assert(arrayHead.getArrayCount() == n)
+
+class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
+	_counts = None
 	
-	def getActionParamValue(self, action):
-		return self.getActionValue(action)
-	
-	def getActionChangeStateValue(self, action, value):
-		return value
-	
-	
-	#####################################################
-	# Event callbacks for state machine
-	
-	def onStateMachineComplete(self, stateMachine):
+	def __init__(self, peach, node):
+		ArrayVarianceMutator.__init__(self, peach, "ArrayNumericalEdgeCasesMutator", node)
 		
-		# Lets calc our count if we haven't already
-		if self._count == -1 and self._countThread == None:
-			self._countThread = MutatorCountCalculator(self)
-			self._countThread.start()
+		if self._counts == None:
+			ArrayNumericalEdgeCasesMutator._counts = []
+			gen = BadPositiveNumbersSmaller()
+			try:
+				while True:
+					self._count.append(int(gen.getValue()))
+			except:
+				pass
 		
-		elif self._countThread != None:
-			if self._countThread.hasCountEvent.isSet():
-				self._count = self._countThread.count
-				self._countThread = None
-				self._countGroup = None
-				self._countGeneratorMap = None
+		self._minCount = None
+		self._maxCount = None
+		
+		self._countsIndex = 0
+		self._currentCount = self._counts[self._countsIndex]
+	
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
+		
+		self._countsIndex += 1
+		if self._countsIndex >= len(self._counts):
+			raise MutatorCompleted()
+		
+		self._currentCount = self._counts[self._countsIndex]
+	
+	def getCount(self):
+		return len(self._counts)
+	
+	def randomMutation(self, node):
+		'''
+		Perform a random mutation
+		'''
+		
+		count = self._random.choice(self._counts)
+		self._performMutation(node, count)
 
 
-class ArrayVaranceMutator(_ArrayMutator):
-	def __init__(self, peach):
-		_ArrayMutator.__init__(self, peach, "ArrayVaranceMutator", 50)
+class ArrayReverseOrderMutator(ArrayVarianceMutator):
+	def __init__(self, peach, node):
+		ArrayVarianceMutator.__init__(self, peach, "ArrayReverseOrderMutator", node)
 	
-	def getGenerator(self, e, n):
-		return ArrayVariance(None, e, n)
-
-class ArrayNumericalEdgeCasesMutator(_ArrayMutator):
-	def __init__(self, peach):
-		_ArrayMutator.__init__(self, peach, "ArrayNumericalEdgeCasesMutator")
+	def next(self):
+		raise MutatorCompleted()
 	
-	def getGenerator(self, e, n):
-		return ArrayBadNumbers(None, e, n)
-
-class ArrayReverseOrderMutator(_ArrayMutator):
-	def __init__(self, peach):
-		_ArrayMutator.__init__(self, peach, "ArrayReverseOrderMutator")
+	def getCount(self):
+		return 1
 	
-	def getGenerator(self, e, n):
-		return ArrayReverse(None, e)
+	def sequencialMutation(self, node):
+		self._performMutation(node)
 
-class ArrayRandomizeOrderMutator(_ArrayMutator):
-	def __init__(self, peach):
-		_ArrayMutator.__init__(self, peach, "ArrayRandomizeOrderMutator")
+	def randomMutation(self, node):
+		self._performMutation(node)
+
+	def _performMutation(self, node):
+		arrayHead = node
+		headIndex = arrayHead.parent.index(arrayHead)
+		items = []
+		
+		for i in xrange(self._arrayCount):
+			obj = arrayHead.getArrayElementAt(i)
+			items.append(obj)
+			del obj.parent[obj.name]
+		
+		x = 0
+		for i in xrange(self._arrayCount-1, -1, -1):
+			obj = items[i]
+			obj.parent.insert(headIndex + x, obj)
+			obj.arrayPosition = x
+			x+=1
+		
+		assert(self._arrayCount == arrayHead.getArrayCount())
+
+
+class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
+	def __init__(self, peach, node):
+		ArrayVarianceMutator.__init__(self, peach, "ArrayRandomizeOrderMutator", node)
+		self._count = 0
+		
+	def next(self):
+		self._count += 1
+		if self._count > self._n:
+			raise MutatorCompleted()
 	
-	def getGenerator(self, e, n):
-		return ArrayRandomize(None, e)
+	def getCount(self):
+		return self._n
+	
+	def sequencialMutation(self, node):
+		self._performMutation(node)
 
+	def randomMutation(self, node):
+		self._performMutation(node)
+
+	def _performMutation(self, node):
+		arrayHead = node
+		headIndex = arrayHead.parent.index(arrayHead)
+		items = []
+		
+		for i in xrange(self._arrayCount):
+			obj = arrayHead.getArrayElementAt(i)
+			items.append(obj)
+			del obj.parent[obj.name]
+		
+		random.shuffle(items)
+		
+		for i in xrange(self._arrayCount):
+			obj = items[i]
+			obj.parent.insert(headIndex + i, obj)
+			obj.arrayPosition = i
+		
+		assert(self.arrayCount == arrayHead.getArrayCount())
 
 # end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

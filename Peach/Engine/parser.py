@@ -1180,7 +1180,6 @@ class ParseTemplate:
 			name = None
 		
 		mutators = dom.Mutators(name, parent)
-		#mutators.node = node
 		
 		# children
 		
@@ -1192,10 +1191,7 @@ class ParseTemplate:
 			if not child.hasAttributeNS(None, 'class'):
 				raise PeachException("Mutator element does not have required class attribute")
 			
-			className = "PeachXml_" + self._getAttribute(child, 'class') + "(self.context)"
-			
 			mutator = Mutator(self._getAttribute(child, 'class'), mutators)
-			mutator.mutator = eval(className, globals(), locals())
 			mutators.append(mutator)
 			
 		parent.append(mutators)

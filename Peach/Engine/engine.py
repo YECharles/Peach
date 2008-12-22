@@ -517,9 +517,10 @@ class Engine:
 		# Get all the mutators we will use
 		mutators = []
 		for m in test.getMutators():
-			mutators.append(m.mutator)
+			mutators.append(eval(m.name))
+		self.mutators = mutators
 		
-		mutator = test.mutator = MutatorCollectionProxy(mutators)
+		mutator = test.mutator = MutationStrategy.DefaultStrategy(None)
 		value = "StateMachine"
 		
 		if self.restartState != None:
@@ -553,22 +554,17 @@ class Engine:
 							break
 					
 					# What if we are just counting?
-					if testCount == len(mutators)+1 and countOnly:
-						print "-- Waiting for count to complete..."
-						while mutator.getCount() == -1:
-							time.sleep(0.5)
-						
+					if testCount == 2 and countOnly:
 						self._stopAgents(run, test)
 						return mutator
 					
-					# Go through one iteration for each mutator
-					# before we load state
-					elif testCount == len(mutators)+1 and self.restartState != None:
+					# Go through one iteration before we load state
+					elif testCount == 2 and self.restartState != None:
 						print "-- Restoring state"
 						testCount = self.restartState[1]
 						mutator.setState(self.restartState[2])
 					
-					elif testCount == len(mutators)+1 and startCount != None and startCount > (len(mutators)+1):
+					elif testCount == 2 and startCount != None and startCount > 2:
 						# Skip ahead to start range, but not if we are
 						# restoring saved state.
 						print "-- Skipping ahead to iteration %d" % startCount
@@ -580,18 +576,14 @@ class Engine:
 					# Update total test count
 					if testRange == None:
 						totalTests = mutator.getCount()
+						
 					else:
 						# if we are parallel use our endCount which will also
 						# cause the estimated time left to be correct
 						totalTests = endCount+1
 					
-					if totalTests == -1:
+					if totalTests == -1 or totalTests == None:
 						totalTests = "?"
-						
-						#print "---"
-						#for m in mutators:
-						#	if m.getCount() == -1:
-						#		print "-- Still waiting for: ", m.name
 						
 					else:
 						self.watcher.setTotalVariations(totalTests)
@@ -602,6 +594,8 @@ class Engine:
 					if not countOnly:
 						self.watcher.OnTestCaseStarting(run, test, testCount)
 					
+					mutator.onTestCaseStarting(test, testCount, stateEngine)
+						
 					# Run the test
 					try:
 						actionValues = stateEngine.run(mutator)
@@ -617,6 +611,8 @@ class Engine:
 					# Pause as needed
 					time.sleep(run.waitTime)
 					
+					mutator.onTestCaseFinished(test, testCount, stateEngine)
+					
 					# Notify
 					if not countOnly:
 						self.watcher.OnTestCaseFinished(run, test, testCount, actionValues)
@@ -628,6 +624,9 @@ class Engine:
 						# Collect data
 						print "-- Detected fault, getting data --"
 						results = self.agent.GetMonitorData()
+						
+						mutator.onFaultDetected(test, testCount, stateEngine, results, actionValues)
+						
 						self.watcher.OnFault(run, test, testCount, results, actionValues)
 						self.agent.OnFault()
 					
@@ -700,7 +699,7 @@ class Engine:
 				
 				print "-- Saving position to restart file: %s" % stateFilename
 				
-				state = [ test.name, testCount, mutator.getState() ]
+				state = [ test.name, testCount ]
 				fd = open(stateFilename, "wb+")
 				fd.write(pickle.dumps(state))
 				fd.close()
@@ -760,8 +759,7 @@ from Peach.Engine.path import *
 
 from Peach.agent import AgentPlexer
 from Peach.group import *
-from Peach.Mutators.default import *
-from Peach.Mutators.path import *
-from Peach.mutator import *
+from Peach.mutatestrategies import *
+from Peach.MutateStrategies import *
 
 # end

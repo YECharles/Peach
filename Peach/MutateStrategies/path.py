@@ -1,11 +1,12 @@
 
 '''
-@author: Michael Eddington
+Used to verify state path
+
 @version: $Id$
 '''
 
 #
-# Copyright (c) 2007-2008 Michael Eddington
+# Copyright (c) 2008 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +27,56 @@
 # SOFTWARE.
 #
 
-# Authors:
-#   Michael Eddington (mike@phed.org)
-
 # $Id$
 
-## Circular dependencies were caused by this file!
+import sys, os, time
+from Peach.mutatestrategies import MutationStrategy
 
-#import engine, parser, incoming, dom, state, common
-#__all__ = [ "engine", "parser", "incoming", "dom", "state", "common" ]
-
+class PathValidationStrategy(MutationStrategy):
+	'''
+	Used by path unittests
+	'''
+	
+	def __init__(self, args):
+		'''
+		@type	args: Dictionary
+		@param	args: Arguments
+		'''
+		MutationStrategy.__init__(self, args)
+		self.states = []
+	
+	def isFinite(self):
+		'''
+		Will this mutation strategy ever end?
+		'''
+		return True
+	
+	def getCount(self):
+		'''
+		Return the number of test cases
+		'''
+		return 1
+	
+	## Events
+	
+	def onStateMachineFinished(self, stateEngine):
+		'''
+		Called as we exit the state machine
+		
+		@type	stateEngine: StateEngine instance
+		@param	stateEngine: StateEngine instance in use
+		'''
+		stateEngine.pathFinder.reset()
+	
+	def onStateStarting(self, stateEngine, state):
+		'''
+		Called as we enter a new state
+		
+		@type	stateEngine: StateEngine instance
+		@param	stateEngine: StateEngine instance in use
+		@type	state: State instance
+		@param	state: Current state
+		'''
+		self.states.append(state.name)
+	
 # end

@@ -44,9 +44,6 @@
 	another <Mutators> block at a higher level.
 	-->
 	<Mutators>
-		<!-- This should always be first -->
-		<Mutator class="default.NullMutator"/>
-		
 		<Mutator class="number.NumericalEdgeCaseMutator" />
 		<Mutator class="number.NumericalVarianceMutator" />
 		<Mutator class="number.FiniteRandomNumbersMutator" />
@@ -58,7 +55,7 @@
 		<Mutator class="datatree.DataTreeDuplicateMutator" />
 		<Mutator class="datatree.DataTreeSwapNearNodesMutator" />
 		
-		<Mutator class="array.ArrayVaranceMutator" />
+		<Mutator class="array.ArrayVarianceMutator" />
 		<Mutator class="array.ArrayNumericalEdgeCasesMutator" />
 		<Mutator class="array.ArrayReverseOrderMutator" />
 		<Mutator class="array.ArrayRandomizeOrderMutator" />
@@ -71,7 +68,6 @@
 		<Mutator class="string.PathMutator"/>
 		<Mutator class="string.HostnameMutator"/>
 		<Mutator class="string.FilenameMutator"/>
-		
 	</Mutators>
 	
 	<!--
