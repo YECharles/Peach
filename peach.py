@@ -191,7 +191,7 @@ else:
 
 
 try:
-	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:a:", ['analyzer=', 'parallel=','restart=',
+	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['analyzer=', 'parallel=','restart=',
 																 'test', 'count', 'web', 'agent',
 																 'gui', 'debug', 'new', 'skipto='])
 except:
@@ -201,7 +201,7 @@ if len(optlist) < 1 and len(args) < 1:
 	usage()
 
 for i in range(len(optlist)):
-	if optlist[i][0] == '--analyzer' or optlist[i][0] == '-a':
+	if optlist[i][0] == '--analyzer':
 		
 		try:	
 			analyzer = optlist[i][1]
