@@ -101,26 +101,30 @@ class SequencialMutationStrategy(MutationStrategy):
 		return self._count
 
 	def next(self):
-		if self._isFirstTestCase:
-			self._isFirstTestCase = False
-			return
-		
-		# Figure out next field to mutate
+		# Goto next test case
 		
 		dataModelName = self._dataModels[self._dataModelIndex]
 		fieldName = self._dataModelFields[dataModelName][self._fieldIndex]
-		mutator = self._fieldMutators[fieldName][self._mutatorIndex]
 		
-		try:
-			mutator.next()
-			return
-		except MutatorCompleted:
-			pass
+		# If this is the first test case, don't next the mutator
 		
-		mutatorCount = len( self._fieldMutators[fieldName] )
+		if self._isFirstTestCase:
+			self._isFirstTestCase = False
 		
-		self._mutatorIndex += 1
-		if self._mutatorIndex >= mutatorCount:
+		else:
+			try:
+				mutator = self._fieldMutators[fieldName][self._mutatorIndex]
+				mutator.next()
+				return
+			
+			except MutatorCompleted:
+				pass
+			
+			self._mutatorIndex += 1
+		
+		# Fall through to here and move to next available field/mutator
+		
+		while self._mutatorIndex >= len(self._fieldMutators[fieldName]):
 			self._mutatorIndex = 0
 			self._fieldIndex += 1
 			
@@ -132,6 +136,10 @@ class SequencialMutationStrategy(MutationStrategy):
 				dataModelCount = len(self._dataModels)
 				if self._dataModelIndex >= dataModelCount:
 					raise MutatorCompleted()
+				else:
+					dataModelName = self._dataModels[self._dataModelIndex]
+			else:
+				fieldName = self._dataModelFields[dataModelName][self._fieldIndex]
 	
 	def currentMutator(self):
 		'''

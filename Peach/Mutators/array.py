@@ -132,37 +132,47 @@ class ArrayVarianceMutator(Mutator):
 		n = count
 		arrayHead = node
 		
-		if n < self._arrayCount:
+		# TODO: Support zero array elements!
+		if n == 0:
+			## Remove all
+			#for i in xrange(self._arrayCount - 1, -1, -1):
+			#	obj = arrayHead.getArrayElementAt(i)
+			#	if obj == None:
+			#		raise Exception("Couldn't locate item at pos %d (max of %d)" % (i, self._arrayCount))
+			#	
+			#	obj.parent.__delitem__(obj.name)
+			pass
+		
+		elif n < self._arrayCount:
 			# Remove some items
-			for i in xrange(n, self._arrayCount):
+			for i in xrange(self._arrayCount - 1, n-1, -1):
 				obj = arrayHead.getArrayElementAt(i)
 				if obj == None:
 					raise Exception("Couldn't locate item at pos %d (max of %d)" % (i, self._arrayCount))
 				obj.parent.__delitem__(obj.name)
 			
-			#print "count",arrayHead.getArrayCount()
-			#print "n",n
 			assert(arrayHead.getArrayCount() == n)
 		
 		elif n > self._arrayCount:
 			# Add some items
 			headIndex = arrayHead.parent.index(arrayHead)
 			
-			## Faster, but array count may be off
-			#obj = arrayHead.getArrayElementAt(arrayHead.getArrayCount()-1)
-			#try:
-			#	obj.currentValue = obj.getValue() * (n - self.arrayCount)
-			#	obj.arrayPosition = n
-			#except MemoryError:
-			#	# Catch out of memory errors
-			#	pass
+			# Faster, but getValue() might not be correct.
+			obj = arrayHead.getArrayElementAt(arrayHead.getArrayCount()-1)
+			try:
+				obj.value = obj.getValue() * (n - self._arrayCount)
+				obj.arrayPosition = n-1
+			except MemoryError:
+				# Catch out of memory errors
+				pass
 			
-			## Slower but reliable (we hope)
-			for i in xrange(self._arrayCount, n):
-				obj = arrayHead.copy(arrayHead)
-				obj.arrayPosition = i
-				arrayHead.parent.insert(headIndex+i, obj)
+			### Slower but reliable (we hope)
+			#for i in xrange(self._arrayCount, n):
+			#	obj = arrayHead.copy(arrayHead)
+			#	obj.arrayPosition = i
+			#	arrayHead.parent.insert(headIndex+i, obj)
 			
+			#print arrayHead.getArrayCount(), n
 			assert(arrayHead.getArrayCount() == n)
 
 class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
