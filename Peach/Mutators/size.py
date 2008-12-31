@@ -101,20 +101,20 @@ class SizedVaranceMutator(Mutator):
 		size = long(node.getInternalValue())
 		n = size + count
 		
-		if n == 0:
-			node.currentValue = ""
+		if n <= 0:
+			nodeOf.value = ""
 		
 		elif n < size:
-			node.currentValue = nodeOf.getValue()[:n]
+			nodeOf.value = nodeOf.getValue()[:n]
 			
 		elif size == 0:
-			node.currentValue = "A" * n
+			nodeOf.value = "A" * n
 		
 		else:
-			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
 		
 		# Verify things worked out okay
-		assert(n == long(node.getInternalValue()))
+		assert((n == long(node.getInternalValue()) and n == len(nodeOf.getValue())) or n < 0)
 
 
 class SizedNumericalEdgeCasesMutator(Mutator):
@@ -218,22 +218,22 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		relation = node._GetSizeofRelation()
 		nodeOf = relation.getOfElement()
 		size = long(node.getInternalValue())
-		n = count
+		n = size + count
 		
-		if n == 0:
-			node.currentValue = ""
+		if n <= 0:
+			nodeOf.value = ""
 		
 		elif n < size:
-			node.currentValue = nodeOf.getValue()[:n]
+			nodeOf.value = nodeOf.getValue()[:n]
 			
 		elif size == 0:
-			node.currentValue = "A" * n
+			nodeOf.value = "A" * n
 		
 		else:
-			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
 		
 		# Verify things worked out okay
-		assert(n == long(node.getInternalValue()))
+		assert((n == long(node.getInternalValue()) and n == len(nodeOf.getValue())) or n < 0)
 
 
 class SizedDataVaranceMutator(Mutator):
@@ -300,25 +300,26 @@ class SizedDataVaranceMutator(Mutator):
 		size = long(node.getInternalValue())
 		
 		# Keep size indicator the same
+		node.value = node.getValue()
 		node.currentValue = node.getInternalValue()
 		
 		# Modify data
 		n = size + count
 		
 		if n == 0:
-			node.currentValue = ""
+			nodeOf.value = ""
 		
 		elif n < size:
-			node.currentValue = nodeOf.getValue()[:n]
+			nodeOf.value = nodeOf.getValue()[:n]
 			
 		elif size == 0:
-			node.currentValue = "A" * n
+			nodeOf.value = "A" * n
 		
 		else:
-			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
 		
 		# Verify things worked out okay
-		assert(size == long(node.getInternalValue()))
+		assert(size == long(node.getInternalValue()) and n == len(nodeOf.getValue()))
 
 
 class SizedDataNumericalEdgeCasesMutator(Mutator):
@@ -424,23 +425,24 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 		size = long(node.getInternalValue())
 		
 		# Keep size indicator the same
+		node.value = node.getValue()
 		node.currentValue = node.getInternalValue()
 
 		n = count
 		
 		if n == 0:
-			node.currentValue = ""
+			nodeOf.value = ""
 		
 		elif n < size:
-			node.currentValue = nodeOf.getValue()[:n]
+			nodeOf.value = nodeOf.getValue()[:n]
 			
 		elif size == 0:
-			node.currentValue = "A" * n
+			nodeOf.value = "A" * n
 		
 		else:
-			node.currentValue = (node.getValue() * ((n/size)+1))[:n]
+			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
 		
 		# Verify things worked out okay
-		assert(size == long(node.getInternalValue()))
+		assert(size == long(node.getInternalValue()) and n == len(nodeOf.getValue()))
 
 # end
