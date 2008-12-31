@@ -293,6 +293,6 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 			obj.parent.insert(headIndex + i, obj)
 			obj.arrayPosition = i
 		
-		assert(self.arrayCount == arrayHead.getArrayCount())
+		assert(self._arrayCount == arrayHead.getArrayCount())
 
 # end
