@@ -198,6 +198,8 @@ if len(optlist) < 1 and len(args) < 1:
 for i in range(len(optlist)):
 	if optlist[i][0] == '--analyzer':
 		
+		# set the analyzer to use
+		
 		try:	
 			analyzer = optlist[i][1]
 			if analyzer == None or len(analyzer) == 0:
@@ -229,6 +231,8 @@ for i in range(len(optlist)):
 	
 	elif optlist[i][0] == '--strategy':
 		
+		# Set the fuzzing strategy to use
+		
 		try:	
 			strategy = optlist[i][1]
 			if strategy == None or len(strategy) == 0:
@@ -247,6 +251,8 @@ for i in range(len(optlist)):
 	
 	elif optlist[i][0] == '--debug':
 		
+		# show debugging messages
+		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -254,12 +260,16 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--new':
 		
+		# use the new match relation stuffs
+		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
 		engine.Engine.relationsNew = True
 		
 	elif optlist[i][0] == '--test' or optlist[0][0] == '-t':
+
+		# do a parse test
 
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -294,6 +304,8 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--count' or optlist[i][0] == '-c':
 		
+		# count the total test case #
+		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -315,6 +327,8 @@ for i in range(len(optlist)):
 		sys.exit(0)
 		
 	elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
+		
+		# Start peach builder UI
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
