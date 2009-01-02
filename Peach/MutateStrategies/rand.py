@@ -181,7 +181,14 @@ class RandomMutationStrategy(MutationStrategy):
 		# Now perform mutations on fields
 		for node in fields:
 			mutator = self._random.choice(self._fieldMutators[node.getFullname()])
-			mutator.randomMutation(node)
+			
+			# Note: Since we are applying multiple mutations
+			#       sometimes a mutation will fail.  We should
+			#       ignore those failures.
+			try:
+				mutator.randomMutation(node)
+			except:
+				pass
 		
 		# all done!
 

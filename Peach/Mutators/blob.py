@@ -175,6 +175,8 @@ class BitFlipperMutator(Mutator):
 		
 		if position >= length:
 			position = length - 1
+		if position < 0:
+			position = 0
 		
 		byte = struct.unpack('B', data[position])[0]
 		byte ^= self._random.randint(0, 255)

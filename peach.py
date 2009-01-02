@@ -43,15 +43,9 @@ performing parsing tests of Peach XML files.
 import sys, getopt, os
 sys.path.append(".")
 
-#if sys.version.find("AMD64") > -1:
-#	PSYCO = False
-#else:
-#	PSYCO = False
-
 PROFILE = False
 
 if PROFILE:
-	PSYCO = False
 	print " --- PROFILING ENABLED ---- "
 	import profile
 
@@ -191,7 +185,8 @@ else:
 
 
 try:
-	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['analyzer=', 'parallel=','restart=',
+	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['strategy=','analyzer=', 'parallel=',
+																 'restart=',
 																 'test', 'count', 'web', 'agent',
 																 'gui', 'debug', 'new', 'skipto='])
 except:
@@ -232,13 +227,25 @@ for i in range(len(optlist)):
 			
 		sys.exit(0)
 	
-	elif optlist[i][0] == '--debug':
+	elif optlist[i][0] == '--strategy':
 		
-		#if PSYCO:
-		#	import psyco
-		#	# 300MB
-		#	psyco.full(memory=307200)
-		#	PSYCO = False
+		try:	
+			strategy = optlist[i][1]
+			if strategy == None or len(strategy) == 0:
+				strategy = args[0]
+			
+			from Peach.Engine.common import *
+			from Peach.mutatestrategies import *
+			from Peach.MutateStrategies import *
+			
+			exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+		
+		except:
+			print ""
+			print "Error using mutation strategy '%s'.\n" % strategy
+			#raise
+	
+	elif optlist[i][0] == '--debug':
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -247,12 +254,6 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--new':
 		
-		#if PSYCO:
-		#	import psyco
-		#	# 300MB
-		#	psyco.full(memory=307200)
-		#	PSYCO = False
-		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -260,12 +261,6 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--test' or optlist[0][0] == '-t':
 
-		#if PSYCO:
-		#	import psyco
-		#	# 300MB
-		#	psyco.full(memory=307200)
-		#	PSYCO = False
-		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -299,13 +294,6 @@ for i in range(len(optlist)):
 		
 	elif optlist[i][0] == '--count' or optlist[i][0] == '-c':
 		
-		# count test cases
-		#if PSYCO:
-		#	import psyco
-		#	# 300MB
-		#	psyco.full(memory=307200)
-		#	PSYCO = False
-		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -327,13 +315,6 @@ for i in range(len(optlist)):
 		sys.exit(0)
 		
 	elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
-		
-		# start peach gui
-		if PSYCO:
-			import psyco
-			# 300MB
-			psyco.full(memory=307200)
-			PSYCO = False
 		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
@@ -408,10 +389,6 @@ for i in range(len(optlist)):
 	
 	else:
 		usage()
-
-#if PSYCO:
-#import psyco
-#psyco.full()
 
 from Peach.Engine import *
 from Peach.Engine.common import *
