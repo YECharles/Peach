@@ -61,6 +61,9 @@ class Analyzer(object):
 	model based on XML file, etc.
 	'''
 	
+	#: Default parser analyzer to use
+	DefaultParser = None
+	
 	#: Does analyzer support asParser()
 	supportParser = False
 	#: Does analyzer support asDataElement()

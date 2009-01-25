@@ -186,7 +186,7 @@ else:
 
 try:
 	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['strategy=','analyzer=', 'parallel=',
-																 'restart=',
+																 'restart=', 'parser=',
 																 'test', 'count', 'web', 'agent',
 																 'gui', 'debug', 'new', 'skipto='])
 except:
@@ -208,20 +208,54 @@ for i in range(len(optlist)):
 			from Peach.Engine.common import *
 			from Peach.Analyzers import *
 			
-			cls = eval("%s()" % analyzer)
+			cls = eval(analyzer)
+			if cls.supportCommandLine:
+				print "[*] Using %s as analyzer" % analyzer
+				
+				cls = eval("%s()" % analyzer)
+				
+				a = {}
+				
+				for arg in args[1:]:
+					try:
+						k,v = arg.split("=")
+						a[k] = v
+					except:
+						#print arg
+						#raise
+						pass
+				
+				cls.asCommandLine(a)
 			
-			a = {}
+			elif cls.supportParser:
+				print "[*] Using %s as parser" % analyzer
+				Analyzer.DefaultParser = cls
+		
+		except PeachException, pe:
+			print ""
+			print pe.msg, "\n"
 			
-			for arg in args[1:]:
-				try:
-					k,v = arg.split("=")
-					a[k] = v
-				except:
-					#print arg
-					#raise
-					pass
+		sys.exit(0)
+	
+	elif optlist[i][0] == '--parser':
+		
+		# set the analyzer to use
+		
+		try:	
+			analyzer = optlist[i][1]
+			if analyzer == None or len(analyzer) == 0:
+				analyzer = args[0]
 			
-			cls.asCommandLine(a)
+			from Peach.Engine.common import *
+			from Peach.Analyzers import *
+			
+			cls = eval(analyzer)
+			if cls.supportParser:
+				print "[*] Using %s as parser" % analyzer
+				Analyzer.DefaultParser = cls
+			
+			else:
+				raise PeachException("Error: Analyzer %s does not support being a parser!" % analyzer)
 		
 		except PeachException, pe:
 			print ""
@@ -280,12 +314,15 @@ for i in range(len(optlist)):
 			if args[0][:5] != 'file:':
 				args[0] = 'file:' + args[0]
 			
-			parse = parser.ParseTemplate()
-			
-			if PROFILE:
-				profile.run("parse.parse(args[0])")
-			else:
-				peach = parse.parse(args[0])
+			#parse = parser.ParseTemplate()
+			#
+			#if PROFILE:
+			#	profile.run("parse.parse(args[0])")
+			#else:
+			#	peach = parse.parse(args[0])
+
+			parser = Analyzer.DefaultParser()
+			parser.asParser(args[0])
 			
 			print "File parsed with out errors."
 

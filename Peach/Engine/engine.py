@@ -50,8 +50,10 @@ if PROFILE:
 	print " --- ENGINE PROFILING ENABLED ---- "
 	import profile
 
+class Empty(object):
+	pass
 
-class EngineWatcher:
+class EngineWatcher(object):
 	'''
 	Base for a class that receives callback when events occur
 	in the Peach Engine.
@@ -240,7 +242,7 @@ class StdoutWatcher(EngineWatcher):
 		#print "--------\n"
 		pass
 
-class Engine:
+class Engine(object):
 	"""
 	The highlevel Peach engine.  The main entrypoint is "Run(...)" which
 	consumes a Peach XML file and performs the fuzzing run.
@@ -263,7 +265,8 @@ class Engine:
 		self.agent = None
 		self._agents = {}
 		self.startNum = None
-	
+		Engine.context = self
+		
 	def Count(self, uri, runName = None):
 		"""
 		Just count the tests!
@@ -283,8 +286,7 @@ class Engine:
 		if runName == None:
 			runName = "DefaultRun"
 		
-		parse = ParseTemplate()
-		self.peach = parse.parse(uri)
+		self.peach = Analyzer.DefaultParser().asParser(uri)
 		self.agent = AgentPlexer()
 		self._agents = {}
 		
@@ -329,15 +331,14 @@ class Engine:
 		if runName == None:
 			runName = "DefaultRun"
 		
-		Engine.context = self
-		
 		self.noCount = noCount
 		self.restartFile = restartFile
 		self.restartState = None
 		self.verbose = verbose
 		Engine.verbose = verbose
-		parse = ParseTemplate()
-		self.peach = parse.parse(uri)
+		
+		self.peach = Analyzer.DefaultParser().asParser(uri)
+		
 		run = None
 		self.agent = AgentPlexer()
 		self._agents = {}
@@ -416,8 +417,7 @@ class Engine:
 			
 			# 1. Get our total count.  We want to use a copy of everything
 			#    so we don't pollute the DOM!
-			parse2 = ParseTemplate()
-			peach = parse2.parse(uri)
+			peach = Analyzer.DefaultParser().asParser(uri)
 			
 			totalCount = self._countTest(getattr(peach.runs, runName), getattr(peach.runs, runName).tests[0])
 			
@@ -471,7 +471,7 @@ class Engine:
 		if mutator == None:
 			cnt = 0
 		else:
-			cnt = mutator.getCount(verbose)
+			cnt = mutator.getCount()
 		
 		if cnt == None:
 			raise PeachException("An error occured counting total tests.")
@@ -515,19 +515,18 @@ class Engine:
 		maxErrorCount = 10
 		
 		# Get all the mutators we will use
-		mutators = []
+		self.mutators = []
 		for m in test.getMutators():
-			mutators.append(eval(m.name))
-		self.mutators = mutators
+			self.mutators.append(eval(m.name))
 		
 		mutator = test.mutator = MutationStrategy.DefaultStrategy(None)
 		value = "StateMachine"
 		
 		if self.restartState != None:
-			print "-- State will load in %d iterations" % (len(mutators)+1)
+			print "-- State will load in 1 iteration"
 		
 		elif testRange != None:
-			print "-- Will skip to start of chunk in %d iterations" % (len(mutators)+1)
+			print "-- Will skip to start of chunk in 1 iteration"
 		
 		# Needs to be off on its own!
 		startCount = None
@@ -744,6 +743,7 @@ class Engine:
 		except PeachException, e:
 			print ("\n[-] End of path validation test : Validation failed!\n")
 			raise e
+		
 		else:
 			print("\n[+] End of path validation test : Successfully passed\n")
 		
@@ -751,15 +751,19 @@ class Engine:
 # ##################################################################################
 
 import sys, os, time, pickle
-from Peach.Engine.parser import *
+
 from Peach.Engine.state import StateEngine
 from Peach.Engine.common import *
 from Peach.Engine.common import SoftException
 from Peach.Engine.path import *
 
 from Peach.agent import AgentPlexer
-from Peach.group import *
 from Peach.mutatestrategies import *
 from Peach.MutateStrategies import *
+
+from Peach.analyzer import Analyzer
+from Peach.Analyzers import *
+
+from Peach.Mutators import *
 
 # end

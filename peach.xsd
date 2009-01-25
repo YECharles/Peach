@@ -108,6 +108,7 @@
 				like Blocks. </xs:documentation>
 		</xs:annotation>
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="Relation" minOccurs="0" maxOccurs="unbounded" />
 			<xs:group ref="dataTypes" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element ref="Transformer" minOccurs="0" maxOccurs="1" />
 			<xs:element ref="Fixup" minOccurs="0" maxOccurs="1" />

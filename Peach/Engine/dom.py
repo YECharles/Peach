@@ -51,12 +51,7 @@ import Peach
 PeachModule = Peach
 import Ft.Xml.Domlette
 from Ft.Xml.Domlette import Print, PrettyPrint
-
-if Engine.nativeDeepCopy:
-	from cDeepCopy import deepcopy
-
-else:
-	from copy import deepcopy
+from cDeepCopy import deepcopy
 
 try:
 	import Ft.Xml.Domlette

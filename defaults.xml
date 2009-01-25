@@ -68,6 +68,7 @@
 		<Mutator class="string.PathMutator"/>
 		<Mutator class="string.HostnameMutator"/>
 		<Mutator class="string.FilenameMutator"/>
+		<Mutator class="string.StringCaseMutator" />
 	</Mutators>
 	
 	<!--

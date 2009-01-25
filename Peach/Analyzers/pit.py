@@ -56,4 +56,8 @@ class PitXmlAnalyzer(Analyzer):
 		parser = ParseTemplate()
 		return parser.parse(uri)
 
+
+# Set us as the default parser
+Analyzer.DefaultParser = PitXmlAnalyzer
+
 # end

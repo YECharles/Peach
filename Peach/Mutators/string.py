@@ -185,6 +185,7 @@ class StringTokenMutator(_SimpleGeneratorMutator):
 				gen.next()
 		except GeneratorCompleted:
 			pass
+		self._count -= 1
 	
 
 class XmlW3CMutator(_SimpleGeneratorMutator):
