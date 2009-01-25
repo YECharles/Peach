@@ -105,6 +105,9 @@ class Analyzer(object):
 		
 		From the top level producing zero or more data models and
 		state models is possible.
+		
+		@type	args	Dictionary
+		@param	args	Arguments from <Param>'s
 		'''
 		raise Exception("asTopLevel not supported")
 	

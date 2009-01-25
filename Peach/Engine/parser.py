@@ -309,6 +309,9 @@ class ParseTemplate:
 				code = self._getAttribute(child, "code")
 				if code != None:
 					exec(code)
+					
+			elif child.nodeName == 'Analyzer':
+				self.HandleAnalyzerTopLevel(child, peach)
 			
 			elif child.nodeName == 'DataModel' or child.nodeName == 'Template':
 				# do something
@@ -915,6 +918,30 @@ class ParseTemplate:
 				raise PeachException("Error: Value of Relation relative attribute is not true or false.")
 		
 		return relation
+	
+	def HandleAnalyzerTopLevel(self, node, elem):
+		
+		if not node.hasAttributeNS(None, "class"):
+			raise PeachException("Analyzer element must have a 'class' attribute")
+		
+		# Locate any arguments
+		args = {}
+		
+		for child in node:
+			if child.nodeName == 'Param' and child.hasAttributeNS(None, 'name'):
+				args[self._getAttribute(child, 'name')] = self._getAttribute(child, 'value')
+		
+		cls = self._getAttribute(node, "class")
+		
+		try:
+			obj = eval("%s()" % cls)
+		except:
+			raise PeachException("Error creating analyzer '%s': %s" % (obj, repr(sys.exc_info())))
+		
+		if not obj.supportTopLevel:
+			raise PeachException("Analyzer '%s' does not support use as top-level element"%cls)
+		
+		obj.asTopLevel(self.context, args)
 	
 	def HandleCommonDataElementAttributes(self, node, element):
 		'''

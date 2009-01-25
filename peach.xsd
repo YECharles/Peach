@@ -49,6 +49,7 @@
 				<xs:element ref="StateModel" />
 				<xs:element ref="Mutators"/>
 				<xs:element ref="Python" />
+				<xs:element ref="Analyzer" />
 			</xs:choice>
 			<xs:attribute name="version" type="xs:string">
 				<xs:annotation>
@@ -1884,6 +1885,22 @@
 			<xs:attribute name="before" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Indicates this element should occur before the specified element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Analyzer">
+		<xs:annotation>
+			<xs:documentation>Call an analyzer to build out part of the DOM.  Parameters are passed using Param element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="class" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Full class name of the Analyzer to use.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
