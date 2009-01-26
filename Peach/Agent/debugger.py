@@ -338,7 +338,7 @@ try:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff, 'MiniDump.dmp' : minidump }
 				else:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff }
-
+				
 				# Build bucket string
 				bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(_DbgEventHandler.buff).group(1)
 				exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
