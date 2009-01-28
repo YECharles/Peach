@@ -64,13 +64,19 @@ static PyObject* _getAllRelationsInDataModel(PyObject* self, PyObject* node, int
 			for(cnt = PyList_GET_SIZE(relationCache), i=0; i<cnt; i++)
 			{
 				item = PyList_GET_ITEM(relationCache, i);	// BORROW
-				if(!item || item == Py_None)
+				if(item == 0 || item == Py_None)
 				{
 					fprintf(stderr, "_getAllRelationsInDataModel: Warning item #%d is null or None\n", i);
 					continue;
 				}
 
 				item = PyObject_CallMethod(root, "getDataElementByName", "O", item); // NEW
+				if(item == 0 || item == Py_None)
+				{
+					// This is okay, it can happen sometimes due to "when" relations that cause
+					// trimming of the tree after an "input" action or loading a data set.
+					continue;
+				}
 
 				if(Yield(YieldData, item))
 				{
@@ -79,7 +85,7 @@ static PyObject* _getAllRelationsInDataModel(PyObject* self, PyObject* node, int
 					Py_XDECREF(root);
 					return item;
 				}
-
+				
 				Py_XDECREF(item);
 			}
 
@@ -259,7 +265,7 @@ static PyObject* _getRelationOfThisElement(PyObject* self, PyObject* type)
 	args[1] = type;
 
 	r = _getRelationsInDataModelFromHere(self, NULL, &MyYield, args);	// NEW
-	if(!r)
+	if(!r || r == Py_None)
 		Py_RETURN_NONE;
 
 	return r;
