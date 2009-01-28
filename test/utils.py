@@ -10,6 +10,8 @@ from win32process import *
 import threading
 
 class Utils:
+	
+	pythonPath = "c:/python25/python.exe"
 
 	localAgentPid = 0
 	dataBuff = None
@@ -19,7 +21,7 @@ class Utils:
 		'''
 		Start a local agent instance.
 		'''
-		(handle, hThread, dwProcessId, dwThreadId) = CreateProcess(None, 'c:/python26/python.exe ../peach.py -a',
+		(handle, hThread, dwProcessId, dwThreadId) = CreateProcess(None, self.pythonPath+' ../peach.py -a',
 			None, None, 0, 0, None, None, STARTUPINFO())
 		self.localAgentPid = handle
 		#print "handle",self.localAgentPid
@@ -87,7 +89,7 @@ class Utils:
 		Returns true or false depending on how 'peach.py xml' goes.
 		'''
 		args = ['python', '../peach.py', xml]
-		ret = os.spawnv(os.P_WAIT, 'c:/python26/python.exe'	, args)
+		ret = os.spawnv(os.P_WAIT, self.pythonPath, args)
 		return ret == 0
 	
 	def RunDebugPeachXml(self, xml):
@@ -95,7 +97,7 @@ class Utils:
 		Returns true or false depending on how 'peach.py xml' goes.
 		'''
 		args = ['python', '../peach.py', '--debug', xml]
-		ret = os.spawnv(os.P_WAIT, 'c:/python26/python.exe'	, args)
+		ret = os.spawnv(os.P_WAIT, self.pythonPath, args)
 		return ret == 0
 	
 	def TestPeachXml(self, xml):
@@ -103,7 +105,7 @@ class Utils:
 		Returns true or false depending on how 'peach.py -t xml' goes.
 		'''
 		args = ['python', '../peach.py', '-t', xml]
-		ret = os.spawnv(os.P_WAIT, 'c:/python26/python.exe'	, args)
+		ret = os.spawnv(os.P_WAIT, self.pythonPath, args)
 		return ret == 0
 	
 	def CountPeachXml(self, xml):
@@ -111,7 +113,7 @@ class Utils:
 		Returns true or false depending on how 'peach.pyh -c xml' goes.
 		'''
 		args = ['python', '../peach.py', '-c', xml]
-		ret = os.spawnv(os.P_WAIT, 'c:/python26/python.exe'	, args)
+		ret = os.spawnv(os.P_WAIT, self.pythonPath, args)
 		return ret == 0
 
 		

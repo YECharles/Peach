@@ -27,6 +27,7 @@ class IncomingString1TestCase(utils.PeachSendAndRecvTestCase):
 		# Test
 		self.peachUtils.SetSendAndReceiveData("Hello World!12345")
 		self.peachUtils.RunPeachXml("strings1.xml")
+		#self.peachUtils.RunDebugPeachXml("strings1.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == "Hello World!", 'strings1.xml failed, instead [%s]' % repr(ret)
 

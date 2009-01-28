@@ -10,7 +10,7 @@
 	<!-- Create a simple data template containing a single string -->
 	<DataModel name="GetTemplate">
 		<String name="data"/>
-		<String length="5"/>
+		<String name="staticdata" length="5"/>
 	</DataModel>
 	
 	<DataModel name="EchoTemplate">

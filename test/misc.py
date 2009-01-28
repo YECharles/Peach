@@ -14,8 +14,8 @@ def suite():
 	suite.addTest(PngTestCase())
 	suite.addTest(MiscRef1TestCase())
 	suite.addTest(SwfTestCase())
-	suite.addTest(SwfCountTestCase())
-	suite.addTest(PngCountTestCase())
+	#suite.addTest(SwfCountTestCase())
+	#suite.addTest(PngCountTestCase())
 	return suite
 
 class PngTestCase(utils.PeachTcpTestCase):

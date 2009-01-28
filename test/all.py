@@ -4,14 +4,14 @@ Run all of the unit tests
 
 import sys
 
-if sys.version.find("AMD64") > -1:
-	PSYCO = False
-else:
-	PSYCO = True
-
-if PSYCO:
-	import psyco
-	psyco.full()
+#if sys.version.find("AMD64") > -1:
+#	PSYCO = False
+#else:
+#	PSYCO = True
+#
+#if PSYCO:
+#	import psyco
+#	psyco.full()
 
 # 1. Add your module to this import list
 
@@ -39,7 +39,7 @@ import os, coverage, coverage_color
 # 2. Add your module to this array
 
 allModules = [
-	path,
+	#path,
 	offset,
 	fixups,
 	incoming,
@@ -50,12 +50,11 @@ allModules = [
 	state,
 	flags,
 	data,
-	state,
 	blobs,
 	numbers,
 	strings,
 	# These are slow and should be last.
-	mutators,
+	#mutators,
 	misc
 	]
 

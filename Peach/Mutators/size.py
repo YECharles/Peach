@@ -198,7 +198,7 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 	def supportedDataElement(e):
 		# This will pick up both numbers or strings, etc that have a size-of relation
 		if isinstance(e, DataElement) and e._HasSizeofRelation(e) and e.isMutable:
-			print "Size: ",e.name
+			#print "Size: ",e.name
 			return True
 		
 		return False

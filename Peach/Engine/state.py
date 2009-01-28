@@ -430,7 +430,7 @@ class StateEngine:
 					raise PeachException("StateEngine: Action of type \"call\" does not yet support out or inout parameters (bug in comtypes)!")
 				
 				# Run mutator
-				mutator.onDataModelGetValue(self, action, p.template)
+				mutator.onDataModelGetValue(action, p.template)
 				
 				# Get value
 				if p.template.modelHasOffsetRelation:
@@ -518,7 +518,7 @@ class StateEngine:
 			for c in action:
 				if c.elementType == 'actionparam' and c.type == "in":
 					# Run mutator
-					mutator.onDataModelGetValue(self, action, c.template)
+					mutator.onDataModelGetValue(action, c.template)
 					
 					# Get value
 					if p.template.modelHasOffsetRelation:
@@ -575,10 +575,16 @@ class StateEngine:
 				
 				if valueElement != None:
 					
-					Debug(1, "Action-Slurp: Setting %s from %s" % (
+					Debug(1, "Action-Slurp: 1 Setting %s from %s" % (
 						str(node.getAttributeNS(None, "fullName")),
 						str(valueNode.getAttributeNS(None, "fullName"))
 						))
+					
+					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
+					
+					#print "len(defaultValue):", len(valueElement.defaultValue)
+					#print "len(currentValue):", len(valueElement.currentValue)
+					#print "len(value):", len(valueElement.value)
 					
 					setElement.currentValue = valueElement.currentValue
 					setElement.value = valueElement.value
@@ -586,7 +592,7 @@ class StateEngine:
 				
 				else:
 					
-					Debug(1, "Action-Slurp: Setting %s to %s" % (
+					Debug(1, "Action-Slurp: 2 Setting %s to %s" % (
 						str(node.getAttributeNS(None, "fullName")),
 						repr(action.valueLiteral)
 						))

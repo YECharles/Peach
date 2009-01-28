@@ -1733,7 +1733,7 @@ class ParseTemplate:
 
 		# common attributes
 		
-		self.HandleCommonDataElementAttributes(node, string)
+		self.HandleCommonDataElementAttributes(node, custom)
 
 		# Handle any common children
 
