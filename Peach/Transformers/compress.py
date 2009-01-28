@@ -34,7 +34,13 @@ Some default compression transforms (gzip, compress, etc).
 
 # $Id$
 
-import zlib, bz2
+import zlib
+
+try:
+	import bz2
+except:
+	pass
+
 from Peach.transformer import Transformer
 
 class GzipCompress(Transformer):

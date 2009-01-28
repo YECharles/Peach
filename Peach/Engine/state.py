@@ -211,7 +211,7 @@ class StateEngine:
 		# Next setup a few things
 		
 		self.actionValues.append( [ state.name, 'state' ] )
-		mutator.onStateStarting(self, state)
+		mutator.onStateStarting(state)
 		
 		# EVENT: onEnter
 		if state.onEnter != None:
@@ -271,7 +271,7 @@ class StateEngine:
 				
 				evalEvent(state.onExit, environment, self.engine.peach)
 				
-			mutator.onStateFinished(self, state)
+			mutator.onStateFinished(state)
 			
 		except StateChangeStateException, e:
 			
@@ -288,7 +288,7 @@ class StateEngine:
 				
 				evalEvent(state.onExit, environment, self.engine.peach)
 			
-			mutator.onStateFinished(self, state)
+			mutator.onStateFinished(state)
 			newState = mutator.onStateChange(self, state, e.state)
 			if newState == None:
 				newState = e.state

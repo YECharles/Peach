@@ -351,6 +351,7 @@ class DataCracker:
 		Debug(1, "*** Node Occures more then once!")
 		rating = newRating = 1
 		newCurPos = pos
+		origPos = pos
 		dom = None
 		curpos = None
 		maxOccurs = node.maxOccurs
@@ -373,11 +374,11 @@ class DataCracker:
 				## Check for count relation, verify > 0
 				if maxOccurs == 0:
 					# Remove element
-					node.parent.__delitem__(node.name)
+					del node.parent[node.name]
 					
 					# Remove relation (else we get errors)
 					relation.parent.relations.remove(relation)
-					relation.parent.__delitem__(relation.name)
+					del relation.parent[relation.name]
 					
 					# We passed muster...I think :)
 					rating = 2
@@ -486,10 +487,11 @@ class DataCracker:
 						relation.parent.__delitem__(relation.name)
 					
 					# Delete our copy
-					del node.parent[nodeCopy.name]
+					if nodeCopy.name != node.name:
+						del node.parent[nodeCopy.name]
 					
 					# Delete orig
-					node.parent.__delitem__(node.name)
+					del node.parent[node.name]
 					rating = 2
 					curpos = pos = origPos
 					break
@@ -617,7 +619,7 @@ class DataCracker:
 						except:
 							pass
 				
-				node.parent.__delitem__(node.name)
+				del node.parent[node.name]
 				
 				Debug(1, "_handleNode: When: Returned False.  Removing and returning 1.")
 				
@@ -977,7 +979,7 @@ class DataCracker:
 			return size
 		
 		elif isinstance(node, Flags):
-			return int(node.size) / 8
+			return int(node.length) / 8
 	
 		elif isinstance(node, Choice):
 			# Until choice is run we
@@ -1639,6 +1641,7 @@ class DataCracker:
 			try:
 				buff.read((pos+length) - len(buff.data))
 			except:
+				Debug(1, "_handleNumber(): Read failed: %s" % repr(sys.exc_info()))
 				pass
 			
 			if (pos+length) > len(buff.data):
@@ -1663,6 +1666,14 @@ class DataCracker:
 			fmt += 'b'
 		elif node.size == 16:
 			fmt += 'h'
+		elif node.size == 24:
+			fmt += 'i'
+			
+			if node.endian == 'little':
+				value = value + '\0'
+			else:
+				value = '\0' + value
+			
 		elif node.size == 32:
 			fmt += 'i'
 		elif node.size == 64:

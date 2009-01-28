@@ -278,7 +278,12 @@ class Element(object):
 		if hasattr(self, 'ref') and self.ref != None:
 			node = owner.createElementNS(None, self.ref)
 		else:
-			node = owner.createElementNS(None, self.name)
+			try:
+				name = self.name.replace(":", "_")
+				node = owner.createElementNS(None, name)
+			except:
+				print "name:", self.name
+				raise
 		
 		node.setAttributeNS(None, "elementType", self.elementType)
 		node.setAttributeNS(None, "name", self.name)
@@ -1530,20 +1535,26 @@ class DataElement(Mutatable):
 		@return: DataElement or None
 		'''
 		
-		names = name.split('.')
+		try:
+			self._fixRealParent(self)
 		
-		if self.name == names[0]:
-			obj = self._checkDottedName(self, names)
-			if obj != None:
-				return obj
+			names = name.split('.')
 		
-		# Assume if we have more then 2 parts we may be from the root
-		if len(names) > 2:
-			obj = self._checkDottedName(self.getRootOfDataMap(), names)
-			if obj != None:
-				return obj
+			if self.name == names[0]:
+				obj = self._checkDottedName(self, names)
+				if obj != None:
+					return obj
 		
-		return cPeach.findDataElementByName(self, names)
+			# Assume if we have more then 2 parts we may be from the root
+			if len(names) > 2:
+				obj = self._checkDottedName(self.getRootOfDataMap(), names)
+				if obj != None:
+					return obj
+				
+			return cPeach.findDataElementByName(self, names)
+		
+		finally:
+			self._unFixRealParent(self)
 		
 		#for block in self._findAllBlocksGoingUp():
 		#	print "findDataElementByName: Looking for %s in %s" % (name, block.name)
@@ -1716,7 +1727,11 @@ class DataElement(Mutatable):
 			return None
 
 		# Faster by some
-		return cPeach.getRelationOfThisElement(self, type)
+		self._fixRealParent(self)
+		rel = cPeach.getRelationOfThisElement(self, type)
+		self._unFixRealParent(self)
+		
+		return rel
 
 		## To Test
 		##print "getRelationOfThisElement: ", self.getFullDataName()
@@ -1769,6 +1784,7 @@ class DataElement(Mutatable):
 			#print "Not for", self.getFullDataName()
 			return relations
 		
+		self._fixRealParent(self)
 		if self.relationCache != None:
 			#print "Using relation cache!"
 			root = self.getRootOfDataMap()
@@ -1780,12 +1796,14 @@ class DataElement(Mutatable):
 					if r != None:
 						relations.append(r)
 			
+			self._unFixRealParent(self)
 			return relations
 		
 		for r in self._genRelationsInDataModelFromHere():
 			if r.getOfElement() == self:
 				relations.append(r)
 		
+		self._unFixRealParent(self)
 		return relations
 	
 	def _genRelationsInDataModelFromHere(self, node = None):
@@ -1800,6 +1818,8 @@ class DataElement(Mutatable):
 		# Check if we are the top of the data model
 		if not isinstance(node.parent, DataElement):
 			for r in self._getAllRelationsInDataModel(node):
+				if r == None:
+					continue
 				yield r
 			
 		else:
@@ -1807,6 +1827,8 @@ class DataElement(Mutatable):
 			cur = node.parent
 			while cur != None and isinstance(cur, DataElement):
 				for r in self._getAllRelationsInDataModel(cur):
+					if r == None:
+						continue
 					yield r
 				
 				cur = cur.parent
@@ -2381,6 +2403,25 @@ class Template(DataElement):
 		
 		return ret
 	
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		if self.transformer != None and not self.transformer.changesSize():
+			return len(self.getValue())
+		
+		if self.fixup != None:
+			return len(self.getValue())
+		
+		size = 0
+		for c in self:
+			if isinstance(c, DataElement):
+				size += c.getSize()
+		
+		return size
+	
 	def hasLength(self):
 		if self.length != None:
 			return True
@@ -2413,6 +2454,26 @@ class Template(DataElement):
 			
 		finally:
 			self.relationStringBuffer = None
+	
+	def isInvalidated(self):
+		'''
+		Check if we need to reproduce this value.
+		
+		If we have a relation always True.
+		Otherwise False.
+		'''
+		
+		if len(self.relations) > 0:
+			return True
+		
+		# Check children
+		for c in self:
+			if isinstance(c, DataElement):
+				if c.isInvalidated():
+					return True
+		
+		# Return false
+		return False
 	
 	def getInternalValue(self, sout = None):
 		'''
@@ -2453,7 +2514,7 @@ class Template(DataElement):
 						value += c.getValue(sout)
 				
 				except:
-					print "value: [%s]" % repr(value)
+					#print "value: [%s]" % repr(value)
 					print "c.name: %s" % c.name
 					print "c.type: %s" % c.elementType
 					raise
@@ -2514,6 +2575,20 @@ class Choice(DataElement):
 		self.getValue()
 		return self.currentElement.asCType()
 	
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		if self.transformer != None or self.fixup != None:
+			return len(self.getValue())
+		
+		if self.currentElement != None:
+			return self.currentElement.getSize()
+		
+		return len(self.getValue())
+	
 	def hasLength(self):
 		if self.length != None:
 			return True
@@ -2540,6 +2615,27 @@ class Choice(DataElement):
 			self.currentElement = self[value]
 		
 		return self.currentElement
+	
+	def isInvalidated(self):
+		'''
+		Check if we need to reproduce this value.
+		
+		If we have a relation always True.
+		Otherwise False.
+		'''
+		
+		if len(self.relations) > 0:
+			return True
+		
+		# Check children
+		if self.currentElement == None:
+			return True
+		
+		if self.currentElement.isInvalidated():
+			return True
+		
+		# Return false
+		return False
 	
 	def getInternalValue(self, sout = None):
 		'''
@@ -2640,6 +2736,25 @@ class Block(DataElement):
 		
 		return ret
 	
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		if self.transformer != None and not self.transformer.changesSize():
+			return len(self.getValue())
+		
+		if self.fixup != None:
+			return len(self.getValue())
+		
+		size = 0
+		for c in self._children:
+			if isinstance(c, DataElement):
+				size += c.getSize()
+		
+		return size
+	
 	def hasLength(self):
 		if self.length != None:
 			return True
@@ -2658,6 +2773,26 @@ class Block(DataElement):
 			return len(self.getValue())
 		
 		return self.length
+	
+	def isInvalidated(self):
+		'''
+		Check if we need to reproduce this value.
+		
+		If we have a relation always True.
+		Otherwise False.
+		'''
+		
+		if len(self.relations) > 0:
+			return True
+		
+		# Check children
+		for c in self:
+			if isinstance(c, DataElement):
+				if c.isInvalidated():
+					return True
+		
+		# Return false
+		return False
 	
 	def getInternalValue(self, sout = None):
 		'''
@@ -2695,7 +2830,7 @@ class Block(DataElement):
 						value += c.getValue(sout)
 					
 					except:
-						print "value: [%s]" % repr(value)
+						#print "value: [%s]" % repr(value)
 						print "c.name: %s" % c.name
 						print "---------------"
 						raise
@@ -2714,7 +2849,7 @@ class Block(DataElement):
 						value += c.getValue(stringBuffer)
 					
 					except:
-						print "value: [%s]" % repr(value)
+						#print "value: [%s]" % repr(value)
 						print "c.name: %s" % c.name
 						print "---------------"
 						raise
@@ -2729,7 +2864,7 @@ class Block(DataElement):
 						value += c.getValue(stringBuffer)
 					
 					except:
-						print "value: [%s]" % repr(value)
+						#print "value: [%s]" % repr(value)
 						print "c.name: %s" % c.name
 						print "---------------"
 						raise
@@ -2795,6 +2930,19 @@ class Number(DataElement):
 		ret = eval(evalString)
 		
 		return ret
+	
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		# Note in the case of numbers a fixup will not
+		# make a difference
+		if self.transformer != None:
+			return len(self.getValue())
+		
+		return self.size/8
 	
 	def getMinValue(self):
 		'''
@@ -3218,6 +3366,17 @@ class Flags(DataElement):
 		
 		return ret
 
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		if self.transformer != None or self.fixup != None:
+			return len(self.getValue())
+		
+		return self.length/8
+	
 	def binaryFormatter(self, num, bits):
 		'''
 		Convert number to binary string
@@ -3262,6 +3421,26 @@ class Flags(DataElement):
 											self.binaryFormatter(ret,size))
 		
 		return ret
+	
+	def isInvalidated(self):
+		'''
+		Check if we need to reproduce this value.
+		
+		If we have a relation always True.
+		Otherwise False.
+		'''
+		
+		if len(self.relations) > 0:
+			return True
+		
+		# Check children
+		for c in self:
+			if isinstance(c, DataElement):
+				if c.isInvalidated():
+					return True
+		
+		# Return false
+		return False
 	
 	def getInternalValue(self, sout = None):
 		'''
@@ -3559,6 +3738,23 @@ class Blob(DataElement):
 		'''
 		return self.getRawValue(sout)
 	
+	def getSize(self):
+		'''
+		Return the length of this data element.  Try and
+		be fast about it!
+		'''
+		
+		if self.transformer != None or self.fixup != None:
+			return len(self.getValue())
+		
+		if self.currentValue != None:
+			return len(self.currentValue)
+		
+		if self.defaultValue != None:
+			return len(self.defaultValue)
+		
+		return len(self.getValue())
+		
 	def getLength(self):
 		'''
 		Get the length of this element.

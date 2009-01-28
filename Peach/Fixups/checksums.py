@@ -34,6 +34,8 @@ A few standard fixups.
 import zlib, hashlib, struct, binascii, array
 from Peach.fixup import Fixup
 from Peach.Engine.common import *
+import Ft.Xml.Domlette
+from Ft.Xml.Domlette import Print, PrettyPrint
 
 class ExpressionFixup(Fixup):
 	'''
@@ -231,5 +233,80 @@ class IcmpChecksumFixup(Fixup):
 			raise Exception("Error: IcmpChecksumFixup was unable to locate [%s]" % self.ref)
 		
 		return self._checksum(stuff)
+
+# This Fixup only works on windows... wrap in a try
+try:
+	import sspi
+	
+	class SspiAuthenticationFixup(Fixup):
+		'''
+		Perform basic SSPI authentication. Assumes a two step auth (kerb).
+		'''
+		
+		_sspi = None
+		_firstObj = None
+		_secondObj = None
+		_data = None
+		
+		def __init__(self, firstSend, secondSend):
+			Fixup.__init__(self)
+			self.firstSend = firstSend
+			self.secondSend = secondSend
+		
+		def getXml(self):
+			dict = {}
+			doc  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
+			self.context.getRoot().toXmlDom(doc.rootNode.firstChild, dict)
+			return doc
+		
+		def fixup(self):
+			try:
+				fullName = self.context.getFullname()
+				xml = self.getXml()
+				
+				firstFullName = str(xml.xpath(self.firstSend)[0].getAttributeNS(None, "fullName"))
+				firstFullName = firstFullName[firstFullName.index('.')+1:]
+				if fullName.find(firstFullName) > -1 and SspiAuthenticationFixup._firstObj != self.context:
+					SspiAuthenticationFixup._firstObj = self.context
+					SspiAuthenticationFixup._sspi = sspi.ClientAuth(
+						"Negotiate",
+						"",	# client_name
+						("dd", "", "helpme"),	# auth_info
+						None, # targetsn (target security context provider)
+						None, # security context flags
+						)
+					
+					(done, data) = SspiAuthenticationFixup._sspi.authorize(None)
+					data = data[0].Buffer
+					SspiAuthenticationFixup._data = data
+					
+					return data
+				
+				if fullName.find(firstFullName) > -1:
+					return SspiAuthenticationFixup._data
+				
+				secondFullName = str(xml.xpath(self.secondSend)[0].getAttributeNS(None, "fullName"))
+				secondFullName = secondFullName[secondFullName.index('.')+1:]
+				if fullName.find(secondFullName) > -1 and SspiAuthenticationFixup._secondObj != self.context:
+					inputData = self.context.getInternalValue()
+					
+					(done, data) = SspiAuthenticationFixup._sspi.authorize(inputData)
+					
+					data = data[0].Buffer
+					
+					SspiAuthenticationFixup._secondObj = self.context
+					SspiAuthenticationFixup._data = data
+					
+					return data
+				
+				if fullName.find(secondFullName) > -1:
+					return SspiAuthenticationFixup._data
+				
+			except:
+				print "!!! EXCEPTION !!!"
+				raise
+
+except:
+	pass
 
 # end

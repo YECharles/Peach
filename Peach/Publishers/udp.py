@@ -113,6 +113,82 @@ class Udp(Publisher):
 		except:
 			raise Timeout("")
 		
+class Udp6(Publisher):
+	'''
+	A simple UDP publisher.
+	'''
+	
+	def __init__(self, host, port, timeout = None):
+		'''
+		@type	host: string
+		@param	host: Remote hostname
+		@type	port: number
+		@param	port: Remote port
+		'''
+		Publisher.__init__(self)
+		self._host = host
+		self._port = port
+		self._timeout = timeout
+		
+		if self._timeout == None:
+			self._timeout = 2
+		
+		else:
+			self._timeout = timeout
+		
+		self._socket = None
+		self.buff = ""
+		self.pos = 0
+	
+	def stop(self):
+		'''Close connection if open'''
+		self.close()
+	
+	def close(self):
+		if self._socket != None:
+			self._socket.close()
+			self._socket = None
+		self.buff = ""
+		self.pos = 0
+	
+	def connect(self):
+		if self._socket != None:
+			# Close out old socket first
+			self._socket.close()
+		
+		self._socket = socket.socket(23, socket.SOCK_DGRAM)
+		self._socket.connect((self._host,int(self._port)))
+		self.buff = ""
+		self.pos = 0
+	
+	def send(self, data):
+		'''
+		Send data via sendall.
+		
+		@type	data: string
+		@param	data: Data to send
+		'''
+		try:
+			self._socket.sendall(data)
+		except socket.error:
+			pass
+	
+	def receive(self, size = None):
+		data = None
+		try:
+			self._socket.settimeout(self._timeout)
+			data,addr = self._socket.recvfrom(65565)
+			
+			if hasattr(self, "publisherBuffer"):
+				publisherBuffer.haveAllData = True
+		
+			return data
+		except:
+			if data == None or len(data) < size:
+				raise Timeout("")
+			
+			return data
+		
 class UdpListener(Publisher):
 	'''
 	A simple UDP publisher.

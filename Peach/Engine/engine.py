@@ -602,6 +602,18 @@ class Engine(object):
 					except RedoTestException:
 						raise
 					
+					except MemoryError:
+						# Some tests cause out of memeory
+						# exceptions, let skip past them
+						print "Warning: Out of memory, going to next test"
+						pass
+					
+					except OverflowError:
+						# Some tests cause out of memeory
+						# exceptions, let skip past them
+						print "Warning: Out of memory, going to next test"
+						pass
+					
 					except SoftException:
 						# Ignore any SoftExceptions
 						# and head for next iteration

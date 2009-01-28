@@ -1694,7 +1694,7 @@ class ParseTemplate:
 		
 		# common attributes
 		
-		self.HandleCommonDataElementAttributes(node, string)
+		self.HandleCommonDataElementAttributes(node, blob)
 		
 		# Handle any common children
 		
