@@ -89,7 +89,7 @@ class NumericalVarianceMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
-		node.currentValue = node.getInternalValue() - self._values[self._currentCount]
+		node.currentValue = long(node.getInternalValue()) - self._values[self._currentCount]
 	
 	def randomMutation(self, node):
 		try:

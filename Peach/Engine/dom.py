@@ -1500,7 +1500,13 @@ class DataElement(Mutatable):
 		'''
 		
 		# look at us!
-		if node.array == name and node.arrayPosition == 0:
+		if node.array == name:
+			# Try and locate array elem 0
+			obj = node.getArrayElementAt(0)
+			if obj != None:
+				return obj
+			
+			# Otherwise we found something :)
 			return node
 		
 		# look at each child

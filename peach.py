@@ -282,6 +282,7 @@ for i in range(len(optlist)):
 			print ""
 			print "Error using mutation strategy '%s'.\n" % strategy
 			#raise
+			sys.exit(0)
 	
 	elif optlist[i][0] == '--debug':
 		

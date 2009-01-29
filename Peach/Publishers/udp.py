@@ -47,7 +47,7 @@ class Udp(Publisher):
 	A simple UDP publisher.
 	'''
 	
-	def __init__(self, host, port, timeout = None):
+	def __init__(self, host, port, timeout = 2):
 		'''
 		@type	host: string
 		@param	host: Remote hostname
@@ -57,13 +57,10 @@ class Udp(Publisher):
 		Publisher.__init__(self)
 		self._host = host
 		self._port = port
-		self._timeout = timeout
+		self._timeout = float(timeout)
 		
 		if self._timeout == None:
 			self._timeout = 2
-		
-		else:
-			self._timeout = timeout
 		
 		self._socket = None
 		self.buff = ""
@@ -118,7 +115,7 @@ class Udp6(Publisher):
 	A simple UDP publisher.
 	'''
 	
-	def __init__(self, host, port, timeout = None):
+	def __init__(self, host, port, timeout = 2):
 		'''
 		@type	host: string
 		@param	host: Remote hostname
@@ -128,13 +125,10 @@ class Udp6(Publisher):
 		Publisher.__init__(self)
 		self._host = host
 		self._port = port
-		self._timeout = timeout
+		self._timeout = float(timeout)
 		
 		if self._timeout == None:
 			self._timeout = 2
-		
-		else:
-			self._timeout = timeout
 		
 		self._socket = None
 		self.buff = ""
@@ -194,7 +188,7 @@ class UdpListener(Publisher):
 	A simple UDP publisher.
 	'''
 	
-	def __init__(self, host, port, timeout = None):
+	def __init__(self, host, port, timeout = 2):
 		'''
 		@type	host: string
 		@param	host: Remote hostname
@@ -204,13 +198,10 @@ class UdpListener(Publisher):
 		Publisher.__init__(self)
 		self._host = host
 		self._port = port
-		self._timeout = timeout
+		self._timeout = float(timeout)
 		
 		if self._timeout == None:
 			self._timeout = 2
-			
-		else:
-			self._timeout = timeout
 			
 		self._socket = None
 		self.buff = ""

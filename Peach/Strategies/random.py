@@ -14,3 +14,5 @@ class RandomStrategy(Strategy):
 		print int(self.params['maxsteps'])
 		
 		return [start, destination]
+
+# end

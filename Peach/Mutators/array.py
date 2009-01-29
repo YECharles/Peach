@@ -103,7 +103,11 @@ class ArrayVarianceMutator(Mutator):
 		 * Is head of array
 		'''
 		
-		if isinstance(e, DataElement) and e.isArray() and e.arrayPosition == 0 and e.isMutable:
+		if isinstance(e, DataElement) and \
+			e.isArray() and \
+			e.arrayPosition == 0 and \
+			e.isMutable:
+			
 			return True
 		
 		return False

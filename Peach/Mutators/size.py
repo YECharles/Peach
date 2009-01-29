@@ -216,7 +216,7 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		Perform array mutation using count
 		'''
 		
-		print node.name
+		#print node.name
 		relation = node._GetSizeofRelation()
 		nodeOf = relation.getOfElement()
 		size = long(node.getInternalValue())
