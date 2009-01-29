@@ -10,7 +10,7 @@ from comtypes.automation import IID
 from comtypes.gen import DbgEng
 #from comtypes.gen import DBGEVENTPROXYLib
 
-import sys
+import sys,os
 import struct
 
 #from DbgEngEvent import DbgEngEventCallbacks
@@ -28,6 +28,26 @@ class DbgEngDllFinder:
 		try:
 			hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
 		except:
+			
+			# Lets try a few common places before failing.
+			pgPaths = [
+				"c:\\",
+				os.environ["SystemDrive"],
+				os.environ["ProgramFiles"],
+				os.environ["ProgramFiles(x86)"],
+				]
+			dbgPaths = ["Debugging Tools for Windows",
+				"Debugging Tools for Windows (x64)",
+				"Debugging Tools for Windows (x86)",
+				]
+			
+			for p in pgPaths:
+				for d in dbgPaths:
+					testPath = os.path.join(p,d)
+					
+					if os.path.exists(testPath):
+						return testPath
+			
 			raise DebuggerException("Failed to locate Microsoft Debugging Tools in the registry. Please make sure its installed")
 		val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
 		return val
