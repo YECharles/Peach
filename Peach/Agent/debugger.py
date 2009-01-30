@@ -496,7 +496,7 @@ try:
 					while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
 						time.sleep(0.25)
 						
-					if win32serviceutil.QueryServiceStatus(self.Service)[1] == 4:
+					if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
 						raise Exception("WindowsDebugEngine: Unable to start service!")
 				
 				# Determin PID of service
