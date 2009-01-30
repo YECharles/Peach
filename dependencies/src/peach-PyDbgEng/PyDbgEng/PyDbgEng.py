@@ -30,8 +30,10 @@ class DbgEngDllFinder:
 				"c:\\",
 				os.environ["SystemDrive"],
 				os.environ["ProgramFiles"],
-				os.environ["ProgramFiles(x86)"],
 				]
+			if "ProgramFiles(x86)" in os.environ:
+				pgPaths.append(os.environ["ProgramFiles(x86)"])
+			
 			dbgPaths = [
 				"Debuggers",
 				"Debugger",
