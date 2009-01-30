@@ -591,7 +591,8 @@ class ElementWithChildren(Element):
 			ret.append(self)
 			
 		for child in self:
-			child.getElementsByType(type, ret)
+			if isinstance(child, ElementWithChildren):
+				child.getElementsByType(type, ret)
 		
 		return ret
 	

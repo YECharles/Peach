@@ -35,7 +35,7 @@ issued to the fuzzer.
 
 # $Id$
 
-import sys
+import sys, time
 sys.path.append("..")
 sys.path.append("../..")
 import os
@@ -197,5 +197,120 @@ class Process(Monitor):
 		Called when Agent is shutting down.
 		'''
 		self._StopProcess()
+
+try:
+	import win32serviceutils
+except:
+	pass
+
+class WindowsService(Monitor):
+	'''
+	Controls a windows service making sure it's started,
+	optionally restarting, etc.
+	'''
+	
+	def __init__(self, args):
+		if args.has_key('RestartOnEachTest'):
+			if args['RestartOnEachTest'].lower() == 'true':
+				self.restartOnTest = True
+			else:
+				self.restartOnTest = False
+		else:
+			self.restartOnTest = False
+		
+		if args.has_key('FaultOnEarlyExit'):
+			if args['FaultOnEarlyExit'].lower() == 'true':
+				self.faultOnEarlyExit = True
+			else:
+				self.faultOnEarlyExit = False
+		else:
+			self.faultOnEarlyExit = True
+		
+		self.strangeExit = False
+		self.service = args["Service"].replace("'''", "")
+		
+		if args.has_key("Machine"):
+			self.machine = args["Machine"].replace("'''", "")
+		else:
+			self.machine = None
+	
+	def _StopProcess(self):
+		win32serviceutil.StopService(self.service, self.machine)
+		
+		while win32serviceutil.QueryServiceStatus(self.service, self.machine)[1] == 3:
+			time.sleep(0.25)
+		
+		if win32serviceutil.QueryServiceStatus(self.service, self.machine)[1] != 1:
+			raise Exception("WindowsService: Unable to stop service!")
+	
+	def _StartProcess(self):
+		if self._IsProcessRunning():
+			return
+		
+		win32serviceutil.StartService(self.service, self.machine)
+		
+		while win32serviceutil.QueryServiceStatus(self.service, self.machine)[1] == 2:
+			time.sleep(0.25)
+			
+		if win32serviceutil.QueryServiceStatus(self.service, self.machine)[1] == 4:
+			raise Exception("WindowsService: Unable to start service!")
+		
+	def _IsProcessRunning(self):
+		if win32serviceutil.QueryServiceStatus(self.service, self.machine)[1] == 4:
+			return True
+		
+		return False
+	
+	def OnTestStarting(self):
+		'''
+		Called right before start of test.
+		'''
+		self.strangeExit = False
+		if self.restartOnTest or not self._IsProcessRunning():
+			self._StopProcess()
+			self._StartProcess()
+	
+	def OnTestFinished(self):
+		'''
+		Called right after a test.
+		'''
+		if not self._IsProcessRunning():
+			self.strangeExit = True
+		
+		if self.restartOnTest:
+			self._StopProcess()
+	
+	def GetMonitorData(self):
+		'''
+		Get any monitored data.
+		'''
+		if self.strangeExit:
+			return "Process exited early"
+		
+		return None
+	
+	def DetectedFault(self):
+		'''
+		Check if a fault was detected.  If the process exits
+		with out our help we will report it as a fault.
+		'''
+		if self.faultOnEarlyExit:
+			return not self._IsProcessRunning()
+		
+		else:
+			return False
+	
+	def OnFault(self):
+		'''
+		Called when a fault was detected.
+		'''
+		self._StopProcess()
+	
+	def OnShutdown(self):
+		'''
+		Called when Agent is shutting down.
+		'''
+		#self._StopProcess()
+		pass
 
 # end

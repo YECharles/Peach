@@ -367,6 +367,12 @@ class ParseTemplate:
 				peach.runs.append(run)
 				setattr(peach.runs, run.name, run)
 		
+		# Pass 6 -- Analyzers
+		for child in peach.getElementsByType(Blob):
+			if child.analyzer != None and child.defaultValue != None:
+				analyzer = eval("%s()" % child.analyzer)
+				analyzer.asDataElement(child, {}, child.defaultValue)
+		
 		# We suck, so fix this up
 		peach._FixParents()
 		peach.verifyDomMap()
@@ -1692,6 +1698,13 @@ class ParseTemplate:
 		else:
 			blob.padValue = "\0"
 		
+		# Analyzer
+		
+		if node.hasAttributeNS(None, 'analyzer'):
+			blob.analyzer = self._getAttribute(node, 'analyzer')
+		else:
+			blob.analyzer = None
+		
 		# common attributes
 		
 		self.HandleCommonDataElementAttributes(node, blob)
@@ -2729,6 +2742,8 @@ class ParseTemplate:
 		return hint
 
 # ###########################################################################
+
+from Peach.Analyzers import *
 
 #if sys.version.find("AMD64") == -1:
 #	import psyco

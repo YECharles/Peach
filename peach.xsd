@@ -762,6 +762,11 @@
 			<xs:attributeGroup ref="peachCommonAttributes" />
 			<xs:attributeGroup ref="commonTemplateAttributes" />
 			<xs:attributeGroup ref="ValueAttributes" />
+			<xs:attribute name="analyzer" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>[Optional] The class of an analyzer to further decompose data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
 					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
@@ -2240,22 +2245,14 @@
 									</xs:simpleType>
 									<xs:simpleType>
 										<xs:restriction base="xs:string">
-											<xs:enumeration value="debugger.WindowsAppVerifier">
+											<!-- <xs:enumeration value="debugger.WindowsAppVerifier">
 												<xs:annotation>
 													<xs:documentation> Uses Microsoft AppVerifier tool to detect faults
 														on running processes. AppVerifier can be downloaded from Microsoft.
 														The following paramter is required: Application.  NOTE: This monitor
 														does not start the child process.  Use process.Process for that.</xs:documentation>
 												</xs:annotation>
-											</xs:enumeration>
-											<xs:enumeration value="debugger.WindowsDebugger">
-												<xs:annotation>
-													<xs:documentation>Windows debugger agent. This debugger agent is based on
-														the windows debugger API and supports the following features: User mode
-														debugging, x86 and x64. The following two parameters are required: Command,
-														and Params.</xs:documentation>
-												</xs:annotation>
-											</xs:enumeration>
+											</xs:enumeration> -->
 											<xs:enumeration value="debugger.WindowsDebugEngine">
 												<xs:annotation>
 													<xs:documentation>Windows WinDbg agent. This debugger agent is based on

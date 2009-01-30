@@ -34,6 +34,10 @@ XML Analyzers
 
 import sys, os
 
+from Peach.analyzer import *
+from Peach.Engine.dom import *
+from Peach.Engine.common import *
+
 try:
 	import Ft.Xml.Domlette
 	from Ft.Xml.Catalog import GetDefaultCatalog
@@ -49,9 +53,6 @@ try:
 except:
 	raise PeachException("Error loading 4Suite XML library.  This library\ncan be installed from the dependencies folder or\ndownloaded from http://4suite.org/.\n\n")
 
-from Peach.analyzer import *
-from Peach.Engine.dom import *
-from Peach.Engine.common import *
 
 class XmlAnalyzer(Analyzer):
 	'''

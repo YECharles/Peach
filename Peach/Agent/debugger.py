@@ -51,6 +51,8 @@ try:
 	from comtypes.automation import IID
 	import PyDbgEng
 	from comtypes.gen import DbgEng
+	import win32serviceutil
+	import win32service
 
 	
 	class WindowsAppVerifier(Monitor):
@@ -246,6 +248,40 @@ try:
 		
 		buff = ''
 		
+		def LocateWinDbg(self):
+			import win32api, win32con
+			try:
+				hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
+			except:
+				
+				# Lets try a few common places before failing.
+				pgPaths = [
+					"c:\\",
+					os.environ["SystemDrive"],
+					os.environ["ProgramFiles"],
+					os.environ["ProgramFiles(x86)"],
+					]
+				dbgPaths = [
+					"Debuggers",
+					"Debugger",
+					"Debugging Tools for Windows",
+					"Debugging Tools for Windows (x64)",
+					"Debugging Tools for Windows (x86)",
+					]
+				
+				for p in pgPaths:
+					for d in dbgPaths:
+						testPath = os.path.join(p,d)
+						
+						if os.path.exists(testPath):
+							return testPath
+				
+				return None
+			
+			val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
+			return val
+
+		
 		def Output(self, this, Mask, Text):
 			#sys.stdout.write(Text)
 			_DbgEventHandler.buff += Text
@@ -324,13 +360,33 @@ try:
 				# 5. !analyze -v
 				
 				#sys.stdout.write("_DbgEventHandler::Exception(): 5\n")
-				handle = dbg.idebug_control.AddExtension(c_char_p("C:\\Program Files\\Debugging Tools for Windows\\winext\\ext.dll"), 0)
 				try:
+					handle = dbg.idebug_control.AddExtension(c_char_p(self.LocateWinDbg() + "\\winext\\ext.dll"), 0)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
+				
 				except:
 					pass
 				
-				dbg.idebug_control.RemoveExtension(handle)
+				finally:
+					dbg.idebug_control.RemoveExtension(handle)
+				
+				## 6. Bang-Exploitable
+				
+				if sys.version.find("AMD64") == -1:
+					handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\32\\swiexts.dll"), 0)
+				else:
+					handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\64\\swiexts.dll"), 0)
+				
+				try:
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!swiexts.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
+				
+				except:
+					pass
+				
+				finally:
+					dbg.idebug_control.RemoveExtension(handle)
+				
+				## Now off to other things...
 				
 				WindowsDebugEngine.lock.acquire()
 				
@@ -354,6 +410,26 @@ try:
 				
 				print "BUCKET: %s" % bucket
 				WindowsDebugEngine.crashInfo["Bucket"] = bucket
+				
+				## Do we have !exploitable?
+				
+				try:
+					majorHash = re.compile("^MAJOR_HASH:0x.*$").search(_DbgEventHandler.buff).group(1)
+					minorHash = re.compile("^MINOR_HASH:0x.*$").search(_DbgEventHandler.buff).group(1)
+					classification = re.compile("^CLASSIFICATION:.*$").search(_DbgEventHandler.buff).group(1)
+					shortDescription = re.compile("^SHORT_DESCRIPTION:.*$").search(_DbgEventHandler.buff).group(1)
+					
+					if majorHash != None and minorHash != None:
+						
+						bucket = os.path.join(classification,
+							shortDescription,
+							majorHash,
+							minorHash)
+						
+						WindowsDebugEngine.crashInfo["Bucket"] = bucket
+					
+				except:
+					pass
 				
 				# Done
 				WindowsDebugEngine.fault = True
@@ -393,7 +469,49 @@ try:
 					symbols_path = self.SymbolsPath)
 			
 			elif self.ProcessName:
-				self.dbg = PyDbgEng.ProcessAttacher(pid = self.GetProcessIdByName(self.ProcessName),
+				
+				pid = None
+				for x in range(5):
+					pid = self.GetProcessIdByName(self.ProcessName)
+					if pid != None:
+						break
+					
+					time.sleep(0.25)
+				
+				if pid == None:
+					raise Exception("Error, unable to locate process '%s'" % self.ProcessName)
+				
+				self.dbg = PyDbgEng.ProcessAttacher(pid,
+					event_callbacks_sink = self._eventHandler,
+					output_callbacks_sink = self._eventHandler,
+					symbols_path = self.SymbolsPath)
+			
+			elif self.Service:
+				
+				
+				# Make sure service is running
+				if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
+					win32serviceutil.StartService(self.Service)
+					
+					while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
+						time.sleep(0.25)
+						
+					if win32serviceutil.QueryServiceStatus(self.Service)[1] == 4:
+						raise Exception("WindowsDebugEngine: Unable to start service!")
+				
+				# Determin PID of service
+				scm = win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
+				hservice = win32service.OpenService(scm, self.Service, 0xF01FF)
+				
+				status = win32service.QueryServiceStatusEx(hservice)
+				pid = status["ProcessId"]
+				
+				print "SERIVCE PID: ", pid
+				
+				win32service.CloseServiceHandle(hservice)
+				win32service.CloseServiceHandle(scm)
+				
+				self.dbg = PyDbgEng.ProcessAttacher(pid,
 					event_callbacks_sink = self._eventHandler,
 					output_callbacks_sink = self._eventHandler,
 					symbols_path = self.SymbolsPath)
@@ -479,6 +597,11 @@ try:
 			else:
 				self.CommandLine = None
 			
+			if args.has_key('Service'):
+				self.Service = str(args['Service']).replace("'''", "")
+			else:
+				self.Service = None
+			
 			if args.has_key('ProcessName'):
 				self.ProcessName = str(args['ProcessName']).replace("'''", "")
 			else:
@@ -501,7 +624,7 @@ try:
 			else:
 				self.StartOnCall = False
 			
-			if self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
+			if self.Service == None and self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
 				raise Exception("Unable to create WindowsDebugger Instance!!!!!")
 			
 		
@@ -521,6 +644,7 @@ try:
 			self.thread = WindowsDebugEngineThread()
 			
 			self.thread.CommandLine = self.CommandLine
+			self.thread.Service = self.Service
 			self.thread.ProcessName = self.ProcessName
 			self.thread.KernelConnectionString = self.KernelConnectionString
 			self.thread.SymbolsPath = self.SymbolsPath
