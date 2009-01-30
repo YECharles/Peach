@@ -4,16 +4,12 @@ from DebuggerException import *
 from ctypes import *
 from comtypes import HRESULT, COMError
 from comtypes.client import CreateObject, GetEvents, ShowEvents
-#from comtypes.client import CreateObject, GetEvents, ReleaseEvents
 from comtypes.hresult import S_OK
 from comtypes.automation import IID
 from comtypes.gen import DbgEng
-#from comtypes.gen import DBGEVENTPROXYLib
 
 import sys,os
 import struct
-
-#from DbgEngEvent import DbgEngEventCallbacks
 
 ###########################################################
 # utility functions
@@ -36,7 +32,10 @@ class DbgEngDllFinder:
 				os.environ["ProgramFiles"],
 				os.environ["ProgramFiles(x86)"],
 				]
-			dbgPaths = ["Debugging Tools for Windows",
+			dbgPaths = [
+				"Debuggers",
+				"Debugger",
+				"Debugging Tools for Windows",
 				"Debugging Tools for Windows (x64)",
 				"Debugging Tools for Windows (x86)",
 				]
