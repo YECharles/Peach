@@ -2422,6 +2422,9 @@ class Template(DataElement):
 		if self.fixup != None:
 			return len(self.getValue())
 		
+		if self.currentValue != None:
+			return len(self.getValue())
+		
 		size = 0
 		for c in self:
 			if isinstance(c, DataElement):
@@ -2594,6 +2597,9 @@ class Choice(DataElement):
 		if self.currentElement != None:
 			return self.currentElement.getSize()
 		
+		if self.currentValue != None:
+			return len(self.getValue())
+		
 		return len(self.getValue())
 	
 	def hasLength(self):
@@ -2753,6 +2759,9 @@ class Block(DataElement):
 			return len(self.getValue())
 		
 		if self.fixup != None:
+			return len(self.getValue())
+		
+		if self.currentValue != None:
 			return len(self.getValue())
 		
 		size = 0

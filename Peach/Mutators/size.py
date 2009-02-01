@@ -99,22 +99,52 @@ class SizedVaranceMutator(Mutator):
 		relation = node._GetSizeofRelation()
 		nodeOf = relation.getOfElement()
 		size = long(node.getInternalValue())
+		realSize = len(nodeOf.getValue())
 		n = size + count
 		
+		# In cases were expressionSet/Get changes the
+		# size value +/- some amount, we need to take
+		# that into account if possible.
+		diff = size - realSize
+		
+		## Can we make the value?
+		
+		if n - diff < 0:
+			
+			# We can't make N the # we want, so do our best
+			# and get our of here w/o an assert check.
+			
+			nodeOf.currentValue = ""
+			return
+		
+		## Otherwise Make the value
+		
 		if n <= 0:
-			nodeOf.value = ""
+			nodeOf.currentValue = ""
 		
 		elif n < size:
-			nodeOf.value = nodeOf.getValue()[:n]
+			nodeOf.currentValue = nodeOf.getInternalValue()[:n-diff]
 			
 		elif size == 0:
-			nodeOf.value = "A" * n
+			nodeOf.currentValue = "A" * (n-diff)
 		
 		else:
-			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
+			nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
 		
 		# Verify things worked out okay
-		assert((n == long(node.getInternalValue()) and n == len(nodeOf.getValue())) or n < 0)
+		try:
+			assert((n == long(node.getInternalValue()) and (n-diff) == len(nodeOf.getValue())) or n < 0)
+		except:
+			print "realSize:", realSize
+			print "diff:", diff
+			print "node.name:", node.name
+			print "nodeOf.name:", nodeOf.name
+			print "nodeOf:", nodeOf
+			print "n:", n
+			print "long(node.getInternalValue()):",long(node.getInternalValue())
+			print "len(nodeOf.getValue()):", len(nodeOf.getValue())
+			print "repr(nodeOf.getValue()):", repr(nodeOf.getValue())
+			raise
 
 
 class SizedNumericalEdgeCasesMutator(Mutator):
@@ -220,22 +250,52 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		relation = node._GetSizeofRelation()
 		nodeOf = relation.getOfElement()
 		size = long(node.getInternalValue())
+		realSize = len(nodeOf.getValue())
 		n = size + count
 		
+		# In cases were expressionSet/Get changes the
+		# size value +/- some amount, we need to take
+		# that into account if possible.
+		diff = size - realSize
+		
+		## Can we make the value?
+		
+		if n - diff < 0:
+			
+			# We can't make N the # we want, so do our best
+			# and get our of here w/o an assert check.
+			
+			nodeOf.currentValue = ""
+			return
+		
+		## Otherwise Make the value
+		
 		if n <= 0:
-			nodeOf.value = ""
+			nodeOf.currentValue = ""
 		
 		elif n < size:
-			nodeOf.value = nodeOf.getValue()[:n]
+			nodeOf.currentValue = nodeOf.getInternalValue()[:n-diff]
 			
 		elif size == 0:
-			nodeOf.value = "A" * n
+			nodeOf.currentValue = "A" * (n-diff)
 		
 		else:
-			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
+			nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
 		
 		# Verify things worked out okay
-		assert((n == long(node.getInternalValue()) and n == len(nodeOf.getValue())) or n < 0)
+		try:
+			assert((n == long(node.getInternalValue()) and (n-diff) == len(nodeOf.getValue())) or n < 0)
+		except:
+			print "realSize:", realSize
+			print "diff:", diff
+			print "node.name:", node.name
+			print "nodeOf.name:", nodeOf.name
+			print "nodeOf:", nodeOf
+			print "n:", n
+			print "long(node.getInternalValue()):",long(node.getInternalValue())
+			print "len(nodeOf.getValue()):", len(nodeOf.getValue())
+			print "repr(nodeOf.getValue()):", repr(nodeOf.getValue())[:100]
+			raise
 
 
 class SizedDataVaranceMutator(Mutator):
@@ -300,6 +360,7 @@ class SizedDataVaranceMutator(Mutator):
 		relation = node._GetSizeofRelation()
 		nodeOf = relation.getOfElement()
 		size = long(node.getInternalValue())
+		realSize = len(nodeOf.getValue())
 		
 		# Keep size indicator the same
 		node.value = node.getValue()
@@ -318,7 +379,7 @@ class SizedDataVaranceMutator(Mutator):
 			nodeOf.value = "A" * n
 		
 		else:
-			nodeOf.value = (nodeOf.getValue() * ((n/size)+1))[:n]
+			nodeOf.value = (nodeOf.getValue() * ((n/realSize)+1))[:n]
 		
 		# Verify things worked out okay
 		assert(size == long(node.getInternalValue()) and n == len(nodeOf.getValue()))
