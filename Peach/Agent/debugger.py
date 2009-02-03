@@ -259,8 +259,10 @@ try:
 					"c:\\",
 					os.environ["SystemDrive"],
 					os.environ["ProgramFiles"],
-					os.environ["ProgramFiles(x86)"],
 					]
+				if "ProgramFiles(x86)" in os.environ:
+					pgPaths.append(os.environ["ProgramFiles(x86)"])
+
 				dbgPaths = [
 					"Debuggers",
 					"Debugger",
@@ -360,31 +362,38 @@ try:
 				# 5. !analyze -v
 				
 				#sys.stdout.write("_DbgEventHandler::Exception(): 5\n")
+				handle = None
 				try:
-					handle = dbg.idebug_control.AddExtension(c_char_p(self.LocateWinDbg() + "\\winext\\ext.dll"), 0)
+					#handle = dbg.idebug_control.AddExtension(c_char_p(self.LocateWinDbg() + "\\winext\\ext.dll"), 0)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
 				except:
-					pass
+					#print "loc:", self.LocateWinDbg()
+					raise
 				
 				finally:
-					dbg.idebug_control.RemoveExtension(handle)
+					#if handle != None:
+					#	dbg.idebug_control.RemoveExtension(handle)
+					pass
 				
 				## 6. Bang-Exploitable
 				
-				if sys.version.find("AMD64") == -1:
-					handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\32\\swiexts.dll"), 0)
-				else:
-					handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\64\\swiexts.dll"), 0)
-				
+				handle = None
 				try:
-					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!swiexts.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
+					if sys.version.find("AMD64") == -1:
+						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\32\\swiexts.dll"), 0)
+					else:
+						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\64\\swiexts.dll"), 0)
+				
+					dbg.idebug_control.CallExtension(handle, c_char_p("exploitable"), c_char_p("-m"))
+					#dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!swiexts.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
 				except:
 					pass
 				
 				finally:
-					dbg.idebug_control.RemoveExtension(handle)
+					if handle != None:
+						dbg.idebug_control.RemoveExtension(handle)
 				
 				## Now off to other things...
 				
@@ -414,10 +423,10 @@ try:
 				## Do we have !exploitable?
 				
 				try:
-					majorHash = re.compile("^MAJOR_HASH:0x.*$").search(_DbgEventHandler.buff).group(1)
-					minorHash = re.compile("^MINOR_HASH:0x.*$").search(_DbgEventHandler.buff).group(1)
-					classification = re.compile("^CLASSIFICATION:.*$").search(_DbgEventHandler.buff).group(1)
-					shortDescription = re.compile("^SHORT_DESCRIPTION:.*$").search(_DbgEventHandler.buff).group(1)
+					majorHash = re.compile("^MAJOR_HASH:(0x.*)$", re.M).search(_DbgEventHandler.buff).group(1)
+					minorHash = re.compile("^MINOR_HASH:(0x.*)$", re.M).search(_DbgEventHandler.buff).group(1)
+					classification = re.compile("^CLASSIFICATION:(.*)$", re.M).search(_DbgEventHandler.buff).group(1)
+					shortDescription = re.compile("^SHORT_DESCRIPTION:(.*)$", re.M).search(_DbgEventHandler.buff).group(1)
 					
 					if majorHash != None and minorHash != None:
 						

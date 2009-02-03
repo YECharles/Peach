@@ -173,13 +173,21 @@ class Filesystem(Logger):
 		if bucketInfo != None:
 			print "BucketInfo:", bucketInfo
 			
+			bucketInfos = bucketInfo.split(os.path.sep)
+			path = self.faultPath
+			for p in bucketInfos:
+				path = os.path.join(path,p)
+				try:
+					os.mkdir(path)
+				except:
+					pass
+			
+			path = os.path.join(path,str(variationCount))
 			try:
-				path = os.path.join(self.faultPath,bucketInfo)
 				os.mkdir(path)
 			except:
 				pass
 			
-			path = os.path.join(self.faultPath,bucketInfo,str(variationCount))
 		else:
 			try:
 				path = os.path.join(self.faultPath,"Unknown")

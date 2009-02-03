@@ -254,7 +254,7 @@ class FileWriterLauncher(Publisher):
 		self._fd = None
 		self._state = 0	# 0 -stoped; 1 -started
 		self.setFilename(filename)
-		self.waitTime = waitTime
+		self.waitTime = float(waitTime)
 		self.debugger = False
 		if debugger.lower() == "true":
 			self.debugger = True
