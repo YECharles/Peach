@@ -12,9 +12,6 @@
 # 5/3/2008 - Initial version written
 #
 
-from Defines import *
-from DebuggerException import *
-
 import comtypes
 from ctypes import *
 from comtypes import HRESULT, COMError
@@ -28,6 +25,12 @@ import struct
 
 from comtypes import CoClass, GUID
 from PyDbgEng import PyDbgEng
+
+sys.path.append("PyDbgEng")
+sys.path.append(".")
+sys.path.append("..")
+from PyDbgEng.Defines import *
+from PyDbgEng.DebuggerException import *
 
 class DbgEngEventCallbacks(CoClass):
 	

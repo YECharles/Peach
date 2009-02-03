@@ -1,3 +1,8 @@
+01.25.09 [v0.7]: Michael Eddington
+    - code to better locate windbg if registry key is missing
+    - fixing installer to automatically register DbgEngEvent.py
+    - Adding support for py2exe binary compile
+
 05.05.08 [v0.6]: Michael Eddington
     - removed need for compiled event proxy
     - updated pydbgeng to work with latest comtypes
