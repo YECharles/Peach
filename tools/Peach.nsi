@@ -1,7 +1,7 @@
 ;
-; Peach 2.2 Installer
+; Peach 2.3 Installer
 ;
-; Copyright (c) 2007-2008 Michael Eddington
+; Copyright (c) 2007-2009 Michael Eddington
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy 
 ; of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3 DEV"
-  OutFile "Peach-2.3-DEV-py.exe"
+  Name "Peach 2.3 Beta 1"
+  OutFile "Peach-2.3-BETA1-py.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
@@ -93,7 +93,7 @@ ok:
   
   ;ADD YOUR OWN FILES HERE...
   File /r /x docs /x "dependencies" /x ".svn" /x "*.ncb" /x "*.ncb" /x "obj" /x "bin" /x "Peach-2*.exe" /x "logtest" /x "*.pyc" /x "tools\www" "c:\peach\*.*"
-  File /r /x ".svn" /x "src" /x "win64" /x "osx-10.5" "c:\peach\dependencies"
+  File /r /x ".svn" /x "src" /x "py2.4-win64" /x "py2.6-*" /x "osx-10.5" "c:\peach\dependencies"
   
   CreateDirectory "$SMPROGRAMS\Peach"
   CreateShortCut "$SMPROGRAMS\Peach\Peach Documentation.lnk" "$INSTDIR\readme.html" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
@@ -104,18 +104,17 @@ ok:
   ; Execute dependencies
   
   ; have msi now
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\psyco-1.6.win32-py25.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\4Suite-XML-1.0.2.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\PaiMei-1.1.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\pyasn1-0.0.7a.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\pyvmware-0.1.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\pcap-peach.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\comtypes-0.4.2.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\PyDbgEng-0.6.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\zope.interface-3.3.0.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\Twisted-8.0.1.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\win32\cPeach-0.1.win32-py2.5.msi"
-
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\4Suite-XML-1.0.2.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\cDeepCopy-0.2.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\comtypes-0.4.2.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\cPeach-0.2.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pyasn1-0.0.7a.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pyvmware-0.1.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pcap-peach.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\PyDbgEng-0.7.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\zope.interface-3.3.0.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\Twisted-8.0.1.win32-py2.5.msi"
+  
   ; Not sure if we can get msi's of these
   ExecWait "$INSTDIR\dependencies\win32\wxPython2.8-win32-ansi-2.8.7.1-py25.exe"
 
