@@ -7,7 +7,7 @@ Some default file publishers.  Output generated data to a file, etc.
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
+# Copyright (c) 2005-2009 Michael Eddington
 # Copyright (c) 2004-2005 IOActive Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -37,6 +37,15 @@ Some default file publishers.  Output generated data to a file, etc.
 import os, sys, time
 from Peach.Engine.engine import Engine
 from Peach.publisher import Publisher
+
+try:
+	import win32pdh
+	import win32pdhutil
+	import win32pdhquery
+	import ctypes
+	import win32api
+except:
+	pass
 
 class FileWriter(Publisher):
 	'''
@@ -329,6 +338,41 @@ class FileWriterLauncher(Publisher):
 		
 		return self._fd.read()
 	
+	def FindChildrenOf(self, parentid):
+		
+		childPids = []
+		
+		object = "Process"
+		items, instances = win32pdh.EnumObjectItems(None, None, object, win32pdh.PERF_DETAIL_WIZARD)
+		
+		instance_dict = {}
+		for instance in instances:
+			if instance in instance_dict:
+				instance_dict[instance] = instance_dict[instance] + 1
+			else:
+				instance_dict[instance] = 0
+		
+		for instance, max_instances in instance_dict.items():
+			for inum in xrange(max_instances+1):
+				hq = win32pdh.OpenQuery()
+				hcs = []
+				
+				path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "ID Process"))
+				hcs.append(win32pdh.AddCounter(hq, path))
+				
+				path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "Creating Process ID"))
+				hcs.append(win32pdh.AddCounter(hq, path))
+				
+				win32pdh.CollectQueryData(hq)
+				
+				type, pid = win32pdh.GetFormattedCounterValue(hcs[0], win32pdh.PDH_FMT_LONG)
+				type, ppid = win32pdh.GetFormattedCounterValue(hcs[1], win32pdh.PDH_FMT_LONG)
+				
+				if int(ppid) == parentid:
+					childPids.append(int(pid))
+		
+		return childPids
+	
 	def call(self, method, args):
 		'''
 		Launch program to consume file
@@ -353,23 +397,39 @@ class FileWriterLauncher(Publisher):
 		else:
 			# Launch via spawn
 			
-			realArgs = [method, "/c", method]
+			realArgs = ["cmd.exe", "/c", method]
 			for a in args:
 				realArgs.append(a)
 			
-			pid = os.spawnv(os.P_NOWAIT, os.path.join( os.getenv('SystemRoot'), 'system32','cmd.exe'), realArgs)
+			phandle = os.spawnv(os.P_NOWAIT, os.path.join( os.getenv('SystemRoot'), 'system32','cmd.exe'), realArgs)
 			
 			# Give it some time before we KILL!
-			for i in range(self.waitTime/0.25):
-				if win32process.GetExitCodeProcess(pid) != win32con.STILL_ACTIVE:
+			for i in range(long(self.waitTime/0.25)):
+				if win32process.GetExitCodeProcess(phandle) != win32con.STILL_ACTIVE:
 					# Process exited already
-					return
+					break
 				
 				time.sleep(0.25)
 			
 			try:
-				# Kill application
-				win32process.TerminateProcess(pid, 0)
+				pid = ctypes.windll.kernel32.GetProcessId( ctypes.c_ulong(phandle) )
+				if pid > 0:
+					for cid in self.FindChildrenOf(pid):
+						
+						chandle = win32api.OpenProcess(1, 0, cid)
+						win32process.TerminateProcess(chandle, 0)
+						
+						try:
+							win32api.CloseHandle(chandle)
+						except:
+							pass
+				
+				win32process.TerminateProcess(phandle, 0)
+				
+				try:
+					win32api.CloseHandle(phandle)
+				except:
+					pass
 			except:
 				pass
 

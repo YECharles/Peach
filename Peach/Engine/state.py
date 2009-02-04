@@ -289,7 +289,7 @@ class StateEngine:
 				evalEvent(state.onExit, environment, self.engine.peach)
 			
 			mutator.onStateFinished(self, state)
-			newState = mutator.onStateChange(self, state, e.state)
+			newState = mutator.onStateChange(state, e.state)
 			if newState == None:
 				newState = e.state
 			
@@ -521,7 +521,7 @@ class StateEngine:
 					mutator.onDataModelGetValue(action, c.template)
 					
 					# Get value
-					if p.template.modelHasOffsetRelation:
+					if c.template.modelHasOffsetRelation:
 						stringBuffer = StreamBuffer()
 						c.template.getValue(stringBuffer)
 						stringBuffer.setValue("")
