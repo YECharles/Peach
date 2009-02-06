@@ -290,6 +290,9 @@ try:
 				if fullName.find(secondFullName) > -1 and SspiAuthenticationFixup._secondObj != self.context:
 					inputData = self.context.getInternalValue()
 					
+					if len(inputData) < 5:
+						return None
+					
 					(done, data) = SspiAuthenticationFixup._sspi.authorize(inputData)
 					
 					data = data[0].Buffer
@@ -304,7 +307,8 @@ try:
 				
 			except:
 				print "!!! EXCEPTION !!!"
-				raise
+				print repr(sys.exc_info())
+				pass
 
 except:
 	pass

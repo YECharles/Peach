@@ -160,18 +160,29 @@ class BitFlipperMutator(Mutator):
 	
 	def sequencialMutation(self, node):
 		for i in range(self._random.randint(0, 10)):
-			count = self._random.randint(0, self._len-1)
+			if self._len - 1 <= 0:
+				count = 0
+			else:
+				count = self._random.randint(0, self._len-1)
+				
 			self._performMutation(node, count)
 	
 	def randomMutation(self, node):
 		for i in range(self._random.randint(0, 10)):
-			count = self._random.randint(0, self._len-1)
+			if self._len -1 <= 0:
+				count = 0
+			else:
+				count = self._random.randint(0, self._len-1)
+			
 			self._performMutation(node, count)
 	
 	def _performMutation(self, node, position):
 		
 		data = node.getValue()
 		length = len(data)
+		
+		if len(data) == 0:
+			return data
 		
 		if position >= length:
 			position = length - 1

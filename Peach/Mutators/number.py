@@ -89,6 +89,11 @@ class NumericalVarianceMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		
+		# Sometimes self._n == 0, catch that here
+		if self._currentCount >= len(self._values):
+			return
+		
 		node.currentValue = long(node.getInternalValue()) - self._values[self._currentCount]
 	
 	def randomMutation(self, node):
@@ -187,6 +192,7 @@ class NumericalEdgeCaseMutator(Mutator):
 		except:
 			pass
 	
+		self._values[64] = nums
 	
 	def next(self):
 		self._currentCount += 1

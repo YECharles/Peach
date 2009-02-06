@@ -582,13 +582,9 @@ class StateEngine:
 					
 					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
 					
-					#print "len(defaultValue):", len(valueElement.defaultValue)
-					#print "len(currentValue):", len(valueElement.currentValue)
-					#print "len(value):", len(valueElement.value)
-					
 					setElement.currentValue = valueElement.currentValue
-					setElement.value = valueElement.value
 					setElement.defaultValue = valueElement.defaultValue
+					setElement.value = None
 				
 				else:
 					

@@ -252,6 +252,8 @@ class Engine(object):
 	debug = False
 	#: Use the new matched relation method (faster)
 	relationsNew = False
+	#: Only do a single iteration
+	justOne = False
 	#: Use the native cDeepCopy
 	nativeDeepCopy = True
 	
@@ -669,7 +671,7 @@ class Engine(object):
 					mutator.next()
 				
 				# Have we completed our range?
-				if testRange != None and testCount > endCount:
+				if (testRange != None and testCount > endCount) or Engine.justOne:
 					print "-- Completed our iteration range, exiting"
 					break
 				

@@ -355,24 +355,33 @@ class FileWriterLauncher(Publisher):
 		for instance, max_instances in instance_dict.items():
 			for inum in xrange(max_instances+1):
 				hq = win32pdh.OpenQuery()
-				hcs = []
+				try:
+					hcs = []
+					
+					path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "ID Process"))
+					hcs.append(win32pdh.AddCounter(hq, path))
+					
+					path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "Creating Process ID"))
+					hcs.append(win32pdh.AddCounter(hq, path))
+					
+					try:
+						# If the process goes away unexpectedly this call will fail
+						win32pdh.CollectQueryData(hq)
+						
+						type, pid = win32pdh.GetFormattedCounterValue(hcs[0], win32pdh.PDH_FMT_LONG)
+						type, ppid = win32pdh.GetFormattedCounterValue(hcs[1], win32pdh.PDH_FMT_LONG)
+						
+						if int(ppid) == parentid:
+							childPids.append(int(pid))
+					except:
+						pass
 				
-				path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "ID Process"))
-				hcs.append(win32pdh.AddCounter(hq, path))
-				
-				path = win32pdh.MakeCounterPath((None, object, instance, None, inum, "Creating Process ID"))
-				hcs.append(win32pdh.AddCounter(hq, path))
-				
-				win32pdh.CollectQueryData(hq)
-				
-				type, pid = win32pdh.GetFormattedCounterValue(hcs[0], win32pdh.PDH_FMT_LONG)
-				type, ppid = win32pdh.GetFormattedCounterValue(hcs[1], win32pdh.PDH_FMT_LONG)
-				
-				if int(ppid) == parentid:
-					childPids.append(int(pid))
+				finally:
+					win32pdh.CloseQuery(hq)
 		
 		return childPids
 	
+
 	def call(self, method, args):
 		'''
 		Launch program to consume file
@@ -412,6 +421,7 @@ class FileWriterLauncher(Publisher):
 				time.sleep(0.25)
 			
 			try:
+
 				pid = ctypes.windll.kernel32.GetProcessId( ctypes.c_ulong(phandle) )
 				if pid > 0:
 					for cid in self.FindChildrenOf(pid):
@@ -430,6 +440,7 @@ class FileWriterLauncher(Publisher):
 					win32api.CloseHandle(phandle)
 				except:
 					pass
+				
 			except:
 				pass
 
@@ -670,19 +681,22 @@ try:
 			'''
 			Close Application by window title
 			'''
-			win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, [proc, title])
 			
-			if proc:
-				win32event.WaitForSingleObject(int(proc._handle), 5*1000)
+			try:
+				win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, [proc, title])
 				
-				for pid in self.genChildProcesses(proc):
-					try:
-						handle = win32api.OpenProcess(1, False, pid)
-						win32process.TerminateProcess(handle, -1)
-						win32api.CloseHandle(handle)
-					except:
-						pass
-		
+				if proc:
+					win32event.WaitForSingleObject(int(proc._handle), 5*1000)
+					
+					for pid in self.genChildProcesses(proc):
+						try:
+							handle = win32api.OpenProcess(1, False, pid)
+							win32process.TerminateProcess(handle, -1)
+							win32api.CloseHandle(handle)
+						except:
+							pass
+			except:
+				pass
 except:
 	pass
 

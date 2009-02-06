@@ -185,7 +185,7 @@ else:
 
 
 try:
-	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:", ['strategy=','analyzer=', 'parallel=',
+	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:1", ['strategy=','analyzer=', 'parallel=',
 																 'restart=', 'parser=',
 																 'test', 'count', 'web', 'agent',
 																 'gui', 'debug', 'new', 'skipto='])
@@ -302,7 +302,17 @@ for i in range(len(optlist)):
 		
 		engine.Engine.relationsNew = True
 		
-	elif optlist[i][0] == '--test' or optlist[0][0] == '-t':
+	elif optlist[i][0] == '-1':
+		
+		# use the new match relation stuffs
+		
+		from Peach.Engine import *
+		from Peach.Engine.common import *
+		
+		print "[*] Performing single iteration"
+		engine.Engine.justOne = True
+		
+	elif optlist[i][0] == '--test' or optlist[i][0] == '-t':
 
 		# do a parse test
 

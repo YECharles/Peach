@@ -595,6 +595,9 @@ class ParseTemplate:
 			# Convert variouse forms of hex into a binary string
 			if type == 'hex':
 				
+				if len(value) == 1:
+					value = "0" + value
+
 				ret = ''
 				
 				for i in range(len(self._regsHex)):
@@ -640,6 +643,9 @@ class ParseTemplate:
 			# Convert variouse forms of hex into a binary string
 			if type == 'hex':
 				
+				if len(value) == 1:
+					value = "0" + value
+
 				ret = ''
 				
 				for i in range(len(self._regsHex)):

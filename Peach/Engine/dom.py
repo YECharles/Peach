@@ -1214,8 +1214,30 @@ class DataElement(Mutatable):
 					for child in remove:
 						del obj.parent[child.name]
 			
-			obj.setDefaultValue(field.value)
 		
+			# If obj is a number, and field type is hex we
+			# need todo some mojo
+			if field.valueType == 'hex' \
+				and (isinstance(obj, Number) or isinstance(obj, Flags) \
+				or isinstance(obj, Flag)):
+				
+				# Convert hex to number
+				hexString = ""
+				for b in field.value:
+					h = hex(ord(b))[2:]
+					if len(h) < 2:
+						h = "0" + h
+					
+					hexString += h
+					
+				if len(hexString) == 0:
+					obj.setDefaultValue(str(0))
+				
+				else:
+					obj.setDefaultValue(str(long(hexString, 16)))
+			
+			else:
+				obj.setDefaultValue(field.value)
 	
 	def BuildFullNameCache(self):
 		'''
