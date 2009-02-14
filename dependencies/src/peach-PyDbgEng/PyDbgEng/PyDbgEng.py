@@ -28,7 +28,7 @@ class DbgEngDllFinder:
 			# Lets try a few common places before failing.
 			pgPaths = [
 				"c:\\",
-				os.environ["SystemDrive"],
+				os.environ["SystemDrive"]+"\\",
 				os.environ["ProgramFiles"],
 				]
 			if "ProgramFiles(x86)" in os.environ:

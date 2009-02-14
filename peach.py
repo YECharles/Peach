@@ -332,10 +332,12 @@ for i in range(len(optlist)):
 			#else:
 			#	peach = parse.parse(args[0])
 
+			from Peach.analyzer import Analyzer
+			
 			parser = Analyzer.DefaultParser()
 			parser.asParser(args[0])
 			
-			print "File parsed with out errors."
+			print "File parsed with out errors.\n\n"
 
 		except PeachException, pe:
 			print ""

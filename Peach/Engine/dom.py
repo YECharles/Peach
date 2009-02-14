@@ -1077,16 +1077,16 @@ class DataElement(Mutatable):
 					print "[*] Building relation cache"
 					self.BuildRelationCache()
 				
-				# Pickle model
-				try:
-					fd = open(data.fileName + ".peach", "wb+")
-					fd.write(self.pickleModel(self))
-					fd.close()
-				except:
-					try:
-						os.unlink(data.fileName+".peach")
-					except:
-						pass
+				## Pickle model
+				##try:
+				##	fd = open(data.fileName + ".peach", "wb+")
+				##	fd.write(self.pickleModel(self))
+				##	fd.close()
+				##except:
+				##	try:
+				##		os.unlink(data.fileName+".peach")
+				##	except:
+				##		pass
 			
 			return
 		

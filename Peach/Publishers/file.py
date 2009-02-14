@@ -381,7 +381,6 @@ class FileWriterLauncher(Publisher):
 		
 		return childPids
 	
-
 	def call(self, method, args):
 		'''
 		Launch program to consume file
@@ -421,7 +420,6 @@ class FileWriterLauncher(Publisher):
 				time.sleep(0.25)
 			
 			try:
-
 				pid = ctypes.windll.kernel32.GetProcessId( ctypes.c_ulong(phandle) )
 				if pid > 0:
 					for cid in self.FindChildrenOf(pid):
