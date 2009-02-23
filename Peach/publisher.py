@@ -117,8 +117,6 @@ class PublisherBuffer:
 		
 		finally:
 			self.data += ret
-		
-		print "read ", len(ret)
 	
 	def readAll(self):
 		'''
