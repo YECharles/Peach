@@ -104,9 +104,10 @@ class Udp(Publisher):
 			data,addr = self._socket.recvfrom(65565)
 			
 			if hasattr(self, "publisherBuffer"):
-				publisherBuffer.haveAllData = True
-				
+				self.publisherBuffer.haveAllData = True
+			
 			return data
+		
 		except:
 			raise Timeout("")
 		

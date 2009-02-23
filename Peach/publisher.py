@@ -96,7 +96,7 @@ class PublisherBuffer:
 		timeout = False
 		try:
 			if size != None:
-				while(len(ret) < size):
+				while len(ret) < size and not self.haveAllData:
 					try:
 						ret += self.publisher.receive(size)
 					
@@ -117,6 +117,8 @@ class PublisherBuffer:
 		
 		finally:
 			self.data += ret
+		
+		print "read ", len(ret)
 	
 	def readAll(self):
 		'''
