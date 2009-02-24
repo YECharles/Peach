@@ -91,7 +91,7 @@ class XmlAnalyzer(Analyzer):
 		
 		xml = _Xml2Peach().xml2Peach("file:"+inFile)
 		
-		fd = open(outfile, "wb+")
+		fd = open(outFile, "wb+")
 		fd.write(xml)
 		fd.close()
 	
