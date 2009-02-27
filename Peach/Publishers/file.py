@@ -637,6 +637,7 @@ try:
 				
 				# Is this our guy?
 				if title.find(windowName) == -1:
+					win32gui.EnumChildWindows(hwnd, FileWriterLauncherGui.enumChildCallback, args)
 					return
 				
 				# Send WM_CLOSE message
@@ -646,6 +647,32 @@ try:
 				pass
 		
 		enumCallback = staticmethod(enumCallback)
+		
+		def enumChildCallback(hwnd, args):
+			'''
+			Will get called by win32gui.EnumWindows, once for each
+			top level application window.
+			'''
+			
+			proc = args[0]
+			windowName = args[1]
+			
+			try:
+			
+				# Get window title
+				title = win32gui.GetWindowText(hwnd)
+				
+				# Is this our guy?
+				if title.find(windowName) == -1:
+					return
+				
+				# Send WM_CLOSE message
+				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+				win32gui.PostQuitMessage(hwnd)
+			except:
+				pass
+		
+		enumChildCallback = staticmethod(enumChildCallback)
 		
 		def genChildProcesses(self, proc):
 			parentPid = proc.pid

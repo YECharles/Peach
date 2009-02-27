@@ -59,10 +59,10 @@ class PageHeap(Monitor):
 		'''
 		
 		try:
-			self._path = args['Path'].replace("'''", "") + "\\gflags.exe"
+			self._path = os.path.join(args['Path'].replace("'''", ""), "gflags.exe")
 			
 		except:
-			self._path = 'c:\\Program Files\\Debugging Tools for Windows\\gflags.exe'
+			self._path = os.path.join(self.LocateWinDbg(), 'gflags.exe')
 		
 		self._exe = args['Executable'].replace("'''", "")
 		
@@ -71,6 +71,45 @@ class PageHeap(Monitor):
 		
 		os.spawnv(os.P_WAIT, self._path, self._onParams )
 	
+	def LocateWinDbg(self):
+		'''
+		NOTE: Update master copy in debugger.py if you change this!!!!
+		'''
+		
+		import win32api, win32con
+		try:
+			hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
+		except:
+			
+			# Lets try a few common places before failing.
+			pgPaths = [
+				"c:\\",
+				os.environ["SystemDrive"]+"\\",
+				os.environ["ProgramFiles"],
+				]
+			if "ProgramFiles(x86)" in os.environ:
+				pgPaths.append(os.environ["ProgramFiles(x86)"])
+			
+			dbgPaths = [
+				"Debuggers",
+				"Debugger",
+				"Debugging Tools for Windows",
+				"Debugging Tools for Windows (x64)",
+				"Debugging Tools for Windows (x86)",
+				]
+			
+			for p in pgPaths:
+				for d in dbgPaths:
+					testPath = os.path.join(p,d)
+					
+					if os.path.exists(testPath):
+						return testPath
+			
+			return None
+		
+		val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
+		return val
+		
 	def OnShutdown(self):
 		os.spawnv(os.P_WAIT, self._path, self._offParams )
 

@@ -319,13 +319,6 @@ for i in range(len(optlist)):
 			if args[0][:5] != 'file:':
 				args[0] = 'file:' + args[0]
 			
-			#parse = parser.ParseTemplate()
-			#
-			#if PROFILE:
-			#	profile.run("parse.parse(args[0])")
-			#else:
-			#	peach = parse.parse(args[0])
-
 			from Peach.analyzer import Analyzer
 			
 			parser = Analyzer.DefaultParser()

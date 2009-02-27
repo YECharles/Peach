@@ -41,31 +41,58 @@ try:
 	from Peach.agent import *
 	
 	class _WindowWatcher(Thread):
+		'''
+		Look one child deep on each top level window to try
+		and locate dialog boxen.
+		'''
 		
-		CloseWindows = False
-		FoundWindowEvent = None # Will be Event()
-		WindowNames = None # Will be []
-		StopEvent = None # Will be Event()
+		def __init__(self):
+			Thread.__init__(self)
+		
+			self.CloseWindows = False
+			self.FoundWindowEvent = None # Will be Event()
+			self.WindowNames = None # Will be []
+			self.StopEvent = None # Will be Event()
 		
 		def enumCallback(hwnd, self):
-			#print "!"
 			title = win32gui.GetWindowText(hwnd)
 			
-			for name in _WindowWatcher.WindowNames:
+			for name in self.WindowNames:
 				if title.find(name) > -1:
 					try:
-						_WindowWatcher.FoundWindowEvent.set()
+						self.FoundWindowEvent.set()
 						
-						if _WindowWatcher.CloseWindows:
+						if self.CloseWindows:
 							win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+					except:
+						pass
+				else:
+					try:
+						win32gui.EnumChildWindows(hwnd, _WindowWatcher.enumChildCallback, self)
 					except:
 						pass
 					
 			return True
 		enumCallback = staticmethod(enumCallback)
 		
+		def enumChildCallback(hwnd, self):
+			title = win32gui.GetWindowText(hwnd)
+			
+			for name in self.WindowNames:
+				if title.find(name) > -1:
+					try:
+						self.FoundWindowEvent.set()
+						
+						if self.CloseWindows:
+							win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+					except:
+						pass
+					
+			return True
+		enumChildCallback = staticmethod(enumChildCallback)
+		
 		def run(self):
-			while not _WindowWatcher.StopEvent.isSet():
+			while not self.StopEvent.isSet():
 				win32gui.EnumWindows(_WindowWatcher.enumCallback, self)
 				time.sleep(.2)
 	
@@ -91,11 +118,11 @@ try:
 			self._triggerFaults = False
 			
 			if args.has_key("CloseWindows"):
-				if args["CloseWindows"].lower() in ["yes", "true", "1"]:
+				if args["CloseWindows"].replace("'''", "").lower() in ["yes", "true", "1"]:
 					self._closeWindows = True
 			
 			if args.has_key("TriggerFaults"):
-				if args["TriggerFaults"].lower() in ["yes", "true", "1"]:
+				if args["TriggerFaults"].replace("'''", "").lower() in ["yes", "true", "1"]:
 					self._triggerFaults = True
 			
 			if not args.has_key("WindowNames"):
@@ -108,12 +135,13 @@ try:
 			Called right before start of test case or variation
 			'''
 			
-			_WindowWatcher.CloseWindows = self._closeWindows
-			_WindowWatcher.FoundWindowEvent = Event()
-			_WindowWatcher.WindowNames = self._names
-			_WindowWatcher.StopEvent = Event()
-			
 			self._thread = _WindowWatcher()
+			
+			self._thread.CloseWindows = self._closeWindows
+			self._thread.FoundWindowEvent = Event()
+			self._thread.WindowNames = self._names
+			self._thread.StopEvent = Event()
+			
 			self._thread.start()
 		
 		def OnTestFinished(self):

@@ -249,6 +249,10 @@ try:
 		buff = ''
 		
 		def LocateWinDbg(self):
+			'''
+			This method also exists in process.PageHeap!
+			'''
+			
 			import win32api, win32con
 			try:
 				hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
