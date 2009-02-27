@@ -92,10 +92,10 @@ Syntax:
   -w,--web                   Monitor Fuzzer Runs with WebWatcher 
   -r,--restart [file]        Restart fuzzer at saved position
   -p,--parallel M,N          Parallel fuzzing.  Total of M machines, this
-							 is machine N.
+                             is machine N.
   --debug                    Enable debug messages. Usefull when debugging
-							 your Peach XML file.  Warning: Messages are very
-							 cryptic sometimes.
+                             your Peach XML file.  Warning: Messages are very
+                             cryptic sometimes.
   --skipto N                 Skip to a specific test #
 
 Peach Agent
@@ -142,12 +142,12 @@ WireShark to Peach XML
   Peach can convert PDML saved captures into Peach XML Templates.  To
   perform this conversion follow these steps:
   
-	1. Perform a capture in WireShark
-	2. Select a single packet and save as PDML
-	3. Open the PDML file and locate the <proto> element to convert
-	   and note the name of the protocol
-	4. Run Peach using the provided syntax
-	5. Modify generated XML as needed
+    1. Perform a capture in WireShark
+    2. Select a single packet and save as PDML
+    3. Open the PDML file and locate the <proto> element to convert
+       and note the name of the protocol
+    4. Run Peach using the provided syntax
+    5. Modify generated XML as needed
 
 Validate Peach XML File
 

@@ -1796,10 +1796,12 @@ class DataElement(Mutatable):
 					continue
 				
 				#print "Found of relation for", self.getFullDataName()
+				self._fixRealParent(self)
 				obj = self.findDataElementByName(r.From)
+				self._unFixRealParent(self)
 				
 				if obj == None:
-					raise Exception("Mismatched relations1???")
+					raise Exception("Mismatched relations1??? [%s]" % r.From)
 				
 				for rel in obj.relations:
 					relations.append(rel)
@@ -2096,7 +2098,8 @@ class DataElement(Mutatable):
 			sout.storePosition(self.getFullDataName())
 		
 		## If we have a cached value for ourselves, use it!
-		if self.elementType not in ['template', 'block', 'choice', 'flags']:
+		if self.elementType not in ['template', 'block', 'choice', 'flags', \
+									'xmlelement', 'xmlattribute', 'asn1type']:
 			if self.value != None and self.currentValue == None and self.fixup == None and not self.hasRelation():
 				if sout != None:
 					sout.write(self.value)
@@ -2547,8 +2550,8 @@ class Template(DataElement):
 				
 				except:
 					#print "value: [%s]" % repr(value)
-					print "c.name: %s" % c.name
-					print "c.type: %s" % c.elementType
+					#print "c.name: %s" % c.name
+					#print "c.type: %s" % c.elementType
 					raise
 		
 		# 3. Fixup
@@ -3130,6 +3133,150 @@ class Number(DataElement):
 		
 		return ret
 
+try:
+	from pyasn1.type import univ, char, useful
+	import pyasn1.codec.ber.encoder
+	import pyasn1.codec.cer.encoder
+	import pyasn1.codec.der.encoder
+	
+	class Asn1Type(DataElement):
+		'''
+		An XML Element
+		'''
+		
+		ASN1_TYPES = ["BitString", "Boolean", "Choice", "Enumerated", "Integer", "Null",
+					  "ObjectIdentifier", "OctetString", "Real", "Sequence",
+					  "SequenceAndSetBase", "SequenceOf", "Set", "SetOf"]
+		
+		ASN1_ENCODE = ["ber", "cer", "der"]
+		
+		ASN1_MAP = {
+			"BitString":univ.BitString,
+			"Boolean":univ.Boolean,
+			"Choice":univ.Choice,
+			"Enumerated":univ.Enumerated,
+			"Integer":univ.Integer,
+			"Null":univ.Null,
+			"ObjectIdentifier":univ.ObjectIdentifier,
+			"OctetString":univ.OctetString,
+			"Real":univ.Real,
+			"Sequence":univ.Sequence,
+			"SequenceAndSetBase":univ.SequenceAndSetBase,
+			"SequenceOf":univ.SequenceOf,
+			"Set":univ.Set,
+			"SetOf":univ.SetOf,
+			"UTF8String":char.UTF8String,
+			"NumericString":char.NumericString,
+			"PrintableString":char.PrintableString,
+			"TeletexString":char.TeletexString,
+			"VideotexString":char.VideotexString,
+			"IA5String":char.IA5String,
+			"GraphicString":char.GraphicString,
+			"VisibleString":char.VisibleString,
+			"GeneralString":char.GeneralString,
+			"UniversalString":char.UniversalString,
+			"BMPString":char.BMPString,
+			"GeneralizedTime":useful.GeneralizedTime,
+			"UTCTime":useful.UTCTime,
+			}
+		
+		def __init__(self, name, parent):
+			DataElement.__init__(self, name, parent)
+			self.elementType = 'asn1type'
+			self.currentValue = None
+			self.generatedValue = None
+			self.insideRelation = False
+			self.asn1Type = ""
+			self.encodeType = "ber"
+		
+		def asCType(self):
+			# TODO: Should support Ctype, return a string or something...
+			raise Exception("This DataElement (Asn1Type) does not support asCType()!")
+		
+		def int2bin(self, n, count=32):
+			"""returns the binary of integer n, using count number of digits"""
+			return "".join([str((n >> y) & 1) for y in range(count-1, -1, -1)])
+		
+		def blob2bin(self, data):
+			ret = ""
+			for b in data:
+				ret += self.int2bin(ord(b), 8)
+			
+			return ret
+
+		def getInternalValue(self, sout = None, parent = None):
+			'''
+			Return the internal value of this date element.  This
+			value comes before any modifications such as packing,
+			padding, truncating, etc.
+			
+			For Numbers this is the python int value.
+			'''
+			
+			if parent == None:
+				haveParent = False
+			elif isinstance(parent, Asn1Type):
+				haveParent = True
+			
+			asn1Obj = None
+			value = None
+			childAsn1Objs = []
+			for c in self:
+				if isinstance(c, Asn1Type):
+					childAsn1Objs.append(c.getInternalValue(None, self))
+				
+				elif self.asn1Type == 'BitString' and isinstance(c, DataElement):
+					b = c.getValue()
+					b = self.blob2bin(b)
+					value = "'%s'B" % b
+					
+				elif isinstance(c, Number):
+					value = c.getInternalValue()
+				
+				elif isinstance(c, DataElement):
+					value = c.getValue()
+			
+			if value != None:
+				if (self.objType == int or self.objType == long):
+					if type(value) not in [int, long]:
+						try:
+							value = long(value)
+						except:
+							value = long(0)
+				
+				try:
+					asn1Obj = self.ASN1_MAP[self.asn1Type](value)
+				except:
+					raise SoftException("Error building asn.1 obj")
+			
+			else:
+				asn1Obj = self.ASN1_MAP[self.asn1Type]()
+			
+			if len(childAsn1Objs) > 0:
+				for i in range(len(childAsn1Objs)):
+					asn1Obj.setComponentByPosition(i, childAsn1Objs[i])
+			
+			if not haveParent:
+				# Perform encoding ourselves
+				encoder = eval("pyasn1.codec.%s.encoder" % self.encodeType)
+				
+				try:
+					bin = encoder.encode(asn1Obj)
+				except:
+					raise SoftException("Error encoding asn.1 obj")
+				
+				#print asn1Obj
+				
+				return bin
+				
+			# Otherwise allow parent to perform encoding
+			return asn1Obj
+		
+		def getRawValue(self, sout = None, parent = None):
+			return self.getInternalValue(sout, parent)
+	
+except:
+	pass
 
 class XmlElement(DataElement):
 	'''

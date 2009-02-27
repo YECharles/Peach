@@ -30,7 +30,8 @@ import shark
 import stringtoken
 import xml
 import binary
+import asn1
 
-__all__ = ["xml", "shark", "stringtoken", "pit", "binary"]
+__all__ = ["xml", "shark", "stringtoken", "pit", "binary", "asn1"]
 
 # end

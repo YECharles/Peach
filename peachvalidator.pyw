@@ -40,6 +40,18 @@ import sys,os
 #	import psyco
 #	psyco.full()
 
+		
+		# use the new match relation stuffs
+		
+from Peach.Engine import *
+from Peach.Engine.common import *
+		
+try:
+	if sys.argv[0] == '--new' or sys.argv[1] == "--new":
+		engine.Engine.relationsNew = True
+except:
+	pass
+
 from Peach.Gui import PeachValidator
 
 # Chdir so we can locate our icons

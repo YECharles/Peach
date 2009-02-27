@@ -1670,7 +1670,6 @@ class ParseTemplate:
 			name = None
 
 		blob = Blob(name, parent)
-		#blob.node = node
 		
 		# value
 		
