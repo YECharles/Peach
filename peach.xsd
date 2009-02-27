@@ -1191,6 +1191,12 @@
 													parameters.</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
+											<xs:enumeration value="stdout.StdoutHex">
+												<xs:annotation>
+													<xs:documentation>Print tests to console in hex and ASCII format. No
+													parameters.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>											
 											<xs:enumeration value="file.FileWriter">
 												<xs:annotation>
 													<xs:documentation>Writes tests to a file. Requires parameter named
