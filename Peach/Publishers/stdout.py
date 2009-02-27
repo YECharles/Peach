@@ -68,6 +68,54 @@ class Stdout(Publisher):
 		
 		return ''
 
+class StdoutHex(Publisher):
+	'''
+	Basic stdout publisher that emits a hex dump.  All data is written to stdout.  No input
+	is available from this publisher.  Excellent for testing (without the BEEPS).
+
+	'''	
+	
+	def dump2(src, length=16):
+
+		return result
+
+
+	def accept(self):
+		pass
+	
+	def connect(self):
+		pass
+	
+	def close(self):
+		pass
+	
+	def send(self, src):
+		# yoinked from http://code.activestate.com/recipes/142812/
+
+		FILTER=''.join([(len(repr(chr(x)))==3) and chr(x) or '.' for x in range(256)])
+		N=0; result=''
+		length=16
+		while src:
+			s,src = src[:length],src[length:]
+			hexa = ' '.join(["%02X"%ord(x) for x in s])
+			s = s.translate(FILTER)
+			result += "%04X   %-*s   %s\n" % (N, length*3, hexa, s)
+			N+=length
+		print result
+	
+	def receive(self, size = None):
+		return ''
+	
+	def call(self, method, args):
+		str = ""
+		for a in args:
+			str += "%s, " % repr(a)
+		
+		print "%s(%s)" % (method, str[:-2])
+		
+		return ''
+
+
 class Null(Publisher):
 	'''
 	Basic stdout publisher.  All data is written to stdout.  No input
