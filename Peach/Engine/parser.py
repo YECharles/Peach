@@ -615,15 +615,13 @@ class ParseTemplate:
 			value = re.sub(r"([^\\])\\n", r"\1\n", value)
 			value = re.sub(r"([^\\])\\r", r"\1\r", value)
 			value = re.sub(r"([^\\])\\t", r"\1\t", value)
-			value = re.sub(r"([^\\])\\\\", r"\1\\", value)
 			value = re.sub(r"([^\\])\\n", r"\1\n", value)
 			value = re.sub(r"([^\\])\\r", r"\1\r", value)
 			value = re.sub(r"([^\\])\\t", r"\1\t", value)
-			value = re.sub(r"([^\\])\\\\", r"\1\\", value)
 			value = re.sub(r"^\\n", r"\n", value)
 			value = re.sub(r"^\\r", r"\r", value)
 			value = re.sub(r"^\\t", r"\t", value)
-			value = re.sub(r"^\\\\", r"\\", value)
+			value = re.sub(r"\\\\", r"\\", value)
 
 		return value
 		
@@ -2629,42 +2627,9 @@ class ParseTemplate:
 		if not value or not valueType:
 			return None
 		
-		#print "_HandleValueType"
-		#if valueType == 'string':
-		#	value = re.sub(r"([^\\])\\n", r"\1\n", value)
-		#	value = re.sub(r"([^\\])\\r", r"\1\n", value)
-		#	value = re.sub(r"([^\\])\\t", r"\1\n", value)
-		#	value = re.sub(r"([^\\])\\\\", r"\1\\", value)
-		#	value = re.sub(r"^\\n", r"\n", value)
-		#	value = re.sub(r"^\\r", r"\n", value)
-		#	value = re.sub(r"^\\t", r"\n", value)
-		#	value = re.sub(r"^\\\\", r"\\", value)
-		#	#value = value.replace('\\n', '\n')
-		#	#value = value.replace('\\r', '\r')
-			
-		#if valueType == 'hex':
-		#	#print "_HandleValueType: Converting from hex"
-		#	ret = ''
-		#	
-		#	print "VALUE: [%s]" % value
-		#	
-		#	for i in range(len(self._regsHex)):
-		#		match = self._regsHex[i].search(value)
-		#		if match != None:
-		#			while match != None:
-		#				ret += '\\x' + match.group(2)
-		#				value = self._regsHex[i].sub('', value)
-		#				match = self._regsHex[i].search(value)
-		#			break
-		#	
-		#	print "Eval String: [%s]" % ret
-		#	return PeachStr(eval("'" + ret + "'"))
-		#
 		if valueType == 'literal':
-			#print "_HandleValueType: Converting from literal"
 			return PeachStr(eval(value))
 		
-		#print "_HandleValueType: No conversion: %s" % valueType
 		return PeachStr(value)
 		
 	
