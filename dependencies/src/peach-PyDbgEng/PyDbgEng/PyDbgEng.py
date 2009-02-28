@@ -152,6 +152,18 @@ class PyDbgEng(IDebugEventCallbacksSink):
 	
 	register_index_map     = {}
 	
+	def findDbgEngEvent(self):
+		import sys,os
+		
+		fileName = os.path.join("PyDbgEng", "DbgEngEvent.py")
+		
+		for p in sys.path:
+			if os.path.exists(os.path.join(p, fileName)):
+				return os.path.join(p, fileName)
+		
+		return None
+	
+	
 	###########################################################
 	def __init__(self, event_callbacks_sink = None, output_callbacks_sink = None, dbg_eng_dll_path = None, symbols_path = None):
 		self.dbg_eng_log = lambda msg: None # sys.stdout.write("DBGENG_LOG> " + msg + "\n")
@@ -171,7 +183,17 @@ class PyDbgEng(IDebugEventCallbacksSink):
 		# create main interfaces
 		self.dbg_eng_log("PyDbgEng.__init__: creating interfaces")
 		creator = IDebugClientCreator()
-		self.idebug_client          = creator.create_idebug_client(self.dbgeng_dll)
+		
+		try:
+			self.idebug_client          = creator.create_idebug_client(self.dbgeng_dll)
+		except:
+			# Try registering it
+			import os, sys
+			print "Trying to register: ", "%s %s -regserver" % (sys.executable, self.findDbgEngEvent())
+			os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
+			self.idebug_client          = creator.create_idebug_client(self.dbgeng_dll)
+			pass
+		
 		self.idebug_control         = self.idebug_client.QueryInterface(interface = DbgEng.IDebugControl)
 		self.idebug_data_spaces     = self.idebug_client.QueryInterface(interface = DbgEng.IDebugDataSpaces3)
 		self.idebug_registers       = self.idebug_client.QueryInterface(interface = DbgEng.IDebugRegisters)
@@ -193,7 +215,16 @@ class PyDbgEng(IDebugEventCallbacksSink):
 			# Updated code to work with latest comtypes and remove native code needs
 			# Eddington 5/3/2008
 			PyDbgEng.fuzzyWuzzy = self	# HACK!
-			event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
+			try:
+				event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
+			except:
+				# Try registering it
+				import os, sys
+				print "Trying to register: ", "%s %s -regserver" % (sys.executable, self.findDbgEngEvent())
+				os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
+				event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
+				pass
+			
 			self.old_event_callbacks = self.idebug_client.GetEventCallbacks()
 			self.idebug_client.SetEventCallbacks(Callbacks = event_proxy)
 		
