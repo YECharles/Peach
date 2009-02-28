@@ -593,7 +593,9 @@ class StateEngine:
 						repr(action.valueLiteral)
 						))
 					
-					setElement.setDefaultValue(action.valueLiteral)
+					setElement.defaultValue = action.valueLiteral
+					setElement.currentValue = None
+					setElement.value = None
 			
 			#print " - Total time to slurp data: %.2f" % (time.time() - startTime)
 		

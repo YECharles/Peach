@@ -1278,6 +1278,11 @@ class DataCracker:
 					if not buff.haveAllData:
 						try:
 							buff.read((pos + length) - len(buff.data))
+							
+							# Just make sure that buff.read actually worked.
+							if len(buff.data) < (pos + length):
+								raise Exception("Why didn't that throw???")
+							
 						except:
 							rating = 4
 							value = ""
@@ -1293,7 +1298,6 @@ class DataCracker:
 						break
 				
 				if len(buff.data) >= (pos + length):
-					
 					value = buff.data[pos:pos+length]
 					newpos = pos + length
 					defaultValue = node.defaultValue
@@ -1313,6 +1317,8 @@ class DataCracker:
 							rating = 1
 					
 					break
+				
+				raise Exception("We should not be here!")
 				
 			# Are we null terminated?
 			elif node.nullTerminated:

@@ -22,7 +22,7 @@
 			</Action>
 			
 			<Action name="WhenChangeState" type="changeState" ref="State2"
-					when="StateModel['Initial']['GetData']['TestCase']['data'].value == 'State2    '" />
+					when="StateModel['Initial']['GetData']['TestCase']['data'].getInternalValue() == 'State2    '" />
 			
 			<Action name="Stat1Surp" type="slurp" value="STATE1    " setXpath="//EchoData//data" />
 			

@@ -39,6 +39,7 @@ class StateSlurpTestCase2(utils.PeachSendAndRecvTestCase):
 	def runTest(self):
 		self.peachUtils.SetSendAndReceiveData("0987654321")
 		self.peachUtils.RunPeachXml("stateSlurp2.xml")
+		#self.peachUtils.RunDebugPeachXml("stateSlurp2.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == '5432109876', 'stateSlurp2.xml failed, instead got [%s]' % repr(ret)
 
@@ -52,6 +53,7 @@ class StateWhenTestCase(utils.PeachSendAndRecvTestCase):
 	def runTest(self):
 		self.peachUtils.SetSendAndReceiveData("State2    ")
 		self.peachUtils.RunPeachXml("stateWhen.xml")
+		#self.peachUtils.RunDebugPeachXml("stateWhen.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == 'STATE2    ', 'stateWhen.xml failed, instead got [%s]' % repr(ret)
 

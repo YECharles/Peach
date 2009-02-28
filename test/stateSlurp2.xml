@@ -14,9 +14,6 @@
 	
 	<StateModel name="TestState" initialState="Initial">
 		<State name="Initial">
-			<Action type="start" />
-			<Action type="connect" />
-			
 			<Action type="input" name="GetData">
 				<DataModel ref="TestCase" />
 			</Action>
@@ -26,9 +23,6 @@
 			<Action type="output" name="EchoData">
 				<DataModel ref="TestCase" />
 			</Action>
-			
-			<Action type="close" />
-			<Action type="stop" />
 		</State>
 	</StateModel>
 	
