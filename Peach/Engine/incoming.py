@@ -1730,6 +1730,23 @@ class DataCracker:
 		Debug(1, "<--- %s (%d, %d-%d)" % (node.name, node.rating, self.parentPos+pos, self.parentPos+newpos))
 		return (node.rating, newpos)
 	
+	def flipBitsByByte(self, num, size):
+		
+		ret = 0
+		for n in self.splitIntoBytes(num, size):
+			ret = ret << 8
+			ret += n
+		
+		return ret
+		
+	def splitIntoBytes(self, num, size):
+		
+		ret = []
+		for i in range(size/8):
+			ret.append( num & 0xFF )
+			num = num >> 8
+		
+		return ret
 	def _handleFlags(self, node, buff, pos, parent, doingMinMax = False):
 		'''
 		Returns the rating and string.  The rating is
@@ -1762,8 +1779,6 @@ class DataCracker:
 		value = buff.data[pos:pos+length]
 		newpos = pos + length
 		
-		#print "prepack value: %s pos: %d" % (repr(value), pos)
-		#print "data: %s" % repr(data)
 		# Now, unpack the integer
 		
 		fmt = '>'
@@ -1776,48 +1791,42 @@ class DataCracker:
 		elif node.length == 64:
 			fmt += 'Q'
 		
+		##print "formatter:", fmt
 		value = int(struct.unpack(fmt, value)[0])
-		#print "_handleFlags(): Value: %d" % value
+		##print "_handleFlags(): Value: %d" % value
 		
 		# Now, do the Flag portions
-
-		#print "start value:", self.binaryFormatter(value, node.length)
+		
+		if node.endian == 'little':
+			value = self.flipBitsByByte(value, node.length)
+		
+		##print "start value:", self.binaryFormatter(value, node.length)
 		
 		for child in node._children:
 			if child.elementType != 'flag':
 				continue
 			
-			if node.endian == 'little':
-				childValue = value >> child.position
-				
-				mask = 0
-				for i in range(0, child.length):
-					mask += 1 << i
-				
-				#print "_handleFlags(): %d, %d, %d" % (childValue, mask, childValue & mask)
-				childValue = childValue & mask
+			childValue = value >> child.position
 			
-			else:
-				# We will +1 here because position is zero based
-				childValue = value >> child.position + 1
-				
-				mask = 0
-				for i in range(0, child.length):
-					mask += 1 << i
-				
-				#preValue = childValue
-				childValue = childValue & mask
-				#print "mask: %s pre-value: %s post-value: %d" % (
-				#	self.binaryFormatter(mask, node.length),
-				#	self.binaryFormatter(preValue, node.length),
-				#	childValue
-				#	)
+			mask = 0
+			for i in range(0, child.length):
+				mask += 1 << i
+			
+			##preValue = childValue
+			childValue = childValue & mask
+			##print "mask: %s pre-value: %s post-value: %d" % (
+			##	self.binaryFormatter(mask, node.length),
+			##	self.binaryFormatter(preValue, node.length),
+			##	childValue
+			##	)
 			
 			Debug(1, "Found child flag %s value of %s" % (child.name, str(childValue)))
 			
 			# Set child node value
 			eval("child.%s(childValue)" % self.method)
-			#print "[%s] child value:" % child.name, child.getInternalValue()
+			child.rating = 2
+			child.pos = pos
+			##print "[%s] child value:" % child.name, child.getInternalValue()
 		
 		# Determin rating
 		

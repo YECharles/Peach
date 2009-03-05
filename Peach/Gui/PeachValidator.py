@@ -401,7 +401,7 @@ class PeachValidatorGui(gui.PeachValidation):
 			#else:
 			#	nodeInternal = node.getInternalValue()
 			#	nodeValue = node.getValue()
-			nodeValue = node.getValue()
+			nodeValue = str(node.getValue())
 			nodeInternal = str(node.getInternalValue())
 		
 		except:

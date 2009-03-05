@@ -647,6 +647,11 @@
 						must be less then total length of Flag set.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name="isStatic" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attributeGroup ref="ValueAttributes" />
 		</xs:complexType>
 		<xs:unique name="flagKey1">
