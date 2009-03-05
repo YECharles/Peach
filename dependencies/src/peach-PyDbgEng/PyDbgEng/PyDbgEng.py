@@ -189,7 +189,6 @@ class PyDbgEng(IDebugEventCallbacksSink):
 		except:
 			# Try registering it
 			import os, sys
-			print "Trying to register: ", "%s %s -regserver" % (sys.executable, self.findDbgEngEvent())
 			os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
 			self.idebug_client          = creator.create_idebug_client(self.dbgeng_dll)
 			pass
@@ -220,7 +219,6 @@ class PyDbgEng(IDebugEventCallbacksSink):
 			except:
 				# Try registering it
 				import os, sys
-				print "Trying to register: ", "%s %s -regserver" % (sys.executable, self.findDbgEngEvent())
 				os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
 				event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
 				pass

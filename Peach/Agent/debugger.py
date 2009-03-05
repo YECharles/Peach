@@ -9,7 +9,7 @@ detect faults.  Would be nice to also eventually do other things like
 '''
 
 #
-# Copyright (c) 2007-2008 Michael Eddington
+# Copyright (c) 2007-2009 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,10 @@ import struct, sys, time
 from threading import Thread, Event, Lock
 from Peach.agent import Monitor
 
-import struct, sys, time,os, re
+import struct, sys, time, os, re
 
 try:
-
+	
 	import comtypes
 	from ctypes import *
 	from comtypes import HRESULT, COMError
@@ -53,191 +53,191 @@ try:
 	from comtypes.gen import DbgEng
 	import win32serviceutil
 	import win32service
-
 	
-	class WindowsAppVerifier(Monitor):
-		'''
-		Agent that uses the Microsoft AppVerifier tool to detect faults on
-		running processes.  AppVerifier can be downloaded from Microsoft via
-		the following url: http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx
-		'''
-		
-		def __init__(self, args):
-			self._image = str(args['Application']).replace("'''", "")
-			
-			if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
-				self._manual = True
-			else:
-				self._manual = False
-			
-			self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
-			self.stops = {}
-			# self.stops = {"COM":["10","1032"]}
-			
-			if args.has_key("Checks"):
-				self.checks = args["Checks"].replace("'''", "").split(",")
-				for i in range(len(self.checks)):
-					self.checks[i] = self.checks[i].strip()
-			
-			if args.has_key("Stops"):
-				checks = args["Stops"].replace("'''", "").split(";")
-				for check in checks:
-					check, stops = check.split(":")
-					self.stops[check] = stops.split(",")
-				
-			print "WindowsAppVerifier: Enabling the following Checks:"
-			for c in self.checks:
-				print "WindowsAppVerifier: Check: %s" % c
-			
-			print "WindowsAppVerifier: Disabling the following Stops:"
-			for c in self.stops:
-				for s in self.stops[c]:
-					print "%s: %s" % (c, s)
-			
-			self._appManager = CreateObject("{597c1ef7-fc28-451e-8273-417c6c9244ed}")
-			
-			self._RemoveImageLogs(self._image)
-			self._DisableImage(self._image)
-			self._EnableImage(self._image)
-		
-		def _EnableImage(self, image):
-			'''
-			Enables the default checks for an image (exe).
-			'''
-				
-			if not self._manual:
-				image = self._appManager.Images.Add(image)
-				for check in image.Checks:
-					if check.Name in self.checks:
-						check.Enabled = True
-					else:
-						check.Enabled = False
-					
-					if self.stops.has_key(check.Name):
-						stops = self.stops[check.Name]
-						for stop in check.Stops:
-							if str(stop.StopCode) in stops:
-								print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-								stop.Active = False
-							else:
-								print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-		
-		def _DisableImage(self, image):
-			try:
-				if not self._manual:
-					self._appManager.Images.Remove(image)
-			except:
-				pass
-		
-		def _GetImageLogs(self, image):
-			'''
-			Get lof files for an image
-			'''
-			
-			logFiles = []
-			for log in self._appManager.Logs(image):
-				
-				try:
-					os.unlink("appVerifierTmp.xml")
-				except:
-					pass
-				
-				try:
-					log.SaveAsXML("appVerifierTmp.xml", "SRV*http://msdl.microsoft.com/download/symbols")
-				except:
-					pass
-				
-				fd = open("appVerifierTmp.xml","rb+")
-				logFiles.append(fd.read())
-				fd.close()
-				os.unlink("appVerifierTmp.xml")
-			
-			return logFiles
-		
-		def _RemoveImageLogs(self, image):
-			try:
-				logs = self._appManager.Logs(image)
-				for idx in range(logs.Count):
-					try:
-						logs.Remove(0)
-					except:
-						print "Warning: Caught error removing App Verifier logs."
-						pass
-			except:
-				pass
-			
-		def OnTestStarting(self):
-			'''
-			Called right before start of test.
-			'''
-			
-			# We should not do this on every test
-			# instead just on startup.
-			#self._EnableImage(self._image)
-			pass
-		
-		def OnTestFinished(self):
-			'''
-			Called right after a test.
-			'''
-			
-			# We should not do this on every test
-			# instead just on shutdown.
-			#self._DisableImage(self._image)
-			pass
-		
-		def GetMonitorData(self):
-			'''
-			Get any monitored data.
-			'''
-			ret = {}
-			count = 0
-			logs = self.imageLogs
-			
-			if logs == None:
-				logs = self.imageLogs = self._GetImageLogs(self._image)
-			
-			self._RemoveImageLogs(self._image)
-			
-			for log in logs:
-				count += 1
-				ret["AppVerifier_%d.xml" % count] = log
-			
-			return ret
-		
-		def DetectedFault(self):
-			'''
-			Check if a fault was detected.
-			'''
-			
-			time.sleep(0.15) # Pause a sec
-			
-			self.imageLogs = self._GetImageLogs(self._image)
-			self._RemoveImageLogs(self._image)
-			
-			for log in self.imageLogs:
-				if len(log) > 300:
-					print "WindowsAppVerifier: Detected fault"
-					return True
-			
-			self.imageLogs = None
-			print "WindowsAppVerifier: Did not detect fault"
-			return False
-		
-		def OnFault(self):
-			'''
-			Called when a fault was detected.
-			'''
-			pass
-		
-		def OnShutdown(self):
-			'''
-			Called when Agent is shutting down.
-			'''
-			try:
-				self._DisableImage(self._image)
-			except:
-				pass
+	
+	##class WindowsAppVerifier(Monitor):
+	##	'''
+	##	Agent that uses the Microsoft AppVerifier tool to detect faults on
+	##	running processes.  AppVerifier can be downloaded from Microsoft via
+	##	the following url: http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx
+	##	'''
+	##	
+	##	def __init__(self, args):
+	##		self._image = str(args['Application']).replace("'''", "")
+	##		
+	##		if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
+	##			self._manual = True
+	##		else:
+	##			self._manual = False
+	##		
+	##		self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
+	##		self.stops = {}
+	##		# self.stops = {"COM":["10","1032"]}
+	##		
+	##		if args.has_key("Checks"):
+	##			self.checks = args["Checks"].replace("'''", "").split(",")
+	##			for i in range(len(self.checks)):
+	##				self.checks[i] = self.checks[i].strip()
+	##		
+	##		if args.has_key("Stops"):
+	##			checks = args["Stops"].replace("'''", "").split(";")
+	##			for check in checks:
+	##				check, stops = check.split(":")
+	##				self.stops[check] = stops.split(",")
+	##			
+	##		print "WindowsAppVerifier: Enabling the following Checks:"
+	##		for c in self.checks:
+	##			print "WindowsAppVerifier: Check: %s" % c
+	##		
+	##		print "WindowsAppVerifier: Disabling the following Stops:"
+	##		for c in self.stops:
+	##			for s in self.stops[c]:
+	##				print "%s: %s" % (c, s)
+	##		
+	##		self._appManager = CreateObject("{597c1ef7-fc28-451e-8273-417c6c9244ed}")
+	##		
+	##		self._RemoveImageLogs(self._image)
+	##		self._DisableImage(self._image)
+	##		self._EnableImage(self._image)
+	##	
+	##	def _EnableImage(self, image):
+	##		'''
+	##		Enables the default checks for an image (exe).
+	##		'''
+	##			
+	##		if not self._manual:
+	##			image = self._appManager.Images.Add(image)
+	##			for check in image.Checks:
+	##				if check.Name in self.checks:
+	##					check.Enabled = True
+	##				else:
+	##					check.Enabled = False
+	##				
+	##				if self.stops.has_key(check.Name):
+	##					stops = self.stops[check.Name]
+	##					for stop in check.Stops:
+	##						if str(stop.StopCode) in stops:
+	##							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+	##							stop.Active = False
+	##						else:
+	##							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+	##	
+	##	def _DisableImage(self, image):
+	##		try:
+	##			if not self._manual:
+	##				self._appManager.Images.Remove(image)
+	##		except:
+	##			pass
+	##	
+	##	def _GetImageLogs(self, image):
+	##		'''
+	##		Get lof files for an image
+	##		'''
+	##		
+	##		logFiles = []
+	##		for log in self._appManager.Logs(image):
+	##			
+	##			try:
+	##				os.unlink("appVerifierTmp.xml")
+	##			except:
+	##				pass
+	##			
+	##			try:
+	##				log.SaveAsXML("appVerifierTmp.xml", "SRV*http://msdl.microsoft.com/download/symbols")
+	##			except:
+	##				pass
+	##			
+	##			fd = open("appVerifierTmp.xml","rb+")
+	##			logFiles.append(fd.read())
+	##			fd.close()
+	##			os.unlink("appVerifierTmp.xml")
+	##		
+	##		return logFiles
+	##	
+	##	def _RemoveImageLogs(self, image):
+	##		try:
+	##			logs = self._appManager.Logs(image)
+	##			for idx in range(logs.Count):
+	##				try:
+	##					logs.Remove(0)
+	##				except:
+	##					print "Warning: Caught error removing App Verifier logs."
+	##					pass
+	##		except:
+	##			pass
+	##		
+	##	def OnTestStarting(self):
+	##		'''
+	##		Called right before start of test.
+	##		'''
+	##		
+	##		# We should not do this on every test
+	##		# instead just on startup.
+	##		#self._EnableImage(self._image)
+	##		pass
+	##	
+	##	def OnTestFinished(self):
+	##		'''
+	##		Called right after a test.
+	##		'''
+	##		
+	##		# We should not do this on every test
+	##		# instead just on shutdown.
+	##		#self._DisableImage(self._image)
+	##		pass
+	##	
+	##	def GetMonitorData(self):
+	##		'''
+	##		Get any monitored data.
+	##		'''
+	##		ret = {}
+	##		count = 0
+	##		logs = self.imageLogs
+	##		
+	##		if logs == None:
+	##			logs = self.imageLogs = self._GetImageLogs(self._image)
+	##		
+	##		self._RemoveImageLogs(self._image)
+	##		
+	##		for log in logs:
+	##			count += 1
+	##			ret["AppVerifier_%d.xml" % count] = log
+	##		
+	##		return ret
+	##	
+	##	def DetectedFault(self):
+	##		'''
+	##		Check if a fault was detected.
+	##		'''
+	##		
+	##		time.sleep(0.15) # Pause a sec
+	##		
+	##		self.imageLogs = self._GetImageLogs(self._image)
+	##		self._RemoveImageLogs(self._image)
+	##		
+	##		for log in self.imageLogs:
+	##			if len(log) > 300:
+	##				print "WindowsAppVerifier: Detected fault"
+	##				return True
+	##		
+	##		self.imageLogs = None
+	##		print "WindowsAppVerifier: Did not detect fault"
+	##		return False
+	##	
+	##	def OnFault(self):
+	##		'''
+	##		Called when a fault was detected.
+	##		'''
+	##		pass
+	##	
+	##	def OnShutdown(self):
+	##		'''
+	##		Called when Agent is shutting down.
+	##		'''
+	##		try:
+	##			self._DisableImage(self._image)
+	##		except:
+	##			pass
 
 	# ###############################################################################################
 	# ###############################################################################################
@@ -388,7 +388,7 @@ try:
 						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\32\\swiexts.dll"), 0)
 					else:
 						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\64\\swiexts.dll"), 0)
-				
+					
 					dbg.idebug_control.CallExtension(handle, c_char_p("exploitable"), c_char_p("-m"))
 					#dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!swiexts.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
