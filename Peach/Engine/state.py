@@ -130,6 +130,20 @@ class StateEngine:
 			
 			self._runState(obj, mutator)
 		
+		except StateChangeStateException, e:
+			
+			# Hack to stop stack recurtion
+			
+			newState = e.state
+			
+			while True:
+				try:
+					self._runState(newState, mutator)
+					break
+				
+				except StateChangeStateException, ee:
+					newState = ee.state
+		
 		except SoftException:
 			
 			# Soft exceptions are okay
@@ -295,7 +309,8 @@ class StateEngine:
 			
 			# stop fuzzing next state?
 			if not stopFuzzing:
-				self._runState(newState, mutator)
+				#self._runState(newState, mutator)
+				raise StateChangeStateException(newState)
 		
 	def _runAction(self, action, mutator):
 		
@@ -320,7 +335,10 @@ class StateEngine:
 			#	print "Key: ", k
 			
 			if not evalEvent(action.when, environment, self.engine.peach):
+				Debug(1, "Action when failed: " + action.when)
 				return
+			else:
+				Debug(1, "Action when passed: " + action.when)
 		
 		# EVENT: onStart
 		if action.onStart != None:
