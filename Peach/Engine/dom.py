@@ -3929,14 +3929,9 @@ class Blob(DataElement):
 		be fast about it!
 		'''
 		
-		if self.transformer != None or self.fixup != None:
-			return len(self.getValue())
-		
-		if self.currentValue != None:
-			return len(self.currentValue)
-		
-		if self.defaultValue != None:
-			return len(self.defaultValue)
+		l = self.getLength()
+		if l != None:
+			return l
 		
 		return len(self.getValue())
 		
@@ -3947,7 +3942,6 @@ class Blob(DataElement):
 		
 		if self.lengthType == 'calc':
 			self.length = self.calcLength()
-			#print "Calucalted length:", self.length
 		
 		elif self.isStatic:
 			return len(self.getValue())
@@ -3955,6 +3949,14 @@ class Blob(DataElement):
 		return self.length
 		
 	def getRawValue(self, sout = None):
+		
+		targetLength = None
+		
+		if self.lengthType == 'calc':
+			targetLength = self.calcLength()
+		
+		elif self.length != None:
+			targetLength = self.length
 		
 		# 1. init
 		value = ""
@@ -3973,6 +3975,11 @@ class Blob(DataElement):
 		# 4. Override?
 		if self.currentValue != None:
 			value = self.currentValue
+		
+		# Make correct size
+		if targetLength != None:
+			while len(value) < targetLength:
+				value = value + "\x00"
 		
 		# 5. If we have sout
 		if sout != None:

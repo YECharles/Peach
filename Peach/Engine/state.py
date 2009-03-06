@@ -582,7 +582,8 @@ class StateEngine:
 			if action.valueXpath != None:
 				valueNodes = doc.xpath(action.valueXpath)
 				if len(valueNodes) == 0:
-					raise Exception("StateEngine._runAction(xpath): valueXpath did not return a node")
+					print "Warning: valueXpath did not return a node"
+					raise SoftException("StateEngine._runAction(xpath): valueXpath did not return a node")
 				
 				valueNode = valueNodes[0]
 				valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
