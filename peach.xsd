@@ -190,7 +190,7 @@
 			<xs:attributeGroup ref="ValueAttributes" />
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
@@ -392,7 +392,7 @@
 			</xs:attribute>
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="padCharacter">
@@ -647,12 +647,12 @@
 						must be less then total length of Flag set.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attributeGroup ref="ValueAttributes" />
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attributeGroup ref="ValueAttributes" />
 		</xs:complexType>
 		<xs:unique name="flagKey1">
 			<xs:selector xpath="." />
@@ -774,7 +774,7 @@
 			</xs:attribute>
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>Indicates value is static and should not be fuzzed.</xs:documentation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="lengthType">

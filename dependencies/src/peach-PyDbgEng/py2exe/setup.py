@@ -12,15 +12,14 @@ import py2exe
 import sys
 
 setup(
-    name="DbgEngEvent",
-    # the following two parameters embed support files within exe/dll file
-    options={"py2exe": {"optimize":2, "bundle_files": 3, }},
-    zipfile=None,
-    version="0.7",
-    description="DbgEngEvent Proxy",
-    # author, maintainer, contact go here:
-    author="Michael Eddington",
-    author_email="mike@phed.org",
-    packages=["PyDbgEng"],
-    console=['PyDbgEng/DbgEngEvent.py']
-    )
+	name="DbgEngEvent",
+	options={"py2exe": {"bundle_files": 1, }},
+	zipfile=None,
+	version="0.7",
+	description="DbgEngEvent Proxy",
+	author="Michael Eddington",
+	author_email="mike@phed.org",
+	packages=["PyDbgEng"],
+	package_data={'PyDbgEng': ['data/*']},
+	console=['PyDbgEng/DbgEngEvent.py']
+	)

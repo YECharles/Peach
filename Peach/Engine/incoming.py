@@ -2112,12 +2112,16 @@ class DataCracker:
 						#Debug(1, ".")
 						newpos += 1
 						lookRating = self._lookAhead(node, buff, newpos, parent)
-						#Debug(1, "newpos: %d lookRating: %d data: %d" % (newpos, lookRating, len(data)))
+						#Debug(1, "newpos: %d lookRating: %d data: %d" % (newpos, lookRating, len(buff)))
 					
 					while lookRating <= 2 and newpos < len(buff.data):
 						#Debug(1, ",")
 						newpos += 1
 						lookRating = self._lookAhead(node, buff, newpos, parent)
+						
+						if lookRating > 2:
+							newpos -= 1
+						
 						#Debug(1, "newpos: %d lookRating: %d data: %d" % (newpos, lookRating, len(data)))
 					
 					#if newpos >= len(data):
