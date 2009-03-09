@@ -42,10 +42,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        Peach ::
-        Engine ::
-        parser ::
-        ParseTemplate ::
+        <a href="Peach-module.html">Package&nbsp;Peach</a> ::
+        <a href="Peach.Engine-module.html">Package&nbsp;Engine</a> ::
+        <a href="Peach.Engine.parser-module.html">Module&nbsp;parser</a> ::
         Class&nbsp;ParseTemplate
       </span>
     </td>
@@ -60,8 +59,7 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class ParseTemplate</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate">source&nbsp;code</a></span></p>
-<p>The Peach 2.0 XML -&gt; Peach DOM parser.  Uses 4Suite XML 
-  library.</p>
+<p>The Peach 2 XML -&gt; Peach DOM parser.  Uses 4Suite XML library.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -141,7 +139,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="HandleDocument"></a><span class="summary-sig-name">HandleDocument</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">doc</span>)</span></td>
+        <span class="summary-sig-arg">doc</span>,
+        <span class="summary-sig-arg">uri</span>=<span class="summary-sig-default">&quot;&quot;</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleDocument">source&nbsp;code</a></span>
             
@@ -390,6 +389,43 @@
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="HandleAnalyzerTopLevel"></a><span class="summary-sig-name">HandleAnalyzerTopLevel</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">elem</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleAnalyzerTopLevel">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.parser.ParseTemplate-class.html#HandleCommonDataElementAttributes" class="summary-sig-name">HandleCommonDataElementAttributes</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Handle attributes common to all DataElements such as:</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleCommonDataElementAttributes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -433,6 +469,26 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.parser.ParseTemplate-class.html#HandleDataContainerChildren" class="summary-sig-name">HandleDataContainerChildren</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">parent</span>,
+        <span class="summary-sig-arg">errorOnUnknown</span>=<span class="summary-sig-default">True</span>)</span><br />
+      Handle parsing conatiner children.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleDataContainerChildren">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="HandleMutators"></a><span class="summary-sig-name">HandleMutators</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">node</span>,
         <span class="summary-sig-arg">parent</span>)</span></td>
@@ -456,6 +512,42 @@
         <span class="summary-sig-arg">parent</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleChoice">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="HandleXmlElement"></a><span class="summary-sig-name">HandleXmlElement</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">parent</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleXmlElement">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="HandleXmlAttribute"></a><span class="summary-sig-name">HandleXmlAttribute</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">parent</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleXmlAttribute">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -1226,6 +1318,81 @@ r&quot;^([,\s]*([a-zA-Z0-9]{2})[,\s]*)&quot;)">re.compile(r&quot;^([,\s]*\\x([a-
   </dl>
 </td></tr></table>
 </div>
+<a name="HandleCommonDataElementAttributes"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">HandleCommonDataElementAttributes</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleCommonDataElementAttributes">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle attributes common to all DataElements such as:</p>
+  <ul>
+    <li>
+      minOccurs, maxOccurs
+    </li>
+    <li>
+      mutable
+    </li>
+    <li>
+      isStatic
+    </li>
+    <li>
+      constraint
+    </li>
+    <li>
+      pointer
+    </li>
+    <li>
+      pointerDepth
+    </li>
+    <li>
+      token
+    </li>
+  </ul>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="HandleDataContainerChildren"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">HandleDataContainerChildren</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>,
+        <span class="sig-arg">parent</span>,
+        <span class="sig-arg">errorOnUnknown</span>=<span class="sig-default">True</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.parser-pysrc.html#ParseTemplate.HandleDataContainerChildren">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle parsing conatiner children.  This method will handle children 
+  of DataElement types for containers like Block, Choice, and Template.</p>
+  <p>Can be used by Custom types to create Custom container types.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>node</code></strong> (XML Element) - Current XML Node being handled</li>
+        <li><strong class="pname"><code>parent</code></strong> (ElementWithChildren) - Parent of this DataElement</li>
+        <li><strong class="pname"><code>errorOnUnknonw</code></strong> - Should we throw an error on unexpected child node (default True)</li>
+        <li><strong class="pname"><code>errorOnUnknown</code></strong> (Boolean)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="_locateDefaultMutators"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -1331,7 +1498,7 @@ r&quot;^([,\s]*([a-zA-Z0-9]{2})[,\s]*)&quot;)
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:27 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:49 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

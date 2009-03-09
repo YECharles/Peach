@@ -98,59 +98,6 @@
       
     </td>
   </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_getElementByName"></a><span class="summary-sig-name">_getElementByName</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">node</span>,
-        <span class="summary-sig-arg">name</span>)</span><br />
-      DEPRICATED! SHould say: node.findDataElementByName(name)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator._getElementByName">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="isFinite"></a><span class="summary-sig-name">isFinite</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Some mutators could contine forever, this should indicate.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.isFinite">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="reset"></a><span class="summary-sig-name">reset</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Reset mutator</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.reset">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -161,42 +108,6 @@
       Goto next mutation.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.next">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="Peach.mutator.Mutator-class.html#getState" class="summary-sig-name">getState</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return a binary string that contains any information about current 
-      state of Mutator.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.getState">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="Peach.mutator.Mutator-class.html#setState" class="summary-sig-name">setState</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">state</span>)</span><br />
-      Set the state of this object.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.setState">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -227,11 +138,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="Peach.mutator.Mutator-class.html#calculateCount" class="summary-sig-name">calculateCount</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      This method should calculate the count of this mutator in a thread 
-      safe mannor.</td>
+          <td><span class="summary-sig"><a name="sequencialMutation"></a><span class="summary-sig-name">sequencialMutation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Perform a sequencial mutation</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.calculateCount">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.sequencialMutation">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -245,10 +156,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getActionValue"></a><span class="summary-sig-name">getActionValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
+          <td><span class="summary-sig"><a name="randomMutation"></a><span class="summary-sig-name">randomMutation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Perform a random mutation</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.getActionValue">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.randomMutation">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -256,136 +168,35 @@
       
     </td>
   </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getActionParamValue"></a><span class="summary-sig-name">getActionParamValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
+          <td><span class="summary-sig"><a name="supportedDataElement"></a><span class="summary-sig-name">supportedDataElement</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Returns true if element is supported by this mutator</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.getActionParamValue">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="getActionChangeStateValue"></a><span class="summary-sig-name">getActionChangeStateValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>,
-        <span class="summary-sig-arg">value</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.getActionChangeStateValue">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onStateStart"></a><span class="summary-sig-name">onStateStart</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">state</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onStateStart">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onStateComplete"></a><span class="summary-sig-name">onStateComplete</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">state</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onStateComplete">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onActionStart"></a><span class="summary-sig-name">onActionStart</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onActionStart">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onActionComplete"></a><span class="summary-sig-name">onActionComplete</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onActionComplete">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onStateMachineStart"></a><span class="summary-sig-name">onStateMachineStart</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">stateMachine</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onStateMachineStart">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onStateMachineComplete"></a><span class="summary-sig-name">onStateMachineComplete</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">stateMachine</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.onStateMachineComplete">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.supportedDataElement">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -424,6 +235,39 @@
     </td><td class="summary">
         <a href="Peach.mutator.Mutator-class.html#dataTypes" class="summary-name">dataTypes</a> = <code title="['template', 'string', 'number', 'flags', 'choice', 'sequence', 'blob'\
 , 'block']">['template', 'string', 'number', 'flags', 'choice'<code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_random"></a><span class="summary-name">_random</span> = <code title="random.Random()">random.Random()</code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="isFinite"></a><span class="summary-name">isFinite</span><br />
+      Is mutator finite?
     </td>
   </tr>
 </table>
@@ -465,49 +309,6 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="getState"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getState</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.getState">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Return a binary string that contains any information about current 
-  state of Mutator.  This state information should be enough to let the 
-  same mutator &quot;restart&quot; and continue when setState() is 
-  called.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="setState"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setState</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">state</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.setState">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Set the state of this object.  Should put us back in the same place as
-  when we said &quot;getState()&quot;.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="getCount"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -527,30 +328,8 @@
   the first time.  Once the state machine has been run the count can be 
   calculated.  This typically occurs in a separate thread as it can take 
   some time to calculate.</p>
-  <p>This method will return -1 until a the correct value has been 
+  <p>This method will return None until a the correct value has been 
   calculated.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="calculateCount"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">calculateCount</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.mutator-pysrc.html#Mutator.calculateCount">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>This method should calculate the count of this mutator in a thread 
-  safe mannor.  Typically this method is called from a different thread. It
-  will never be called until the state machine has run the first time 
-  through.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -625,7 +404,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:41 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:54:01 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -61,23 +61,18 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class NumericalVarianceMutator</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_mu_14" name="uml_class_diagram_for_peach_mu_14">
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html" title="Produce numbers that are defaultValue &#45; N to defaultValue + N." alt="" coords="16,72,307,323"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#__init__" title="Peach.Mutators.number.NumericalVarianceMutator.__init__" alt="" coords="17,97,305,116"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#isFinite" title="Some mutators could contine forever, this should indicate." alt="" coords="17,116,305,135"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#reset" title="Reset mutator" alt="" coords="17,135,305,153"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#next" title="Goto next mutation." alt="" coords="17,153,305,172"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getState" title="Return a binary string that contains any information about current state of Mutator." alt="" coords="17,172,305,191"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#setState" title="Set the state of this object." alt="" coords="17,191,305,209"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getCount" title="Peach.Mutators.number.NumericalVarianceMutator.getCount" alt="" coords="17,209,305,228"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#calculateCount" title="Peach.Mutators.number.NumericalVarianceMutator.calculateCount" alt="" coords="17,228,305,247"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getActionValue" title="Peach.Mutators.number.NumericalVarianceMutator.getActionValue" alt="" coords="17,247,305,265"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getActionParamValue" title="Peach.Mutators.number.NumericalVarianceMutator.getActionParamValue" alt="" coords="17,265,305,284"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getActionChangeStateValue" title="Peach.Mutators.number.NumericalVarianceMutator.getActionChangeStateValue" alt="" coords="17,284,305,303"/>
-<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#onStateMachineComplete" title="Peach.Mutators.number.NumericalVarianceMutator.onStateMachineComplete" alt="" coords="17,303,305,321"/>
-<area shape="rect" href="javascript:void(0);" title="??&#45;254" alt="" coords="139,11,184,43"/>
+<center>  <map id="uml_class_diagram_for_peach_mu_17" name="uml_class_diagram_for_peach_mu_17">
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html" title="Produce numbers that are defaultValue &#45; N to defaultValue + N." alt="" coords="16,72,208,224"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#isFinite" title="Is mutator finite?" alt="" coords="17,89,207,108"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#__init__" title="Peach.Mutators.number.NumericalVarianceMutator.__init__" alt="" coords="17,111,207,129"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#next" title="Peach.Mutators.number.NumericalVarianceMutator.next" alt="" coords="17,129,207,148"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#getCount" title="Peach.Mutators.number.NumericalVarianceMutator.getCount" alt="" coords="17,148,207,167"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#supportedDataElement" title="Peach.Mutators.number.NumericalVarianceMutator.supportedDataElement" alt="" coords="17,167,207,185"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#sequencialMutation" title="Peach.Mutators.number.NumericalVarianceMutator.sequencialMutation" alt="" coords="17,185,207,204"/>
+<area shape="rect" href="Peach.Mutators.number.NumericalVarianceMutator&#45;class.html#randomMutation" title="Peach.Mutators.number.NumericalVarianceMutator.randomMutation" alt="" coords="17,204,207,223"/>
+<area shape="rect" href="javascript:void(0);" title="??&#45;294" alt="" coords="89,11,135,43"/>
 </map>
-  <img src="uml_class_diagram_for_peach_mu_14.gif" alt='' usemap="#uml_class_diagram_for_peach_mu_14" ismap="ismap" class="graph-without-title" />
+  <img src="uml_class_diagram_for_peach_mu_17.gif" alt='' usemap="#uml_class_diagram_for_peach_mu_17" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
@@ -107,7 +102,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="__init__"></a><span class="summary-sig-name">__init__</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">peach</span>)</span></td>
+        <span class="summary-sig-arg">peach</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.__init__">source&nbsp;code</a></span>
             
@@ -117,16 +113,17 @@
       
     </td>
   </tr>
-<tr>
+<tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="isFinite"></a><span class="summary-sig-name">isFinite</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Some mutators could contine forever, this should indicate.</td>
+          <td><span class="summary-sig"><a name="_getN"></a><span class="summary-sig-name">_getN</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>,
+        <span class="summary-sig-arg">n</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.isFinite">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator._getN">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -140,63 +137,9 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="reset"></a><span class="summary-sig-name">reset</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Reset mutator</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.reset">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="Peach.Mutators.number.NumericalVarianceMutator-class.html#next" class="summary-sig-name">next</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Goto next mutation.</td>
+          <td><span class="summary-sig"><a name="next"></a><span class="summary-sig-name">next</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.next">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="Peach.Mutators.number.NumericalVarianceMutator-class.html#getState" class="summary-sig-name">getState</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return a binary string that contains any information about current 
-      state of Mutator.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.getState">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="Peach.Mutators.number.NumericalVarianceMutator-class.html#setState" class="summary-sig-name">setState</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">state</span>)</span><br />
-      Set the state of this object.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.setState">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -226,44 +169,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="calculateCount"></a><span class="summary-sig-name">calculateCount</span>(<span class="summary-sig-arg">self</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.calculateCount">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_getNumberElements"></a><span class="summary-sig-name">_getNumberElements</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="sequencialMutation"></a><span class="summary-sig-name">sequencialMutation</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">node</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator._getNumberElements">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_getN"></a><span class="summary-sig-name">_getN</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">node</span>)</span><br />
-      Gets N by checking node for hint, or returnign default</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator._getN">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.sequencialMutation">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -277,62 +186,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getActionValue"></a><span class="summary-sig-name">getActionValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
+          <td><span class="summary-sig"><a name="randomMutation"></a><span class="summary-sig-name">randomMutation</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.getActionValue">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="getActionParamValue"></a><span class="summary-sig-name">getActionParamValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.getActionParamValue">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="getActionChangeStateValue"></a><span class="summary-sig-name">getActionChangeStateValue</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">action</span>,
-        <span class="summary-sig-arg">value</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.getActionChangeStateValue">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="onStateMachineComplete"></a><span class="summary-sig-name">onStateMachineComplete</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">stateMachine</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.onStateMachineComplete">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.randomMutation">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -341,88 +198,66 @@
     </td>
   </tr>
 </table>
-<!-- ==================== METHOD DETAILS ==================== -->
-<a name="section-MethodDetails"></a>
-<table class="details" border="1" cellpadding="3"
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td colspan="2" class="table-header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr valign="top">
-        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="left"><span class="table-header">Static Methods</span></td>
         <td align="right" valign="top"
-         ><span class="options">[<a href="#section-MethodDetails"
+         ><span class="options">[<a href="#section-StaticMethods"
          class="privatelink" onclick="toggle_private();"
          >hide private</a>]</span></td>
       </tr>
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="supportedDataElement"></a><span class="summary-sig-name">supportedDataElement</span>(<span class="summary-sig-arg">e</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.supportedDataElement">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 </table>
-<a name="next"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">next</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.next">source&nbsp;code</a></span>&nbsp;
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="isFinite"></a><span class="summary-name">isFinite</span><br />
+      Is mutator finite?
     </td>
-  </tr></table>
-  
-  <p>Goto next mutation.  When this is called the state machine is updated 
-  as needed.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="getState"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getState</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.getState">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Return a binary string that contains any information about current 
-  state of Mutator.  This state information should be enough to let the 
-  same mutator &quot;restart&quot; and continue when setState() is 
-  called.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="setState"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setState</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">state</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.Mutators.number-pysrc.html#NumericalVarianceMutator.setState">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Set the state of this object.  Should put us back in the same place as
-  when we said &quot;getState()&quot;.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<br />
+  </tr>
+</table>
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -454,7 +289,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:36 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:55 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

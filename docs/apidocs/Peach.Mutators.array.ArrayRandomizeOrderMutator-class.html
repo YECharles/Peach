@@ -61,25 +61,19 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class ArrayRandomizeOrderMutator</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_mu_2" name="uml_class_diagram_for_peach_mu_2">
-<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html" title="Peach.Mutators.array.ArrayRandomizeOrderMutator" alt="" coords="69,333,253,397"/>
-<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#__init__" title="Peach.Mutators.array.ArrayRandomizeOrderMutator.__init__" alt="" coords="71,359,252,377"/>
-<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#getGenerator" title="Peach.Mutators.array.ArrayRandomizeOrderMutator.getGenerator" alt="" coords="71,377,252,396"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html" title="Change the length of arrays to count &#45; N to count + N." alt="" coords="16,72,307,304"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#isFinite" title="Some mutators could contine forever, this should indicate." alt="" coords="17,97,305,116"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#reset" title="Reset mutator" alt="" coords="17,116,305,135"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#next" title="Goto next mutation." alt="" coords="17,135,305,153"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#getState" title="Return a binary string that contains any information about current state of Mutator." alt="" coords="17,153,305,172"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#setState" title="Set the state of this object." alt="" coords="17,172,305,191"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#getCount" title="Peach.Mutators.array._ArrayMutator.getCount" alt="" coords="17,191,305,209"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#calculateCount" title="Peach.Mutators.array._ArrayMutator.calculateCount" alt="" coords="17,209,305,228"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#getActionValue" title="Peach.Mutators.array._ArrayMutator.getActionValue" alt="" coords="17,228,305,247"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#getActionParamValue" title="Peach.Mutators.array._ArrayMutator.getActionParamValue" alt="" coords="17,247,305,265"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#getActionChangeStateValue" title="Peach.Mutators.array._ArrayMutator.getActionChangeStateValue" alt="" coords="17,265,305,284"/>
-<area shape="rect" href="Peach.Mutators.array._ArrayMutator&#45;class.html#onStateMachineComplete" title="Peach.Mutators.array._ArrayMutator.onStateMachineComplete" alt="" coords="17,284,305,303"/>
-<area shape="rect" href="javascript:void(0);" title="??&#45;260" alt="" coords="139,11,184,43"/>
+<center>  <map id="uml_class_diagram_for_peach_mu_7" name="uml_class_diagram_for_peach_mu_7">
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html" title="Peach.Mutators.array.ArrayRandomizeOrderMutator" alt="" coords="16,160,208,280"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#__init__" title="Peach.Mutators.array.ArrayRandomizeOrderMutator.__init__" alt="" coords="17,185,207,204"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#next" title="Goto next mutation." alt="" coords="17,204,207,223"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#getCount" title="Peach.Mutators.array.ArrayRandomizeOrderMutator.getCount" alt="" coords="17,223,207,241"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#sequencialMutation" title="Perform a sequencial mutation" alt="" coords="17,241,207,260"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayRandomizeOrderMutator&#45;class.html#randomMutation" title="Perform a random mutation" alt="" coords="17,260,207,279"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayVarianceMutator&#45;class.html" title="Change the length of arrays to count &#45; N to count + N." alt="" coords="31,72,193,131"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayVarianceMutator&#45;class.html#isFinite" title="Is mutator finite?" alt="" coords="32,89,192,108"/>
+<area shape="rect" href="Peach.Mutators.array.ArrayVarianceMutator&#45;class.html#supportedDataElement" title="Returns true if element is supported by this mutator" alt="" coords="32,111,192,129"/>
+<area shape="rect" href="javascript:void(0);" title="??&#45;287" alt="" coords="89,11,135,43"/>
 </map>
-  <img src="uml_class_diagram_for_peach_mu_2.gif" alt='' usemap="#uml_class_diagram_for_peach_mu_2" ismap="ismap" class="graph-without-title" />
+  <img src="uml_class_diagram_for_peach_mu_7.gif" alt='' usemap="#uml_class_diagram_for_peach_mu_7" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
@@ -107,7 +101,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">peach</span>)</span></td>
+        <span class="summary-sig-arg">peach</span>,
+        <span class="summary-sig-arg">node</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.__init__">source&nbsp;code</a></span>
             
@@ -123,11 +118,80 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#getGenerator" class="summary-sig-name">getGenerator</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">e</span>,
-        <span class="summary-sig-arg">n</span>)</span></td>
+          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#next" class="summary-sig-name">next</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Goto next mutation.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.getGenerator">source&nbsp;code</a></span>
+            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.next">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#getCount" class="summary-sig-name">getCount</a>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.getCount">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#sequencialMutation" class="summary-sig-name">sequencialMutation</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Perform a sequencial mutation</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.sequencialMutation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#randomMutation" class="summary-sig-name">randomMutation</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Perform a random mutation</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.randomMutation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Mutators.array.ArrayRandomizeOrderMutator-class.html#_performMutation" class="summary-sig-name" onclick="show_private();">_performMutation</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">node</span>)</span><br />
+      Perform array mutation using count</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator._performMutation">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -137,23 +201,59 @@
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Mutators.array._ArrayMutator-class.html">_ArrayMutator</a></code></b>:
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#calculateCount">calculateCount</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#getActionChangeStateValue">getActionChangeStateValue</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#getActionParamValue">getActionParamValue</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#getActionValue">getActionValue</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#getCount">getCount</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#getState">getState</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#isFinite">isFinite</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#next">next</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#onStateMachineComplete">onStateMachineComplete</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#reset">reset</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#setState">setState</a></code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Mutators.array._ArrayMutator-class.html">_ArrayMutator</a></code></b> (private):
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#_getArrayElements" onclick="show_private();">_getArrayElements</a></code>,
-      <code><a href="Peach.Mutators.array._ArrayMutator-class.html#_getN" onclick="show_private();">_getN</a></code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html">ArrayVarianceMutator</a></code></b> (private):
+      <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#_getN" onclick="show_private();">_getN</a></code>
       </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html">ArrayVarianceMutator</a></code></b>:
+      <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#supportedDataElement">supportedDataElement</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html">ArrayVarianceMutator</a></code></b>:
+      <code><a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#isFinite">isFinite</a></code>
+      </p>
     </td>
   </tr>
 </table>
@@ -183,7 +283,8 @@
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">peach</span>)</span>
+        <span class="sig-arg">peach</span>,
+        <span class="sig-arg">node</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -194,31 +295,125 @@
   
   <dl class="fields">
     <dt>Overrides:
-        <a href="Peach.Mutators.array._ArrayMutator-class.html#__init__">_ArrayMutator.__init__</a>
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#__init__">ArrayVarianceMutator.__init__</a>
     </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="getGenerator"></a>
+<a name="next"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getGenerator</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">e</span>,
-        <span class="sig-arg">n</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">next</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.getGenerator">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.next">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Goto next mutation.  When this is called the state machine is updated 
+  as needed.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#next">ArrayVarianceMutator.next</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getCount"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getCount</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.getCount">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
   
   <dl class="fields">
     <dt>Overrides:
-        <a href="Peach.Mutators.array._ArrayMutator-class.html#getGenerator">_ArrayMutator.getGenerator</a>
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#getCount">ArrayVarianceMutator.getCount</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="sequencialMutation"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">sequencialMutation</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.sequencialMutation">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Perform a sequencial mutation</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#sequencialMutation">ArrayVarianceMutator.sequencialMutation</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="randomMutation"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">randomMutation</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator.randomMutation">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Perform a random mutation</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#randomMutation">ArrayVarianceMutator.randomMutation</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_performMutation"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_performMutation</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">node</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Mutators.array-pysrc.html#ArrayRandomizeOrderMutator._performMutation">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Perform array mutation using count</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.Mutators.array.ArrayVarianceMutator-class.html#_performMutation" onclick="show_private();">ArrayVarianceMutator._performMutation</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -255,7 +450,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:35 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:55 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

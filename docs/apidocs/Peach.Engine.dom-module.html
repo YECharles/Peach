@@ -67,7 +67,7 @@
         Michael Eddington
       </p>
       <p><strong>Version:</strong>
-        $Id: dom.py 1288 2008-10-19 00:26:03Z meddingt $
+        $Id: dom.py 1581 2009-03-06 00:12:46Z meddingt $
       </p>
 </div><!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -91,6 +91,13 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="Peach.Engine.dom.Empty-class.html" class="summary-name">Empty</a>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Peach.Engine.dom._DefaultStructure-class.html" class="summary-name" onclick="show_private();">_DefaultStructure</a>
     </td>
   </tr>
 <tr>
@@ -223,6 +230,30 @@
     </td><td class="summary">
         <a href="Peach.Engine.dom.Number-class.html" class="summary-name">Number</a><br />
       A numerical field
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Peach.Engine.dom.Asn1Type-class.html" class="summary-name">Asn1Type</a><br />
+      An XML Element
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Peach.Engine.dom.XmlElement-class.html" class="summary-name">XmlElement</a><br />
+      An XML Element
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Peach.Engine.dom.XmlAttribute-class.html" class="summary-name">XmlAttribute</a><br />
+      An XML Element
     </td>
   </tr>
 <tr>
@@ -434,24 +465,6 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="Peach.Engine.dom-module.html#PeachDeepCopy" class="summary-sig-name">PeachDeepCopy</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">memo</span>)</span><br />
-      Copying objects in our DOM is a crazy business.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#PeachDeepCopy">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
           <td><span class="summary-sig"><a name="BlockToXml"></a><span class="summary-sig-name">BlockToXml</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">parent</span>)</span></td>
           <td align="right" valign="top">
@@ -547,46 +560,6 @@
     </td>
   </tr>
 </table>
-<!-- ==================== FUNCTION DETAILS ==================== -->
-<a name="section-FunctionDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Function Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-FunctionDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="PeachDeepCopy"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">PeachDeepCopy</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">memo</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#PeachDeepCopy">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Copying objects in our DOM is a crazy business.  Here we try and help 
-  out as much as we can.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -618,7 +591,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:19 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:39 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

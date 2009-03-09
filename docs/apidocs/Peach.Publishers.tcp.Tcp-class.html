@@ -61,18 +61,25 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Tcp</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_pu_17" name="uml_class_diagram_for_peach_pu_17">
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html" title="A simple TCP client publisher." alt="" coords="16,72,253,229"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#__init__" title="Peach.Publishers.tcp.Tcp.__init__" alt="" coords="17,97,252,116"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#start" title="Peach.Publishers.tcp.Tcp.start" alt="" coords="17,116,252,135"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#stop" title="Peach.Publishers.tcp.Tcp.stop" alt="" coords="17,135,252,153"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#connect" title="Create connection." alt="" coords="17,153,252,172"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#close" title="Close connection if open." alt="" coords="17,172,252,191"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#send" title="Send data via sendall." alt="" coords="17,191,252,209"/>
-<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#receive" title="Peach.Publishers.tcp.Tcp.receive" alt="" coords="17,209,252,228"/>
-<area shape="rect" href="javascript:void(0);" title="??&#45;386" alt="" coords="112,11,157,43"/>
+<center>  <map id="uml_class_diagram_for_peach_pu_20" name="uml_class_diagram_for_peach_pu_20">
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html" title="A simple TCP client publisher." alt="" coords="56,192,293,349"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#__init__" title="Peach.Publishers.tcp.Tcp.__init__" alt="" coords="57,217,292,236"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#start" title="Change state such that send/receave will work." alt="" coords="57,236,292,255"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#stop" title="Change state such that send/receave will not work." alt="" coords="57,255,292,273"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#connect" title="Create connection." alt="" coords="57,273,292,292"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#close" title="Close connection if open." alt="" coords="57,292,292,311"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#send" title="Send data via sendall." alt="" coords="57,311,292,329"/>
+<area shape="rect" href="Peach.Publishers.tcp.Tcp&#45;class.html#receive" title="Receive some data." alt="" coords="57,329,292,348"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html" title="The Publisher object(s) implement a way to send and/or receave data by some means." alt="" coords="16,11,333,163"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#withNode" title="Indicates which method should be called." alt="" coords="17,28,332,47"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#sendWithNode" title="Publish some data" alt="" coords="17,49,332,68"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#call" title="Call a method using arguments." alt="" coords="17,68,332,87"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#callWithNode" title="Call a method using arguments." alt="" coords="17,87,332,105"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#property" title="Get or set property" alt="" coords="17,105,332,124"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#propertyWithNode" title="Get or set property" alt="" coords="17,124,332,143"/>
+<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#accept" title="Accept incoming connection." alt="" coords="17,143,332,161"/>
 </map>
-  <img src="uml_class_diagram_for_peach_pu_17.gif" alt='' usemap="#uml_class_diagram_for_peach_pu_17" ismap="ismap" class="graph-without-title" />
+  <img src="uml_class_diagram_for_peach_pu_20.gif" alt='' usemap="#uml_class_diagram_for_peach_pu_20" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
@@ -120,7 +127,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="start"></a><span class="summary-sig-name">start</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a href="Peach.Publishers.tcp.Tcp-class.html#start" class="summary-sig-name">start</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Change state such that send/receave will work.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.start">source&nbsp;code</a></span>
             
@@ -136,7 +144,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="stop"></a><span class="summary-sig-name">stop</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a href="Peach.Publishers.tcp.Tcp-class.html#stop" class="summary-sig-name">stop</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Change state such that send/receave will not work.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.stop">source&nbsp;code</a></span>
             
@@ -169,7 +178,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="close"></a><span class="summary-sig-name">close</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="Peach.Publishers.tcp.Tcp-class.html#close" class="summary-sig-name">close</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Close connection if open.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.close">source&nbsp;code</a></span>
@@ -235,12 +244,13 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="receive"></a><span class="summary-sig-name">receive</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">None</span>)</span></td>
+          <td><span class="summary-sig"><a href="Peach.Publishers.tcp.Tcp-class.html#receive" class="summary-sig-name">receive</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Receive some data.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.receive">source&nbsp;code</a></span>
             
@@ -248,6 +258,43 @@
         </tr>
       </table>
       
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.publisher.Publisher-class.html">publisher.Publisher</a></code></b>:
+      <code><a href="Peach.publisher.Publisher-class.html#accept">accept</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#call">call</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#callWithNode">callWithNode</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#property">property</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#propertyWithNode">propertyWithNode</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#sendWithNode">sendWithNode</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.publisher.Publisher-class.html">publisher.Publisher</a></code></b>:
+      <code><a href="Peach.publisher.Publisher-class.html#withNode">withNode</a></code>
+      </p>
     </td>
   </tr>
 </table>
@@ -295,6 +342,80 @@
         <li><strong class="pname"><code>port</code></strong> (number) - Remote port</li>
         <li><strong class="pname"><code>timeout</code></strong> (number) - How long to wait for reponse</li>
     </ul></dd>
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#__init__">publisher.Publisher.__init__</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="start"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">start</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.start">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Change state such that send/receave will work.  For Tcp this could be 
+  connecting to a remote host</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#start">publisher.Publisher.start</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="stop"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stop</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.stop">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Change state such that send/receave will not work.  For Tcp this could
+  be closing a connection, for a file it might be closing the file 
+  handle.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#stop">publisher.Publisher.stop</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="close"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">close</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.close">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Close connection if open.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#close">publisher.Publisher.close</a>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -319,6 +440,9 @@
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>data</code></strong> (string) - Data to send</li>
     </ul></dd>
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#send">publisher.Publisher.send</a>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -365,6 +489,36 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="receive"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">receive</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">size</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.tcp-pysrc.html#Tcp.receive">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Receive some data.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>size</code></strong> - Number of bytes to return</li>
+    </ul></dd>
+    <dt>Returns: string</dt>
+        <dd>data received</dd>
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#receive">publisher.Publisher.receive</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -397,7 +551,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 22 21:36:37 2008
+    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:57 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
