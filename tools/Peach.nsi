@@ -111,7 +111,7 @@ ok:
   ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pyasn1-0.0.7a.win32-py2.5.msi"
   ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pyvmware-0.1.win32-py2.5.msi"
   ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\pcap-peach.win32-py2.5.msi"
-  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\PyDbgEng-0.7.win32-py2.5.msi"
+  ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\PyDbgEng-0.9.win32-py2.5.msi"
   ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\zope.interface-3.3.0.win32-py2.5.msi"
   ExecWait "msiexec /qn /i $INSTDIR\dependencies\py2.5-win32\Twisted-8.0.1.win32-py2.5.msi"
   
