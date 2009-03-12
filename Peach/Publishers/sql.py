@@ -90,7 +90,12 @@ class Odbc(Publisher):
 		Create cursor and execute data.
 		'''
 		self._cursor = self._sql.cursor()
-		self._cursor.execute(method, args)
+		
+		try:
+			self._cursor.execute(method, args)
+		except:
+			print "Warning: execute failed: ", sys.exc_info()
+			pass
 		
 		ret = ''
 		try:
