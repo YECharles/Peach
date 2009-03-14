@@ -1,6 +1,13 @@
 PyDbgEng - Python Wrapper For Windows Debugging Engine
 ======================================================
 
+README FIRST
+============
+
+This readme file is way out of date.  The current maintaner (me) has yet
+to fully update it.
+
+
 About
 =====
 Microsoft releases free and powerfull debugging tools for Windows (1).
@@ -64,7 +71,7 @@ The last piece of the puzzle is how to handle events. DbgEng can asynchronously 
 of various debug events. The main events interface is IDebugEventCallbacks. The client 
 can set its events callbacks by calling IDebugControl.SetEventCallbacks() and passing a 
 pointer to a class implementing IDebugEventCallbacks.
-Since there's no native way of doing so in Python, I had to improvise:
+
 comtypes can handle COM objects event sinks. Meaning, when a COM object extending 
 IConnectionPointContainer fires an event, the comtypes Python wrapper receives
 this event, and can optionally pass it to a Python class.
@@ -74,7 +81,6 @@ and that also fires an event on each method:
 	IDebugControl.SetEventCallbacks( DbgEventProxy.CreateIDebugEventCallbacks() )
 	DbgEng Event => DbgEventProxy => fire event => comtypes sink => PyDbgEng sink class
 
-Believe it or not, it works =) The code is located at 'DbgEventProxy' folder.
 
 Now we can do this:
 
@@ -99,30 +105,11 @@ Now we can do this:
 	==========================================================
 
 
-Build
-=====
-Im using Microsoft Visual Studio 2005 Express edition (6) and of course the latest Platform
-SDK (7).
-
-To build 'DbgEngTlb' simply run 'nmake' from the build command prompt. 
-To rebuild run 'nmake clean all'. This will create DbgEng.tlb in the 'out' folder.
-
-To build 'DbgEventProxy' please use the included solution file.
-This will create DbgEventProxy.dll.
-
 Install
 =======
-Please run install batch from 'install' folder. This will generate comtypes wrapper files 
-for both DbgEngTlb and DbgEventProxy. It will also register DbgEventProxy dll with regsvr32.
 
-PyDbgEng dependencies are comtypes (5) and ctypes (8). Ahh, and  the latest dbgeng (1) =)
+python setup.py install
 
-Patches
-=======
-Following patches are included in the 'Support' folder.
- - atlbase.h: from platform sdk. added support for VARIANT construction with an __int64 value
- - automation.py: from comtypes. added support for VARIANT construction with an __int64 value
- - __init__.py: from comtypes. added support for returnning HREASULT from event sink methods.
 
 
 References
@@ -138,5 +125,6 @@ References
 
 Author
 ======
+    Michael Eddington (mike@phed.org), 2008-2009
 	Botten Biss (botten.biss@gmail.com), Dec 2006.
 
