@@ -36,6 +36,7 @@ SQL publisher objects.  Includes a default ODBC publisher.
 
 from types import *
 
+import sys
 try:
 	import dbi, odbc
 except:

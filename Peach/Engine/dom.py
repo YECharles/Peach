@@ -1708,77 +1708,61 @@ class DataElement(Mutatable):
 		Locate and return a relation of this element.
 		'''
 		
-		if PeachModule.Engine.engine.Engine.relationsNew:
-			# Assume both of and from relations in model
-			
-			for r in self.relations:
-				# Lets not return "when" :)
-				if r.type == 'when' or r.From == None:
-					continue
-				
-				if type == None or r.type == type:
-					#print "Found of relation for", self.getFullDataName()
-					self._fixRealParent(self)
-					obj = self.findDataElementByName(r.From)
-					self._unFixRealParent(self)
-					
-					if obj == None:
-						raise Exception("Mismatched relations? Can't find r.From: '%s'" % r.From)
-					
-					if type != None:
-						for rel in obj.relations:
-							if rel.type == type:
-								return rel
-						
-						raise Exception("Mismatched relations???")
-					
-					for rel in obj.relations:
-						if rel.type == 'when':
-							continue
-						
-						return rel
-					
-					raise Exception("MIssmatched relations2???")
-			
-			#print "Not for", self.getFullDataName()
-			return None
-		
-		if self.relationCache != None:
-			root = self.getRootOfDataMap()
-			name = self.getFullnameInDataModel()
-			
-			if root.relationOfCache.has_key(name):
-				for r in root.relationOfCache[name]:
-					r = self.find(r)
-					if r != None and (type == None or r.type == type):
-						return r
-			
-			return None
-
-		# Faster by some
 		self._fixRealParent(self)
-		rel = cPeach.getRelationOfThisElement(self, type)
-		self._unFixRealParent(self)
+		try:
+			
+			if PeachModule.Engine.engine.Engine.relationsNew:
+				# Assume both of and from relations in model
+				
+				for r in self.relations:
+					# Lets not return "when" :)
+					if r.type == 'when' or r.From == None:
+						continue
+					
+					if type == None or r.type == type:
+						#print "Found of relation for", self.getFullDataName()
+						obj = self.findDataElementByName(r.From)
+					
+						if obj == None:
+							raise Exception("Mismatched relations? Can't find r.From: '%s'" % r.From)
+						
+						if type != None:
+							for rel in obj.relations:
+								if rel.type == type:
+									return rel
+					
+							raise Exception("Mismatched relations???")
+						
+						for rel in obj.relations:
+							if rel.type == 'when':
+								continue
+					
+							return rel
+			
+						raise Exception("MIssmatched relations2???")
 		
-		return rel
+				#print "Not for", self.getFullDataName()
+				return None
+			
+			if self.relationCache != None:
+				root = self.getRootOfDataMap()
+				name = self.getFullnameInDataModel()
+			
+				if root.relationOfCache.has_key(name):
+					for r in root.relationOfCache[name]:
+						r = self.find(r)
+						if r != None and (type == None or r.type == type):
+							return r
 
-		## To Test
-		##print "getRelationOfThisElement: ", self.getFullDataName()
-		##obj = cPeach.getRelationOfThisElement(self, type)
-		##
-		#for r in self._genRelationsInDataModelFromHere():
-			#if r.getOfElement() == self:
-				#if type == None or r.type == type:
-					##if r != obj:
-					##	print "r != obj"
-					##	print obj
-					##	print r
-					##	raise Exception("EERRK")
-					#return r
+				return None
 		
-		##if obj != None:
-		##	raise Exception("SHOULD BE NULL")
-		#return None
+			# Faster by some
+			rel = cPeach.getRelationOfThisElement(self, type)
+
+			return rel
+		
+		finally:
+			self._unFixRealParent(self)
 	
 	def getRelationsOfThisElement(self):
 		'''
@@ -3941,7 +3925,13 @@ class Blob(DataElement):
 		'''
 		
 		if self.lengthType == 'calc':
-			self.length = self.calcLength()
+			try:
+				self.length = self.calcLength()
+			except:
+				# This can fail while doing
+				# mutations.
+				print "Warning: Calc failed.  Okay to ignore after first iteration."
+				pass
 		
 		elif self.isStatic:
 			return len(self.getValue())

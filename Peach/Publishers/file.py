@@ -722,6 +722,203 @@ try:
 							pass
 			except:
 				pass
+			
+	###class FileRegressionGui(Publisher):
+	###	'''
+	###	Writes a file to disk and then launches a program.  After
+	###	some defined amount of time we will try and close the GUI
+	###	application by sending WM_CLOSE than kill it.
+	###	
+	###	To use, first use this publisher like the FileWriter
+	###	stream publisher.  Close, than call a program (or two).
+	###	'''
+	###	
+	###	def __init__(self, folder, windowname, debugger = "false", waitTime = 3):
+	###		'''
+	###		@type	filename: string
+	###		@param	filename: Log folder with PoC files
+	###		@type   windowname: string
+	###		@param  windowname: Partial window name to locate and kill
+	###		'''
+	###		Publisher.__init__(self)
+	###		self._windowName = windowname
+	###		self.waitTime = float(waitTime)
+	###		self.debugger = False
+	###		if debugger.lower() == "true":
+	###			self.debugger = True
+	###		
+	###		self._files = []
+	###		self._currentFile = 0
+	###			
+	###		## INSERT CODE TO LOCATE FILES
+	###		## c:\cygwin\bin\find folder -iname "*.pdf"
+	###		## put them into self._files
+	###		
+	###	def start(self):
+	###		pass
+	###	
+	###	def connect(self):
+	###		pass
+	###	
+	###	def stop(self):
+	###		pass
+	###	
+	###	def close(self):
+	###		pass
+	###	
+	###	def send(self, data):
+	###		pass
+	###	
+	###	def receive(self, size = None):
+	###		pass
+	###	
+	###	def call(self, method, args):
+	###		'''
+	###		Launch program to consume file
+	###		
+	###		@type	method: string
+	###		@param	method: Command to execute
+	###		@type	args: array of objects
+	###		@param	args: Arguments to pass
+	###		'''
+	###		
+	###		if self._currentFile > len(self._files):
+	###			raise Exception("We are done regressing")
+	###		
+	###		fileName = self._files[self._currentFile]
+	###		self._currentFile += 1
+	###		
+	###		proc = None
+	###		if self.debugger:
+	###			# Launch via agent
+	###			
+	###			## NOTE: Will need to copy PoC file ontop of
+	###			## expected file!
+	###			
+	###			Engine.context.agent.OnPublisherCall(method)
+	###		
+	###		else:
+	###			realArgs = [method]
+	###			for a in args:
+	###				if a == "FILENAME":
+	###					realArgs.append(fileName)
+	###				else:
+	###					realArgs.append(a)
+	###			
+	###			proc = None
+	###			try:
+	###				proc = subprocess.Popen(realArgs, shell=True)
+	###			
+	###			except:
+	###				print "Error: Exception thrown creating process"
+	###				raise
+	###		
+	###		# Wait 5 seconds
+	###		time.sleep(self.waitTime)
+	###		
+	###		self.closeApp(proc, self._windowName)
+	###
+	###	def enumCallback(hwnd, args):
+	###		'''
+	###		Will get called by win32gui.EnumWindows, once for each
+	###		top level application window.
+	###		'''
+	###		
+	###		proc = args[0]
+	###		windowName = args[1]
+	###		
+	###		try:
+	###		
+	###			# Get window title
+	###			title = win32gui.GetWindowText(hwnd)
+	###			
+	###			# Is this our guy?
+	###			if title.find(windowName) == -1:
+	###				win32gui.EnumChildWindows(hwnd, FileWriterLauncherGui.enumChildCallback, args)
+	###				return
+	###			
+	###			# Send WM_CLOSE message
+	###			win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+	###			win32gui.PostQuitMessage(hwnd)
+	###		except:
+	###			pass
+	###	
+	###	enumCallback = staticmethod(enumCallback)
+	###	
+	###	def enumChildCallback(hwnd, args):
+	###		'''
+	###		Will get called by win32gui.EnumWindows, once for each
+	###		top level application window.
+	###		'''
+	###		
+	###		proc = args[0]
+	###		windowName = args[1]
+	###		
+	###		try:
+	###		
+	###			# Get window title
+	###			title = win32gui.GetWindowText(hwnd)
+	###			
+	###			# Is this our guy?
+	###			if title.find(windowName) == -1:
+	###				return
+	###			
+	###			# Send WM_CLOSE message
+	###			win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+	###			win32gui.PostQuitMessage(hwnd)
+	###		except:
+	###			pass
+	###	
+	###	enumChildCallback = staticmethod(enumChildCallback)
+	###	
+	###	def genChildProcesses(self, proc):
+	###		parentPid = proc.pid
+	###		
+	###		for p in self.genProcesses():
+	###			if p.th32ParentProcessID == parentPid:
+	###				yield p.th32ProcessID
+	###	
+	###	def genProcesses(self):
+	###		
+	###		CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
+	###		Process32First = ctypes.windll.kernel32.Process32First
+	###		Process32Next = ctypes.windll.kernel32.Process32Next
+	###		CloseHandle = ctypes.windll.kernel32.CloseHandle
+	###		
+	###		hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+	###		pe32 = PROCESSENTRY32()
+	###		pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
+	###		if Process32First(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+	###			print >> sys.stderr, "Failed getting first process."
+	###			return
+	###		
+	###		while True:
+	###			yield pe32
+	###			if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+	###				break
+	###		
+	###		CloseHandle(hProcessSnap)
+	###	
+	###	def closeApp(self, proc, title):
+	###		'''
+	###		Close Application by window title
+	###		'''
+	###		
+	###		try:
+	###			win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, [proc, title])
+	###			
+	###			if proc:
+	###				win32event.WaitForSingleObject(int(proc._handle), 5*1000)
+	###				
+	###				for pid in self.genChildProcesses(proc):
+	###					try:
+	###						handle = win32api.OpenProcess(1, False, pid)
+	###						win32process.TerminateProcess(handle, -1)
+	###						win32api.CloseHandle(handle)
+	###					except:
+	###						pass
+	###		except:
+	###			pass
 except:
 	pass
 

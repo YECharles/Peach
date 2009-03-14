@@ -729,6 +729,17 @@ class ParseTemplate:
 		
 		self.HandleDataContainerChildren(node, template)
 		
+		# Switch any references to old name
+		if node.hasAttributeNS(None, 'ref'):
+			oldName = self._getAttribute(node, 'ref')
+			for relation in template._genRelationsInDataModelFromHere():
+				if relation.of == oldName:
+					relation.of = self._getAttribute(node, 'name')
+				
+				elif relation.From == oldName:
+					relation.From = self._getAttribute(node, 'name')
+
+
 		#template.printDomMap()
 		return template
 	
@@ -1087,6 +1098,8 @@ class ParseTemplate:
 		
 		if node.hasAttributeNS(None, 'ref'):
 			
+			oldName = self._getAttribute(node, "ref")
+
 			if name == None or len(name) == 0:
 				name = Element.getUniqueName()
 			
@@ -1142,6 +1155,16 @@ class ParseTemplate:
 		# children
 		
 		self.HandleDataContainerChildren(node, block)
+
+		# Switch any references to old name
+		
+		if node.hasAttributeNS(None, 'ref'):
+			for relation in block._genRelationsInDataModelFromHere():
+				if relation.of == oldName:
+					relation.of = name
+				
+				elif relation.From == oldName:
+					relation.From = name
 
 		# Add to parent
 
@@ -2060,6 +2083,8 @@ class ParseTemplate:
 						raise PeachException("Unexpected node %s" % child2.nodeName)
 						
 			elif child.nodeName == 'Mutator':
+				
+				raise PeachException("Sorry, specifying Mutators in the Test element is currently \nbroken.  This will be fixed in beta 2.  A temporary \nworkaround is to edit defaults.xml.\n")
 				
 				if not child.hasAttributeNS(None, 'class'):
 					raise PeachException("Mutator element does not have required class attribute")

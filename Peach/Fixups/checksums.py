@@ -240,7 +240,7 @@ try:
 	
 	class SspiAuthenticationFixup(Fixup):
 		'''
-		Perform basic SSPI authentication. Assumes a two step auth (kerb).
+		Perform basic SSPI authentication. Assumes a two step auth.
 		'''
 		
 		_sspi = None
@@ -248,10 +248,13 @@ try:
 		_secondObj = None
 		_data = None
 		
-		def __init__(self, firstSend, secondSend):
+		def __init__(self, firstSend, secondSend, user = None, group = None, password = None):
 			Fixup.__init__(self)
 			self.firstSend = firstSend
 			self.secondSend = secondSend
+			self.username = user
+			self.workgroup = group
+			self.password = password
 		
 		def getXml(self):
 			dict = {}
@@ -276,8 +279,8 @@ try:
 					SspiAuthenticationFixup._firstObj = self.context
 					SspiAuthenticationFixup._sspi = sspi.ClientAuth(
 						"Negotiate",
-						"157.59.22.155",	# client_name
-						("dd", "157.59.22.155", "helpme"),	# auth_info
+						"",	# client_name
+						(self.username, self.workgroup, self.password),	# auth_info
 						None, # targetsn (target security context provider)
 						scflags, #scflags	# None,	# security context flags
 						)

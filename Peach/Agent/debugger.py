@@ -365,39 +365,23 @@ try:
 				
 				# 5. !analyze -v
 				
-				#sys.stdout.write("_DbgEventHandler::Exception(): 5\n")
 				handle = None
 				try:
-					#handle = dbg.idebug_control.AddExtension(c_char_p(self.LocateWinDbg() + "\\winext\\ext.dll"), 0)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
 				except:
-					#print "loc:", self.LocateWinDbg()
 					raise
-				
-				finally:
-					#if handle != None:
-					#	dbg.idebug_control.RemoveExtension(handle)
-					pass
 				
 				## 6. Bang-Exploitable
 				
 				handle = None
 				try:
-					if sys.version.find("AMD64") == -1:
-						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\32\\swiexts.dll"), 0)
-					else:
-						handle = dbg.idebug_control.AddExtension(c_char_p("C:\\swiexts\\64\\swiexts.dll"), 0)
-					
-					dbg.idebug_control.CallExtension(handle, c_char_p("exploitable"), c_char_p("-m"))
-					#dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!swiexts.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load swiexts.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
 				except:
 					pass
-				
-				finally:
-					if handle != None:
-						dbg.idebug_control.RemoveExtension(handle)
 				
 				## Now off to other things...
 				
@@ -753,7 +737,7 @@ try:
 			self._StopDebugger()
 
 except:
-	print "Error loading windows debugger modules:", sys.exc_info()
+	print "Warning: Windows debugger failed to load: ", sys.exc_info()
 	pass
 
 try:
