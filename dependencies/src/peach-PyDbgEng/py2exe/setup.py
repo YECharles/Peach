@@ -21,5 +21,5 @@ setup(
 	author_email="mike@phed.org",
 	packages=["PyDbgEng"],
 	package_data={'PyDbgEng': ['data/*']},
-	console=['PyDbgEng/DbgEngEvent.py']
+	dll=['PyDbgEng/DbgEngEvent.py']
 	)

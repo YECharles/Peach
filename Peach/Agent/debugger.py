@@ -753,6 +753,7 @@ try:
 			self._StopDebugger()
 
 except:
+	print "Error loading windows debugger modules:", sys.exc_info()
 	pass
 
 try:

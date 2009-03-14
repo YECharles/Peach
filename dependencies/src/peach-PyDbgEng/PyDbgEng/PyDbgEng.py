@@ -219,8 +219,15 @@ class PyDbgEng(IDebugEventCallbacksSink):
 			except:
 				# Try registering it
 				import os, sys
-				os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
-				event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
+				if not hasattr(sys, "frozen"):
+					os.system("%s %s -regserver" % (sys.executable, self.findDbgEngEvent()))
+					event_proxy = CreateObject("PyDbgEngLib.DbgEngEventCallbacks")
+				
+					if event_proxy == None:
+						raise Exception("Error: Unable to create: PyDbgEngLib.DbgEngEventCallbacks")
+				else:
+					raise Exception("Error: Unable to create: PyDbgEngLib.DbgEngEventCallbacks")
+				
 				pass
 			
 			self.old_event_callbacks = self.idebug_client.GetEventCallbacks()

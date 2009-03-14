@@ -191,11 +191,6 @@ class RandomMutationStrategy(MutationStrategy):
 				except:
 					pass
 			
-			# Note: Since we are applying multiple mutations
-			#       sometimes a mutation will fail.  We should
-			#       ignore those failures.
-			try:
-				mutator.randomMutation(node)
 			except:
 				pass
 		
