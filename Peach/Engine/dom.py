@@ -3953,7 +3953,11 @@ class Blob(DataElement):
 		targetLength = None
 		
 		if self.lengthType == 'calc':
-			targetLength = self.calcLength()
+			try:
+				targetLength = self.calcLength()
+			except:
+				# Calc may not run correctly yet!
+				pass
 		
 		elif self.length != None:
 			targetLength = self.length

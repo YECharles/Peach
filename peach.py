@@ -78,18 +78,14 @@ Syntax:
   peach.py -a [port] [password]
   peach.py -c peach_xml_file [run_name]
   peach.py -g
-  peach.py [-r runspot_file] peach_xml_flie [run_name]
-  peach.py -p 10,2 [-r runspot_file] peach_xml_flie [run_name]
-  peach.py --skipto 100 peach_xml_flie [run_name]
-  peach.py -s pdml protocol > output.xml
+  peach.py [--skipto #] peach_xml_flie [run_name]
+  peach.py -p 10,2 [--skipto #] peach_xml_flie [run_name]
   peach.py -t peach_xml_file
 
+  -1                         Perform a single iteration
   -a,--agent                 Launch Peach Agent
   -c,--count                 Count test cases
-  -g,--gui                   Launch Peach Builder
-  -s,--shark pdml protocol   Convert a Wireshark capture to Peach XML
   -t,--test xml_file         Test parse a Peach XML file
-  -w,--web                   Monitor Fuzzer Runs with WebWatcher 
   -r,--restart [file]        Restart fuzzer at saved position
   -p,--parallel M,N          Parallel fuzzing.  Total of M machines, this
                              is machine N.
@@ -107,27 +103,22 @@ Peach Agent
   Starts up a Peach Agent instance on this current machine.  Defaults to
   port 9000.  When specifying a password, the port # must also be given.
 
-Peach Builder
-
-  Syntax: peach.py -g
-  
-  Start the Peach DDL Editor.
+  Note: Local agents are started automatically.
 
 Performing Fuzzing Run
 
   Syntax: peach.py peach_xml_flie [run_name]
-  Syntax: peach.py [-r restart_file] peach_xml_flie [run_name]
+  Syntax: peach.py --skipto 1234 peach_xml_flie [run_name]
   
   A fuzzing run is started by by specifying the Peach XML file and the
   name of a run to perform.
   
   If a run is interupted for some reason it can be restarted using the
-  -r parameter and providing the restart file.  Currently these files are
-  called "RunSpotSave_date_time.peach".
+  --skipto parameter and providing the test # to start at.
 
 Performing A Parellel Fuzzing Run
 
-  Syntax: peach.py -p 10,2 [-r runspot_file] peach_xml_flie [run_name]
+  Syntax: peach.py -p 10,2 peach_xml_flie [run_name]
 
   A parallel fuzzing run uses multiple machines to perform the same fuzzing
   which shortens the time required.  To run in parallel mode we will need
@@ -135,26 +126,21 @@ Performing A Parellel Fuzzing Run
   information is fed into Peach via the "-p" command line argument in the
   format "total_machines,our_machine".
 
-WireShark to Peach XML
-
-  Syntax: peach.py -s pdml protocol > output.xml
-  
-  Peach can convert PDML saved captures into Peach XML Templates.  To
-  perform this conversion follow these steps:
-  
-    1. Perform a capture in WireShark
-    2. Select a single packet and save as PDML
-    3. Open the PDML file and locate the <proto> element to convert
-       and note the name of the protocol
-    4. Run Peach using the provided syntax
-    5. Modify generated XML as needed
-
 Validate Peach XML File
 
   Syntax: peach.py -t peach_xml_file
   
   This will perform a parsing pass of the Peach XML file and display any
   errors that are found.
+
+Debug Peach XML File
+
+  Syntax: peach.py -1 --debug peach_xml_file
+  
+  This will perform a single iteration (-1) of your pit file while displaying
+  alot of debugging information (--debug).  The debugging information was
+  origionally intended just for the developers, but can be usefull in pit
+  debugging as well.
 
 """)
 	sys.exit(0)

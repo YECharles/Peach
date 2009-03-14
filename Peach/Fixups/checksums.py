@@ -236,7 +236,7 @@ class IcmpChecksumFixup(Fixup):
 
 # This Fixup only works on windows... wrap in a try
 try:
-	import sspi
+	import sspi, sspicon
 	
 	class SspiAuthenticationFixup(Fixup):
 		'''
@@ -267,13 +267,19 @@ try:
 				firstFullName = str(xml.xpath(self.firstSend)[0].getAttributeNS(None, "fullName"))
 				firstFullName = firstFullName[firstFullName.index('.')+1:]
 				if fullName.find(firstFullName) > -1 and SspiAuthenticationFixup._firstObj != self.context:
+					
+					#scflags = sspicon.ISC_REQ_INTEGRITY|sspicon.ISC_REQ_SEQUENCE_DETECT|\
+					#	sspicon.ISC_REQ_REPLAY_DETECT|sspicon.ISC_REQ_CONFIDENTIALITY
+					scflags = sspicon.ISC_REQ_INTEGRITY|sspicon.ISC_REQ_SEQUENCE_DETECT|\
+						sspicon.ISC_REQ_REPLAY_DETECT
+					
 					SspiAuthenticationFixup._firstObj = self.context
 					SspiAuthenticationFixup._sspi = sspi.ClientAuth(
 						"Negotiate",
-						"",	# client_name
-						("dd", "", "helpme"),	# auth_info
+						"157.59.22.155",	# client_name
+						("dd", "157.59.22.155", "helpme"),	# auth_info
 						None, # targetsn (target security context provider)
-						None, # security context flags
+						scflags, #scflags	# None,	# security context flags
 						)
 					
 					(done, data) = SspiAuthenticationFixup._sspi.authorize(None)

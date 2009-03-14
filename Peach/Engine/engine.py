@@ -693,8 +693,8 @@ class Engine(object):
 		finally:
 			
 			if saveState:
-				# Save our state and exit
-				stateFilename = "RunSpotSave_%s.peach" % time.strftime("%m%d%y_%H%M%S")
+				### Save our state and exit
+				##stateFilename = "RunSpotSave_%s.peach" % time.strftime("%m%d%y_%H%M%S")
 				
 				print "-- Shutting down publisher(s)"
 				
@@ -710,13 +710,13 @@ class Engine(object):
 				except:
 					pass
 				
-				print "-- Saving position to restart file: %s" % stateFilename
-				
-				state = [ test.name, testCount ]
-				fd = open(stateFilename, "wb+")
-				fd.write(pickle.dumps(state))
-				fd.close()
-				
+				##print "-- Saving position to restart file: %s" % stateFilename
+				##
+				##state = [ test.name, testCount ]
+				##fd = open(stateFilename, "wb+")
+				##fd.write(pickle.dumps(state))
+				##fd.close()
+				##
 				print "-- Done"
 				print "-- Exiting"
 				
