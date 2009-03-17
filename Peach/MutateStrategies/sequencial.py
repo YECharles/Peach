@@ -104,6 +104,17 @@ class SequencialMutationStrategy(MutationStrategy):
 		# Goto next test case
 		
 		dataModelName = self._dataModels[self._dataModelIndex]
+		
+		while self._fieldIndex >= len(self._dataModelFields[dataModelName]):
+			self._fieldIndex = 0
+			self._dataModelIndex += 1
+				
+			dataModelCount = len(self._dataModels)
+			if self._dataModelIndex >= dataModelCount:
+				raise MutatorCompleted()
+			else:
+				dataModelName = self._dataModels[self._dataModelIndex]
+		
 		fieldName = self._dataModelFields[dataModelName][self._fieldIndex]
 		
 		# If this is the first test case, don't next the mutator

@@ -622,7 +622,7 @@ try:
 				self.StartOnCall = False
 			
 			if self.Service == None and self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
-				raise Exception("Unable to create WindowsDebugger Instance!!!!!")
+				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or KernelConnectionString parameter.")
 			
 		
 		def _StartDebugger(self):

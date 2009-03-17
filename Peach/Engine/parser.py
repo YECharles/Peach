@@ -2304,7 +2304,7 @@ class ParseTemplate:
 		
 		if not haveLogger:
 			print "Warning: Run '%s' does not have logging configured!" % name
-
+		
 		return run
 	
 	
@@ -2479,17 +2479,23 @@ class ParseTemplate:
 		state.onEnter = self._getAttribute(node, 'onEnter')
 		state.onExit = self._getAttribute(node, 'onExit')
 		
+		foundAction = False
+		
 		for child in node.childNodes:
 			
 			if child.nodeName == 'Action':
 				action = self.HandleAction(child, state)
 				state.append(action)
+				foundAction = True
 			elif child.nodeName == 'Choice': 
 				choice = self.HandleStateChoice(child, state)
 				state.append(choice)
-		
+			
 			else:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
+				
+		if foundAction == False:
+			raise PeachException("State [%s] has no actions" % state.name)
 		
 		return state
 	
