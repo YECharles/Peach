@@ -165,7 +165,7 @@ class BitFlipperMutator(Mutator):
 			else:
 				count = self._random.randint(0, self._len-1)
 				
-			self._performMutation(node, count)
+			node.currentValue = self._performMutation(node, count)
 	
 	def randomMutation(self, node):
 		for i in range(self._random.randint(0, 10)):
@@ -174,7 +174,7 @@ class BitFlipperMutator(Mutator):
 			else:
 				count = self._random.randint(0, self._len-1)
 			
-			self._performMutation(node, count)
+			node.currentValue = self._performMutation(node, count)
 	
 	def _performMutation(self, node, position):
 		

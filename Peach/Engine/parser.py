@@ -2023,20 +2023,8 @@ class ParseTemplate:
 		test.mutators = None
 		
 		for child in node.childNodes:
-			
-			if child.nodeName == 'Data':
-				
-				#data = self.HandleData(child)
-				if child.hasAttributeNS(None, 'ref'):
-					data = self.GetRef( self._getAttribute(child, 'ref') , None, 'data')
-					
-				if data == None:
-					raise PeachException(PeachStr("Unable to locate data %s specified in Test element %s" % (templateName, name)))
-				
-				test.data = data
-				test.append(data)
-			
-			elif child.nodeName == 'Publisher':
+						
+			if child.nodeName == 'Publisher':
 				test.publisher = self.HandlePublisher(child, test)
 				test.append(test.publisher.domPublisher)
 			
@@ -2084,15 +2072,10 @@ class ParseTemplate:
 						
 			elif child.nodeName == 'Mutator':
 				
-				raise PeachException("Sorry, specifying Mutators in the Test element is currently \nbroken.  This will be fixed in beta 2.  A temporary \nworkaround is to edit defaults.xml.\n")
-				
 				if not child.hasAttributeNS(None, 'class'):
 					raise PeachException("Mutator element does not have required class attribute")
 				
-				className = "PeachXml_" + self._getAttribute(child, 'class') + "(self.context)"
-				
 				mutator = Mutator(self._getAttribute(child, 'class'), test)
-				mutator.mutator = eval(className, globals(), locals())
 				
 				if not test.mutators:
 					test.mutators = Mutators(None, test)
@@ -2485,15 +2468,21 @@ class ParseTemplate:
 			
 			if child.nodeName == 'Action':
 				action = self.HandleAction(child, state)
+				if state.has_key(action.name):
+					raise PeachException("Found duplicate Action name [%s]!" % action.name)
+				
 				state.append(action)
 				foundAction = True
 			elif child.nodeName == 'Choice': 
 				choice = self.HandleStateChoice(child, state)
+				if state.has_key(choice.name):
+					raise PeachException("Found duplicate Choice name [%s]!" % choice.name)
+				
 				state.append(choice)
 			
 			else:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
-				
+			
 		if foundAction == False:
 			raise PeachException("State [%s] has no actions" % state.name)
 		
