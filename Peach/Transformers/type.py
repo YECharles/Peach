@@ -4,7 +4,7 @@ Type transforms (atoi, itoa, etc).
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
+# Copyright (c) 2005-2009 Michael Eddington
 # Copyright (c) 2004-2005 IOActive Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -292,6 +292,100 @@ class AsInt64(_AsNumber):
 	'''Transform an number to an INT64 or UINT64
 	'''
 	_packFormat = 'q'
+
+class UnsignedNumberToString(Transformer):
+	'''
+	Transforms unsigned numbers to strings
+	'''
+	
+	def __init__(self):
+		Transformer.__init__(self)
+		self._size = None
+	
+	def realEncode(self, data):
+		self._size = size = len(data) * 8
+		
+		if size == 0:
+			return ""
+		elif size == 8:
+			return str(struct.unpack("B", data)[0])
+		elif size == 16:
+			return str(struct.unpack("H", data)[0])
+		elif size == 24:
+			raise Exception("24 bit numbers not supported")
+		elif size == 32:
+			return str(struct.unpack("I", data)[0])
+		elif size == 64:
+			return str(struct.unpack("Q", data)[0])
+		
+		raise Exception("Unknown numerical size:")
+	
+	def realDecode(self, data):
+		size = self._size
+		
+		if size == None:
+			return ""
+		
+		if size == 8:
+			return struct.pack("B", data)
+		elif size == 16:
+			return struct.pack("H", data)
+		elif size == 24:
+			raise Exception("24 bit numbers not supported")
+		elif size == 32:
+			return struct.pack("I", data)
+		elif size == 64:
+			return struct.pack("Q", data)
+		
+		raise Exception("Unknown numerical size")
+
+
+class SignedNumberToString(Transformer):
+	'''
+	Transforms unsigned numbers to strings
+	'''
+	
+	def __init__(self):
+		Transformer.__init__(self)
+		self._size = None
+	
+	def realEncode(self, data):
+		self._size = size = len(data) * 8
+		
+		if size == 0:
+			return ""
+		elif size == 8:
+			return str(struct.unpack("b", data)[0])
+		elif size == 16:
+			return str(struct.unpack("h", data)[0])
+		elif size == 24:
+			raise Exception("24 bit numbers not supported")
+		elif size == 32:
+			return str(struct.unpack("i", data)[0])
+		elif size == 64:
+			return str(struct.unpack("q", data)[0])
+		
+		raise Exception("Unknown numerical size")
+	
+	def realDecode(self, data):
+		size = self._size
+		
+		if size == None:
+			return ""
+		
+		if size == 8:
+			return struct.pack("b", data)
+		elif size == 16:
+			return struct.pack("h", data)
+		elif size == 24:
+			raise Exception("24 bit numbers not supported")
+		elif size == 32:
+			return struct.pack("i", data)
+		elif size == 64:
+			return struct.pack("q", data)
+		
+		raise Exception("Unknown numerical size")
+
 
 
 
