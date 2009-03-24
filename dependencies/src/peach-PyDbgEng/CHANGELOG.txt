@@ -1,5 +1,9 @@
+03.24.09 [v0.10]: Michael Eddington
+    - PyDbgEng will automatically generate comtypes stubs
+      for DbgEng if they don't exist.  This removes
+      dependency on install.py.
 
-03.??.09 [v0.9]: Michael Eddington
+03.05.09 [v0.9]: Michael Eddington
     - Automaticly register proxy com control
 
 02.??.09 [v0.8]: Michael Eddington
