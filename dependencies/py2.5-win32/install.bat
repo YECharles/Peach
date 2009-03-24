@@ -9,7 +9,7 @@ msiexec /qn /i pcap-peach.win32-py2.5.msi
 msiexec /qn /i zope.interface-3.3.0.win32-py2.5.msi
 msiexec /qn /i Twisted-8.0.1.win32-py2.5.msi
 msiexec /qn /i comtypes-0.4.2.win32-py2.5.msi
-msiexec /qn /i PyDbgEng-0.9.win32-py2.5.msi
+msiexec /qn /i PyDbgEng-0.10.win32-py2.5.msi
 wxPython2.8-win32-ansi-2.8.7.1-py25.exe
 msiexec /qn /i wxPropertyGrid-1.2.11.win32-py2.5.msi
 WinPcap_4_0_2.exe
