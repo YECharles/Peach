@@ -96,7 +96,7 @@ class Tcp(Publisher):
 		
 		# Try connection three times befor
 		# exiting fuzzer run
-		for i in range(3):
+		for i in range(30):
 			try:
 				self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self._socket.connect((self._host,self._port))
@@ -108,7 +108,7 @@ class Tcp(Publisher):
 				exception = sys.exc_info()
 			
 			# Wait half sec and try again
-			time.sleep(0.5)
+			time.sleep(1)
 		
 		if self._socket == None:
 			value = ""

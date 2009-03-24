@@ -798,7 +798,13 @@ class DataCracker:
 			pos = popPosition
 			Debug(1, "Popping position back to %d" % (self.parentPos+pos))
 		
-		Debug(1, "_handleNode(%s): type=%s, realpos=%d, pos=%d, rating=%d <<EXIT" % (node.name, node.elementType, self.parentPos+pos, pos, rating))
+		try:
+			Debug(1, "_handleNode(%s): type=%s, realpos=%d, pos=%d, rating=%d <<EXIT" % (node.name, node.elementType, self.parentPos+pos, pos, rating))
+		except:
+			print "Caught ODD Exception in CRACKER"
+			print "_handleNode(%s): type=%s, realpos=%d, pos=%d <<EXIT" % (node.name, node.elementType, self.parentPos+pos, pos)
+			rating = 4
+		
 		node.relationOf = None
 		return (rating, pos)
 	
