@@ -129,7 +129,10 @@ class SizedVaranceMutator(Mutator):
 			nodeOf.currentValue = "A" * (n-diff)
 		
 		else:
-			nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
+			try:
+				nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
+			except ZeroDivisionError:
+				nodeOf.currentValue = ""
 		
 		# Verify things worked out okay
 		try:
@@ -280,7 +283,10 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 			nodeOf.currentValue = "A" * (n-diff)
 		
 		else:
-			nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
+			try:
+				nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
+			except ZeroDivisionError:
+				nodeOf.currentValue = ""
 		
 		# Verify things worked out okay
 		try:

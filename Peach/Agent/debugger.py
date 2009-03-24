@@ -376,7 +376,6 @@ try:
 				
 				handle = None
 				try:
-					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load swiexts.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 				
@@ -393,19 +392,23 @@ try:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff }
 				
 				# Build bucket string
-				bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(_DbgEventHandler.buff).group(1)
-				exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
-				exceptionCode = re.compile("ExceptionCode: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
+				try:
+					bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(_DbgEventHandler.buff).group(1)
+					exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
+					exceptionCode = re.compile("ExceptionCode: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
+					
+					exceptionType = "AV"
+					if re.compile("READ_ADDRESS").search(_DbgEventHandler.buff) != None:
+						exceptionType = "ReadAV"
+					elif re.compile("WRITE_ADDRESS").search(_DbgEventHandler.buff) != None:
+						exceptionType = "WriteAV"
 				
-				exceptionType = "AV"
-				if re.compile("READ_ADDRESS").search(_DbgEventHandler.buff) != None:
-					exceptionType = "ReadAV"
-				elif re.compile("WRITE_ADDRESS").search(_DbgEventHandler.buff) != None:
-					exceptionType = "WriteAV"
+					bucket = "%s_at_%s" % (exceptionType, exceptionAddress)
 				
-				bucket = "%s_at_%s" % (exceptionType, exceptionAddress)
+				except:
+					# Sometimes !analyze -v fails
+					bucket = "Unknown"
 				
-				print "BUCKET: %s" % bucket
 				WindowsDebugEngine.crashInfo["Bucket"] = bucket
 				
 				## Do we have !exploitable?
@@ -502,8 +505,6 @@ try:
 				
 				status = win32service.QueryServiceStatusEx(hservice)
 				pid = status["ProcessId"]
-				
-				print "SERIVCE PID: ", pid
 				
 				win32service.CloseServiceHandle(hservice)
 				win32service.CloseServiceHandle(scm)

@@ -293,6 +293,7 @@ class AsInt64(_AsNumber):
 	'''
 	_packFormat = 'q'
 
+
 class UnsignedNumberToString(Transformer):
 	'''
 	Transforms unsigned numbers to strings
