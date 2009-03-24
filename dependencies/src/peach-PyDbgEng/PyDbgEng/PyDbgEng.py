@@ -6,7 +6,18 @@ from comtypes import HRESULT, COMError
 from comtypes.client import CreateObject, GetEvents, ShowEvents
 from comtypes.hresult import S_OK
 from comtypes.automation import IID
-from comtypes.gen import DbgEng
+
+try:
+	from comtypes.gen import DbgEng
+except:
+	import os
+	import Defines
+	import comtypes
+	tlb_file = os.path.join(os.path.dirname(Defines.__file__),
+							"data", "DbgEng.tlb")
+	comtypes.client.GetModule(tlb_file)
+	
+	from comtypes.gen import DbgEng
 
 import sys,os
 import struct
