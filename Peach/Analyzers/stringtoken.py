@@ -29,6 +29,7 @@ Analyzers that produce data models from Strings
 
 # Authors:
 #   Michael Eddington (mike@phed.org)
+#   Adam Cecchetti (adam@cecchetti.com)
 
 # $Id$
 
@@ -108,18 +109,23 @@ class StringTokenAnalyzer(Analyzer):
 		'''
 		A version of split that also returns the tokens.
 		'''
-		
-		pos = string.find(tok)
 		lastPos = 0
 		parts = []
+		
+		tokenLen = len(tok)
+		
+		if tokenLen == 0:
+			return parts
+		
+		pos = string.find(tok)
 		
 		if pos == -1:
 			return parts
 		
 		while pos > -1:
 			parts.append(string[:pos])
-			parts.append(string[pos:pos+1])
-			string = string[pos+1:]
+			parts.append(string[pos:pos+tokenLen])
+			string = string[pos+tokenLen:]
 			lastPos = pos
 			pos = string.find(tok)
 		
