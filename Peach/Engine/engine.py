@@ -339,6 +339,14 @@ class Engine(object):
 		self.verbose = verbose
 		Engine.verbose = verbose
 		
+		if uri.find(":") >= 0:
+			self.pitFile = uri[uri.find(":")+1:]
+		else:
+			self.pitFile = uri
+		
+		if self.pitFile.find("/") >= 0:
+			self.pitFile = self.pitFile[uri.rfind("/")+1:]
+		
 		self.peach = Analyzer.DefaultParser().asParser(uri)
 		
 		run = None

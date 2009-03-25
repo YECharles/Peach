@@ -36,6 +36,7 @@ extend from Logger.
 # $Id$
 
 from Engine.engine import EngineWatcher
+from Engine.engine import Engine
 
 class Logger(EngineWatcher):
 	'''
@@ -117,7 +118,11 @@ class Filesystem(Logger):
 	def OnRunStarting(self, run):
 		suppliedPath = eval(str(self.params['path']))
 		
-		self.path = os.path.join(suppliedPath, run.name + "_" + strftime("%Y_%b_%d_%H_%M_%S", gmtime()))
+		if run.name == "DefaultRun":
+			self.path = os.path.join(suppliedPath, Engine.context.pitFile + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
+		else:
+			self.path = os.path.join(suppliedPath, Engine.context.pitFile + "_" + run.name + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
+		
 		self.faultPath = os.path.join(self.path, "Faults")
 		try:
 			os.mkdir(suppliedPath)
@@ -130,8 +135,8 @@ class Filesystem(Logger):
 		
 		self.file = open(os.path.join(self.path,"status.txt"), "w")
 		
-		self.file.write("Peach 2.0 Fuzzer Run\n")
-		self.file.write("====================\n\n")
+		self.file.write("Peach Fuzzer Run\n")
+		self.file.write("=================\n\n")
 		self.file.write("Date of run: " + asctime() + "\n")
 		self.file.write("Run name: " + run.name + "\n\n")
 	
