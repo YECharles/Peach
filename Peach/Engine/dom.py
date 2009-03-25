@@ -3370,6 +3370,13 @@ class String(DataElement):
 	'''
 	A string field
 	'''
+	
+	EncodeAs = {
+		'char':'iso-8859-1',
+		'wchar':'utf-16le',
+		'utf8':'utf-8',
+		}
+	
 	def __init__(self, name = None, parent = None):
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'string'
@@ -3392,10 +3399,10 @@ class String(DataElement):
 	
 	def asCType(self):
 		
-		if self.type == 'char':
-			return ctypes.c_char_p(self.getInternalValue())
-		else:
+		if self.type == 'wchar':
 			return ctypes.c_wchar_p(self.getInternalValue())
+		else:
+			return ctypes.c_char_p(self.getInternalValue().encode(self.EncodeAs[self.type]))
 		
 	def getLength(self, inRaw = True):
 		'''
@@ -3455,13 +3462,6 @@ class String(DataElement):
 		
 	def getRawValue(self, sout = None):
 		
-		
-		# -1. Character encoding
-		
-		trans = None
-		if self.type == 'wchar':
-			trans  = WideChar()
-		
 		# 0. Override value?
 		if self.currentValue != None:
 			value = self.currentValue
@@ -3484,9 +3484,11 @@ class String(DataElement):
 		if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
 			value += '\0'
 			
-		# 9. All done
-		if trans != None:
-			value = trans.encode(value)
+		# Encode
+		
+		value = value.encode(self.EncodeAs[self.type])
+		
+		# Output
 		
 		if sout != None:
 			sout.write(value, self.getFullDataName())

@@ -368,10 +368,22 @@ class ParseTemplate:
 				setattr(peach.runs, run.name, run)
 		
 		# Pass 6 -- Analyzers
+		
+		# Simce analyzers can modify the DOM we need to make our list
+		# of objects we will look at first!
+		
+		objs = []
+		
 		for child in peach.getElementsByType(Blob):
 			if child.analyzer != None and child.defaultValue != None:
-				analyzer = eval("%s()" % child.analyzer)
-				analyzer.asDataElement(child, {}, child.defaultValue)
+				objs.append(child)
+		for child in peach.getElementsByType(String):
+			if child.analyzer != None and child.defaultValue != None:
+				objs.append(child)
+			
+		for child in objs:
+			analyzer = eval("%s()" % child.analyzer)
+			analyzer.asDataElement(child, {}, child.defaultValue)
 		
 		# We suck, so fix this up
 		peach._FixParents()

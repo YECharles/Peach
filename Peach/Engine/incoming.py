@@ -1427,7 +1427,7 @@ class DataCracker:
 				Debug(1, "%s_handleString: %s: Found default value, doing checks" % ('\t'*self.deepString, node.name))
 				
 				if node.type == 'wchar':
-					defaultValue = str(node.defaultValue.decode("utf-16le"))
+					defaultValue = node.defaultValue.decode("utf-16le")
 					
 				else:
 					defaultValue = node.defaultValue
@@ -1578,7 +1578,7 @@ class DataCracker:
 		# Deal with wchar
 		if node.type == 'wchar':
 			try:
-				value = value.decode("utf-16le").encode("latin-1")
+				value = value.decode("utf-16le")
 			except:
 				print "Error decoding: ", repr(value)
 				raise

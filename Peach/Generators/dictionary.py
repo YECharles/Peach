@@ -330,7 +330,7 @@ class List(generator.Generator):
 			raise generator.GeneratorCompleted("List")
 	
 	def getRawValue(self):
-		return str(self._list[self._curPos])
+		return self._list[self._curPos]
 	
 	def getList(self):
 		'''

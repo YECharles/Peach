@@ -107,8 +107,8 @@ class Tcp(Publisher):
 		'''
 		self.close()
 		
-		# Try connection three times befor
-		# exiting fuzzer run
+		# Try connecting many times
+		# before we crash.
 		for i in range(30):
 			try:
 				self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -156,6 +156,11 @@ class Tcp(Publisher):
 		@param	data: Data to send
 		'''
 		
+		if Peach.Engine.engine.Engine.debug:
+			print ">>>>>>>>>>>>>>>>"
+			print "tcp.Tcp.send():"
+			self.hexPrint(data)
+		
 		try:
 			self._socket.sendall(data)
 		except:
@@ -182,8 +187,10 @@ class Tcp(Publisher):
 			self._socket.settimeout(self._timeout)
 			ret = self._socket.recv(diffSize)
 			
-			Debug("udp.Udp.receive we got:")
-			Debug(repr(ret))
+			if Peach.Engine.engine.Engine.debug:
+				print "<<<<<<<<<<<<<<<<<"
+				print "tcp.Tcp.receive():"
+				self.hexPrint(ret)
 			
 			if not ret:
 				# Socket was closed
@@ -217,8 +224,10 @@ class Tcp(Publisher):
 		try:
 			ret = self._socket.recv(4096)
 			
-			Debug("udp.Udp.receive we got:")
-			Debug(repr(ret))
+			if Peach.Engine.engine.Engine.debug:
+				print "<<<<<<<<<<<<<<<<<"
+				print "tcp.Tcp.receive():"
+				self.hexPrint(ret)
 			
 			if not ret:
 				raise PublisherSoftException("Socket is closed")

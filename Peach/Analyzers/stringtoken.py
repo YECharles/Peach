@@ -56,7 +56,33 @@ class StringTokenAnalyzer(Analyzer):
 		Should return a DataElement such as Block, Number or String.
 		'''
 		
-		return self._tokenizeString(data, None)
+		if not isinstance(parent, String):
+			raise PeachException("Error, StringTokenAnalyzer can only be attached to String data elements.")
+		
+		self.stringType = parent.type
+		dom = self._tokenizeString(data, None)
+		
+		# Handle null termination
+		if parent.nullTerminated:
+			blob = Blob(None, None)
+			
+			if parent.type == 'wchar':
+				blob.defaultValue = "\x00"
+			else:
+				blob.defaultValue = "\x00\x00"
+			
+			dom.append(blob)
+		
+		# Replace parent with new dom
+		
+		parentOfParent = parent.parent
+		dom.name = parent.name
+		
+		indx = parentOfParent.index(parent)
+		del parentOfParent[parent.name]
+		parentOfParent.insert(indx, dom)
+		
+		# now just cross our fingers :)
 	
 	def asCommandLine(self, args):
 		'''
@@ -72,6 +98,7 @@ class StringTokenAnalyzer(Analyzer):
 		From the top level producing zero or more data models and
 		state models is possible.
 		'''
+		self.stringType = parent.type
 		dom = DataModel()
 		dom.append(self._tokenizeString)
 		
@@ -87,7 +114,7 @@ class StringTokenAnalyzer(Analyzer):
 		topNode = _StringNode(None, string)
 		
 		for t in tokens:
-			self._tokenTree(t, self._topNode)
+			self._tokenTree(t, topNode)
 		
 		# Now build Peach DOM
 		return self._buildDom(topNode, None)
@@ -96,10 +123,12 @@ class StringTokenAnalyzer(Analyzer):
 		
 		if len(stringNode.children) == 0:
 			node = String()
+			node.type = self.stringType
 			node.defaultValue = stringNode.string
+			
 			return node
 		
-		node = Block()
+		node = Block(None, None)
 		for c in stringNode.children:
 			node.append(self._buildDom(c, node))
 		
@@ -109,23 +138,18 @@ class StringTokenAnalyzer(Analyzer):
 		'''
 		A version of split that also returns the tokens.
 		'''
-		lastPos = 0
-		parts = []
-		
-		tokenLen = len(tok)
-		
-		if tokenLen == 0:
-			return parts
 		
 		pos = string.find(tok)
+		lastPos = 0
+		parts = []
 		
 		if pos == -1:
 			return parts
 		
 		while pos > -1:
 			parts.append(string[:pos])
-			parts.append(string[pos:pos+tokenLen])
-			string = string[pos+tokenLen:]
+			parts.append(string[pos:pos+1])
+			string = string[pos+1:]
 			lastPos = pos
 			pos = string.find(tok)
 		

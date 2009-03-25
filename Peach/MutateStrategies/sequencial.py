@@ -103,7 +103,6 @@ class SequencialMutationStrategy(MutationStrategy):
 	def next(self):
 		# Goto next test case
 		
-		print self._dataModelIndex
 		dataModelName = self._dataModels[self._dataModelIndex]
 		
 		while self._fieldIndex >= len(self._dataModelFields[dataModelName]):

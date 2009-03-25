@@ -352,4 +352,65 @@ class WindowsService(Monitor):
 		#self._StopProcess()
 		pass
 
+try:
+
+	import win32gui, win32con
+	import sys,time, os, signal
+	from threading import *
+	from Peach.agent import *
+except:
+	pass
+
+class ProcessWatcher(Monitor):
+	''' Will watch for specific process and kill '''
+	
+	def __init__(self, args):
+		'''
+		Constructor.  Arguments are supplied via the Peach XML
+		file.
+		
+		@type    args: Dictionary
+		@param    args: Dictionary of parameters
+		'''
+		
+		# Our name for this monitor
+		self._name = "ProcessWatcher"
+		
+		if not args.has_key("ProcessNames"):
+			raise Exception("ProcessWatcher requires a parameter named ProcessNames.")
+		
+		self._names = args["ProcessNames"].replace("'''", "").split(',')
+	
+	def OnTestStarting(self):
+		'''
+		Called right before start of test case or variation
+		'''
+		pass
+	
+	def OnTestFinished(self):
+		'''
+		Called right after a test case or varation
+		'''
+		for name in self._names:
+			os.popen('TASKKILL /IM ' + name + ' /F')
+			time.sleep(.6)
+	
+	def DetectedFault(self):
+		'''
+		Check if a fault was detected.
+		'''
+		return False
+	
+	def OnShutdown(self):
+		'''
+		Called when Agent is shutting down, typically at end
+		of a test run or when a Stop-Run occurs
+		'''
+		try:
+			for name in self._names:
+				os.popen('TASKKILL /IM ' + name + ' /F')
+				time.sleep(.6)
+		except:
+			pass
+
 # end
