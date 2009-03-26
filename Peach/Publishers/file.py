@@ -401,6 +401,7 @@ class FileWriterLauncher(Publisher):
 			# Launch via agent
 			
 			Engine.context.agent.OnPublisherCall(method)
+			time.sleep(self.waitTime)
 		
 		else:
 			# Launch via spawn

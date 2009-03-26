@@ -3501,7 +3501,10 @@ class String(DataElement):
 			
 		# Encode
 		
-		value = value.encode(self.EncodeAs[self.type])
+		try:
+			value = value.encode(self.EncodeAs[self.type])
+		except:
+			pass
 		
 		# Output
 		
