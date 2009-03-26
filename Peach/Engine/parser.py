@@ -1517,6 +1517,13 @@ class ParseTemplate:
 			except:
 				raise PeachException("length must be a number or missing %s" % length)
 		
+		# Analyzer
+		
+		if node.hasAttributeNS(None, 'analyzer'):
+			string.analyzer = self._getAttribute(node, 'analyzer')
+		else:
+			string.analyzer = None
+		
 		# common attributes
 		
 		self.HandleCommonDataElementAttributes(node, string)

@@ -358,9 +358,9 @@ class DataCracker:
 		name = node.name
 		goodLookAhead = None
 		hasCountRelation = False
-		isDeterministic = self._doesNodeHaveStatic(node)
+		isDeterministic = self._doesNodeHaveStatic(node) or self._doesNodeHaveConstraint(node)
 		origionalNode = node.copy(node.parent)
-
+		
 		## Locate any count restrictions and update maxCount to match
 		
 		Debug(1, "-- Looking for Count relation...")
@@ -1005,6 +1005,20 @@ class DataCracker:
 		
 		for c in node.getAllChildDataElements():
 			if c.isStatic:
+				return True
+		
+		return False
+		
+	def _doesNodeHaveConstraint(self, node):
+		'''
+		Return true if node or it's children is static
+		'''
+		
+		if node.constraint != None:
+			return True
+		
+		for c in node.getAllChildDataElements():
+			if c.constraint != None:
 				return True
 		
 		return False

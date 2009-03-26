@@ -1510,6 +1510,20 @@ class DataElement(Mutatable):
 		@return: DataElement or None
 		'''
 		
+		if name.find(".") > -1:
+			# Handle foo.bar.wee
+			parentName = name[:name.rfind(".")]
+			arrayName = name[name.rfind(".")+1:]
+			
+			parent = self.find(parentName)
+			if parent == None:
+				print self
+				raise Exception("Unable to locate [%s]" % parentName)
+			
+			obj = self._findArrayByName(parent, arrayName)
+			if obj != None:
+				return obj
+		
 		for block in self._findAllBlocksGoingUp():
 			obj = self._findArrayByName(block, name)
 			if obj != None:
@@ -3391,6 +3405,7 @@ class String(DataElement):
 		self.generatedOccurs = 1
 		self.currentValue = None
 		self.insideRelation = False
+		self.analyzer = None
 		
 		self.padCharacter = '\0'	#: Value to pad string with, defaults to NULL '\0'
 		self.type = 'char'			#: Type of string, currently only char and wchar are supported.
