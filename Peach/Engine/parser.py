@@ -770,6 +770,9 @@ class ParseTemplate:
 				elem.append(relation)
 			
 			elif child.nodeName == 'Transformer':
+				if elem.transformer != None:
+					raise PeachException("Error, data element [%s] already has a transformer." % elem.name)
+				
 				elem.transformer = self.HandleTransformer(child, elem)
 				
 			elif child.nodeName == 'Fixup':
@@ -885,6 +888,9 @@ class ParseTemplate:
 		fixup.fixup = eval(code, globals(), locals())
 		
 		if parent != None:
+			if parent.fixup != None:
+				raise PeachException("Error, data element [%s] already has a fixup." % parent.name)
+			
 			parent.fixup = fixup
 			parent.append(fixup)
 		
@@ -907,6 +913,9 @@ class ParseTemplate:
 			raise PeachException("Error: Placement can only have one of 'after' or 'before' but not both.")
 		
 		if parent != None:
+			if parent.placement != None:
+				raise PeachException("Error, data element [%s] already has a placement." % parent.name)
+			
 			parent.placement = placement
 			parent.append(placement)
 		
@@ -1650,6 +1659,12 @@ class ParseTemplate:
 		for child in node.childNodes:
 			
 			if child.nodeName == 'Flag':
+				
+				childName = child._getAttribute(child, 'name')
+				if childName != None:
+					if flags.has_key(childName):
+						raise PeachException("Error, found duplicate Flag name in Flags set [%s]" % flags.name)
+				
 				self.HandleFlag(child, flags)
 			else:
 				raise PeachException(PeachStr("found unexpected node in Flags: %s" % child.nodeName))
@@ -1917,6 +1932,10 @@ class ParseTemplate:
 		field = Field(name, value, parent)
 		field.value = PeachStr(self.GetValueFromNode(node))
 		field.valueType = self._getValueType(node)
+		
+		if parent.has_key(field.name):
+			raise PeachException("Error, a field of name [%s] already exists in data set [%s]." % (field.name, parent.name))
+		
 		parent.append(field)
 		
 		return field
@@ -2570,6 +2589,10 @@ class ParseTemplate:
 					raise PeachException("Parser: Param is an invalid child of Action for this Action type")
 				
 				param = self.HandleActionParam(child, action)
+				
+				if action.has_key(param.name):
+					raise PeachException("Error, duplicate Param name [%s] found in Action [%s]." % (param.name, action.name))
+				
 				action.append(param)
 			
 			elif child.nodeName == 'Template' or child.nodeName == 'DataModel':
@@ -2580,6 +2603,9 @@ class ParseTemplate:
 				if not child.hasAttributeNS(None, 'ref'):
 					raise PeachException("Parser: When DataModel is a child of Action it must have the ref attribute.")
 				
+				if action.template != None:
+					raise PeachException("Error, action [%s] already has a DataModel specified." % action.name)
+
 				obj = self.HandleTemplate(child, action)
 				action.template = obj
 				action.append(obj)
@@ -2589,6 +2615,9 @@ class ParseTemplate:
 				if not (action.type == 'input' or action.type == 'output'):
 					raise PeachException("Parser: Data is an invalid child of Action for this Action type")
 				
+				if action.data != None:
+					raise PeachException("Error, action [%s] already has a Data element specified." % action.name)
+
 				data = self.HandleData(child, action)
 				action.data = data
 				

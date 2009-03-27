@@ -4,12 +4,24 @@ Peach 2 DOM.  Peach XML files are parsed into an object model using
 these classes.  The document object is Peach and all objects extend
 from Element.
 
+Elements used inside of <DataModel>'s are called data elements and
+extend from DataElement.  This also allows easy checking for a data
+element vs. a relation or other object by saying
+isinstance(obj, DataElement).
+
+For speed, a native deepcopy was implemented in cDeepCopy, also
+some of the tree walking code for locating objects by name is
+done in native code for performance reasons (see cPeach).
+
+API documentation is generated using epydoc and the script
+tools\gendocs.bat.  Output ends up in docs\apidocs\index.html.
+
 @author: Michael Eddington
 @version: $Id$
 '''
 
 #
-# Copyright (c) 2007-2008 Michael Eddington
+# Copyright (c) 2007-2009 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -2469,6 +2481,9 @@ class Template(DataElement):
 		if self.lengthType == 'calc':
 			self.length = self.calcLength()
 		
+			if self.length != None and self.length < 0:
+				self.length = None
+		
 		elif self.isStatic:
 			return len(self.getValue())
 		
@@ -2639,6 +2654,9 @@ class Choice(DataElement):
 		if self.lengthType == 'calc':
 			self.length = self.calcLength()
 		
+			if self.length != None and self.length < 0:
+				self.length = None
+		
 		elif self.isStatic:
 			return len(self.getValue())
 		
@@ -2807,6 +2825,9 @@ class Block(DataElement):
 		
 		if self.lengthType == 'calc':
 			self.length = self.calcLength()
+		
+			if self.length != None and self.length < 0:
+				self.length = None
 		
 		elif self.isStatic:
 			return len(self.getValue())
@@ -3430,6 +3451,9 @@ class String(DataElement):
 		if self.lengthType == 'calc':
 			self.length = self.calcLength()
 		
+			if self.length != None and self.length < 0:
+				self.length = None
+		
 		return self.length
 		
 	def getInternalValue(self, sout = None):
@@ -3947,6 +3971,11 @@ class Blob(DataElement):
 		if self.lengthType == 'calc':
 			try:
 				self.length = self.calcLength()
+				
+				if self.length != None and self.length < 0:
+					# SANITY!
+					self.length = None
+			
 			except:
 				# This can fail while doing
 				# mutations.
@@ -4528,17 +4557,6 @@ class Custom(DataElement):
 	def getRawValue(self, sout = None):
 		return self.getInternalValue(sout)
 		
-
-#if sys.version.find("AMD64") == -1:
-#	import psyco
-#	psyco.bind(DataElement)
-#	psyco.bind(Relation)
-#	psyco.bind(String)
-#	psyco.bind(Number)
-#	psyco.bind(Template)
-#	psyco.bind(Block)
-#	psyco.bind(Choice)
-#	psyco.bind(deepcopy)
 
 # ###################################################################
 
