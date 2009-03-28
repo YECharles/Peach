@@ -649,6 +649,8 @@ class ElementWithChildren(Element):
 	def toXmlDomLight(self, parent, dict):
 		'''
 		Convert to an XML DOM boject tree for use in xpath queries.
+		
+		Note: toXmlDomLight and toXmlDom are the same now
 		'''
 		
 		node = Element.toXmlDomLight(self, parent, dict)
@@ -715,6 +717,11 @@ class ElementWithChildren(Element):
 	
 	# Container emulation methods ############################
 	
+	# Note: We have both a dictionary and an ordered list
+	#       that we must keep upto date.  This allows us
+	#       to access children by index or by key
+	#       So saying: elem[0] is valid as is elem['Name']
+	
 	def __len__(self):
 		return self._children.__len__()
 	
@@ -740,20 +747,7 @@ class ElementWithChildren(Element):
 		else:
 			if key in self._childrenHash:
 				# Existing item
-				#try:
 				inx = self._children.index( self._childrenHash[key] )
-				#except:
-					#print "Key:",key
-					#print "Number of items in _children:", len(self._children)
-					#print "Number of items in _childrenHash:", len(self._childrenHash)
-					
-					#for c in self._children:
-						#print "Child:", c.name
-					
-					#for c in self._childrenHash.keys():
-						#print "Hash Child:", c
-					
-					#raise
 					
 				self._children[inx] = value
 				self._childrenHash[key] = value

@@ -35,7 +35,7 @@ issued to the fuzzer.
 
 # $Id$
 
-import sys, time
+import sys, time, timer
 sys.path.append("..")
 sys.path.append("../..")
 import os
@@ -122,21 +122,28 @@ class Process(Monitor):
 	'''
 	
 	def __init__(self, args):
+		self.restartOnTest = False
 		if args.has_key('RestartOnEachTest'):
-			if args['RestartOnEachTest'].lower() == 'true':
+			if args['RestartOnEachTest'].replace("'''", "").lower() == 'true':
 				self.restartOnTest = True
-			else:
-				self.restartOnTest = False
-		else:
-			self.restartOnTest = False
 		
+		self.faultOnEarlyExit = True
 		if args.has_key('FaultOnEarlyExit'):
-			if args['FaultOnEarlyExit'].lower() == 'true':
-				self.faultOnEarlyExit = True
-			else:
+			if args['FaultOnEarlyExit'].replace("'''", "").lower() != 'true':
 				self.faultOnEarlyExit = False
-		else:
-			self.faultOnEarlyExit = True
+		
+		self.startOnCall = False
+		if args.has_key('StartOnCall'):
+			self.startOnCall = True
+			self.startOnCallMethod = args['StartOnCall'].replace("'''", "").lower()
+		
+		self.waitForExitOnCall = False
+		if args.has_key('WaitForExitOnCall'):
+			self.waitForExitOnCall = True
+			self.waitForExitOnCallMethod = args['WaitForExitOnCall'].replace("'''", "").lower()
+		
+		if not args.has_key('Command'):
+			raise PeachException("Error, monitor Process requires a parameter named 'Command'")
 		
 		self.strangeExit = False
 		self.command = args["Command"].replace("'''", "")
@@ -146,6 +153,24 @@ class Process(Monitor):
 		self.hThread = None
 		self.dwProcessId = None
 		self.dwThreadId = None
+	
+	def PublisherCall(self, method):
+		
+		method = method.lower()
+		if self.startOnCall and self.startOnCallMethod == method:
+			print "Process: startOnCall, starting process!"
+			
+			self._StopProcess()
+			self._StartProcess()
+		
+		elif self.waitForExitOnCall and self.waitForExitOnCallMethod == method:
+			print "Process: waitForExitOnCall, waiting on process exit"
+			
+			while True:
+				if not self._IsProcessRunning:
+					print "Process: Process exitted"
+					return
+				timer.sleep(0.25)
 	
 	def _StopProcess(self):
 		
@@ -191,7 +216,7 @@ class Process(Monitor):
 		Called right before start of test.
 		'''
 		self.strangeExit = False
-		if self.restartOnTest or not self._IsProcessRunning():
+		if not self.startOnCall (self.restartOnTest or not self._IsProcessRunning()):
 			self._StopProcess()
 			self._StartProcess()
 	
@@ -361,7 +386,7 @@ try:
 except:
 	pass
 
-class ProcessWatcher(Monitor):
+class ProcessKiller(Monitor):
 	''' Will watch for specific process and kill '''
 	
 	def __init__(self, args):

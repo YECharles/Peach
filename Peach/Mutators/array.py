@@ -155,7 +155,7 @@ class ArrayVarianceMutator(Mutator):
 					raise Exception("Couldn't locate item at pos %d (max of %d)" % (i, self._arrayCount))
 				obj.parent.__delitem__(obj.name)
 			
-			assert(arrayHead.getArrayCount() == n)
+			#assert(arrayHead.getArrayCount() == n)
 		
 		elif n > self._arrayCount:
 			# Add some items
@@ -177,7 +177,7 @@ class ArrayVarianceMutator(Mutator):
 			#	arrayHead.parent.insert(headIndex+i, obj)
 			
 			#print arrayHead.getArrayCount(), n
-			assert(arrayHead.getArrayCount() == n)
+			#assert(arrayHead.getArrayCount() == n)
 
 class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 	_counts = None

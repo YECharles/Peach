@@ -1660,7 +1660,7 @@ class ParseTemplate:
 			
 			if child.nodeName == 'Flag':
 				
-				childName = child._getAttribute(child, 'name')
+				childName = self._getAttribute(child, 'name')
 				if childName != None:
 					if flags.has_key(childName):
 						raise PeachException("Error, found duplicate Flag name in Flags set [%s]" % flags.name)
