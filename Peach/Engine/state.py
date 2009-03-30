@@ -314,7 +314,7 @@ class StateEngine:
 		
 	def _runAction(self, action, mutator):
 		
-		Debug(1, "StateEngine._runAction: %s" % action.name)
+		Debug(1, "\nStateEngine._runAction: %s" % action.name)
 				
 		mutator.onActionStarting(action.parent, action)
 		

@@ -117,11 +117,12 @@ class Filesystem(Logger):
 		
 	def OnRunStarting(self, run):
 		suppliedPath = eval(str(self.params['path']))
+		pitFile = os.path.basename(Engine.context.pitFile)
 		
 		if run.name == "DefaultRun":
-			self.path = os.path.join(suppliedPath, Engine.context.pitFile + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
+			self.path = os.path.join(suppliedPath, pitFile + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
 		else:
-			self.path = os.path.join(suppliedPath, Engine.context.pitFile + "_" + run.name + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
+			self.path = os.path.join(suppliedPath, pitFile + "_" + run.name + "_" + strftime("%Y%b%d%H%M%S", gmtime()))
 		
 		self.faultPath = os.path.join(self.path, "Faults")
 		try:

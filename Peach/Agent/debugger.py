@@ -304,6 +304,32 @@ try:
 				ExceptionInformation11, ExceptionInformation12, ExceptionInformation13,
 				ExceptionInformation14, FirstChance):
 			
+			# Only capture dangerouse first chance exceptions
+			if FirstChance:
+				# Guard page or illegal op
+				if ExceptionCode == 0x80000001 or ExceptionCode == 0xC000001D:
+					pass
+				elif ExceptionCode == 0xC0000005:
+					# is av on eip?
+					if ExceptionInformation0 == 0 and ExceptionInformation1 == ExceptionAddress:
+						pass
+					
+					# is write a/v?
+					elif ExceptionInformation0 == 1 and ExceptionInformation1 != 0:
+						pass
+					
+					# is DEP?
+					elif ExceptionInformation0 == 0:
+						pass
+					
+					else:
+						# Otherwise skip first chance
+						return DbgEng.DEBUG_STATUS_NO_CHANGE
+				else:
+					# otherwise skip first chance
+					return DbgEng.DEBUG_STATUS_NO_CHANGE
+					
+			
 			if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
 				# We are already handling, so skip
 				#sys.stdout.write("_DbgEventHandler::Exception(): handlingFault set, skipping.\n")
