@@ -518,7 +518,7 @@ try:
 			'''
 			if not self.StartOnCall and not self._IsDebuggerAlive():
 				self._StartDebugger()
-			else:
+			elif self.StartOnCall:
 				self._StopDebugger()
 		
 		def PublisherCall(self, method):
