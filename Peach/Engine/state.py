@@ -575,7 +575,7 @@ class StateEngine:
 			doc = self.getXml()
 			setNodes = doc.xpath(action.setXpath)
 			if len(setNodes) == 0:
-				raise Exception("StateEngine._runAction(xpath): setXpath did not return a node")
+				raise PeachException("Slurp [%s] setXpath [%s] did not return a node" % (action.name,action.setXpath))
 			
 			# Only do this once :)
 			valueElement = None

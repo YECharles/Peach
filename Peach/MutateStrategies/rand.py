@@ -155,7 +155,8 @@ class RandomMutationStrategy(MutationStrategy):
 					for m in Engine.context.mutators:
 						if m.supportedDataElement(node):
 							# Need to create new instance from class
-							mutators.append( m(Engine.context,node) )
+							for i in range(m.weight):
+								mutators.append( m(Engine.context,node) )
 			
 			return
 		

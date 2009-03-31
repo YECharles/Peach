@@ -55,6 +55,8 @@ class Mutator:
 	elementType = "mutator"
 	dataTypes = ['template', 'string', 'number', 'flags', 'choice', 'sequence', 'blob', 'block']
 	_random = random.Random()
+	#: Weight to be chosen randomly
+	weight = 1
 	
 	def __init__(self):
 		self.name = "Mutator"

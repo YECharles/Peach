@@ -172,6 +172,8 @@ class StringTokenMutator(_SimpleGeneratorMutator):
 	
 	def __init__(self, peach, node):
 		_SimpleGeneratorMutator.__init__(self, peach, node)
+		#: Weight to be chosen randomly
+		self.weight = 3
 		
 		self.name = "StringTokenMutator"
 		self._generator = BadStrings()
@@ -196,6 +198,8 @@ class XmlW3CMutator(_SimpleGeneratorMutator):
 	
 	def __init__(self, peach, node):
 		_SimpleGeneratorMutator.__init__(self, peach, node)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		self.name = "XmlW3CMutator"
 		self._generator = XmlParserTests(None)
@@ -228,6 +232,8 @@ class PathMutator(_SimpleGeneratorMutator):
 	
 	def __init__(self, peach, node):
 		_SimpleGeneratorMutator.__init__(self, peach, node)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		self.name = "PathMutator"
 		self._generator = BadPath(None)
@@ -260,6 +266,8 @@ class HostnameMutator(_SimpleGeneratorMutator):
 	
 	def __init__(self, peach, node):
 		_SimpleGeneratorMutator.__init__(self, peach, node)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		self.name = "HostnameMutator"
 		self._generator = BadHostname(None)
@@ -292,6 +300,8 @@ class FilenameMutator(_SimpleGeneratorMutator):
 	
 	def __init__(self, peach):
 		_SimpleGeneratorMutator.__init__(self, peach, node)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		self.name = "FilenameMutator"
 		self._generator = BadFilename(None)

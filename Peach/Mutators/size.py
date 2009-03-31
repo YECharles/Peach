@@ -45,6 +45,8 @@ class SizedVaranceMutator(Mutator):
 	
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		#: Is mutator finite?
 		self.isFinite = True
@@ -157,6 +159,8 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 	
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		#: Is mutator finite?
 		self.isFinite = True
@@ -312,6 +316,8 @@ class SizedDataVaranceMutator(Mutator):
 	
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		#: Is mutator finite?
 		self.isFinite = True
@@ -398,6 +404,8 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 	
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
 		
 		#: Is mutator finite?
 		self.isFinite = True

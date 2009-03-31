@@ -46,6 +46,8 @@ class ArrayVarianceMutator(Mutator):
 	
 	def __init__(self, peach, node, name = "ArrayVarianceMutator"):
 		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		ArrayVarianceMutator.weight = 2
 		
 		if not ArrayVarianceMutator.supportedDataElement(node):
 			raise Exception("Error: ArrayVarianceMutator created with bad node")
@@ -184,6 +186,8 @@ class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 	
 	def __init__(self, peach, node):
 		ArrayVarianceMutator.__init__(self, peach, node, "ArrayNumericalEdgeCasesMutator")
+		#: Weight to be chosen randomly
+		ArrayNumericalEdgeCasesMutator.weight = 2
 		
 		if self._counts == None:
 			ArrayNumericalEdgeCasesMutator._counts = []
