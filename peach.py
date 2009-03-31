@@ -145,7 +145,7 @@ Debug Peach XML File
 """)
 	sys.exit(0)
 
-printError("\n] Peach 2.3 BETA1 Runtime")
+printError("\n] Peach 2.3 BETA2 Runtime")
 printError("] Copyright (c) Michael Eddington\n")
 
 if sys.version[:3] not in ['2.5', '2.6']:
@@ -374,8 +374,11 @@ for i in range(len(optlist)):
 		
 		# Restarting a fuzzer run
 		
-		restartFuzzer = True
-		restartFuzzerFile = optlist[i][1]
+		print "Error, -r/--restart is no longer supported.  Instead please say \"--skipto N\" where N is the test count."
+		sys.exit(0)
+
+		#restartFuzzer = True
+		#restartFuzzerFile = optlist[i][1]
 		
 	elif optlist[i][0] == '--skipto':
 		
