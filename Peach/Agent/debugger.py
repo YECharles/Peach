@@ -54,190 +54,6 @@ try:
 	import win32serviceutil
 	import win32service
 	
-	
-	##class WindowsAppVerifier(Monitor):
-	##	'''
-	##	Agent that uses the Microsoft AppVerifier tool to detect faults on
-	##	running processes.  AppVerifier can be downloaded from Microsoft via
-	##	the following url: http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx
-	##	'''
-	##	
-	##	def __init__(self, args):
-	##		self._image = str(args['Application']).replace("'''", "")
-	##		
-	##		if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
-	##			self._manual = True
-	##		else:
-	##			self._manual = False
-	##		
-	##		self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
-	##		self.stops = {}
-	##		# self.stops = {"COM":["10","1032"]}
-	##		
-	##		if args.has_key("Checks"):
-	##			self.checks = args["Checks"].replace("'''", "").split(",")
-	##			for i in range(len(self.checks)):
-	##				self.checks[i] = self.checks[i].strip()
-	##		
-	##		if args.has_key("Stops"):
-	##			checks = args["Stops"].replace("'''", "").split(";")
-	##			for check in checks:
-	##				check, stops = check.split(":")
-	##				self.stops[check] = stops.split(",")
-	##			
-	##		print "WindowsAppVerifier: Enabling the following Checks:"
-	##		for c in self.checks:
-	##			print "WindowsAppVerifier: Check: %s" % c
-	##		
-	##		print "WindowsAppVerifier: Disabling the following Stops:"
-	##		for c in self.stops:
-	##			for s in self.stops[c]:
-	##				print "%s: %s" % (c, s)
-	##		
-	##		self._appManager = CreateObject("{597c1ef7-fc28-451e-8273-417c6c9244ed}")
-	##		
-	##		self._RemoveImageLogs(self._image)
-	##		self._DisableImage(self._image)
-	##		self._EnableImage(self._image)
-	##	
-	##	def _EnableImage(self, image):
-	##		'''
-	##		Enables the default checks for an image (exe).
-	##		'''
-	##			
-	##		if not self._manual:
-	##			image = self._appManager.Images.Add(image)
-	##			for check in image.Checks:
-	##				if check.Name in self.checks:
-	##					check.Enabled = True
-	##				else:
-	##					check.Enabled = False
-	##				
-	##				if self.stops.has_key(check.Name):
-	##					stops = self.stops[check.Name]
-	##					for stop in check.Stops:
-	##						if str(stop.StopCode) in stops:
-	##							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-	##							stop.Active = False
-	##						else:
-	##							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-	##	
-	##	def _DisableImage(self, image):
-	##		try:
-	##			if not self._manual:
-	##				self._appManager.Images.Remove(image)
-	##		except:
-	##			pass
-	##	
-	##	def _GetImageLogs(self, image):
-	##		'''
-	##		Get lof files for an image
-	##		'''
-	##		
-	##		logFiles = []
-	##		for log in self._appManager.Logs(image):
-	##			
-	##			try:
-	##				os.unlink("appVerifierTmp.xml")
-	##			except:
-	##				pass
-	##			
-	##			try:
-	##				log.SaveAsXML("appVerifierTmp.xml", "SRV*http://msdl.microsoft.com/download/symbols")
-	##			except:
-	##				pass
-	##			
-	##			fd = open("appVerifierTmp.xml","rb+")
-	##			logFiles.append(fd.read())
-	##			fd.close()
-	##			os.unlink("appVerifierTmp.xml")
-	##		
-	##		return logFiles
-	##	
-	##	def _RemoveImageLogs(self, image):
-	##		try:
-	##			logs = self._appManager.Logs(image)
-	##			for idx in range(logs.Count):
-	##				try:
-	##					logs.Remove(0)
-	##				except:
-	##					print "Warning: Caught error removing App Verifier logs."
-	##					pass
-	##		except:
-	##			pass
-	##		
-	##	def OnTestStarting(self):
-	##		'''
-	##		Called right before start of test.
-	##		'''
-	##		
-	##		# We should not do this on every test
-	##		# instead just on startup.
-	##		#self._EnableImage(self._image)
-	##		pass
-	##	
-	##	def OnTestFinished(self):
-	##		'''
-	##		Called right after a test.
-	##		'''
-	##		
-	##		# We should not do this on every test
-	##		# instead just on shutdown.
-	##		#self._DisableImage(self._image)
-	##		pass
-	##	
-	##	def GetMonitorData(self):
-	##		'''
-	##		Get any monitored data.
-	##		'''
-	##		ret = {}
-	##		count = 0
-	##		logs = self.imageLogs
-	##		
-	##		if logs == None:
-	##			logs = self.imageLogs = self._GetImageLogs(self._image)
-	##		
-	##		self._RemoveImageLogs(self._image)
-	##		
-	##		for log in logs:
-	##			count += 1
-	##			ret["AppVerifier_%d.xml" % count] = log
-	##		
-	##		return ret
-	##	
-	##	def DetectedFault(self):
-	##		'''
-	##		Check if a fault was detected.
-	##		'''
-	##		
-	##		time.sleep(0.15) # Pause a sec
-	##		
-	##		self.imageLogs = self._GetImageLogs(self._image)
-	##		self._RemoveImageLogs(self._image)
-	##		
-	##		for log in self.imageLogs:
-	##			if len(log) > 300:
-	##				print "WindowsAppVerifier: Detected fault"
-	##				return True
-	##		
-	##		self.imageLogs = None
-	##		print "WindowsAppVerifier: Did not detect fault"
-	##		return False
-	##	
-	##	def OnFault(self):
-	##		'''
-	##		Called when a fault was detected.
-	##		'''
-	##		pass
-	##	
-	##	def OnShutdown(self):
-	##		'''
-	##		Called when Agent is shutting down.
-	##		'''
-	##		try:
-	##			self._DisableImage(self._image)
-	##		except:
-	##			pass
 
 	# ###############################################################################################
 	# ###############################################################################################
@@ -478,76 +294,80 @@ try:
 			# Hack for comtypes early version
 			comtypes._ole32.CoInitializeEx(None, comtypes.COINIT_APARTMENTTHREADED)
 			
-			self._eventHandler = _DbgEventHandler()
-			
-			if self.KernelConnectionString:
-				self.dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
-					follow_forks = True,
-					event_callbacks_sink = self._eventHandler,
-					output_callbacks_sink = self._eventHandler,
-					symbols_path = self.SymbolsPath)
-			
-			elif self.CommandLine:
-				self.dbg = PyDbgEng.ProcessCreator(command_line = self.CommandLine,
-					follow_forks = True,
-					event_callbacks_sink = self._eventHandler,
-					output_callbacks_sink = self._eventHandler,
-					symbols_path = self.SymbolsPath)
-			
-			elif self.ProcessName:
+			try:
+				self._eventHandler = _DbgEventHandler()
 				
-				pid = None
-				for x in range(5):
-					pid = self.GetProcessIdByName(self.ProcessName)
-					if pid != None:
-						break
+				if self.KernelConnectionString:
+					self.dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
+						follow_forks = True,
+						event_callbacks_sink = self._eventHandler,
+						output_callbacks_sink = self._eventHandler,
+						symbols_path = self.SymbolsPath)
+				
+				elif self.CommandLine:
+					self.dbg = PyDbgEng.ProcessCreator(command_line = self.CommandLine,
+						follow_forks = True,
+						event_callbacks_sink = self._eventHandler,
+						output_callbacks_sink = self._eventHandler,
+						symbols_path = self.SymbolsPath)
+				
+				elif self.ProcessName:
 					
-					time.sleep(0.25)
-				
-				if pid == None:
-					raise Exception("Error, unable to locate process '%s'" % self.ProcessName)
-				
-				self.dbg = PyDbgEng.ProcessAttacher(pid,
-					event_callbacks_sink = self._eventHandler,
-					output_callbacks_sink = self._eventHandler,
-					symbols_path = self.SymbolsPath)
-			
-			elif self.Service:
-				
-				
-				# Make sure service is running
-				if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
-					win32serviceutil.StartService(self.Service)
-					
-					while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
-						time.sleep(0.25)
+					pid = None
+					for x in range(10):
+						print "WindowsDebugEngineThread: Attempting to locate process by name..."
+						pid = self.GetProcessIdByName(self.ProcessName)
+						if pid != None:
+							break
 						
+						time.sleep(0.25)
+					
+					if pid == None:
+						raise Exception("Error, unable to locate process '%s'" % self.ProcessName)
+					
+					self.dbg = PyDbgEng.ProcessAttacher(pid,
+						event_callbacks_sink = self._eventHandler,
+						output_callbacks_sink = self._eventHandler,
+						symbols_path = self.SymbolsPath)
+				
+				elif self.Service:
+					
+					# Make sure service is running
 					if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
-						raise Exception("WindowsDebugEngine: Unable to start service!")
+						win32serviceutil.StartService(self.Service)
+						
+						while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
+							time.sleep(0.25)
+							
+						if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
+							raise Exception("WindowsDebugEngine: Unable to start service!")
+					
+					# Determin PID of service
+					scm = win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
+					hservice = win32service.OpenService(scm, self.Service, 0xF01FF)
+					
+					status = win32service.QueryServiceStatusEx(hservice)
+					pid = status["ProcessId"]
+					
+					win32service.CloseServiceHandle(hservice)
+					win32service.CloseServiceHandle(scm)
+					
+					self.dbg = PyDbgEng.ProcessAttacher(pid,
+						event_callbacks_sink = self._eventHandler,
+						output_callbacks_sink = self._eventHandler,
+						symbols_path = self.SymbolsPath)
 				
-				# Determin PID of service
-				scm = win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
-				hservice = win32service.OpenService(scm, self.Service, 0xF01FF)
+				else:
+					raise Exception("Didn't find way to start debugger... bye bye!!")
 				
-				status = win32service.QueryServiceStatusEx(hservice)
-				pid = status["ProcessId"]
+				WindowsDebugEngineThread.Quit = Event()
+				WindowsDebugEngine.started.set()
 				
-				win32service.CloseServiceHandle(hservice)
-				win32service.CloseServiceHandle(scm)
-				
-				self.dbg = PyDbgEng.ProcessAttacher(pid,
-					event_callbacks_sink = self._eventHandler,
-					output_callbacks_sink = self._eventHandler,
-					symbols_path = self.SymbolsPath)
+				self.dbg.event_loop_with_user_callback(self.Callback, 10)
+				self.dbg.__del__()
 			
-			else:
-				raise Exception("Didn't find way to start debugger... bye bye!!")
-			
-			WindowsDebugEngineThread.Quit = Event()
-			WindowsDebugEngine.started.set()
-			
-			self.dbg.event_loop_with_user_callback(self.Callback, 10)
-			self.dbg.__del__()
+			finally:
+				comtypes._ole32.CoUninitialize()
 		
 		def Callback(self = None, stuff = None, stuff2 = None):
 			PumpEvents(0.1)
@@ -576,12 +396,11 @@ try:
 				
 			try:
 				hPid = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 0, pid)
-					
+				
 				try:
 					mids = win32process.EnumProcessModules(hPid)
 					for mid in mids:
 						name = str(win32process.GetModuleFileNameEx(hPid, mid))
-						#print "Filename: ", name
 						if name.lower().find(procname) != -1:
 							return pid
 					
@@ -684,7 +503,7 @@ try:
 		
 		def _StopDebugger(self):
 			print "_StopDebugger"
-			if self.thread.isAlive():
+			if self.thread != None and self.thread.isAlive():
 				WindowsDebugEngineThread.Quit.set()
 				WindowsDebugEngine.started.clear()
 				self.thread.join()
@@ -996,4 +815,189 @@ try:
 except:
 	pass
 
+	##class WindowsAppVerifier(Monitor):
+	##	'''
+	##	Agent that uses the Microsoft AppVerifier tool to detect faults on
+	##	running processes.  AppVerifier can be downloaded from Microsoft via
+	##	the following url: http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx
+	##	'''
+	##	
+	##	def __init__(self, args):
+	##		self._image = str(args['Application']).replace("'''", "")
+	##		
+	##		if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
+	##			self._manual = True
+	##		else:
+	##			self._manual = False
+	##		
+	##		self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
+	##		self.stops = {}
+	##		# self.stops = {"COM":["10","1032"]}
+	##		
+	##		if args.has_key("Checks"):
+	##			self.checks = args["Checks"].replace("'''", "").split(",")
+	##			for i in range(len(self.checks)):
+	##				self.checks[i] = self.checks[i].strip()
+	##		
+	##		if args.has_key("Stops"):
+	##			checks = args["Stops"].replace("'''", "").split(";")
+	##			for check in checks:
+	##				check, stops = check.split(":")
+	##				self.stops[check] = stops.split(",")
+	##			
+	##		print "WindowsAppVerifier: Enabling the following Checks:"
+	##		for c in self.checks:
+	##			print "WindowsAppVerifier: Check: %s" % c
+	##		
+	##		print "WindowsAppVerifier: Disabling the following Stops:"
+	##		for c in self.stops:
+	##			for s in self.stops[c]:
+	##				print "%s: %s" % (c, s)
+	##		
+	##		self._appManager = CreateObject("{597c1ef7-fc28-451e-8273-417c6c9244ed}")
+	##		
+	##		self._RemoveImageLogs(self._image)
+	##		self._DisableImage(self._image)
+	##		self._EnableImage(self._image)
+	##	
+	##	def _EnableImage(self, image):
+	##		'''
+	##		Enables the default checks for an image (exe).
+	##		'''
+	##			
+	##		if not self._manual:
+	##			image = self._appManager.Images.Add(image)
+	##			for check in image.Checks:
+	##				if check.Name in self.checks:
+	##					check.Enabled = True
+	##				else:
+	##					check.Enabled = False
+	##				
+	##				if self.stops.has_key(check.Name):
+	##					stops = self.stops[check.Name]
+	##					for stop in check.Stops:
+	##						if str(stop.StopCode) in stops:
+	##							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+	##							stop.Active = False
+	##						else:
+	##							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
+	##	
+	##	def _DisableImage(self, image):
+	##		try:
+	##			if not self._manual:
+	##				self._appManager.Images.Remove(image)
+	##		except:
+	##			pass
+	##	
+	##	def _GetImageLogs(self, image):
+	##		'''
+	##		Get lof files for an image
+	##		'''
+	##		
+	##		logFiles = []
+	##		for log in self._appManager.Logs(image):
+	##			
+	##			try:
+	##				os.unlink("appVerifierTmp.xml")
+	##			except:
+	##				pass
+	##			
+	##			try:
+	##				log.SaveAsXML("appVerifierTmp.xml", "SRV*http://msdl.microsoft.com/download/symbols")
+	##			except:
+	##				pass
+	##			
+	##			fd = open("appVerifierTmp.xml","rb+")
+	##			logFiles.append(fd.read())
+	##			fd.close()
+	##			os.unlink("appVerifierTmp.xml")
+	##		
+	##		return logFiles
+	##	
+	##	def _RemoveImageLogs(self, image):
+	##		try:
+	##			logs = self._appManager.Logs(image)
+	##			for idx in range(logs.Count):
+	##				try:
+	##					logs.Remove(0)
+	##				except:
+	##					print "Warning: Caught error removing App Verifier logs."
+	##					pass
+	##		except:
+	##			pass
+	##		
+	##	def OnTestStarting(self):
+	##		'''
+	##		Called right before start of test.
+	##		'''
+	##		
+	##		# We should not do this on every test
+	##		# instead just on startup.
+	##		#self._EnableImage(self._image)
+	##		pass
+	##	
+	##	def OnTestFinished(self):
+	##		'''
+	##		Called right after a test.
+	##		'''
+	##		
+	##		# We should not do this on every test
+	##		# instead just on shutdown.
+	##		#self._DisableImage(self._image)
+	##		pass
+	##	
+	##	def GetMonitorData(self):
+	##		'''
+	##		Get any monitored data.
+	##		'''
+	##		ret = {}
+	##		count = 0
+	##		logs = self.imageLogs
+	##		
+	##		if logs == None:
+	##			logs = self.imageLogs = self._GetImageLogs(self._image)
+	##		
+	##		self._RemoveImageLogs(self._image)
+	##		
+	##		for log in logs:
+	##			count += 1
+	##			ret["AppVerifier_%d.xml" % count] = log
+	##		
+	##		return ret
+	##	
+	##	def DetectedFault(self):
+	##		'''
+	##		Check if a fault was detected.
+	##		'''
+	##		
+	##		time.sleep(0.15) # Pause a sec
+	##		
+	##		self.imageLogs = self._GetImageLogs(self._image)
+	##		self._RemoveImageLogs(self._image)
+	##		
+	##		for log in self.imageLogs:
+	##			if len(log) > 300:
+	##				print "WindowsAppVerifier: Detected fault"
+	##				return True
+	##		
+	##		self.imageLogs = None
+	##		print "WindowsAppVerifier: Did not detect fault"
+	##		return False
+	##	
+	##	def OnFault(self):
+	##		'''
+	##		Called when a fault was detected.
+	##		'''
+	##		pass
+	##	
+	##	def OnShutdown(self):
+	##		'''
+	##		Called when Agent is shutting down.
+	##		'''
+	##		try:
+	##			self._DisableImage(self._image)
+	##		except:
+	##			pass
+	
+	
 # end
