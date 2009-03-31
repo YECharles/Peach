@@ -156,7 +156,6 @@ try:
 				WindowsDebugEngine.handlingFault.set()
 				
 				# 1. Calculate no. of frames
-				#sys.stdout.write("_DbgEventHandler::Exception(): 1\n")
 				
 				frames_filled = 0
 				stack_frames = dbg.get_stack_trace(100)
@@ -167,13 +166,11 @@ try:
 					frames_filled += 1
 				
 				# 2. Output registers
-				#sys.stdout.write("_DbgEventHandler::Exception(): 2\n")
 				
 				dbg.idebug_registers.OutputRegisters(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, DbgEng.DEBUG_REGISTERS_ALL)
 				_DbgEventHandler.buff += "\n\n"
 				
 				# 3. Ouput stack trace
-				#sys.stdout.write("_DbgEventHandler::Exception(): 3\n")
 				
 				frames_count = 100
 				frames_buffer = create_string_buffer( frames_count * sizeof(DbgEng._DEBUG_STACK_FRAME) )
@@ -192,7 +189,6 @@ try:
 				_DbgEventHandler.buff += "\n\n"
 				
 				# 4. Write dump file
-				#sys.stdout.write("_DbgEventHandler::Exception(): 4\n")
 				
 				dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
 				minidump = None
@@ -201,6 +197,8 @@ try:
 					f = open('dumpfile.core', 'rb+')
 					minidump = f.read()
 					f.close()
+					
+					os.unlink('dumpfile.core')
 					
 				except:
 					pass

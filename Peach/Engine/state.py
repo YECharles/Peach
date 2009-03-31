@@ -223,7 +223,6 @@ class StateEngine:
 			action.append(action.template)
 		
 		# Next setup a few things
-		
 		self.actionValues.append( [ state.name, 'state' ] )
 		mutator.onStateStarting(self, state)
 		

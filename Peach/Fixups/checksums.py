@@ -4,7 +4,7 @@ A few standard fixups.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) 2008-2009 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -269,6 +269,7 @@ try:
 				
 				firstFullName = str(xml.xpath(self.firstSend)[0].getAttributeNS(None, "fullName"))
 				firstFullName = firstFullName[firstFullName.index('.')+1:]
+				
 				if fullName.find(firstFullName) > -1 and SspiAuthenticationFixup._firstObj != self.context:
 					
 					#scflags = sspicon.ISC_REQ_INTEGRITY|sspicon.ISC_REQ_SEQUENCE_DETECT|\

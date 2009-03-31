@@ -86,13 +86,13 @@ Syntax:
   -a,--agent                 Launch Peach Agent
   -c,--count                 Count test cases
   -t,--test xml_file         Test parse a Peach XML file
-  -r,--restart [file]        Restart fuzzer at saved position
   -p,--parallel M,N          Parallel fuzzing.  Total of M machines, this
                              is machine N.
   --debug                    Enable debug messages. Usefull when debugging
                              your Peach XML file.  Warning: Messages are very
                              cryptic sometimes.
-  --skipto N                 Skip to a specific test #
+  --skipto N                 Skip to a specific test #.  This replaced -r for
+                             restarting Peach runs.
 
 Peach Agent
 
