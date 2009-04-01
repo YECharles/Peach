@@ -65,6 +65,18 @@ class Fixup:
 		else:
 			return None
 		
+	def _getRef(self):
+		'''
+		AFtering incoming data is cracked some elements move around.
+		Peach will auto update parameters called "ref" but you will
+		need to-refetch the value using this method.
+		'''
+		for param in self.context.fixup:
+			if param.name == "ref":
+				return eval(param.defaultValue)
+		
+		return None
+	
 	def fixup(self):
 		'''
 		Perform the required fixup.  OVERRIDE ME!

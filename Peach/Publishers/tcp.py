@@ -88,19 +88,6 @@ class Tcp(Publisher):
 	def stop(self):
 		self.close()
 	
-	def hexPrint(self, src):
-
-		FILTER=''.join([(len(repr(chr(x)))==3) and chr(x) or '.' for x in range(256)])
-		N=0; result=''
-		length=16
-		while src:
-			s,src = src[:length],src[length:]
-			hexa = ' '.join(["%02X"%ord(x) for x in s])
-			s = s.translate(FILTER)
-			result += "%04X   %-*s   %s\n" % (N, length*3, hexa, s)
-			N+=length
-		print result
-
 	def connect(self):
 		'''
 		Create connection.

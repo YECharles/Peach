@@ -135,6 +135,7 @@ class DataCracker:
 			
 			relations = []
 			relationsHold = []
+			paramReferences = []
 			
 			Debug(1, "Get all relations")
 			for relation in placement.parent.getRelationsOfThisElement():
@@ -160,6 +161,14 @@ class DataCracker:
 						raise Exception("obj is null")
 					relations.append([relation, obj])
 					relationsHold.append(relation)
+			
+			# Locate things like <Param name="ref" value="Data" />
+			Debug(1, "Get all parameter references")
+			for param in placement.parent.getRootOfDataMap().getElementsByType(Param):
+				if param.name == 'ref':
+					obj = param.parent.parent.find(param.defaultValue.replace("'",""))
+					if obj == placement.parent:
+						paramReferences.append([param, obj])
 			
 			# ----
 			
@@ -237,6 +246,10 @@ class DataCracker:
 			for relation, of in relations:
 				relation.of = of.getFullnameInDataModel()
 				#print "Updating %s to %s" % (relation.getFullname(), relation.of)
+			
+			Debug(1, "Update relations")
+			for param, obj in paramReferences:
+				param.defaultValue = "'''%s'''" % obj.getFullnameInDataModel()
 			
 		Debug(1, "Done cracking stuff")
 		#sys.exit(0)

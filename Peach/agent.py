@@ -701,7 +701,8 @@ class AgentClient:
 			
 			if sys.platform == "win32":
 				# Figure out were Peach is!
-				os.system("start %s c:\\peach\\peach.py -a" % (sys.executable))
+				peachPath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+				os.system("start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a" % (sys.executable, peachPath))
 			else:
 				raise PeachException("Sorry, we only support auto starting agents on Windows.  Please configure all agents with location uris and pre-launch any Agent processes.")
 			
