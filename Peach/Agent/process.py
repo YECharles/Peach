@@ -216,9 +216,11 @@ class Process(Monitor):
 		Called right before start of test.
 		'''
 		self.strangeExit = False
-		if not self.startOnCall (self.restartOnTest or not self._IsProcessRunning()):
+		if not self.startOnCall and (self.restartOnTest or not self._IsProcessRunning()):
 			self._StopProcess()
 			self._StartProcess()
+		elif self.startOnCall:
+			self._StopProcess()
 	
 	def OnTestFinished(self):
 		'''
@@ -228,6 +230,9 @@ class Process(Monitor):
 			self.strangeExit = True
 			
 		if self.restartOnTest:
+			self._StopProcess()
+	
+		elif self.startOnCall:
 			self._StopProcess()
 	
 	def GetMonitorData(self):
