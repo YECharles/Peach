@@ -502,6 +502,13 @@ class Hex(Transformer):
 		except:
 			return data
 		
+	def realDecode(self, data):
+		ret = ""
+		for i in range(len(data), 2):
+			h = data[i:i+2]
+			ret += ord(h)
+		
+		return ret
 
 
 class HexString(Transformer):

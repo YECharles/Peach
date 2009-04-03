@@ -48,8 +48,8 @@ class Eval(Transformer):
 		'''
 		Eval a statement.  Should include a formater (%s) for data.
 		'''
-		self._eval = eval
 		transformer.Transformer.__init__(self, anotherTransformer)
+		self._eval = eval
 	
 	def realEncode(self, data):
 		return eval(self._eval % data)
