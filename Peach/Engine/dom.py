@@ -857,8 +857,10 @@ class DataElement(Mutatable):
 		
 		#: Default value to use
 		self.defaultValue = None
-		#: Override default value
+		#: Mutated value prior to packing and transformers
 		self.currentValue = None
+		#: Mutated value after everything but transformers
+		self.finalValue = None
 		#: Current value
 		self.value = None
 		
@@ -2956,14 +2958,25 @@ class Number(DataElement):
 	
 	_allowedSizes = [8, 16, 24, 32, 64]
 	
+	#: Default value used for size
+	defaultSize = 8
+	#: Default value used for endian
+	defaultEndian = 'little'
+	#: Default value used for signed
+	defaultSigned = False
+	#: Default value used for valueType
+	defaultValueType = 'string'
+	
 	def __init__(self, name, parent):
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'number'
-		self.size = 8
+		
+		self.size = Number.defaultSize
+		self.endian = Number.defaultEndian
+		self.signed = Number.defaultSigned
+		self.valueType = Number.defaultValueType
+		
 		self.ref = None
-		self.endian = 'little'
-		self.signed = False
-		self.valueType = 'string'
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
@@ -3395,6 +3408,7 @@ class XmlAttribute(DataElement):
 	def getRawValue(self, sout = None, parent = None):
 		return self.getInternalValue(sout, parent)
 
+
 class String(DataElement):
 	'''
 	A string field
@@ -3406,13 +3420,24 @@ class String(DataElement):
 		'utf8':'utf-8',
 		}
 	
+	#: Default value for valueType
+	defaultValueType = 'string'
+	#: Default value for lengthTYpe
+	defaultLengthType = 'string'
+	#: Default value for padCharacter
+	defaultPadCharacter = '\0'
+	#: Default value for type
+	defaultType = 'char'
+	#: Default value for nullTerminated
+	defaultNullTerminated = False
+	
 	def __init__(self, name = None, parent = None):
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'string'
-		self.valueType = 'string'
+		self.valueType = String.defaultValueType
 		self.defaultValue = None
 		self.isStatic = False
-		self.lengthType = 'string'
+		self.lengthType = String.defaultLengthType
 		self.lengthCalc = None
 		self.length = None
 		self.minOccurs = 1
@@ -3422,10 +3447,14 @@ class String(DataElement):
 		self.insideRelation = False
 		self.analyzer = None
 		
-		self.padCharacter = '\0'	#: Value to pad string with, defaults to NULL '\0'
-		self.type = 'char'			#: Type of string, currently only char and wchar are supported.
-		self.nullTerminated = False	#: Is string null terminated, defaults to false
-		self.tokens = None			#: DEPRICATED, Use hint instead
+		#: Value to pad string with, defaults to NULL '\0'
+		self.padCharacter = String.defaultPadCharacter
+		#: Type of string, currently only char and wchar are supported.
+		self.type = String.defaultType
+		#: Is string null terminated, defaults to false
+		self.nullTerminated = String.defaultNullTerminated
+		#: DEPRICATED, Use hint instead
+		self.tokens = None
 	
 	def asCType(self):
 		
@@ -3495,34 +3524,40 @@ class String(DataElement):
 		
 	def getRawValue(self, sout = None):
 		
-		# 0. Override value?
-		if self.currentValue != None:
-			value = self.currentValue
+		# finalValue overrides everything!
+		if self.finalValue != None:
+			value = self.finalValue
 		
 		else:
-			# 1. Init value
-			value = self.getInternalValue()
 			
-			# 6. Fixed length string
-			if self.length != None:
-				self.length = self.getLength(True)
+			# 0. Override value?
+			if self.currentValue != None:
+				value = self.currentValue
 				
-				if len(value) < self.length:
-					value += self.padCharacter * (self.length - len(value))
-				else:
-					value = value[:self.length]
+			else:
+				# 1. Init value
+				value = self.getInternalValue()
+				
+				# 6. Fixed length string
+				if self.length != None:
+					self.length = self.getLength(True)
+					
+					if len(value) < self.length:
+						value += self.padCharacter * (self.length - len(value))
+					else:
+						value = value[:self.length]
 			
-		# 7. Null terminated strings
-		# Lets try null terminating even the mutated value.  Might as well!
-		if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
-			value += '\0'
+			# 7. Null terminated strings
+			# Lets try null terminating even the mutated value.  Might as well!
+			if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
+				value += '\0'
 			
-		# Encode
+			# Encode
 		
-		try:
-			value = value.encode(self.EncodeAs[self.type])
-		except:
-			pass
+			try:
+				value = value.encode(self.EncodeAs[self.type])
+			except:
+				pass
 		
 		# Output
 		
@@ -3557,11 +3592,15 @@ class Flags(DataElement):
 	'''
 	Set of flags
 	'''
+	
+	#: Default value for endian
+	defaultEndian = 'little'
+	
 	def __init__(self, name, parent):
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'flags'
 		self.length = None	# called size
-		self.endian = 'little'
+		self.endian = Flags.defaultEndian
 
 	def asCType(self):
 		
@@ -3917,11 +3956,17 @@ class Blob(DataElement):
 	'''
 	A flag in a flag set
 	'''
+	
+	#: Default value for valueType
+	defaultValueType = 'string'
+	#: Default value for lengthType
+	defaultLengthType = 'string'
+	
 	def __init__(self, name, parent):
 		DataElement.__init__(self, name, parent)
 		self.elementType = 'blob'
-		self.valueType = 'string'
-		self.lengthType = 'string'
+		self.valueType = Blob.defaultValueType
+		self.lengthType = Blob.defaultLengthType
 		self.length = None
 		self.lengthCalc = None
 

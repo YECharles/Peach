@@ -386,12 +386,19 @@ class DataCracker:
 				
 				## Check for count relation, verify > 0
 				if maxOccurs == 0:
-					# Remove element
-					del node.parent[node.name]
+					for child in node.getElementsByType(DataElement):
+						# Remove relation (else we get errors)
+						for relation in child.getRelationsOfThisElement():
+							relation.parent.relations.remove(relation)
+							relation.parent.__delitem__(relation.name)
 					
 					# Remove relation (else we get errors)
-					relation.parent.relations.remove(relation)
-					del relation.parent[relation.name]
+					for relation in node.getRelationsOfThisElement():
+						relation.parent.relations.remove(relation)
+						relation.parent.__delitem__(relation.name)
+					
+					# Remove element
+					del node.parent[node.name]
 					
 					# We passed muster...I think :)
 					rating = 2
@@ -431,6 +438,12 @@ class DataCracker:
 							
 							# Remove node and increase rating.
 							Debug(1, "@ minOccurs == 0, removing node")
+							
+							for child in node.getElementsByType(DataElement):
+								# Remove relation (else we get errors)
+								for relation in child.getRelationsOfThisElement():
+									relation.parent.relations.remove(relation)
+									relation.parent.__delitem__(relation.name)
 							
 							# Remove relation (else we get errors)
 							for relation in node.getRelationsOfThisElement():
@@ -493,6 +506,12 @@ class DataCracker:
 					
 					# Remove node and increase rating.
 					Debug(1, "Firt element rating was poor and minOccurs == 0, remoing element and upping rating.")
+					
+					for child in node.getElementsByType(DataElement):
+						# Remove relation (else we get errors)
+						for relation in child.getRelationsOfThisElement():
+							relation.parent.relations.remove(relation)
+							relation.parent.__delitem__(relation.name)
 					
 					# Remove relation (else we get errors)
 					for relation in node.getRelationsOfThisElement():
@@ -1302,6 +1321,10 @@ class DataCracker:
 				if length == None:
 					length = node.getLength()
 				
+				# If we are null terminated add on to length
+				if node.nullTerminated:
+					length += 1
+				
 				Debug(1, "_handleString: Found length of: %d" % length)
 				
 				if node.type == 'wchar':
@@ -1335,6 +1358,22 @@ class DataCracker:
 					newpos = pos + length
 					defaultValue = node.defaultValue
 					rating = 2
+					
+					if node.nullTerminated and node.type != 'wchar':
+						if value[-1] != '\0':
+							# Failed to locate null!
+							Debug(1, "%s_handleString: %s: Null not found!" % ('\t'*self.deepString, node.name))
+							rating = 4
+						else:
+							value = value[:-1]
+					
+					elif node.nullTerminated and node.type == 'wchar':
+						if value[-1] != '\0' and value[-2] != '\0':
+							# Failed to locate null!
+							Debug(1, "%s_handleString: %s: Null not found!" % ('\t'*self.deepString, node.name))
+							rating = 4
+						else:
+							value = value[:-2]
 					
 					if node.isStatic:
 						if node.type == 'wchar':

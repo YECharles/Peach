@@ -7,7 +7,7 @@ Mutators that operate on string types.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) 2008-2009 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ Mutators that operate on string types.
 
 # $Id$
 
-import sys, os, time
+import sys, os, time, random
 
 from Peach.generator import *
 from Peach.Generators.data import *
@@ -104,6 +104,282 @@ class StringCaseMutator(Mutator):
 		return data
 
 
+class UnicodeStringsMutator(Mutator):
+	'''
+	Generate unicode strings
+	'''
+	
+	values = None
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
+		
+		self.name = "UnicodeStringsMutator"
+		
+		if UnicodeStringsMutator.values == None:
+			self._genValues()
+			
+		self.isFinite = True
+		self._peach = peach
+		self._count = 0
+		self._maxCount = len(self.values)
+		
+	def _genValues(self):
+		if UnicodeStringsMutator.values == None:
+			
+			values = []
+			
+			# Add some long strings
+			sample = random.sample(range(2, 6024), 200)
+			sample.append(0)
+			sample.append(1024 * 65)
+			
+			uchars = xrange(0, 0xffff)
+			for length in sample:
+				
+				value = u""
+				for i in range(length):
+					value += unichr(random.choice(uchars))
+				
+				values.append(value)
+			
+			UnicodeStringsMutator.values = values
+	
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
+		
+		self._count += 1
+		if self._count >= self._maxCount:
+			self._count -= 1
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return self._maxCount
+
+	def supportedDataElement(node):
+		if isinstance(node, String) and node.type != 'ascii' and node.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+
+	def sequencialMutation(self, node):
+		node.currentValue = self.values[self._count]
+	
+	def randomMutation(self, node):
+		node.currentValue = random.choice(self.values)
+
+
+class UnicodeBomMutator(Mutator):
+	'''
+	Injects BOM markers into default value and longer strings.
+	'''
+	
+	values = None
+	boms = ['\xFE\xFF', '\xFF\xEF', '\xEF\xBB\xBF']
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
+		
+		self.name = "UnicodeBomMutator"
+		
+		if UnicodeBomMutator.values == None:
+			self._genValues()
+			
+		self.isFinite = True
+		self._peach = peach
+		self._count = 0
+		self._maxCount = len(self.values)
+		
+	def _genValues(self):
+		if UnicodeBomMutator.values == None:
+			
+			valuesWithBOM = []
+			
+			values = []
+			
+			# Add some long strings
+			sample = random.sample(range(2, 6024, 2), 200)
+			sample.append(0)
+			sample.append(1024 * 65)
+			
+			for r in sample:
+				values.append('A' * r)
+			
+			# 1. Prefix with both BOMs
+			for v in values:
+				for b in self.boms:
+					valuesWithBOM.append(b + v)
+			
+			# 2. Every other wchar
+			for v in values:
+				for b in self.boms:
+					newval = b
+					for i in range(0, len(v), 2):
+						newval += v[i:i+2]
+						newval += b
+					
+					valuesWithBOM.append(newval)
+			
+			# 3. Just BOM's
+			for r in sample:
+				newval = ""
+				for i in range(r):
+					newval += random.choice(self.boms)
+				
+				valuesWithBOM.append(newval)
+			
+			UnicodeBomMutator.values = valuesWithBOM
+			values = None
+		
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
+		
+		self._count += 1
+		if self._count >= self._maxCount:
+			self._count -= 1
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return self._maxCount
+
+	def supportedDataElement(node):
+		if isinstance(node, String) and node.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+
+	def sequencialMutation(self, node):
+		node.finalValue = self.values[self._count]
+	
+	def randomMutation(self, node):
+		node.finalValue = random.choice(self.values)
+
+
+class UnicodeBadUtf8Mutator(Mutator):
+	'''
+	Generate bad UTF-8 strings.
+	'''
+	
+	values = None
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		self.weight = 2
+		
+		self.name = "UnicodeBadUtf8Mutator"
+		
+		if UnicodeBadUtf8Mutator.values == None:
+			self._genValues()
+			
+		self.isFinite = True
+		self._peach = peach
+		self._count = 0
+		self._maxCount = len(self.values)
+	
+	def _utf8OneByte(self, c):
+		return c
+	
+	def _utf8TwoByte(self, c):
+		if c < 63:
+			return '\xc0' + chr(0x80 | c)
+		
+		pass		
+		
+	def _utf8ThreeByte(self, c):
+		pass
+		
+	def _utf8FourByte(self, c):
+		pass
+		
+	def _utf8FiveByte(self, c):
+		pass
+		
+	def _utf8SixByte(self, c):
+		pass
+		
+	def _genValues(self):
+		if UnicodeBadUtf8Mutator.values == None:
+			
+			utf8 = []
+			values = []
+			
+			# Add some long strings
+			sample = random.sample(range(2, (65 * 1024), 2), 200)
+			sample.append(0)
+			sample.append(1024 * 65)
+			
+			ascii = range(32, 126)
+			for r in sample:
+				values.append(random.sample(ascii, r))
+			
+			# 1. Prefix with both BOMs
+			for v in values:
+				for b in self.boms:
+					valuesWithDOM.append(b + v)
+			
+			# 2. Every other wchar
+			for v in values:
+				for b in self.boms:
+					newval = b
+					for i in range(0, len(v), 2):
+						newval += v[i:i+2]
+						newval += b
+					
+					valuesWithBOM.append(newval)
+			
+			# 3. Just BOM's
+			for r in sample:
+				newval = ""
+				for i in range(r):
+					newval += random.choice(self.boms)
+				
+				valuesWithBOM.append(newval)
+			
+			
+			UnicodeBadUtf8Mutator.values = valuesWithBOM
+			values = None
+		
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
+		
+		self._count += 1
+		if self._count >= self._maxCount:
+			self._count -= 1
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return self._maxCount
+
+	def supportedDataElement(node):
+		if isinstance(node, String) and node.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+
+	def sequencialMutation(self, node):
+		node.finalValue = self.values[self._count]
+	
+	def randomMutation(self, node):
+		node.finalValue = random.choice(self.values)
+
+
 class _SimpleGeneratorMutator(Mutator):
 	'''
 	Base class for other mutators that use a
@@ -164,9 +440,9 @@ class _SimpleGeneratorMutator(Mutator):
 		node.currentValue = gen.getValue()
 
 
-class StringTokenMutator(_SimpleGeneratorMutator):
+class StringMutator(_SimpleGeneratorMutator):
 	'''
-	Apply StringTokenFuzzer to each string node in DDT
+	Apply StringFuzzer to each string node in DDT
 	one Node at a time.
 	'''
 	
@@ -175,7 +451,7 @@ class StringTokenMutator(_SimpleGeneratorMutator):
 		#: Weight to be chosen randomly
 		self.weight = 3
 		
-		self.name = "StringTokenMutator"
+		self.name = "StringMutator"
 		self._generator = BadStrings()
 		
 		# Get count

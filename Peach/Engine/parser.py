@@ -219,7 +219,7 @@ class ParseTemplate:
 		# The good stuff -- We are going todo multiple passes here to increase the likely hood
 		# that things will turn out okay.
 		
-		# Pass 1 -- Include and PythonPath
+		# Pass 1 -- Include, PythonPath, Defaults
 		for child in ePeach.childNodes:
 			
 			if child.nodeName == 'Include':
@@ -256,6 +256,9 @@ class ParseTemplate:
 				peach.append(p)
 				sys.path.append(p.name)
 				
+			elif child.nodeName == 'Defaults':
+				self.HandleDefaults(child, peach)
+
 		# Pass 2 -- Import
 		for child in ePeach.childNodes:
 			
@@ -847,6 +850,98 @@ class ParseTemplate:
 		
 		return transformer
 		
+	def HandleDefaults(self, node, parent):
+		'''
+		Handle data element defaults
+		'''
+
+		# children
+
+		for child in node.childNodes:
+			if child.nodeName == 'Blob':
+				if child.hasAttributeNS(None, 'valueType'):
+					Blob.defaultValueType = self._getAttribute(child, 'valueType')
+					
+					if Blob.defaultValueType not in ['string', 'literal','hex']:
+						raise PeachException("Error, default value for Blob.valueType incorrect.")
+					
+				if child.hasAttributeNS(None, 'lengthType'):
+					Blob.defaultLengthType = self._getAttribute(child, 'lengthType')
+					
+					if Blob.defaultLengthType not in ['string', 'literal','calc']:
+						raise PeachException("Error, default value for Blob.lengthType incorrect.")
+					
+			elif child.nodeName == 'Flags':
+				if child.hasAttributeNS(None, 'endian'):
+					Flags.defaultEndian = self._getAttribute(child, 'endian')
+					
+					if Flags.defaultEndian not in ['little', 'big','network']:
+						raise PeachException("Error, default value for Flags.endian incorrect.")
+			
+			elif child.nodeName == 'Number':
+				if child.hasAttributeNS(None, 'endian'):
+					Number.defaultEndian = self._getAttribute(child, 'endian')
+					
+					if Number.defaultEndian not in ['little', 'big','network']:
+						raise PeachException("Error, default value for Number.endian incorrect.")
+			
+				if child.hasAttributeNS(None, 'size'):
+					Number.defaultSize = int(self._getAttribute(child, 'size'))
+					
+					if Number.defaultSize not in Number._allowedSizes:
+						raise PeachException("Error, default value for Number.size incorrect.")
+			
+				if child.hasAttributeNS(None, 'signed'):
+					Number.defaultSigned = self._getAttribute(child, 'signed')
+					
+					if Number.defaultSigned not in ['true', 'false']:
+						raise PeachException("Error, default value for Number.signed incorrect.")
+					
+					if Number.defaultSigned == 'true':
+						Number.defaultSigned = True
+					else:
+						Number.defaultSigned = False
+			
+				if child.hasAttributeNS(None, 'valueType'):
+					Number.defaultValueType = self._getAttribute(child, 'valueType')
+					
+					if Number.defaultValueType not in ['string', 'literal', 'hex']:
+						raise PeachException("Error, default value for Number.valueType incorrect.")
+			
+			elif child.nodeName == 'String':
+				if child.hasAttributeNS(None, 'valueType'):
+					String.defaultValueType = self._getAttribute(child, 'valueType')
+					
+					if String.defaultValueType not in ['string', 'literal', 'hex']:
+						raise PeachException("Error, default value for String.valueType incorrect.")
+
+				if child.hasAttributeNS(None, 'lengthType'):
+					String.defaultLengthType = self._getAttribute(child, 'lengthType')
+					
+					if String.defaultLengthType not in ['string', 'literal', 'calc']:
+						raise PeachException("Error, default value for String.lengthType incorrect.")
+
+				if child.hasAttributeNS(None, 'padCharacter'):
+					String.defaultPadCharacter = self._getAttribute(child, 'padCharacter')
+					
+				if child.hasAttributeNS(None, 'type'):
+					String.defaultType = self._getAttribute(child, 'type')
+					
+					if String.defaultType not in ['string', 'literal', 'hex']:
+						raise PeachException("Error, default value for String.type incorrect.")
+				
+				if child.hasAttributeNS(None, 'nullTerminated'):
+					String.defaultNullTerminated = self._getAttribute(child, 'nullTerminated')
+					
+					if String.defaultNullTerminated not in ['true', 'false']:
+						raise PeachException("Error, default value for String.nullTerminated incorrect.")
+					
+					if String.defaultNullTerminated == 'true':
+						String.defaultNullTerminated = True
+					else:
+						String.defaultNullTerminated = False
+
+
 	def HandleFixup(self, node, parent):
 		'''
 		Handle Fixup element
@@ -1480,31 +1575,33 @@ class ParseTemplate:
 		
 		# type
 		
-		type = self._getAttribute(node, 'type')
-		if type == None or len(type) == 0:
-			string.type = 'char'
+		if node.hasAttributeNS(None, 'type'):
+			type = self._getAttribute(node, 'type')
+			if type == None or len(type) == 0:
+				string.type = 'char'
 		
-		elif not (type == 'char' or type == 'wchar' or type == 'utf8'):
-			raise PeachException("Unknown type of String")
+			elif not (type == 'char' or type == 'wchar' or type == 'utf8'):
+				raise PeachException("Unknown type of String")
 		
-		else:
-			string.type = type
+			else:
+				string.type = type
 		
-		if type == 'wchar':
+		if string.type == 'wchar':
 			string.padCharacter = string.padCharacter * 2
 
 		# nullTerminated (optional)
 		
-		nullTerminated = self._getAttribute(node, 'nullTerminated')
-		if nullTerminated == None or len(nullTerminated) == 0:
-			nullTerminated = 'false'
+		if node.hasAttributeNS(None, 'nullTerminated'):
+			nullTerminated = self._getAttribute(node, 'nullTerminated')
+			if nullTerminated == None or len(nullTerminated) == 0:
+				nullTerminated = 'false'
 		
-		if nullTerminated.lower() == 'true':
-			string.nullTerminated = True
-		elif nullTerminated.lower() == 'false':
-			string.nullTerminated = False
-		else:
-			raise PeachException("nullTerminated should be true or false")
+			if nullTerminated.lower() == 'true':
+				string.nullTerminated = True
+			elif nullTerminated.lower() == 'false':
+				string.nullTerminated = False
+			else:
+				raise PeachException("nullTerminated should be true or false")
 		
 		# length (bytes)
 		
@@ -1572,39 +1669,39 @@ class ParseTemplate:
 		
 		# size (bits)
 		
-		size = self._getAttribute(node, 'size')
-		if size == None:
-			raise PeachException("Number element %s is missing the 'size' attribute which is required." % number.name)
+		if node.hasAttributeNS(None, 'size'):
+			size = self._getAttribute(node, 'size')
+			if size == None:
+				raise PeachException("Number element %s is missing the 'size' attribute which is required." % number.name)
 		
-		number.size = int(size)
+			number.size = int(size)
 		
-		if not number.size in number._allowedSizes:
-			raise PeachException("invalid size")
+			if not number.size in number._allowedSizes:
+				raise PeachException("invalid size")
 		
 		# endian (optional)
 		
-		number.endian = self._getAttribute(node, 'endian')
-		if number.endian == None or len(number.endian) == 0:
-			number.endian = 'little'
+		if node.hasAttributeNS(None, 'endian'):
+			number.endian = self._getAttribute(node, 'endian')
+			if number.endian == 'network':
+				number.endian = 'big'
 		
-		if number.endian == 'network':
-			number.endian = 'big'
-		
-		if number.endian != 'little' and number.endian != 'big':
-			raise PeachException("invalid endian %s" % number.endian)
+			if number.endian != 'little' and number.endian != 'big':
+				raise PeachException("invalid endian %s" % number.endian)
 	
 		# signed (optional)
 		
-		signed = self._getAttribute(node, 'signed')
-		if signed == None or len(signed) == 0:
-			signed = 'false'
+		if node.hasAttributeNS(None, 'signed'):
+			signed = self._getAttribute(node, 'signed')
+			if signed == None or len(signed) == 0:
+				signed = Number.defaultSigned
 		
-		if signed.lower() == 'true':
-			number.signed = True
-		elif signed.lower() == 'false':
-			number.signed = False
-		else:
-			raise PeachException("signed must be true or false")
+			if signed.lower() == 'true':
+				number.signed = True
+			elif signed.lower() == 'false':
+				number.signed = False
+			else:
+				raise PeachException("signed must be true or false")
 		
 		# common attributes
 		
@@ -1647,9 +1744,6 @@ class ParseTemplate:
 			
 			if not ( flags.endian == 'little' or flags.endian == 'big' ):
 				raise PeachException("Invalid endian type on Flags element")
-		
-		else:
-			flags.endian = 'little'
 		
 		# constraint
 		flags.constraint = self._getAttribute(node, "constraint")
