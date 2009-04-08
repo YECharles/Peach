@@ -386,19 +386,20 @@ class DataCracker:
 				
 				## Check for count relation, verify > 0
 				if maxOccurs == 0:
-					for child in node.getElementsByType(DataElement):
-						# Remove relation (else we get errors)
-						for relation in child.getRelationsOfThisElement():
-							relation.parent.relations.remove(relation)
-							relation.parent.__delitem__(relation.name)
+					
+					# Remove element
+					del node.parent[node.name]
+					
+					#for child in node.getElementsByType(DataElement):
+					#	# Remove relation (else we get errors)
+					#	for relation in child.getRelationsOfThisElement():
+					#		relation.parent.relations.remove(relation)
+					#		relation.parent.__delitem__(relation.name)
 					
 					# Remove relation (else we get errors)
 					for relation in node.getRelationsOfThisElement():
 						relation.parent.relations.remove(relation)
 						relation.parent.__delitem__(relation.name)
-					
-					# Remove element
-					del node.parent[node.name]
 					
 					# We passed muster...I think :)
 					rating = 2
@@ -439,11 +440,11 @@ class DataCracker:
 							# Remove node and increase rating.
 							Debug(1, "@ minOccurs == 0, removing node")
 							
-							for child in node.getElementsByType(DataElement):
-								# Remove relation (else we get errors)
-								for relation in child.getRelationsOfThisElement():
-									relation.parent.relations.remove(relation)
-									relation.parent.__delitem__(relation.name)
+							#for child in node.getElementsByType(DataElement):
+							#	# Remove relation (else we get errors)
+							#	for relation in child.getRelationsOfThisElement():
+							#		relation.parent.relations.remove(relation)
+							#		relation.parent.__delitem__(relation.name)
 							
 							# Remove relation (else we get errors)
 							for relation in node.getRelationsOfThisElement():
@@ -507,11 +508,11 @@ class DataCracker:
 					# Remove node and increase rating.
 					Debug(1, "Firt element rating was poor and minOccurs == 0, remoing element and upping rating.")
 					
-					for child in node.getElementsByType(DataElement):
-						# Remove relation (else we get errors)
-						for relation in child.getRelationsOfThisElement():
-							relation.parent.relations.remove(relation)
-							relation.parent.__delitem__(relation.name)
+					#for child in node.getElementsByType(DataElement):
+					#	# Remove relation (else we get errors)
+					#	for relation in child.getRelationsOfThisElement():
+					#		relation.parent.relations.remove(relation)
+					#		relation.parent.__delitem__(relation.name)
 					
 					# Remove relation (else we get errors)
 					for relation in node.getRelationsOfThisElement():
@@ -693,6 +694,16 @@ class DataCracker:
 		
 		elif node.elementType == 'string':
 			(rating, pos) = self._handleString(node, buff, pos, parent, doingMinMax)
+			
+			# Do we have a transformer, if so decode the data
+			if node.transformer != None:
+				try:
+					Debug(1, "String: Found transformer, decoding...")
+					node.defaultValue = node.transformer.transformer.decode(node.defaultValue)
+				
+				except:
+					Debug(1, "String: Transformer threw exception!")
+					pass
 		
 		elif node.elementType == 'number':
 			(rating, pos) = self._handleNumber(node, buff, pos, parent, doingMinMax)
@@ -814,6 +825,17 @@ class DataCracker:
 		
 		elif node.elementType == 'blob':
 			(rating, pos) = self._handleBlob(node, buff, pos, parent, doingMinMax)
+
+			# Do we have a transformer, if so decode the data
+			if node.transformer != None:
+				try:
+					Debug(1, "Found transformer, decoding...")
+					node.defaultValue = node.transformer.transformer.decode(node.defaultValue)
+				
+				except:
+					Debug(1, "Transformer threw exception!")
+					pass
+
 			Debug(1, "---] pos = %d" % (self.parentPos+pos))
 		elif node.elementType == 'custom':
 			(rating, pos) = self._handleCustom(node, buff, pos, parent, doingMinMax)
