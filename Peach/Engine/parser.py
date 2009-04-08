@@ -51,7 +51,8 @@ except:
 	raise PeachException("Error loading 4Suite XML library.  This library\ncan be installed from the dependencies folder or\ndownloaded from http://4suite.org/.\n\n")
 
 from Peach.Engine.dom import *
-from Peach.Engine import dom, engine
+from Peach.Engine import dom
+import Peach.Engine
 from Peach.Mutators import *
 from Peach.Engine.common import *
 
