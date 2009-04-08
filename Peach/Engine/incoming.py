@@ -398,6 +398,7 @@ class DataCracker:
 					
 					# Remove relation (else we get errors)
 					for relation in node.getRelationsOfThisElement():
+						Debug(1, "@ Found and removing relation...")
 						relation.parent.relations.remove(relation)
 						relation.parent.__delitem__(relation.name)
 					
