@@ -7,7 +7,7 @@ Encoding transforms (URL, Base64, etc).
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
+# Copyright (c) 2005-2009 Michael Eddington
 # Copyright (c) 2004-2005 IOActive Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -494,19 +494,22 @@ class Ipv6StringToOctet(Transformer):
 
 class Hex(Transformer):
 	'''
-	Transform a number to hex w/o prefix.
+	Transform a data stream into HEX.
 	'''
+	
 	def realEncode(self, data):
-		try:
-			return hex(int(data))[2:]
-		except:
-			return data
+		
+		ret = ""
+		for c in data:
+			ret += hex(ord(c))[2:]
+		
+		return ret
 		
 	def realDecode(self, data):
 		ret = ""
 		for i in range(len(data), 2):
 			h = data[i:i+2]
-			ret += ord(h)
+			ret += chr(int(h, 16))
 		
 		return ret
 

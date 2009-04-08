@@ -405,7 +405,7 @@ class DataCracker:
 					rating = 2
 					pos = origPos
 					
-					Debug(1, "_handleArray(%s): Zero count on array, removed <<EXIT")
+					Debug(1, "_handleArray(%s): Zero count on array, removed <<EXIT 1" % node.name)
 					return (rating, pos)
 			
 			except:
@@ -448,6 +448,7 @@ class DataCracker:
 							
 							# Remove relation (else we get errors)
 							for relation in node.getRelationsOfThisElement():
+								Debug(1, "@ Found and removing relation...")
 								relation.parent.relations.remove(relation)
 								relation.parent.__delitem__(relation.name)
 							
