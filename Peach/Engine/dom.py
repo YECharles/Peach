@@ -1836,7 +1836,14 @@ class DataElement(Mutatable):
 			self._unFixRealParent(self)
 			return relations
 		
-		for r in self._genRelationsInDataModelFromHere():
+		for r in self._genRelationsInDataModelFromHere(self):
+			# Huh, do we break something here?
+			if r.parent == None:
+				continue
+			
+			if r.type == 'when' or r.of == None:
+				continue
+			
 			if r.getOfElement() == self:
 				relations.append(r)
 		
@@ -4276,6 +4283,8 @@ class Relation(Element):
 		if self.of == None:
 			return None
 		
+		if self.parent == None:
+			print "self.of:", self.of
 		obj = self.parent.findDataElementByName(self.of)
 		if obj == None:
 			# Could element have become an array?

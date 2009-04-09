@@ -635,7 +635,7 @@ class DataCracker:
 			
 			if not evalEvent(rel.when, environment, node):
 				# Remove this node from data tree
-				self._unFixRealParent(node)
+				print "REMOVING:",node.name
 				
 				# Locate relations and kill 'em off
 				for r in node.getRelationsOfThisElement():
@@ -654,6 +654,7 @@ class DataCracker:
 						except:
 							pass
 				
+				self._unFixRealParent(node)
 				del node.parent[node.name]
 				
 				Debug(1, "_handleNode: When: Returned False.  Removing and returning 1.")

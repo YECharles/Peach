@@ -63,7 +63,7 @@
 		<Mutator class="size.SizedVaranceMutator" />
 		<Mutator class="size.SizedNumericalEdgeCasesMutator" />
 		
-		<Mutator class="string.StringTokenMutator" /> 
+		<Mutator class="string.StringMutator" /> 
 		<Mutator class="string.XmlW3CMutator"/>
 		<Mutator class="string.PathMutator"/>
 		<Mutator class="string.HostnameMutator"/>
