@@ -635,7 +635,7 @@ class DataCracker:
 			
 			if not evalEvent(rel.when, environment, node):
 				# Remove this node from data tree
-				print "REMOVING:",node.name
+				#print "REMOVING:",node.name
 				
 				# Locate relations and kill 'em off
 				for r in node.getRelationsOfThisElement():
