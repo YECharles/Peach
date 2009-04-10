@@ -41,6 +41,7 @@
 				<xs:element ref="PythonPath" />
 				<xs:element ref="Import" />
 				<xs:element ref="Include" />
+				<xs:element ref="Defaults" />
 				<xs:element ref="DataModel" />
 				<xs:element ref="Data" />
 				<xs:element ref="Test" />
@@ -81,6 +82,12 @@
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Defaults">
+		<xs:annotation>
+			<xs:documentation>This element allow setting default values for data elements.</xs:documentation>
+		</xs:annotation>
 	</xs:element>
 
 	<xs:element name="DataModel" type="tTemplate">
