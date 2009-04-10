@@ -40,8 +40,11 @@ performing parsing tests of Peach XML files.
 
 # $Id$
 
-import sys, getopt, os
+import sys, getopt, os, warnings,exceptions
 sys.path.append(".")
+
+## Note: this will disable all deprication warnings!  For v2.6 compat.
+warnings.filterwarnings('ignore', message='', category=exceptions.DeprecationWarning)
 
 PROFILE = False
 

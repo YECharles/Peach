@@ -4283,8 +4283,6 @@ class Relation(Element):
 		if self.of == None:
 			return None
 		
-		if self.parent == None:
-			print "self.of:", self.of
 		obj = self.parent.findDataElementByName(self.of)
 		if obj == None:
 			# Could element have become an array?
