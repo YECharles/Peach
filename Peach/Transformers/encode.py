@@ -498,20 +498,10 @@ class Hex(Transformer):
 	'''
 	
 	def realEncode(self, data):
-		
-		ret = ""
-		for c in data:
-			ret += hex(ord(c))[2:]
-		
-		return ret
+		return binascii.b2a_hex(data)
 		
 	def realDecode(self, data):
-		ret = ""
-		for i in range(len(data), 2):
-			h = data[i:i+2]
-			ret += chr(int(h, 16))
-		
-		return ret
+		return binascii.a2b_hex(data)
 
 
 class HexString(Transformer):
