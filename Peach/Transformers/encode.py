@@ -35,7 +35,7 @@ Encoding transforms (URL, Base64, etc).
 # $Id$
 
 
-import urllib
+import urllib, binascii
 import xml.sax.saxutils
 import base64
 from struct import *

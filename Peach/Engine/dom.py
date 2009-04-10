@@ -4050,25 +4050,26 @@ class Blob(DataElement):
 		# 1. init
 		value = ""
 		
-		# 2. default value?
-		if self.defaultValue != None:
-			value = self.defaultValue
-		
-		# 3. Fixup
-		if self.fixup != None:
-			self.fixup.fixup.context = self
-			ret = self.fixup.fixup.dofixup()
-			if ret != None:
-				value = ret
-		
-		# 4. Override?
 		if self.currentValue != None:
 			value = self.currentValue
 		
-		# Make correct size
-		if targetLength != None:
-			while len(value) < targetLength:
-				value = value + "\x00"
+		else:
+			
+			# 2. default value?
+			if self.defaultValue != None:
+				value = self.defaultValue
+			
+			# 3. Fixup
+			if self.fixup != None:
+				self.fixup.fixup.context = self
+				ret = self.fixup.fixup.dofixup()
+				if ret != None:
+					value = ret
+		
+			# Make correct size
+			if targetLength != None:
+				while len(value) < targetLength:
+					value = value + "\x00"
 		
 		# 5. If we have sout
 		if sout != None:

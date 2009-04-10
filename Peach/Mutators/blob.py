@@ -33,7 +33,7 @@ Mutators that operate on blob types.
 
 # $Id$
 
-import sys, os, time, struct
+import sys, os, time, struct, traceback
 from Peach.mutator import *
 from Peach.group import *
 from Peach.Engine.common import *
@@ -56,7 +56,7 @@ class DWORDSliderMutator(Mutator):
 		self._peach = peach
 		self._curPos = 0
 		
-		self._len = len(node.getValue())
+		self._len = len(node.getInternalValue())
 		self._position = 0		
 		self._dword = 0xFFFFFFFF
 		self._counts = 0
@@ -89,7 +89,7 @@ class DWORDSliderMutator(Mutator):
 
 	def _performMutation(self, node, position):
 		
-		data = node.getValue()
+		data = node.getInternalValue()
 		length = len(data)
 		
 		if position >= length:
@@ -129,13 +129,13 @@ class BitFlipperMutator(Mutator):
 		self._peach = peach
 		self._n = self._getN(node, None)
 		self._current = 0
-		self._len = len(node.getValue())
+		self._len = len(node.getInternalValue())
 		
 		if self._n != None:
 			self._count = self._n
 		
 		else:
-			self._count = long((len(node.getValue())*8) * 0.2)
+			self._count = long((len(node.getInternalValue())*8) * 0.2)
 	
 	def _getN(self, node, n):
 		for c in node._children:
@@ -181,8 +181,7 @@ class BitFlipperMutator(Mutator):
 			node.currentValue = self._performMutation(node, count)
 	
 	def _performMutation(self, node, position):
-		
-		data = node.getValue()
+		data = node.getInternalValue()
 		length = len(data)
 		
 		if len(data) == 0:
