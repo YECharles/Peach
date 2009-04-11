@@ -44,7 +44,9 @@ try:
 	import win32con
 	from win32process import *
 except:
-	print "Warning: win32 extensions not found, disabing variouse process monitors."
+	# Only complain on Windows platforms.
+	if sys.platform == 'win32':
+		print "Warning: win32 extensions not found, disabing variouse process monitors."
 
 from Peach.agent import Monitor
 

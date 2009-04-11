@@ -41,7 +41,8 @@ from Peach.agent import Monitor
 try:
 	from vix import Vix
 except:
-	print "Warning: Module pyvix not found.  VMWare Monitor will not function."
+	pass
+	#print "Warning: Module pyvix not found.  VMWare Monitor will not function."
 
 class Vmware(Monitor):
 	'''

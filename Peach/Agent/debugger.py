@@ -583,9 +583,10 @@ try:
 			self._StopDebugger()
 
 except:
-	print "Warning: Windows debugger failed to load: ", sys.exc_info()
-	pass
-
+	# Only complain on Windows platforms.
+	if sys.platform == 'win32':
+		print "Warning: Windows debugger failed to load: ", sys.exc_info()
+	
 try:
 	
 	import vtrace, envi
@@ -811,7 +812,9 @@ try:
 			self._StopDebugger()
 
 except:
-	pass
+	# Only complain on Windows platforms.
+	if sys.platform != 'win32':
+		print "Warning: Unix debugger failed to load: ", sys.exc_info()
 
 	##class WindowsAppVerifier(Monitor):
 	##	'''
