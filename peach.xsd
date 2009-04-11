@@ -197,6 +197,11 @@
 			<xs:attributeGroup ref="ValueAttributes" />
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
+					<xs:documentation>[Depricated, use token instead] Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
 					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -398,6 +403,11 @@
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="isStatic" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>[Depricated, use token instead] Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="token" type="xs:boolean">
 				<xs:annotation>
 					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
@@ -657,6 +667,11 @@
 			<xs:attributeGroup ref="ValueAttributes" />
 			<xs:attribute name="isStatic" type="xs:boolean">
 				<xs:annotation>
+					<xs:documentation>[Depricated, use token instead] Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
 					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -780,6 +795,11 @@
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="isStatic" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>[Depricated, use token instead] Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="token" type="xs:boolean">
 				<xs:annotation>
 					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
 				</xs:annotation>

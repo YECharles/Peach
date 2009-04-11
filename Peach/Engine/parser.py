@@ -1806,6 +1806,12 @@ class ParseTemplate:
 		
 		self.HandleCommonTemplate(node, flag)
 		
+		# Handle common data elements attributes
+		
+		self.HandleCommonDataElementAttributes(node, flag)
+		
+		# rest
+		
 		if parent.ref == None and parent.has_key(flag.name):
 			raise PeachException("Error: %s already has element named %s!" % (parent.name, flag.name))
 

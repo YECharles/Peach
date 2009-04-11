@@ -1898,6 +1898,7 @@ class DataCracker:
 			value = self.flipBitsByByte(value, node.length)
 		
 		##print "start value:", self.binaryFormatter(value, node.length)
+		rating = 2
 		
 		for child in node._children:
 			if child.elementType != 'flag':
@@ -1919,18 +1920,24 @@ class DataCracker:
 			
 			Debug(1, "Found child flag %s value of %s" % (child.name, str(childValue)))
 			
+			if child.isStatic:
+				Debug(1, "Child flag is token %s must eq %s" % (str(childValue), str(child.defaultValue)))
+				if str(child.defaultValue) != str(childValue):
+					Debug(1, "Child flag token match failed, setting rating to 4")
+					rating = 4
+					break
+				
+				Debug(1, "Child flag token matched!")
+			
 			# Set child node value
 			eval("child.%s(childValue)" % self.method)
 			child.rating = 2
 			child.pos = pos
 			##print "[%s] child value:" % child.name, child.getInternalValue()
 		
-		# Determin rating
-		
-		rating = 2
 		
 		# contraint
-		if node.constraint != None:
+		if rating >= 2 and node.constraint != None:
 			env = {
 				"self":node,
 				"pos":pos,
