@@ -35,7 +35,7 @@ issued to the fuzzer.
 
 # $Id$
 
-import sys, time, timer
+import sys, time
 sys.path.append("..")
 sys.path.append("../..")
 import os
@@ -170,7 +170,7 @@ class Process(Monitor):
 				if not self._IsProcessRunning:
 					print "Process: Process exitted"
 					return
-				timer.sleep(0.25)
+				time.sleep(0.25)
 	
 	def _StopProcess(self):
 		

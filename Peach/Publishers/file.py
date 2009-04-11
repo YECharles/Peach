@@ -305,22 +305,23 @@ class FileWriterLauncher(Publisher):
 	
 	def mkdir(self):
 		# lets try and create the folder this file lives in
-		delim = ""
 		
-		if self._filename.find("\\") != -1:
-			delim = '\\'
-		elif self._filename.find("/") != -1:
-			delim = '/'
-		else:
+		if os.path.sep not in self._filename:
 			return
 		
-		# strip filename
-		try:
-			path = self._filename[: self._filename.rfind(delim) ]
-			os.mkdir(path)
-		except:
-			pass
-		
+		paths = os.path.dirname(self.filename).split(os.path.sep)
+		curpath = ""
+		for p in paths:
+			if len(curpath) == 0:
+				curpath = p
+			else:
+				os.join(curpath,p)
+			
+			try:
+				os.mkdir(p)
+			except:
+				pass
+	
 	def close(self):
 		if self._state == 0:
 			return
@@ -380,8 +381,59 @@ class FileWriterLauncher(Publisher):
 					win32pdh.CloseQuery(hq)
 		
 		return childPids
+
+	def call(self, method, args):	
+		# windows or unix?
+		if sys.platform == 'win32':
+			return callWindows(method, args)
+		
+		return callUnix(method,args)
 	
-	def call(self, method, args):
+	def callUnix(self, method, args):
+		'''
+		Launch program to consume file
+		
+		@type	method: string
+		@param	method: Command to execute
+		@type	args: array of objects
+		@param	args: Arguments to pass
+		'''
+		
+		## Make sure we close the file first :)
+		
+		self.close()
+		
+		## Figure out how we are calling the program
+		
+		if self.debugger:
+			# Launch via agent
+			
+			Engine.context.agent.OnPublisherCall(method)
+			time.sleep(self.waitTime)
+		
+		else:
+			# Launch via spawn
+			
+			realArgs = [os.path.basename(method)]
+			for a in args:
+				realArgs.append(a)
+			
+			pid = os.spawnv(os.P_NOWAIT, method, realArgs)
+			
+			for i in range(0, long(self.waitTime/0.15)):
+				(pid, ret) = os.wait(pid, os.WNOHANG)
+				if not (pid == 0 and ret == 0):
+					break
+				
+				time.sleep(0.15)
+			
+			try:
+				os.kill(pid)
+				os.wait(pid)
+			except:
+				pass
+	
+	def callWindows(self, method, args):
 		'''
 		Launch program to consume file
 		
@@ -487,6 +539,9 @@ try:
 			self.debugger = False
 			if debugger.lower() == "true":
 				self.debugger = True
+				
+			if sys.platform == 'win32':
+				raise PeachException("Error, publisher FileWriterLauncherGui not supported on non-Windows platforms.")
 		
 		def getFilename(self):
 			'''
