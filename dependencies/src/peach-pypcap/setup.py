@@ -85,7 +85,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'build':
         sys.exit(1)
 
 pcap = Extension(name='pcap',
-                 sources=[ 'pcap.pyx','pcap.c', 'pcap_ex.c' ],
+                 sources=[ 'pcap.pyx', 'pcap_ex.c' ],
                  include_dirs=pcap_config.get('include_dirs', ''),
                  library_dirs=pcap_config.get('library_dirs', ''),
                  libraries=pcap_config.get('libraries', ''),
