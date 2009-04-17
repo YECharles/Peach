@@ -2113,7 +2113,10 @@ class DataElement(Mutatable):
 		## If we have a cached value for ourselves, use it!
 		if self.elementType not in ['template', 'block', 'choice', 'flags', \
 									'xmlelement', 'xmlattribute', 'asn1type']:
-			if self.value != None and self.currentValue == None and self.fixup == None and not self.hasRelation():
+			if self.value != None and self.finalValue == None \
+					and self.currentValue == None and self.fixup == None \
+					and not self.hasRelation():
+				
 				if sout != None:
 					sout.write(self.value)
 				
@@ -3545,14 +3548,10 @@ class String(DataElement):
 				# 1. Init value
 				value = self.getInternalValue()
 				
-				# 6. Fixed length string
-				if self.length != None:
-					self.length = self.getLength(True)
-					
-					if len(value) < self.length:
-						value += self.padCharacter * (self.length - len(value))
-					else:
-						value = value[:self.length]
+				if len(value) < self.length:
+					value += self.padCharacter * (self.length - len(value))
+				else:
+					value = value[:self.length]
 			
 			# 7. Null terminated strings
 			# Lets try null terminating even the mutated value.  Might as well!

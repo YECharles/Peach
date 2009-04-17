@@ -33,7 +33,7 @@ Mutators that operate on string types.
 
 # $Id$
 
-import sys, os, time, random
+import sys, os, time, random, array
 
 from Peach.generator import *
 from Peach.Generators.data import *
@@ -162,7 +162,11 @@ class UnicodeStringsMutator(Mutator):
 		return self._maxCount
 
 	def supportedDataElement(node):
-		if isinstance(node, String) and node.type != 'ascii' and node.isMutable:
+		if isinstance(node, String) \
+			and node.type != 'ascii' \
+			and node.type != 'char' \
+			and node.isMutable:
+			
 			return True
 		
 		return False
@@ -206,9 +210,9 @@ class UnicodeBomMutator(Mutator):
 			values = []
 			
 			# Add some long strings
-			sample = random.sample(range(2, 6024, 2), 200)
+			sample = random.sample(range(2, 2024, 2), 200)
 			sample.append(0)
-			sample.append(1024 * 65)
+			sample.append(1024 * 2)
 			
 			for r in sample:
 				values.append('A' * r)
@@ -290,67 +294,158 @@ class UnicodeBadUtf8Mutator(Mutator):
 		self._maxCount = len(self.values)
 	
 	def _utf8OneByte(self, c):
-		return c
+		return struct.pack("!B", c)
 	
-	def _utf8TwoByte(self, c):
-		if c < 63:
-			return '\xc0' + chr(0x80 | c)
+	def binaryFormatter(self, num, bits = None, strip = False):
 		
-		pass		
+		if bits == None:
+			bits = 64
+			strip = True
 		
-	def _utf8ThreeByte(self, c):
-		pass
+		if type(num) == str:
+			raise Exception("Strings not permitted")
 		
-	def _utf8FourByte(self, c):
-		pass
+		ret = ""
+		for i in range(bits-1, -1, -1):
+			ret += str((num >> i) & 1)
 		
-	def _utf8FiveByte(self, c):
-		pass
+		if strip:
+			return ret.lstrip('0')
 		
-	def _utf8SixByte(self, c):
-		pass
+		return ret
+	
+	def _utf8TwoByte(self, c, mask = '1100000010000000'):
+		
+		bfC = self.binaryFormatter(c)
+		if len(bfC) > 11:
+			raise Exception("Larger than two byte UTF-8")
+		
+		bfC = self.binaryFormatter(c, 11)
+		bf = array.array('c', mask)
+		
+		bf[3:8] = array.array('c', bfC[0:5])
+		bf[10:16] = array.array('c', bfC[5:])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BB", int(bfs[0:8], 2), int(bfs[8:16], 2))
+		
+	def _utf8ThreeByte(self, c, mask = '111000001000000010000000'):
+		
+		bfC = self.binaryFormatter(c)
+		if len(bfC) > 16:
+			raise Exception("Larger than three byte UTF-8")
+		
+		bfC = self.binaryFormatter(c, 16)
+		bf = array.array('c', mask)
+		bf[4:8] = array.array('c', bfC[:4])
+		bf[10:16] = array.array('c', bfC[4:10])
+		bf[18:24] = array.array('c', bfC[10:])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BBB", int(bfs[0:8], 2), int(bfs[8:16], 2),
+						   int(bfs[16:24], 2))
+		
+	def _utf8FourByte(self, c, mask = '11110000100000001000000010000000'):
+		
+		bfC = self.binaryFormatter(c)
+		if len(bfC) > 21:
+			raise Exception("Larger than four byte UTF-8")
+		
+		bfC = self.binaryFormatter(c, 21)
+		bf = array.array('c', mask)
+		bf[5:8] = array.array('c', bfC[:3])
+		bf[10:16] = array.array('c', bfC[3:9])
+		bf[18:24] = array.array('c', bfC[9:15])
+		bf[26:32] = array.array('c', bfC[15:])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BBBB", int(bfs[0:8], 2), int(bfs[8:16], 2),
+						   int(bfs[16:24], 2), int(bfs[24:32], 2))
+		
+	def _utf8FiveByte(self, c, mask = '1111100010000000100000001000000010000000'):
+		
+		bfC = self.binaryFormatter(c)
+		if len(bfC) > 26:
+			raise Exception("Larger than five byte UTF-8")
+		
+		bfC = self.binaryFormatter(c, 26)
+		bf = array.array('c', mask)
+		bf[6:8] = array.array('c', bfC[:2])
+		bf[10:16] = array.array('c', bfC[2:8])
+		bf[18:24] = array.array('c', bfC[8:14])
+		bf[26:32] = array.array('c', bfC[14:20])
+		bf[34:40] = array.array('c', bfC[20:])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BBBBB", int(bfs[0:8], 2), int(bfs[8:16], 2),
+						   int(bfs[16:24], 2), int(bfs[24:32], 2), int(bfs[32:40], 2))
+	
+	def _utf8SixByte(self, c, mask = '111111001000000010000000100000001000000010000000'):
+		
+		bfC = self.binaryFormatter(c)
+		if len(bfC) > 31:
+			raise Exception("Larger than six byte UTF-8")
+		
+		bfC = self.binaryFormatter(c, 31)
+		bf = array.array('c', mask)
+		bf[7] = bfC[0]
+		bf[10:16] = array.array('c', bfC[1:7])
+		bf[18:24] = array.array('c', bfC[7:13])
+		bf[26:32] = array.array('c', bfC[13:19])
+		bf[34:40] = array.array('c', bfC[19:25])
+		bf[42:48] = array.array('c', bfC[25:31])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BBBBBB", int(bfs[0:8], 2), int(bfs[8:16], 2),
+						   int(bfs[16:24], 2), int(bfs[24:32], 2), int(bfs[32:40], 2),
+						   int(bfs[40:48], 2))
+	
+	def _utf8SevenByte(self, c, mask = '11111110100000001000000010000000100000001000000010000000'):
+		
+		bfC = self.binaryFormatter(c, 36)
+		bf = array.array('c', mask)
+		bf[10:16] = array.array('c', bfC[:6])
+		bf[18:24] = array.array('c', bfC[6:12])
+		bf[26:32] = array.array('c', bfC[12:18])
+		bf[34:40] = array.array('c', bfC[18:24])
+		bf[42:48] = array.array('c', bfC[24:30])
+		bf[50:56] = array.array('c', bfC[30:])
+		
+		bfs = bf.tostring()
+		return struct.pack("!BBBBBBB", int(bfs[0:8], 2), int(bfs[8:16], 2),
+						   int(bfs[16:24], 2), int(bfs[24:32], 2), int(bfs[32:40], 2),
+						   int(bfs[40:48], 2), int(bfs[48:], 2))
 		
 	def _genValues(self):
 		if UnicodeBadUtf8Mutator.values == None:
 			
-			utf8 = []
-			values = []
+			encoding = [
+				self._utf8OneByte,
+				self._utf8TwoByte,
+				self._utf8ThreeByte,
+				self._utf8FourByte,
+				self._utf8FiveByte,
+				self._utf8SixByte,
+				self._utf8SevenByte
+				]
+			
+			endValues = []
 			
 			# Add some long strings
-			sample = random.sample(range(2, (65 * 1024), 2), 200)
-			sample.append(0)
-			sample.append(1024 * 65)
+			sample = random.sample(range(2, (2 * 1024), 2), 100)
+			sample.append(1024 * 2)
+			for s in random.sample(range(2, 500), 50):
+				sample.append(s)
 			
 			ascii = range(32, 126)
 			for r in sample:
-				values.append(random.sample(ascii, r))
-			
-			# 1. Prefix with both BOMs
-			for v in values:
-				for b in self.boms:
-					valuesWithDOM.append(b + v)
-			
-			# 2. Every other wchar
-			for v in values:
-				for b in self.boms:
-					newval = b
-					for i in range(0, len(v), 2):
-						newval += v[i:i+2]
-						newval += b
-					
-					valuesWithBOM.append(newval)
-			
-			# 3. Just BOM's
-			for r in sample:
-				newval = ""
+				value = ""
 				for i in range(r):
-					newval += random.choice(self.boms)
-				
-				valuesWithBOM.append(newval)
+					value += random.choice(encoding)(random.choice(ascii))
 			
+				endValues.append(value)
 			
-			UnicodeBadUtf8Mutator.values = valuesWithBOM
-			values = None
+			UnicodeBadUtf8Mutator.values = endValues
 		
 	def next(self):
 		'''
@@ -364,10 +459,10 @@ class UnicodeBadUtf8Mutator(Mutator):
 			raise MutatorCompleted()
 	
 	def getCount(self):
-		return self._maxCount
+		return self._maxCount+1
 
 	def supportedDataElement(node):
-		if isinstance(node, String) and node.isMutable:
+		if isinstance(node, String) and node.isMutable and node.type != 'wchar':
 			return True
 		
 		return False
@@ -378,6 +473,36 @@ class UnicodeBadUtf8Mutator(Mutator):
 	
 	def randomMutation(self, node):
 		node.finalValue = random.choice(self.values)
+
+
+class UnicodeUtf8ThreeCharMutator(UnicodeBadUtf8Mutator):
+	'''
+	Generate long UTF-8 three byte strings
+	'''
+	
+	def __init__(self, peach, node):
+		UnicodeBadUtf8Mutator.__init__(self, peach, node)
+		
+		#: Weight to be chosen randomly
+		self.weight = 2
+		self.name = "UnicodeUtf8ThreeCharMutator"
+		
+	def _genValues(self):
+		if UnicodeUtf8ThreeCharMutator.values == None:
+			
+			endValues = []
+			
+			# Add some long strings
+			sample = random.sample(range(2, (2 * 1024), 2), 300)
+			sample.append(1024 * 2)
+			
+			# 1. Three char encoded values (can cause odd overflows)
+			for r in sample:
+				print type(r), r
+				s = self._utf8ThreeByte(0xf0f0)
+				endValues.append(s * r)
+			
+			UnicodeUtf8ThreeCharMutator.values = endValues
 
 
 class _SimpleGeneratorMutator(Mutator):

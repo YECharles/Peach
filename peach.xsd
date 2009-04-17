@@ -964,12 +964,7 @@
 						</xs:simpleType>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:enumeration value="default.NullMutator">
-									<xs:annotation>
-										<xs:documentation></xs:documentation>
-									</xs:annotation>
-								</xs:enumeration>
-								<xs:enumeration value="string.StringTokenMutator">
+								<xs:enumeration value="string.StringMutator">
 									<xs:annotation>
 										<xs:documentation></xs:documentation>
 									</xs:annotation>
@@ -994,6 +989,21 @@
 										<xs:documentation></xs:documentation>
 									</xs:annotation>
 								</xs:enumeration>
+								<xs:enumeration value="string.StringCaseMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.UnicodeBomMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.UnicodeStringsMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
 								<xs:enumeration value="number.NumericalEdgeCaseMutator">
 									<xs:annotation>
 										<xs:documentation></xs:documentation>
@@ -1014,6 +1024,11 @@
 										<xs:documentation></xs:documentation>
 									</xs:annotation>
 								</xs:enumeration>
+								<xs:enumeration value="blob.DWORDSliderMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
 								<xs:enumeration value="datatree.DataTreeRemoveMutator">
 									<xs:annotation>
 										<xs:documentation></xs:documentation>
@@ -1025,6 +1040,38 @@
 									</xs:annotation>
 								</xs:enumeration>
 								<xs:enumeration value="datatree.DataTreeSwapNearNodesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								
+								<xs:enumeration value="size.SizedVaranceMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="size.SizedNumericalEdgeCasesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								
+								<xs:enumeration value="array.ArrayVarianceMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayNumericalEdgeCasesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayReverseOrderMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayRandomizeOrderMutator">
 									<xs:annotation>
 										<xs:documentation></xs:documentation>
 									</xs:annotation>

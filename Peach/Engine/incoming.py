@@ -1347,6 +1347,7 @@ class DataCracker:
 					length = node.getLength()
 				
 				# If we are null terminated add on to length
+				# Urm...!
 				if node.nullTerminated:
 					length += 1
 				

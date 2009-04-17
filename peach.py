@@ -94,8 +94,8 @@ Syntax:
   --debug                    Enable debug messages. Usefull when debugging
                              your Peach XML file.  Warning: Messages are very
                              cryptic sometimes.
-  --skipto N                 Skip to a specific test #.  This replaced -r for
-                             restarting Peach runs.
+  --skipto N                 Skip to a specific test #.  This replaced -r
+                             for restarting a Peach run.
 
 Peach Agent
 

@@ -391,5 +391,65 @@ class StreamBuffer:
 		newpos = len(self.data) + pos
 		self.seekFromStart(newpos)
 
+class bitfield(object):
+	'''
+	Access bit field with indexes
+	
+	NOTE: THIS CLASS IS BUGGY, NEEDS FIXING!
+	
+	'''
+	
+	def __init__(self, value=0, size=None):
+		self._d = value
+		self._len = size
+		
+	def __len__(self):
+		return len(self._d)
+	
+	def __getitem__(self, index):
+		return self._d[index]
+	
+	def __setitem__(self,index,value):
+		value    = (value&1L)<<index
+		mask     = (1L)<<index
+		self._d  = (self._d & ~mask) | value
+	
+	def __getslice__(self, start, end):
+		if end > self._len:
+			end = self._len
+		
+		mask = 2L**(end - start) -1
+		return (self._d >> start) & mask
+	
+	def __setslice__(self, start, end, value):
+		
+		if type(value) == str:
+			value = int(value, 2)
+		
+		mask = 2L**(end - start) -1
+		value = (value & mask) << start
+		mask = mask << start
+		self._d = (self._d & ~mask) | value
+		return (self._d >> start) & mask
+	
+	def __int__(self):
+		return self._d
+	
+	def __str__(self):
+		if self._len == None:
+			return self.binaryFormatter(self._d, 64).lstrip('0')
+		
+		return self.binaryFormatter(self._d, self._len)
+	
+	def binaryFormatter(self, num, bits):
+		if type(num) == str:
+			raise Exception("Strings not permitted")
+		
+		ret = ""
+		for i in range(bits-1, -1, -1):
+			ret += str((num >> i) & 1)
+		
+		assert len(ret) == bits
+		return ret
 
 # end

@@ -69,8 +69,10 @@
 		<Mutator class="string.HostnameMutator"/>
 		<Mutator class="string.FilenameMutator"/>
 		<Mutator class="string.StringCaseMutator" />
-	<Mutator class="string.UnicodeBomMutator" />
+		<Mutator class="string.UnicodeBomMutator" />
 		<Mutator class="string.UnicodeStringsMutator" />
+		<Mutator class="string.UnicodeBadUtf8Mutator" />
+		<Mutator class="string.UnicodeUtf8ThreeCharMutator" />
 	</Mutators>
 	
 	<!--
