@@ -540,7 +540,7 @@ try:
 			if debugger.lower() == "true":
 				self.debugger = True
 				
-			if sys.platform == 'win32':
+			if sys.platform != 'win32':
 				raise PeachException("Error, publisher FileWriterLauncherGui not supported on non-Windows platforms.")
 		
 		def getFilename(self):

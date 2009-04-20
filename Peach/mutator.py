@@ -43,7 +43,7 @@ import random, threading, random
 import pickle, types
 from Peach.Engine.dom import *
 
-class Mutator:
+class Mutator(object):
 	'''
 	A Mutator implements a method of mutating data/state for a Peach 2
 	fuzzer.  For example a mutator might change the state flow defined

@@ -527,7 +527,13 @@ class Engine(object):
 		# Get all the mutators we will use
 		self.mutators = []
 		for m in test.getMutators():
-			self.mutators.append(eval(m.name))
+			try:
+				self.mutators.append(eval(m.name))
+			except:
+				try:
+					self.mutators.append(evalEvent("PeachXml_"+m.name, {}, run))
+				except:
+					raise PeachException("Unable to load mutator [%s], please verify it was imported correctly." % m.name)
 		
 		mutator = test.mutator = MutationStrategy.DefaultStrategy(None)
 		value = "StateMachine"

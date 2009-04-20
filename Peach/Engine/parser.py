@@ -182,6 +182,8 @@ class ParseTemplate:
 				classes.append(item)
 			elif type(i) == types.FunctionType and item[0] != '_':
 				classes.append(item)
+			elif repr(i).startswith("<class"):
+				classes.append(item)
 		
 		return classes
 	

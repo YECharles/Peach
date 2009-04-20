@@ -34,7 +34,7 @@ Implementation of base Transformer class.
 
 # $Id$
 
-class Transformer:
+class Transformer(object):
 	'''
 	Transforms some form of input.  Transformers can be changed.
 	Base64 encoding would be a type of Transformer.  Chained transformer
