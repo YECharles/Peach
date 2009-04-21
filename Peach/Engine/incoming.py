@@ -379,38 +379,38 @@ class DataCracker:
 		Debug(1, "-- Looking for Count relation...")
 		relation = node.getRelationOfThisElement('count')
 		if relation != None and relation.type == 'count' and node.parent != None:
-			try:
-				maxOccurs = int(relation.getValue(True))
-				Debug(1, "@@@ Found count relation [%d]" % maxOccurs)
-				hasCountRelation = True
-				
-				## Check for count relation, verify > 0
-				if maxOccurs == 0:
-					
-					# Remove element
-					del node.parent[node.name]
-					
-					#for child in node.getElementsByType(DataElement):
-					#	# Remove relation (else we get errors)
-					#	for relation in child.getRelationsOfThisElement():
-					#		relation.parent.relations.remove(relation)
-					#		relation.parent.__delitem__(relation.name)
-					
-					# Remove relation (else we get errors)
-					for relation in node.getRelationsOfThisElement():
-						Debug(1, "@ Found and removing relation...")
-						relation.parent.relations.remove(relation)
-						relation.parent.__delitem__(relation.name)
-					
-					# We passed muster...I think :)
-					rating = 2
-					pos = origPos
-					
-					Debug(1, "_handleArray(%s): Zero count on array, removed <<EXIT 1" % node.name)
-					return (rating, pos)
 			
-			except:
-				pass
+			maxOccurs = int(relation.getValue(True))
+			Debug(1, "@@@ Found count relation [%d]" % maxOccurs)
+			hasCountRelation = True
+			
+			## Check for count relation, verify > 0
+			if maxOccurs == 0:
+				
+				#for child in node.getElementsByType(DataElement):
+				#	# Remove relation (else we get errors)
+				#	for relation in child.getRelationsOfThisElement():
+				#		relation.parent.relations.remove(relation)
+				#		relation.parent.__delitem__(relation.name)
+				
+				# Remove relation (else we get errors)
+				for relation in node.getRelationsOfThisElement():
+					Debug(1, "@ Found and removing relation...")
+					if relation in relation.parent.relations:
+						relation.parent.relations.remove(relation)
+					
+					if relation.parent.has_key(relation.name):
+						del relation.parent[relation.name]
+				
+				# Remove element
+				del node.parent[node.name]
+				
+				# We passed muster...I think :)
+				rating = 2
+				pos = origPos
+				
+				Debug(1, "_handleArray(%s): Zero count on array, removed <<EXIT 1" % node.name)
+				return (rating, pos)
 		
 		## Hack for fixed length arrays to remove lookAheads
 		

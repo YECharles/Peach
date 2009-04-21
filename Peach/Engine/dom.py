@@ -4293,6 +4293,7 @@ class Relation(Element):
 			print "DataRoot.parent:", self.parent.getRootOfDataMap().parent
 			print "Fullname:", self.getFullDataName()
 			print "Couldn't locate [%s]" % self.of
+			print "default value:", self.parent.defaultValue
 			raise Exception("Couldn't locate [%s]" % self.of)
 		
 		return obj
