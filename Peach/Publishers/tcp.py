@@ -171,6 +171,9 @@ class Tcp(Publisher):
 		diffSize = (self.pos+size) - len(self.buff)
 		
 		try:
+			if Peach.Engine.engine.Engine.debug:
+				print "Asking for %d, have %d" % (diffSize, len(self.buff))
+			
 			self._socket.settimeout(self._timeout)
 			ret = self._socket.recv(diffSize)
 			

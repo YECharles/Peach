@@ -930,7 +930,7 @@ class ParseTemplate:
 				if child.hasAttributeNS(None, 'type'):
 					String.defaultType = self._getAttribute(child, 'type')
 					
-					if String.defaultType not in ['string', 'literal', 'hex']:
+					if String.defaultType not in ['wchar', 'char', 'utf8']:
 						raise PeachException("Error, default value for String.type incorrect.")
 				
 				if child.hasAttributeNS(None, 'nullTerminated'):
@@ -1286,10 +1286,6 @@ class ParseTemplate:
 					relation.From = name
 
 		# Add to parent
-
-		if parent.ref == None and parent.has_key(block.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
-
 		parent.append(block)
 		return block
 	
@@ -1314,41 +1310,71 @@ class ParseTemplate:
 
 		for child in node.childNodes:
 			
-			if child.nodeName == 'Block':
-				self.HandleBlock(child, parent)
-			elif child.nodeName == 'String':
-				self.HandleString(child, parent)
-			elif child.nodeName == 'Number':
-				self.HandleNumber(child, parent)
-			elif child.nodeName == 'Flags':
-				self.HandleFlags(child, parent)
-			elif child.nodeName == 'Blob':
-				self.HandleBlob(child, parent)
-			elif child.nodeName == 'Choice':
-				self.HandleChoice(child, parent)
-			elif child.nodeName == 'Transformer':
-				parent.transformer = self.HandleTransformer(child, parent)
-			elif child.nodeName == 'Relation':
-				relation = self.HandleRelation(child, parent)
-				parent.relations.append(relation)
-				parent.append(relation)
-			elif child.nodeName == 'Fixup':
-				self.HandleFixup(child, parent)
-			elif child.nodeName == 'Placement':
-				self.HandlePlacement(child, parent)
-			elif child.nodeName == 'Hint':
-				self.HandleHint(child, parent)
-			elif child.nodeName == 'Seek':
-				self.HandleSeek(child, parent)
-			elif child.nodeName == 'Custom':
-				self.HandleCustom(child, parent)
-			elif child.nodeName == 'XmlElement':
-				self.HandleXmlElement(child, parent)
-			elif child.nodeName == 'XmlAttribute':
-				self.HandleXmlAttribute(child, parent)
+			name = self._getAttribute(child, 'name')
+			if name != None and '.' in name:
+				# Replace a deep node, can only happen if we
+				# have a ref on us.
+				
+				if not node.hasAttributeNS(None, 'ref'):
+					raise PeachException("Error, periods (.) are not allowed in element names unless overrideing deep elements when a parent reference (ref). Name: [%s]" % name)
+				
+				# Okay, lets locate the real parent.
+				obj = parent
+				for part in name.split('.')[:-1]:
+					if not obj.has_key(part):
+						raise PeachException("Error, unable to resolve [%s] in deep parent of [%s] override." % (part, name))
+						
+					obj = obj[part]
+				
+				if obj == None:
+					raise PeachException("Error, unable to resolve deep parent of [%s] override." % name)
+				
+				# Remove periods from name
+				child.setAttributeNS(None, 'name', name.split('.')[-1])
+				
+				# Handle child with new parent.
+				self._HandleDataContainerChildren(node, child, obj, errorOnUnknown)
 			
-			elif errorOnUnknown:
-				raise PeachException(PeachStr("found unexpected node in Element: %s" % node.nodeName))
+			else:
+				self._HandleDataContainerChildren(node, child, parent, errorOnUnknown)
+				
+	
+	def _HandleDataContainerChildren(self, node, child, parent, errorOnUnknown = True):
+		if child.nodeName == 'Block':
+			self.HandleBlock(child, parent)
+		elif child.nodeName == 'String':
+			self.HandleString(child, parent)
+		elif child.nodeName == 'Number':
+			self.HandleNumber(child, parent)
+		elif child.nodeName == 'Flags':
+			self.HandleFlags(child, parent)
+		elif child.nodeName == 'Blob':
+			self.HandleBlob(child, parent)
+		elif child.nodeName == 'Choice':
+			self.HandleChoice(child, parent)
+		elif child.nodeName == 'Transformer':
+			parent.transformer = self.HandleTransformer(child, parent)
+		elif child.nodeName == 'Relation':
+			relation = self.HandleRelation(child, parent)
+			parent.relations.append(relation)
+			parent.append(relation)
+		elif child.nodeName == 'Fixup':
+			self.HandleFixup(child, parent)
+		elif child.nodeName == 'Placement':
+			self.HandlePlacement(child, parent)
+		elif child.nodeName == 'Hint':
+			self.HandleHint(child, parent)
+		elif child.nodeName == 'Seek':
+			self.HandleSeek(child, parent)
+		elif child.nodeName == 'Custom':
+			self.HandleCustom(child, parent)
+		elif child.nodeName == 'XmlElement':
+			self.HandleXmlElement(child, parent)
+		elif child.nodeName == 'XmlAttribute':
+			self.HandleXmlAttribute(child, parent)
+			
+		elif errorOnUnknown:
+			raise PeachException(PeachStr("found unexpected node [%s] in Element: %s" % (child.nodeName, node.nodeName)))
 	
 	def HandleMutators(self, node, parent):
 		# name
@@ -1430,9 +1456,6 @@ class ParseTemplate:
 		# children
 		self.HandleDataContainerChildren(node, block)
 		
-		if parent.ref == None and parent.has_key(block.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
-
 		parent.append(block)
 		return block
 
@@ -1476,9 +1499,6 @@ class ParseTemplate:
 		# children
 		self.HandleDataContainerChildren(node, block)
 		
-		if parent.ref == None and parent.has_key(block.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
-		
 		parent.append(block)
 		return block
 
@@ -1521,9 +1541,6 @@ class ParseTemplate:
 
 		# children
 		self.HandleDataContainerChildren(node, block)
-		
-		if parent.ref == None and parent.has_key(block.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, block.name))
 		
 		parent.append(block)
 		return block
@@ -1642,9 +1659,6 @@ class ParseTemplate:
 		
 		self.HandleCommonTemplate(node, string)
 		
-		if parent.ref == None and parent.has_key(string.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, string.name))
-
 		parent.append(string)
 		return string	
 		
@@ -1714,9 +1728,6 @@ class ParseTemplate:
 		
 		self.HandleCommonTemplate(node, number)
 		
-		if parent.ref == None and parent.has_key(number.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, number.name))
-
 		parent.append(number)
 		return number
 		
@@ -1766,9 +1777,6 @@ class ParseTemplate:
 			else:
 				raise PeachException(PeachStr("found unexpected node in Flags: %s" % child.nodeName))
 		
-		if parent.ref == None and parent.has_key(flags.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, flags.name))
-
 		parent.append(flags)
 		return flags
 	
@@ -1814,9 +1822,6 @@ class ParseTemplate:
 		
 		# rest
 		
-		if parent.ref == None and parent.has_key(flag.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, flag.name))
-
 		parent.append(flag)
 		return flag
 	
@@ -1876,9 +1881,6 @@ class ParseTemplate:
 		
 		self.HandleCommonTemplate(node, blob)
 		
-		if parent.ref == None and parent.has_key(blob.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, blob.name))
-
 		parent.append(blob)
 		return blob
 
@@ -1922,9 +1924,6 @@ class ParseTemplate:
 		custom.handleParsing(node)
 
 		# Done
-		if parent.ref == None and parent.has_key(custom.name):
-			raise PeachException("Error: %s already has element named %s!" % (parent.name, custom.name))
-
 		parent.append(custom)
 		return custom
 
