@@ -1503,6 +1503,10 @@ class ParseTemplate:
 				# This is our special case, if we ref we suck the children
 				# of the ref into our selves.  This is tricky!
 				
+				# remove this child from node
+				node.removeChild(child)
+				
+				# get and copy our ref
 				obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
 				
 				newobj = obj.copy(parent)
