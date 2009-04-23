@@ -1496,7 +1496,30 @@ class ParseTemplate:
 		
 		self.HandleCommonDataElementAttributes(node, block)
 
-		# children
+		# special XmlElement reference
+		
+		for child in node:
+			if child.hasAttributeNS(None, 'ref'):
+				# This is our special case, if we ref we suck the children
+				# of the ref into our selves.  This is tricky!
+				
+				obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
+				
+				newobj = obj.copy(parent)
+				newobj.parent = None
+				
+				# first verify all children are XmlElement or XmlAttribute
+				for subchild in newobj:
+					if not isinstance(subchild, XmlElement) and not isinstance(subchild, XmlAttribute):
+						raise PeachException("Error, special XmlElement ref case, reference must only have Xml elements!!")
+				
+				# now move over children
+				for subchild in newobj:
+					block.append(subchild)
+				
+		
+		# normal children
+		
 		self.HandleDataContainerChildren(node, block)
 		
 		parent.append(block)
