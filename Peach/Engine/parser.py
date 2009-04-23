@@ -1369,7 +1369,36 @@ class ParseTemplate:
 		elif child.nodeName == 'Custom':
 			self.HandleCustom(child, parent)
 		elif child.nodeName == 'XmlElement':
-			self.HandleXmlElement(child, parent)
+			# special XmlElement reference
+		
+			if child.hasAttributeNS(None, 'ref'):
+				# This is our special case, if we ref we suck the children
+				# of the ref into our selves.  This is tricky!
+				
+				# remove this child from node
+				#node.removeChild(child)
+				
+				# get and copy our ref
+				obj = self.GetRef( self._getAttribute(child, 'ref'), parent.parent )
+				
+				newobj = obj.copy(parent)
+				newobj.parent = None
+				
+				# first verify all children are XmlElement or XmlAttribute
+				for subchild in newobj:
+					if not isinstance(subchild, XmlElement) and not isinstance(subchild, XmlAttribute):
+						raise PeachException("Error, special XmlElement ref case, reference must only have Xml elements!!")
+				
+				# now move over children
+				for subchild in newobj:
+					parent.append(subchild)
+					
+				# remove replaced element
+				del parent[self._getAttribute(child, 'name')]
+			
+			else:
+				self.HandleXmlElement(child, parent)
+		
 		elif child.nodeName == 'XmlAttribute':
 			self.HandleXmlAttribute(child, parent)
 			
@@ -1496,32 +1525,6 @@ class ParseTemplate:
 		
 		self.HandleCommonDataElementAttributes(node, block)
 
-		# special XmlElement reference
-		
-		for child in node:
-			if child.hasAttributeNS(None, 'ref'):
-				# This is our special case, if we ref we suck the children
-				# of the ref into our selves.  This is tricky!
-				
-				# remove this child from node
-				node.removeChild(child)
-				
-				# get and copy our ref
-				obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
-				
-				newobj = obj.copy(parent)
-				newobj.parent = None
-				
-				# first verify all children are XmlElement or XmlAttribute
-				for subchild in newobj:
-					if not isinstance(subchild, XmlElement) and not isinstance(subchild, XmlAttribute):
-						raise PeachException("Error, special XmlElement ref case, reference must only have Xml elements!!")
-				
-				# now move over children
-				for subchild in newobj:
-					block.append(subchild)
-				
-		
 		# normal children
 		
 		self.HandleDataContainerChildren(node, block)
