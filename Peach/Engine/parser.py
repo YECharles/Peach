@@ -1375,9 +1375,6 @@ class ParseTemplate:
 				# This is our special case, if we ref we suck the children
 				# of the ref into our selves.  This is tricky!
 				
-				# remove this child from node
-				#node.removeChild(child)
-				
 				# get and copy our ref
 				obj = self.GetRef( self._getAttribute(child, 'ref'), parent.parent )
 				
@@ -1394,7 +1391,8 @@ class ParseTemplate:
 					parent.append(subchild)
 					
 				# remove replaced element
-				del parent[self._getAttribute(child, 'name')]
+				if parent.has_key(self._getAttribute(child, 'name')):
+					del parent[self._getAttribute(child, 'name')]
 			
 			else:
 				self.HandleXmlElement(child, parent)
