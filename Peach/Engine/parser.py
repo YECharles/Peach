@@ -1384,7 +1384,7 @@ class ParseTemplate:
 				# first verify all children are XmlElement or XmlAttribute
 				for subchild in newobj:
 					if not isinstance(subchild, XmlElement) and not isinstance(subchild, XmlAttribute):
-						raise PeachException("Error, special XmlElement ref case, reference must only have Xml elements!! (%s,%s)" % (subchild.name, subchild))
+						raise PeachException("Error, special XmlElement ref case, reference must only have Xml elements!! (%s,%s,%s)" % (subchild.parent.name, subchild.name, subchild))
 				
 				# now move over children
 				for subchild in newobj:
