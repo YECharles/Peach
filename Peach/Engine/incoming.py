@@ -718,7 +718,7 @@ class DataCracker:
 			
 			length = None
 			relation = node.getRelationOfThisElement('size')
-			if relation != None and node.getRelationOfThisElement('offset') == None and node.parent != None:
+			if relation != None and node.parent != None:
 				try:
 					
 					length = relation.getValue(True)
@@ -787,6 +787,28 @@ class DataCracker:
 					node.parent = None
 					node.realParent = parent
 					
+					# We need to remove any offset relation temporarily
+					# to avoid running it twice
+					offsetRelation = node.getRelationOfThisElement('offset')
+					if offsetRelation != None:
+						offsetRelationParent = offsetRelation.parent
+						
+						if offsetRelation in offsetRelationParent.relations:
+							offsetRelationParent.relations.remove(offsetRelation)
+						if offsetRelationParent.has_key(offsetRelation.name):
+							del offsetRelationParent[offsetRelation.name]
+						
+						offsetFromRelation = None
+						for child in node:
+							if isinstance(child, Relation) and child.type == 'offset':
+								offsetFromRelation = child
+								
+								if offsetFromRelation in node.relations:
+									node.relations.remove(offsetFromRelation)
+								if node.has_key(offsetFromRelation.name):
+									del node[offsetFromRelation.name]
+					
+					
 					try:
 						newBuff = PublisherBuffer(None, data)
 						(rating, crackpos) = cracker.internalCrackData(node, newBuff, self.method)
@@ -804,6 +826,16 @@ class DataCracker:
 							if hasattr(c, 'pos') and c.pos != None:
 								c.pos += pos
 						
+					# Add back our offset relation
+					if offsetRelation != None:
+						offsetRelationParent.relations.append(offsetRelation)
+						offsetRelationParent.append(offsetRelation)
+						
+						if offsetFromRelation != None:
+							node.relations.append(offsetFromRelation)
+							node.append(offsetFromRelation)
+					
+					# Add back our parent
 					node.parent = parent
 					node.realParent = None
 					node.pos = pos

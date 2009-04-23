@@ -1523,8 +1523,7 @@ class ParseTemplate:
 		
 		self.HandleCommonDataElementAttributes(node, block)
 
-		# normal children
-		
+		# children
 		self.HandleDataContainerChildren(node, block)
 		
 		parent.append(block)
