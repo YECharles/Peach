@@ -63,7 +63,7 @@ class Asn1Analyzer(Analyzer):
 	#: Does analyzer support asDataElement()
 	supportDataElement = True
 	#: Does analyzer support asCommandLine()
-	supportCommandLine = True
+	supportCommandLine = False
 	#: Does analyzer support asTopLevel()
 	supportTopLevel = True
 	
@@ -82,6 +82,8 @@ class Asn1Analyzer(Analyzer):
 		obj = Asn1Type(None, None)
 		obj.asn1Type = asn1Obj.__class__.__name__
 		obj.encodeType = codec
+		obj.asnTagSet = None #asn1Obj._tagSet
+		obj.asn1Spec = None # asn1Obj._asn1Spec
 		
 		if hasattr(asn1Obj, "_value"):
 			value = asn1Obj._value
@@ -96,8 +98,25 @@ class Asn1Analyzer(Analyzer):
 			
 			elif type(value) == str:
 				# Could be blob or string...hmmm
-				b = Blob(None, None)
-				b.defaultValue = value
+				
+				# Sometimes we have ASN.1 inside of ASN.1
+				# most common for OctetString type
+				if asn1Obj.__class__.__name__ == 'OctetString':
+					try:
+						decoder = eval("pyasn1.codec.%s.decoder" % codec)
+						subAsn1 = decoder.decode(asn1Obj._value)[0]
+						
+						child = self.Asn12Peach(codec, subAsn1)
+						b = Block(None, None)
+						b.append(child)
+					
+					except:
+						b = Blob(None, None)
+						b.defaultValue = value
+				
+				else:
+					b = Blob(None, None)
+					b.defaultValue = value
 				
 				obj.append(b)
 			

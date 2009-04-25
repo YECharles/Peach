@@ -3264,6 +3264,9 @@ try:
 				elif self.asn1Type == 'BitString' and isinstance(c, DataElement):
 					b = c.getValue()
 					b = self.blob2bin(b)
+					if b[:8] == '00000000':
+						b = b[8:]
+					
 					value = "'%s'B" % b
 					
 				elif isinstance(c, Number):
@@ -3286,7 +3289,7 @@ try:
 					raise SoftException("Error building asn.1 obj")
 			
 			else:
-				asn1Obj = self.ASN1_MAP[self.asn1Type]()
+				asn1Obj = self.ASN1_MAP[self.asn1Type](self.asnTagSet, self.asn1Spec)
 			
 			if len(childAsn1Objs) > 0:
 				for i in range(len(childAsn1Objs)):
@@ -3297,6 +3300,7 @@ try:
 				encoder = eval("pyasn1.codec.%s.encoder" % self.encodeType)
 				
 				try:
+					#print asn1Obj
 					bin = encoder.encode(asn1Obj)
 				except:
 					raise SoftException("Error encoding asn.1 obj")
