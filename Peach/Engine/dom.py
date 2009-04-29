@@ -1801,7 +1801,7 @@ class DataElement(Mutatable):
 				if r.type == 'when' or r.From == None:
 					continue
 				
-				#print "Found of relation for", self.getFullDataName()
+				#print "Found of relation for", self.getFullDataName(), r.From
 				self._fixRealParent(self)
 				obj = self.findDataElementByName(r.From)
 				self._unFixRealParent(self)
@@ -1810,12 +1810,10 @@ class DataElement(Mutatable):
 					raise Exception("Mismatched relations1??? [%s]" % r.From)
 				
 				for rel in obj.relations:
-					relations.append(rel)
-				
-				for rel in obj.relations:
 					if rel.type == 'when':
 						continue
 					
+					#print rel.of
 					relations.append(rel)
 			
 			#print "Not for", self.getFullDataName()
@@ -3430,7 +3428,7 @@ class String(DataElement):
 	
 	EncodeAs = {
 		'char':'iso-8859-1',
-		'wchar':'utf-16le',
+		'wchar':'utf-16be',
 		'utf8':'utf-8',
 		}
 	
@@ -3510,7 +3508,7 @@ class String(DataElement):
 			return self.currentValue
 			
 		# 1. Init value
-		value = ""
+		value = u""
 		
 		# 3. default value?
 		if self.defaultValue != None:
@@ -3519,8 +3517,7 @@ class String(DataElement):
 		# 4. Relations
 		
 		value = self.getRelationValue(value)
-		if type(value) != str:
-			#print "Type was:", type(value)
+		if not type(value) in [str, unicode]:
 			value = str(value)
 		
 		# 5. fixup
@@ -3564,10 +3561,13 @@ class String(DataElement):
 			
 			# Encode
 		
-			try:
-				value = value.encode(self.EncodeAs[self.type])
-			except:
-				pass
+			if not (type(value) == str and self.type == 'char'):
+				try:
+					value = value.encode(self.EncodeAs[self.type])
+				except:
+					print type(value)
+					print "ENcoding:",self.EncodeAs[self.type]
+					raise
 		
 		# Output
 		

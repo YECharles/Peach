@@ -142,12 +142,14 @@ class DataCracker:
 				if relation.type == 'when':
 					continue
 				
+				#print "Found:",relation.getFullname()
 				relations.append([relation, placement.parent])
 				relationsHold.append(relation)
 			
 			for child in placement.parent.getAllChildDataElements():
 				for relation in child.getRelationsOfThisElement():
 					if relation not in relationsHold and relation.type != 'when':
+						#print "Found:",relation.getFullname()
 						relations.append([relation, child])
 						relationsHold.append(relation)
 			
@@ -159,6 +161,7 @@ class DataCracker:
 						print "of: ", relation.of
 						
 						raise Exception("obj is null")
+					#print "Found:",relation.getFullname()
 					relations.append([relation, obj])
 					relationsHold.append(relation)
 			
@@ -1436,7 +1439,7 @@ class DataCracker:
 					if node.isStatic:
 						if node.type == 'wchar':
 							# convert to ascii string
-							defaultValue = node.defaultValue.decode("utf-16le")
+							defaultValue = node.defaultValue.decode("utf-16be")
 						
 						if value != defaultValue and node.isStatic:
 							Debug(1, "%s_handleString: %s: Bad match, static, but default didn't match [%s != %s]" % ('\t'*self.deepString, node.name, repr(value), repr(defaultValue)))
@@ -1551,7 +1554,7 @@ class DataCracker:
 				Debug(1, "%s_handleString: %s: Found default value, doing checks" % ('\t'*self.deepString, node.name))
 				
 				if node.type == 'wchar':
-					defaultValue = node.defaultValue.decode("utf-16le")
+					defaultValue = node.defaultValue.decode("utf-16be")
 					
 				else:
 					defaultValue = node.defaultValue
@@ -1702,7 +1705,7 @@ class DataCracker:
 		# Deal with wchar
 		if node.type == 'wchar':
 			try:
-				value = value.decode("utf-16le")
+				value = value.decode("utf-16be")
 			except:
 				print "Error decoding: ", repr(value)
 				raise

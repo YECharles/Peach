@@ -402,7 +402,9 @@ class PeachValidatorGui(gui.PeachValidation):
 			#	nodeInternal = node.getInternalValue()
 			#	nodeValue = node.getValue()
 			nodeValue = str(node.getValue())
-			nodeInternal = str(node.getInternalValue())
+			nodeInternal = node.getInternalValue()
+			if type(nodeInternal) not in [str, unicode]:
+				nodeInternal = str(node.getInternalValue())
 		
 		except:
 			raise

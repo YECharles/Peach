@@ -179,6 +179,65 @@ class UnicodeStringsMutator(Mutator):
 		node.currentValue = random.choice(self.values)
 
 
+class ValidValuesMutator(Mutator):
+	'''
+	Allows different valid values to be
+	specified.
+	'''
+	
+	# 'ValidValues'
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		
+		#: Weight to be chosen randomly
+		self.weight = 2
+		
+		self.name = "ValidValuesMutator"
+		
+		self.values = []
+		
+		self._genValues(node)
+		
+		self.isFinite = True
+		self._peach = peach
+		self._count = 0
+		self._maxCount = len(self.values)
+		
+	def _genValues(self, node):
+		self.values = []
+		
+		for child in node:
+			if isinstance(child, Hint) and child.name == 'ValidValues':
+				self.values = child.value.split(';')
+		
+	def next(self):
+		'''
+		Goto next mutation.  When this is called
+		the state machine is updated as needed.
+		'''
+		
+		self._count += 1
+		if self._count >= self._maxCount:
+			self._count -= 1
+			raise MutatorCompleted()
+	
+	def getCount(self):
+		return self._maxCount
+
+	def supportedDataElement(node):
+		if isinstance(node, String) and node.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+
+	def sequencialMutation(self, node):
+		node.finalValue = self.values[self._count]
+	
+	def randomMutation(self, node):
+		node.finalValue = random.choice(self.values)
+
 class UnicodeBomMutator(Mutator):
 	'''
 	Injects BOM markers into default value and longer strings.
