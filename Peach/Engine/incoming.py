@@ -1439,7 +1439,7 @@ class DataCracker:
 					if node.isStatic:
 						if node.type == 'wchar':
 							# convert to ascii string
-							defaultValue = node.defaultValue.decode("utf-16be")
+							defaultValue = node.defaultValue.decode("utf-16le")
 						
 						if value != defaultValue and node.isStatic:
 							Debug(1, "%s_handleString: %s: Bad match, static, but default didn't match [%s != %s]" % ('\t'*self.deepString, node.name, repr(value), repr(defaultValue)))
@@ -1554,7 +1554,7 @@ class DataCracker:
 				Debug(1, "%s_handleString: %s: Found default value, doing checks" % ('\t'*self.deepString, node.name))
 				
 				if node.type == 'wchar':
-					defaultValue = node.defaultValue.decode("utf-16be")
+					defaultValue = node.defaultValue.decode("utf-16le")
 					
 				else:
 					defaultValue = node.defaultValue
@@ -1705,7 +1705,7 @@ class DataCracker:
 		# Deal with wchar
 		if node.type == 'wchar':
 			try:
-				value = value.decode("utf-16be")
+				value = value.decode("utf-16le")
 			except:
 				print "Error decoding: ", repr(value)
 				raise

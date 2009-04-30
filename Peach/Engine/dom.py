@@ -3428,7 +3428,7 @@ class String(DataElement):
 	
 	EncodeAs = {
 		'char':'iso-8859-1',
-		'wchar':'utf-16be',
+		'wchar':'utf-16le',
 		'utf8':'utf-8',
 		}
 	
