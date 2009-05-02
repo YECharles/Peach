@@ -391,6 +391,83 @@ class StreamBuffer:
 		newpos = len(self.data) + pos
 		self.seekFromStart(newpos)
 
+import weakref
+
+class Event:
+	'''
+	A .NET like Event system.  Uses weak references
+	to avoid memory issues.
+	'''
+	
+	def __init__(self):
+		self.handlers = set()
+		
+	def _objectFinalized(self, obj):
+		'''
+		Called when an object we have a weak reference
+		to is being garbage collected.
+		'''
+		self.handlers.remove(obj)
+	
+	def handle(self, handler):
+		'''
+		Add a handler to our event
+		'''
+		self.handlers.add(weakref.ref(handler, self._objectFinalized))
+		return self
+	
+	def unhandle(self, handler):
+		'''
+		Remove a handler from our event
+		'''
+		try:
+			for ref in self.handlers:
+				if ref() == handler:
+					self.handlers.remove(ref)
+		except:
+			raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+		
+		return self
+	
+	def fire(self, *args, **kargs):
+		'''
+		Trigger event and call our handlers
+		'''
+		for handler in self.handlers:
+			handler()(*args, **kargs)
+	
+	def getHandlerCount(self):
+		'''
+		Count of handlers registered for this event
+		'''
+		return len(self.handlers)
+	
+	__iadd__ = handle
+	__isub__ = unhandle
+	__call__ = fire
+	__len__  = getHandlerCount
+
+#class MockFileWatcher:
+#    def __init__(self):
+#        self.fileChanged = Event()
+#
+#    def watchFiles(self):
+#        source_path = "foo"
+#        self.fileChanged(source_path)
+#
+#def log_file_change(source_path):
+#    print "%r changed." % (source_path,)
+#
+#def log_file_change2(source_path):
+#    print "%r changed!" % (source_path,)
+#
+#watcher              = MockFileWatcher()
+#watcher.fileChanged += log_file_change2
+#watcher.fileChanged += log_file_change
+#watcher.fileChanged -= log_file_change2
+#watcher.watchFiles()
+
+
 class bitfield(object):
 	'''
 	Access bit field with indexes

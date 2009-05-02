@@ -773,7 +773,7 @@ class ParseTemplate:
 			if child.nodeName == 'Relation':
 				relation = self.HandleRelation(child, elem)
 				elem.relations.append(relation)
-				elem.append(relation)
+				#elem.append(relation)
 			
 			elif child.nodeName == 'Transformer':
 				if elem.transformer != None:
@@ -1015,7 +1015,7 @@ class ParseTemplate:
 				raise PeachException("Error, data element [%s] already has a placement." % parent.name)
 			
 			parent.placement = placement
-			parent.append(placement)
+			#parent.append(placement)
 		
 		return placement
 		
@@ -2904,7 +2904,7 @@ class ParseTemplate:
 		
 		hint = Hint(self._getAttribute(node, 'name'), parent)
 		hint.value = self._getAttribute(node, 'value')
-		parent.append(hint)
+		parent.hints.append(hint)
 		
 		return hint
 

@@ -64,8 +64,8 @@ class NumericalVarianceMutator(Mutator):
 		self._maxValue = node.getMaxValue()
 	
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == 'NumericalVarianceMutator-N':
+		for c in node.hints:
+			if c.name == 'NumericalVarianceMutator-N':
 				try:
 					n = int(c.value)
 				except:
@@ -215,8 +215,8 @@ class NumericalEdgeCaseMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == 'NumericalEdgeCaseMutator-N':
+		for c in node.hints:
+			if c.name == 'NumericalEdgeCaseMutator-N':
 				try:
 					n = int(c.value)
 				except:
@@ -272,8 +272,8 @@ class FiniteRandomNumbersMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == 'FiniteRandomNumbersMutator-N':
+		for c in node.hints:
+			if c.name == 'FiniteRandomNumbersMutator-N':
 				try:
 					n = int(c.value)
 				except:

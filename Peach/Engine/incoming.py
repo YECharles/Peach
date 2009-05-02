@@ -802,8 +802,8 @@ class DataCracker:
 							del offsetRelationParent[offsetRelation.name]
 						
 						offsetFromRelation = None
-						for child in node:
-							if isinstance(child, Relation) and child.type == 'offset':
+						for child in node.relations:
+							if child.type == 'offset':
 								offsetFromRelation = child
 								
 								if offsetFromRelation in node.relations:

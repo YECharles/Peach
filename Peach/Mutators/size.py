@@ -62,8 +62,8 @@ class SizedVaranceMutator(Mutator):
 		self._currentCount = 0
 	
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+		for c in node.hints:
+			if c.name == ('%s-N' % self.name):
 				try:
 					n = int(c.value)
 				except:
@@ -215,8 +215,8 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		return nums
 		
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+		for c in node.hints:
+			if c.name == ('%s-N' % self.name):
 				try:
 					n = int(c.value)
 				except:
@@ -333,8 +333,8 @@ class SizedDataVaranceMutator(Mutator):
 		self._currentCount = 0
 	
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+		for c in node.hints:
+			if c.name == ('%s-N' % self.name):
 				try:
 					n = int(c.value)
 				except:
@@ -460,8 +460,8 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 		return nums
 		
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+		for c in node.hints:
+			if c.name == ('%s-N' % self.name):
 				try:
 					n = int(c.value)
 				except:

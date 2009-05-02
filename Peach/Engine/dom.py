@@ -848,6 +848,9 @@ class DataElement(Mutatable):
 		#: Relations this element has
 		self.relations = []
 		
+		#: Mutator Hints
+		self.hints = []
+		
 		#: Fixed occurs
 		self.occurs = None
 		#: Minimum occurences
@@ -1075,15 +1078,16 @@ class DataElement(Mutatable):
 				cracker = PeachModule.Engine.incoming.DataCracker(parent)
 				#cracker.haveAllData = True
 				
+				startTime = time.time()
 				if PROFILE:
 					profile.runctx("cracker.crackData(self, buff, \"setDefaultValue\")",
-								   globals(), {"cracker":cracker, "self":self, "stuff":stuff})
+								   globals(), {"cracker":cracker, "self":self, "stuff":stuff, "buff":buff})
 				else:
-					startTime = time.time()
 					cracker.crackData(self, buff, "setDefaultValue")
-					print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
-					print "[*] Building relation cache"
-					self.BuildRelationCache()
+				
+				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
+				print "[*] Building relation cache"
+				self.BuildRelationCache()
 				
 				## Pickle model
 				##try:
@@ -1891,9 +1895,10 @@ class DataElement(Mutatable):
 			
 			return
 		
-		if isinstance(node, Relation) and node.From == None:
-			#print "_getAllRelationsInDataModel: Yielding self"
-			yield node
+		for r in node.relations:
+			if node.From == None:
+				#print "_getAllRelationsInDataModel: Yielding self"
+				yield node
 		
 		if isinstance(node, DataElement):
 			for child in node._children:

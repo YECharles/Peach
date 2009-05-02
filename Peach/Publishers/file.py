@@ -385,9 +385,9 @@ class FileWriterLauncher(Publisher):
 	def call(self, method, args):	
 		# windows or unix?
 		if sys.platform == 'win32':
-			return callWindows(method, args)
+			return self.callWindows(method, args)
 		
-		return callUnix(method,args)
+		return self.callUnix(method,args)
 	
 	def callUnix(self, method, args):
 		'''

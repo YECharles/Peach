@@ -71,8 +71,8 @@ class DWORDSliderMutator(Mutator):
 
 	def supportedDataElement(e):
 		if isinstance(e, Blob) and e.isMutable:
-			for child in e:
-				if isinstance(child, Hint) and child.name == 'DWORDSliderMutator' and child.value == 'off':
+			for child in e.hints:
+				if child.name == 'DWORDSliderMutator' and child.value == 'off':
 					return False
 			
 			return True
@@ -138,8 +138,8 @@ class BitFlipperMutator(Mutator):
 			self._count = long((len(node.getInternalValue())*8) * 0.2)
 	
 	def _getN(self, node, n):
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == 'BitFlipperMutator-N':
+		for c in node.hints:
+			if c.name == 'BitFlipperMutator-N':
 				try:
 					n = int(c.value)
 				except:

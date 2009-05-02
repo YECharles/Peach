@@ -72,8 +72,8 @@ class ArrayVarianceMutator(Mutator):
 		Gets N by checking node for hint, or returnign default
 		'''
 		
-		for c in node._children:
-			if isinstance(c, Hint) and c.name == ('%s-N' % self.name):
+		for c in node.hints:
+			if c.name == ('%s-N' % self.name):
 				try:
 					n = int(c.value)
 				except:

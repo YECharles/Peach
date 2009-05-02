@@ -177,14 +177,14 @@ class Tcp(Publisher):
 			self._socket.settimeout(self._timeout)
 			ret = self._socket.recv(diffSize)
 			
+			if not ret:
+				# Socket was closed
+				raise PublisherSoftException("Socket is closed")
+			
 			if Peach.Engine.engine.Engine.debug:
 				print "<<<<<<<<<<<<<<<<<"
 				print "tcp.Tcp.receive():"
 				self.hexPrint(ret)
-			
-			if not ret:
-				# Socket was closed
-				raise PublisherSoftException("Socket is closed")
 			
 			self.buff += ret
 			
@@ -214,13 +214,13 @@ class Tcp(Publisher):
 		try:
 			ret = self._socket.recv(4096)
 			
+			if not ret:
+				raise PublisherSoftException("Socket is closed")
+			
 			if Peach.Engine.engine.Engine.debug:
 				print "<<<<<<<<<<<<<<<<<"
 				print "tcp.Tcp.receive():"
 				self.hexPrint(ret)
-			
-			if not ret:
-				raise PublisherSoftException("Socket is closed")
 			
 			self.buff += ret
 			
