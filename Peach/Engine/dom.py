@@ -214,14 +214,30 @@ class Element(object):
 		self.parent = parent
 		#setattr(self, '__deepcopy__', me)
 		
-		# fixup copies relatiosn
-		if hasattr(e, "relations"):
-			for r in e.relations:
-				r.parent = e
+		# fixup copies relations
+		# This may be overkill, we can probably
+		# just update "e" and be OKAY
+		if isinstance(e, DataElement):
+			e.updateRelationParents()
+			
+		if hasattr(e, "placement") and e.placement != None:
+			e.placement.parent = e
 		
 		#sys.stderr.write("PeachDeepCopy(3): %s\n" % self)
 		#sys.stderr.write("PeachDeepCopy: Returning: %s\n" % e)
 		return e
+
+	def updateRelationParents(self):
+		'''
+		Recurse through dom fixing
+		relation's parents
+		'''
+		
+		for r in self.relations:
+			r.parent = self
+		
+		for c in self:
+			c.updateRelationParents()
 
 	def getElementsByType(self, type, ret = None):
 		'''
@@ -1714,6 +1730,20 @@ class DataElement(Mutatable):
 			obj = obj[names[i]]
 		
 		return obj
+	
+	def getAllPlacementsInDataModel(self):
+		'''
+		As the name says, recurse looking for
+		placements
+		'''
+		
+		if self.placement != None:
+			yield self.placement
+		
+		for child in self:
+			if isinstance(child, DataElement):
+				for p in child.getAllPlacementsInDataModel():
+					yield p
 	
 	def getDataElementByName(self, name):
 		'''
@@ -4332,7 +4362,8 @@ class Relation(Element):
 			print "DataRoot:", self.parent.getRootOfDataMap()
 			print "DataRoot.parent:", self.parent.getRootOfDataMap().parent
 			print "Fullname:", self.getFullDataName()
-			print "Couldn't locate [%s]" % self.of
+			print "Couldn't locate [%s]" % self.of, self.type
+			#DomPrint(0, self.parent.getRootOfDataMap())
 			raise Exception("Couldn't locate [%s]" % self.of)
 		
 		return obj

@@ -1013,6 +1013,7 @@ class ParseTemplate:
 			if parent.placement != None:
 				raise PeachException("Error, data element [%s] already has a placement." % parent.name)
 			
+			#print "Setting placement on",parent.name
 			parent.placement = placement
 			#parent.append(placement)
 		

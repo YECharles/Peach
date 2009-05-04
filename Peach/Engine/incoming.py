@@ -123,7 +123,7 @@ class DataCracker:
 		
 		# Find all our placements and shift elements around.
 		placements = []
-		for placement in template.getElementsByType(Placement):
+		for placement in template.getAllPlacementsInDataModel():
 			placements.append(placement)
 			
 		for placement in placements:
@@ -205,7 +205,7 @@ class DataCracker:
 				placement.parent.parent = after.parent
 				
 				# Remove placement
-				placement.parent.__delitem__(placement.name)
+				placement.parent.placement = None
 				
 			elif placement.before != None:
 				before = template.findDataElementByName(placement.before)
@@ -237,7 +237,7 @@ class DataCracker:
 				placement.parent.parent = before.parent
 				
 				# Remove placement
-				placement.parent.__delitem__(placement.name)
+				placement.parent.placement = None
 				
 				Debug(1, "  Final name: %s" % placement.parent.getFullDataName())
 				
