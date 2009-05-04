@@ -773,7 +773,6 @@ class ParseTemplate:
 			if child.nodeName == 'Relation':
 				relation = self.HandleRelation(child, elem)
 				elem.relations.append(relation)
-				#elem.append(relation)
 			
 			elif child.nodeName == 'Transformer':
 				if elem.transformer != None:
@@ -849,7 +848,8 @@ class ParseTemplate:
 		
 		if parent != None:
 			parent.transformer = transformer
-			parent.append(transformer)
+			transformer.parent = parent
+			#parent.append(transformer)
 		
 		return transformer
 		
@@ -990,7 +990,6 @@ class ParseTemplate:
 				raise PeachException("Error, data element [%s] already has a fixup." % parent.name)
 			
 			parent.fixup = fixup
-			parent.append(fixup)
 		
 		return fixup
 		
@@ -1357,7 +1356,6 @@ class ParseTemplate:
 		elif child.nodeName == 'Relation':
 			relation = self.HandleRelation(child, parent)
 			parent.relations.append(relation)
-			parent.append(relation)
 		elif child.nodeName == 'Fixup':
 			self.HandleFixup(child, parent)
 		elif child.nodeName == 'Placement':

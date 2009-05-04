@@ -832,11 +832,9 @@ class DataCracker:
 					# Add back our offset relation
 					if offsetRelation != None:
 						offsetRelationParent.relations.append(offsetRelation)
-						offsetRelationParent.append(offsetRelation)
 						
 						if offsetFromRelation != None:
 							node.relations.append(offsetFromRelation)
-							node.append(offsetFromRelation)
 					
 					# Add back our parent
 					node.parent = parent

@@ -467,6 +467,60 @@ class Event:
 #watcher.fileChanged -= log_file_change2
 #watcher.watchFiles()
 
+import traceback
+
+class ArraySetParent(object):
+	'''
+	Special array type that will
+	set the parent on all children.
+	'''
+	
+	def __init__(self, parent):
+		if parent == None:
+			raise Exception("Whoa, parent == None!")
+		self._parent = parent
+		self._array = []
+	
+	def append(self, obj):
+		
+		#if hasattr(obj, "of"):
+		#	if obj.of == "Tables":
+		#		print "SETTING TABLES PARENT TO:", self._parent
+		#		print obj
+		#		traceback.print_stack();
+		
+		obj.parent = self._parent
+		return self._array.append(obj)
+	
+	def index(self, obj):
+		return self._array.index(obj)
+	
+	def insert(self, index, obj):
+		obj.parent = self._parent
+		return self._array.insert(index, obj)
+	
+	def remove(self, obj):
+		return self._array.remove(obj)
+	
+	def __len__(self):
+		return self._array.__len__()
+	
+	def __getitem__(self, key):
+		return self._array.__getitem__(key)
+	
+	def __setitem__(self, key, value):
+		value.parent = self._parent
+		return self._array.__setitem__(key, value)
+	
+	def __delitem__(self, key):
+		return self._array.__delitem__(key)
+	
+	def __iter__(self):
+		return self._array.__iter__()
+	
+	def __contains__(self, item):
+		return self._array.__contains__(item)
+
 
 class bitfield(object):
 	'''

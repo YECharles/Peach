@@ -214,6 +214,11 @@ class Element(object):
 		self.parent = parent
 		#setattr(self, '__deepcopy__', me)
 		
+		# fixup copies relatiosn
+		if hasattr(e, "relations"):
+			for r in e.relations:
+				r.parent = e
+		
 		#sys.stderr.write("PeachDeepCopy(3): %s\n" % self)
 		#sys.stderr.write("PeachDeepCopy: Returning: %s\n" % e)
 		return e
@@ -673,6 +678,7 @@ class ElementWithChildren(Element):
 				dict[child].updateFromXmlDom(child, dict)
 	
 	def append(self, obj):
+
 		if obj in self._children:
 			raise Exception("object already child of element")
 		
@@ -846,10 +852,10 @@ class DataElement(Mutatable):
 		self.placement = None
 		
 		#: Relations this element has
-		self.relations = []
+		self.relations = ArraySetParent(self)
 		
 		#: Mutator Hints
-		self.hints = []
+		self.hints = ArraySetParent(self)
 		
 		#: Fixed occurs
 		self.occurs = None
@@ -1891,21 +1897,26 @@ class DataElement(Mutatable):
 		if useCache and isinstance(node, DataElement) and node.relationCache != None:
 			root = self.getRootOfDataMap()
 			for s in node.relationCache:
-				yield root.getDataElementByName(s)
+				relName = s[s.rfind(".")+1:]
+				parentName = s[:s.rfind(".")]
+				obj = root.getDataElementByName(parentName)
+				
+				for r in obj:
+					if r.name == relName:
+						yield r
 			
 			return
 		
 		for r in node.relations:
-			if node.From == None:
+			if r.From == None:
 				#print "_getAllRelationsInDataModel: Yielding self"
-				yield node
+				yield r
 		
 		if isinstance(node, DataElement):
 			for child in node._children:
 				for r in self._getAllRelationsInDataModel(child, useCache):
 					#print "_getAllRelationsInDataModel: Yielding"
 					yield r
-	#_getAllRelationsInDataModel = profile(_getAllRelationsInDataModel)
 	
 	def isArray(self):
 		'''
@@ -1964,6 +1975,10 @@ class DataElement(Mutatable):
 		rel = self.getRelationOfThisElement('count')
 		if rel != None:
 			try:
+				#print "of:  ",self.getFullname()
+				#print "from:",rel.parent.getFullname()
+				#print rel.of
+				#print rel.From
 				cnt = int(rel.parent.getInternalValue())
 				
 				if cnt < self.minOccurs:
@@ -2899,10 +2914,13 @@ class Block(DataElement):
 						value += c.getValue(sout)
 					
 					except:
-						#print "value: [%s]" % repr(value)
+						print "c.getValue(sout) failed." + repr(sys.exc_info())
 						print "c.name: %s" % c.name
+						traceback.print_stack()
 						print "---------------"
 						raise
+				else:
+					print "FOUND NON DATAELEMENT:", c
 		
 		else:
 			
@@ -4098,6 +4116,17 @@ class Relation(Element):
 	- Zero or more
 	- 1 or more
 	'''
+	
+	## For debugging
+	#def getParent(self):
+	#	return self._parent
+	#def setParent(self, value):
+	#	self._parent = value
+	#	#if hasattr(self, "of") and self.of == "Tables":
+	#	#	print self,"Relation.setParent()",value
+	#	#	traceback.print_stack()
+	#parent = property(fget=getParent, fset=setParent)
+	
 	def __init__(self, name, parent):
 		Element.__init__(self, name, parent)
 		self.elementType = 'relation'
@@ -4117,7 +4146,7 @@ class Relation(Element):
 		self.relativeTo = None
 		
 		#: Parent of this object
-		self.parent = parent
+		#self.parent = parent
 		#: Expression to apply to relation when getting value
 		self.expressionGet = None
 		#: Expression to apply to relation when setting value
@@ -4292,6 +4321,8 @@ class Relation(Element):
 		if self.of == None:
 			return None
 		
+		#print self
+		#print self.of
 		obj = self.parent.findDataElementByName(self.of)
 		if obj == None:
 			# Could element have become an array?

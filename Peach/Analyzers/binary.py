@@ -177,14 +177,12 @@ class Binary(Analyzer):
 				relation.type = "size"
 				relation.of = stringNode.name
 				
-				numberNode.append(relation)
 				numberNode.relations.append(relation)
 				
 				relation = Relation()
 				relation.type = "size"
 				relation.From = numberNode.name
 				
-				stringNode.append(relation)
 				stringNode.relations.append(relation)
 			
 			if s.value[-1] == "\0":
