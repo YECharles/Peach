@@ -1312,7 +1312,6 @@ try:
                 self.p = parser.ParseTemplate()
                 self.peach = self.p.parse("file:"+self.FileName)
                 self.textOutput.SetValue("No errors on parse!")
-            
             except:
                 out = "*** Errors detected during parse ***\n\n"
                 value = sys.exc_info()[1]
