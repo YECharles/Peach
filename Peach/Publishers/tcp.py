@@ -172,13 +172,16 @@ class Tcp(Publisher):
 		
 		try:
 			if Peach.Engine.engine.Engine.debug:
-				print "Asking for %d, have %d" % (diffSize, len(self.buff))
+				print "Asking for %d, need %d, have %d" % (size, diffSize, len(self.buff)-self.pos)
 			
 			self._socket.settimeout(self._timeout)
 			ret = self._socket.recv(diffSize)
 			
 			if not ret:
 				# Socket was closed
+				if Peach.Engine.engine.Engine.debug:
+					print "Socket is closed"
+				
 				raise PublisherSoftException("Socket is closed")
 			
 			if Peach.Engine.engine.Engine.debug:
@@ -189,10 +192,22 @@ class Tcp(Publisher):
 			self.buff += ret
 			
 		except socket.error, e:
-			if str(e).find('The socket operation could not complete without blocking') == -1:
+			if str(e).find('The socket operation could not complete without blocking') != -1:
+				if Peach.Engine.engine.Engine.debug:
+					print "timed out waiting for data"
+				
 				raise Timeout("Timed out waiting for data [%d:%d:%d:%d]" % (len(self.buff), (size+self.pos), size, diffSize))
 			
+			elif str(e).find('An existing connection was forcibly') != -1:
+				if Peach.Engine.engine.Engine.debug:
+					print "Socket was closed!"
+				
+				raise PublisherSoftException("Socket is closed")
+			
 			else:
+				if Peach.Engine.engine.Engine.debug:
+					print "recv failed: " + str(sys.exc_info()[1])
+				
 				raise PublisherSoftException("recv failed: " + str(sys.exc_info()[1]))
 		
 		finally:
