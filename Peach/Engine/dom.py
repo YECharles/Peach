@@ -223,6 +223,10 @@ class Element(object):
 		if hasattr(e, "placement") and e.placement != None:
 			e.placement.parent = e
 		
+		if hasattr(e, "hints"):
+			for h in e.hints:
+				h.parent = e
+		
 		#sys.stderr.write("PeachDeepCopy(3): %s\n" % self)
 		#sys.stderr.write("PeachDeepCopy: Returning: %s\n" % e)
 		return e
@@ -1819,13 +1823,27 @@ class DataElement(Mutatable):
 				return None
 		
 			# Faster by some
-			rel = cPeach.getRelationOfThisElement(self, type)
+			#rel = cPeach.getRelationOfThisElement(self, type)
+			for r in self.getRelationsOfThisElement():
+				if r.type == type:
+					return r
 
-			return rel
+			return None
 		
 		finally:
 			self._unFixRealParent(self)
 	
+	def getRelationByName(self, name):
+		relName = s[s.rfind(".")+1:]
+		parentName = s[:s.rfind(".")]
+		obj = root.getDataElementByName(parentName)
+		
+		for r in obj:
+			if r.name == relName:
+				return r
+		
+		return None
+
 	def getRelationsOfThisElement(self):
 		'''
 		Locate and return a relation of this element.
@@ -1843,7 +1861,7 @@ class DataElement(Mutatable):
 				
 				#print "Found of relation for", self.getFullDataName(), r.From
 				self._fixRealParent(self)
-				obj = self.findDataElementByName(r.From)
+				obj = self.getRelationByName(r.From)
 				self._unFixRealParent(self)
 				
 				if obj == None:
@@ -1858,7 +1876,7 @@ class DataElement(Mutatable):
 			
 			#print "Not for", self.getFullDataName()
 			return relations
-		
+
 		self._fixRealParent(self)
 		if self.relationCache != None:
 			#print "Using relation cache!"
@@ -1867,7 +1885,7 @@ class DataElement(Mutatable):
 			
 			if root.relationOfCache.has_key(name):
 				for r in root.relationOfCache[name]:
-					r = self.find(r)
+					r = self.getRelationByName(r)
 					if r != None:
 						relations.append(r)
 			
@@ -1877,6 +1895,7 @@ class DataElement(Mutatable):
 		for r in self._genRelationsInDataModelFromHere(self):
 			# Huh, do we break something here?
 			if r.parent == None:
+				raise Exception("Relation with no parent!")
 				continue
 			
 			if r.type == 'when' or r.of == None:
