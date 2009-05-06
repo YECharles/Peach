@@ -379,6 +379,8 @@ class StateEngine:
 			if rating > 2:
 				raise SoftException("Was unble to crack incoming data into %s data model." % action.template.name)
 			
+			#print "Have %d bytes left" % (len(self.publisher.buff) - self.publisher.pos)
+			
 			action.value = action.template.getValue()
 			
 		elif action.type == 'output':

@@ -1834,14 +1834,17 @@ class DataElement(Mutatable):
 			self._unFixRealParent(self)
 	
 	def getRelationByName(self, name):
-		relName = s[s.rfind(".")+1:]
-		parentName = s[:s.rfind(".")]
-		obj = root.getDataElementByName(parentName)
+		relName = name[name.rfind(".")+1:]
+		parentName = name[:name.rfind(".")]
+		obj = self.getRootOfDataMap().getDataElementByName(parentName)
 		
+		if obj == None:
+			print "Unable to locate:", parentName, name
 		for r in obj:
 			if r.name == relName:
 				return r
 		
+		print "Returning None!"
 		return None
 
 	def getRelationsOfThisElement(self):
@@ -1861,7 +1864,7 @@ class DataElement(Mutatable):
 				
 				#print "Found of relation for", self.getFullDataName(), r.From
 				self._fixRealParent(self)
-				obj = self.getRelationByName(r.From)
+				obj = self.find(r.From)
 				self._unFixRealParent(self)
 				
 				if obj == None:

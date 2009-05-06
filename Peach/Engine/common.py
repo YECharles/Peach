@@ -393,7 +393,7 @@ class StreamBuffer:
 
 import weakref
 
-class Event:
+class PeachEvent:
 	'''
 	A .NET like Event system.  Uses weak references
 	to avoid memory issues.
