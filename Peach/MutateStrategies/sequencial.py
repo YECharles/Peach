@@ -185,6 +185,7 @@ class SequencialMutationStrategy(MutationStrategy):
 				
 				nodes = dataModel.getAllChildDataElements()
 				nodes.append(dataModel)
+				
 				for node in nodes:
 					if node.isMutable:
 						self._dataModelFields[fullName].append(node.getFullname())

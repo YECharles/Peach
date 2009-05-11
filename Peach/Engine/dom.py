@@ -1634,22 +1634,25 @@ class DataElement(Mutatable):
 				
 			return cPeach.findDataElementByName(self, names)
 		
+			##print "----"
+			##for block in self._findAllBlocksGoingUp():
+			##	print "findDataElementByName: Looking for %s in %s" % (name, block.name)
+			##	for node in self._findDataElementByName(block, names[0]):
+			##		obj = self._checkDottedName(node, names)
+			##		if obj != None:
+			##			#print "Could not locate", name
+			##			#print "But we did with old code", obj.getFullnameInDataModel()
+			##			#print node
+			##			#print obj.parent
+			##			#raise Exception("Boggers")
+			##			return obj
+			##		else:
+			##			print "checkdottednamefailed:", node.name, name
+		
 		finally:
 			self._unFixRealParent(self)
 		
-		#for block in self._findAllBlocksGoingUp():
-		#	print "findDataElementByName: Looking for %s in %s" % (name, block.name)
-		#	for node in self._findDataElementByName(block, names[0]):
-		#		obj = self._checkDottedName(node, names)
-		#		if obj != None:
-		#			#print "Could not locate", name
-		#			#print "But we did with old code", obj.getFullnameInDataModel()
-		#			#print node
-		#			#print obj.parent
-		#			#raise Exception("Boggers")
-		#			return obj
-		#
-		#return None
+		return None
 
 	def find(self, name):
 		'''
@@ -1703,7 +1706,7 @@ class DataElement(Mutatable):
 			yield node[name]
 		else:
 			for c in node:
-				print "%s: %s" % (node.name, c.name)
+				print "%s: %s != %s" % (node.name, c.name, name)
 		
 		# search down each child path
 		for child in node._children:
@@ -1757,11 +1760,13 @@ class DataElement(Mutatable):
 		names = name.split(".")
 		
 		if self.name != names[0]:
+			#print "[%s] != [%s]" % (self.name, names[0])
 			return None
 		
 		obj = self
 		for i in range(1, len(names)):
 			if not obj.has_key(names[i]):
+				#print "no [%s]" % (names[i])
 				return None
 			
 			obj = obj[names[i]]
@@ -1952,6 +1957,11 @@ class DataElement(Mutatable):
 				relName = s[s.rfind(".")+1:]
 				parentName = s[:s.rfind(".")]
 				obj = root.getDataElementByName(parentName)
+				
+				if obj == None:
+					continue
+					#print "Can't find:",s,parentName
+					#DomPrint(0, root)
 				
 				for r in obj:
 					if r.name == relName:
@@ -3446,6 +3456,10 @@ class XmlElement(DataElement):
 			Print(node, stream=buff, encoding="utf8")
 			value = buff.getvalue()
 			buff.close()
+			
+			if sout != None:
+				sout.write(value, self.getFullDataName())
+			
 			return value
 		
 		return None

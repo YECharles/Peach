@@ -408,7 +408,6 @@ class StateEngine:
 			else:
 				action.value = action.template.getValue()
 			
-			
 			Debug(1, "Actiong output sending %d bytes" % len(action.value))
 			
 			if not self.publisher.withNode:
