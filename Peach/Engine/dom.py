@@ -98,7 +98,7 @@ class Element(object):
 		#: Name of Element, cannot include "."s
 		self.name = name
 		#: Parent of Element
-		self.parent = parent
+		self._parent = parent
 		#: If element has children
 		self.hasChildren = False
 		#: Type of this element
@@ -111,6 +111,22 @@ class Element(object):
 		
 		if self.name == None or len(self.name) == 0:
 			self.name = self.getUniqueName()
+	
+	def getParent(self):
+		return self._parent
+	def setParent(self, parent):
+		if self.name == "Lqcd" and parent == None and self.parent != None:
+			print "Setting Lqcd("+repr(self)+").parent is not null, setting to null"
+			#traceback.print_stack()
+		if self.name == "Lqcd" and parent == None:
+			print "Setting Lqcd("+repr(self)+").parent == None"
+			#traceback.print_stack()
+		elif self.name == "Lqcd" and parent != None:
+			print "Setting Lqcd("+repr(self)+").parent:", parent
+			#traceback.print_stack()
+		
+		self._parent = parent
+	parent = property(fget=getParent, fset=setParent)
 	
 	def __deepcopy__(self, memo):
 		'''
@@ -217,8 +233,12 @@ class Element(object):
 		# fixup copies relations
 		# This may be overkill, we can probably
 		# just update "e" and be OKAY
-		if isinstance(e, DataElement):
-			e.updateRelationParents()
+		#if isinstance(e, DataElement):
+		#	e.updateRelationParents()
+		
+		if isinstance(e, DataElement): #hasattr(e, "relations"):
+			for r in e.relations:
+				r.parent = e
 			
 		if hasattr(e, "placement") and e.placement != None:
 			e.placement.parent = e
@@ -4395,11 +4415,13 @@ class Relation(Element):
 			obj = self.parent.findArrayByName(self.of)
 		
 		if obj == None:
+			print self.parent.name, self.parent
+			print "Parent:",self.parent.parent
 			print "DataRoot:", self.parent.getRootOfDataMap()
 			print "DataRoot.parent:", self.parent.getRootOfDataMap().parent
 			print "Fullname:", self.getFullDataName()
 			print "Couldn't locate [%s]" % self.of, self.type
-			#DomPrint(0, self.parent.getRootOfDataMap())
+			DomPrint(0, self.parent.getRootOfDataMap())
 			raise Exception("Couldn't locate [%s]" % self.of)
 		
 		return obj
