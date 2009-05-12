@@ -98,7 +98,8 @@ class Element(object):
 		#: Name of Element, cannot include "."s
 		self.name = name
 		#: Parent of Element
-		self._parent = parent
+		self.parent = parent
+		#self._parent = parent
 		#: If element has children
 		self.hasChildren = False
 		#: Type of this element
@@ -112,21 +113,21 @@ class Element(object):
 		if self.name == None or len(self.name) == 0:
 			self.name = self.getUniqueName()
 	
-	def getParent(self):
-		return self._parent
-	def setParent(self, parent):
-		if self.name == "Lqcd" and parent == None and self.parent != None:
-			print "Setting Lqcd("+repr(self)+").parent is not null, setting to null"
-			#traceback.print_stack()
-		if self.name == "Lqcd" and parent == None:
-			print "Setting Lqcd("+repr(self)+").parent == None"
-			#traceback.print_stack()
-		elif self.name == "Lqcd" and parent != None:
-			print "Setting Lqcd("+repr(self)+").parent:", parent
-			#traceback.print_stack()
-		
-		self._parent = parent
-	parent = property(fget=getParent, fset=setParent)
+	#def getParent(self):
+	#	return self._parent
+	#def setParent(self, parent):
+	#	if self.name == "Lqcd" and parent == None and self.parent != None:
+	#		print "Setting Lqcd("+repr(self)+").parent is not null, setting to null"
+	#		#traceback.print_stack()
+	#	if self.name == "Lqcd" and parent == None:
+	#		print "Setting Lqcd("+repr(self)+").parent == None"
+	#		#traceback.print_stack()
+	#	elif self.name == "Lqcd" and parent != None:
+	#		print "Setting Lqcd("+repr(self)+").parent:", parent
+	#		#traceback.print_stack()
+	#	
+	#	self._parent = parent
+	#parent = property(fget=getParent, fset=setParent)
 	
 	def __deepcopy__(self, memo):
 		'''
@@ -1929,12 +1930,26 @@ class DataElement(Mutatable):
 			if r.type == 'when' or r.of == None:
 				continue
 			
+			# The last part of both names must match
+			# for it to ever be the same
+			if self.getLastNamePart(r.of) != self.name:
+				continue
+			
 			if r.getOfElement() == self:
 				relations.append(r)
 		
 		self._unFixRealParent(self)
 		return relations
 	
+	def getLastNamePart(self, name):
+		'''Return the last part of a name:
+		
+		foo.bar.hello -- return hello
+		'''
+		
+		names = name.split('.')
+		return names[-1]
+
 	def _genRelationsInDataModelFromHere(self, node = None):
 		'''
 		Instead of returning all relations starting with
