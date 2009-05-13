@@ -371,6 +371,7 @@ class DataCracker:
 		dom = None
 		curpos = None
 		maxOccurs = node.maxOccurs
+		minOccurs = node.minOccurs
 		name = node.name
 		goodLookAhead = None
 		hasCountRelation = False
@@ -583,6 +584,9 @@ class DataCracker:
 				
 				Debug(1, "@@@ Looping, occurs=%d, rating=%d" % (occurs, rating))
 		
+			if occurs < minOccurs:
+				rating = 4
+			
 			Debug(1, "@@@ Exiting While Loop")
 			
 		except:
