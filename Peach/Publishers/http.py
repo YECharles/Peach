@@ -33,8 +33,93 @@ Send something by HTTP.
 
 # $Id$
 
-import time, urllib2
+import time, urllib2, httplib, urllib
 from Peach.publisher import Publisher
+
+class HttpPost:
+	'''
+	This publisher can be called like a method including one or more
+	parameters to be sent.
+	
+	If called as a stream the data will be posted in the body.
+	'''
+	
+	def __init__(self, url):
+		#: Indicates which method should be called.
+		self.withNode = False
+		self.url = url
+		(self.scheme, self.netloc, self.path, self.query, self.frag) = httplib.urlsplit(url)
+		self.headers = { 'User-Agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)' }
+	
+	def connect(self):
+		pass
+	
+	def start(self):
+		'''
+		Change state such that send/receave will work.  For Tcp this
+		could be connecting to a remote host
+		'''
+		pass
+	
+	def stop(self):
+		'''
+		Change state such that send/receave will not work.  For Tcp this
+		could be closing a connection, for a file it might be closing the
+		file handle.
+		'''
+		pass
+	
+	def send(self, data):
+		'''
+		Publish some data
+		
+		@type	data: string
+		@param	data: Data to publish
+		'''
+		
+		req = urllib2.Request(self.url, data, self.headers)
+		urllib2.urlopen(req)
+	
+	def receive(self, size = None):
+		'''
+		Receive some data.
+		
+		@type	size: integer
+		@param	size: Number of bytes to return
+		@rtype: string
+		@return: data received
+		'''
+		raise PeachException("Action 'receive' not supported by publisher")
+	
+	def call(self, method, args):
+		'''
+		Call a method using arguments.
+		
+		@type	method: string
+		@param	method: Method to call
+		@type	args: Array
+		@param	args: Array of strings as arguments
+		@rtype: string
+		@return: data returned (if any)
+		'''
+		raise PeachException("Action 'call' not supported by publisher")
+
+	def property(self, property, value = None):
+		'''
+		Get or set property
+		
+		@type	property: string
+		@param	property: Name of method to invoke
+		@type	value: object
+		@param	value: Value to set.  If None, return property instead
+		'''
+		self.headers[property] = value
+	
+	def close(self):
+		'''
+		Close current stream/connection.
+		'''
+		pass
 
 class HttpDigestAuth(Publisher):
 	'''
