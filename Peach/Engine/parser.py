@@ -65,7 +65,7 @@ def PeachStr(s):
 	if s == None:
 		return None
 	
-	return str(s)
+	return unicode(s)
 
 class PeachResolver(SchemeRegistryResolver):
 	def __init__(self):
