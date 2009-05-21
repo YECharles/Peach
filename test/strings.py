@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 '''
 Several testcases around <String> and it's arguments.
 '''
@@ -110,6 +112,14 @@ class StringArraysTestCase(utils.PeachTcpTestCase):
 		self.peachUtils.RunPeachXml("stringsArrays.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == '1.0\n1.1\n1.2\n2.0\n2.1\n2.2\n3.0.1\n3.0.2\n3.1.1\n3.1.2\n3.2.1\n3.2.2\n4.0.1\n4.0.2\n4.1.1\n4.1.2\n4.2.1\n4.2.2\n', 'stringsArrays.xml failed, instead [%s]' % repr(ret)
+		
+class StringUtf8_1_TestCase(utils.PeachTcpTestCase):
+	
+	def runTest(self):
+		# Test
+		self.peachUtils.RunPeachXml("stringUtf8-1.xml")
+		ret = self.peachUtils.GetListenerData()
+		assert ret.decode('utf8') == u"∞HelloHowAreYou", 'stringUtf8-1.xml failed, instead [%s]' % repr(ret)
 		
 		
 if __name__ == "__main__":
