@@ -65,7 +65,7 @@ def PeachStr(s):
 	if s == None:
 		return None
 	
-	return unicode(s)
+	return str(s)
 
 class PeachResolver(SchemeRegistryResolver):
 	def __init__(self):
@@ -616,6 +616,58 @@ class ParseTemplate:
 				if len(value) == 1:
 					value = "0" + value
 
+				ret = ''
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += chr(int(match.group(2),16))
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
+				
+				return ret
+		
+		if value != None and (self._getAttribute(node, 'valueType') == 'string' or not node.hasAttributeNS(None, 'valueType')):
+			value = re.sub(r"([^\\])\\n", r"\1\n", value)
+			value = re.sub(r"([^\\])\\r", r"\1\r", value)
+			value = re.sub(r"([^\\])\\t", r"\1\t", value)
+			value = re.sub(r"([^\\])\\n", r"\1\n", value)
+			value = re.sub(r"([^\\])\\r", r"\1\r", value)
+			value = re.sub(r"([^\\])\\t", r"\1\t", value)
+			value = re.sub(r"^\\n", r"\n", value)
+			value = re.sub(r"^\\r", r"\r", value)
+			value = re.sub(r"^\\t", r"\t", value)
+			value = re.sub(r"\\\\", r"\\", value)
+
+		return value
+		
+	def GetValueFromNodeString(self, node):
+		'''
+		This one is specific to <String> elements.  We
+		want to preserve unicode characters.
+		'''
+		
+		value = None
+		type = 'literal'
+		
+		if node.hasAttributeNS(None, 'valueType'):
+			type = self._getAttribute(node, 'valueType')
+			if not (type == 'literal' or type == 'hex'):
+				type = 'literal'
+		
+		if node.hasAttributeNS(None, 'value'):
+			value = node.getAttributeNS(None, 'value')
+			
+			# Convert variouse forms of hex into a binary string
+			if type == 'hex':
+				
+				value = str(value)
+				
+				if len(value) == 1:
+					value = "0" + value
+				
 				ret = ''
 				
 				for i in range(len(self._regsHex)):
@@ -1599,11 +1651,9 @@ class ParseTemplate:
 		
 		# value
 		
-		string.defaultValue = PeachStr(self.GetValueFromNode(node))
+		string.defaultValue = self.GetValueFromNodeString(node)
 		string.valueType = self._getValueType(node)
-		#print "HandleString(%s): Before handletype: [%s]" % (string.name, string.defaultValue)
-		string.defaultValue = self._HandleValueType(string.defaultValue, string.valueType)
-		#print "HandleString(%s): After handletype: [%s]" % (string.name, string.defaultValue)
+		string.defaultValue = self._HandleValueTypeString(string.defaultValue, string.valueType)
 
 		# tokens
 		
@@ -2827,6 +2877,19 @@ class ParseTemplate:
 			return PeachStr(eval(value))
 		
 		return PeachStr(value)
+		
+	def _HandleValueTypeString(self, value, valueType):
+		'''
+		Handle types: string, literal, and hex
+		'''
+		
+		if not value or not valueType:
+			return None
+		
+		if valueType == 'literal':
+			return eval(value)
+		
+		return value
 		
 	
 	def HandleParam(self, node, parent):

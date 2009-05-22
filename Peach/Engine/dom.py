@@ -1101,10 +1101,10 @@ class DataElement(Mutatable):
 				fd = open(data.fileName+".peach", "rb+")
 				data = fd.read()
 				fd.close()
-			
+				
 				model = self.unpickleModel(data)
 				model.parent = self.parent
-			
+				
 				# Remove self and insert model
 				index = self.parent.index(self)
 				del self.parent[self.name]
@@ -1329,10 +1329,6 @@ class DataElement(Mutatable):
 					self.modelHasOffsetRelation = True
 					break
 			
-		## We always need a cache, it's used around more
-		#if self.relationCache != None or PeachModule.Engine.engine.Engine.relationsNew:
-		#	return
-		
 		# 1. Build list of all relations from here down
 		relations = self._getAllRelationsInDataModel(self, False)
 		
@@ -1363,12 +1359,6 @@ class DataElement(Mutatable):
 			if rStr not in self.relationCache:
 				self.relationCache.append(rStr)
 		
-		## Not sure why we are doing this, but I think we
-		## can skip it.  Certainly speeds up cache building :)
-		#for child in self._children:
-		#	
-		#	if isinstance(child, DataElement):
-		#		child.BuildRelationCache()
 	
 	def get_minOccurs(self):
 		minOccurs = self._minOccurs
