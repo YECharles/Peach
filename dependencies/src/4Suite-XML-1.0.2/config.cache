@@ -1,0 +1,16 @@
+[win-amd64-2.6]
+docdir = $prefix/Share/Doc/$name
+localedir = $prefix/Share/Locale
+pythonlibdir = $prefix/Lib/site-packages
+sysconfdir = $prefix/Share/Settings/$name
+exec_prefix = 
+libdir = $prefix/Share/$name
+datadir = $prefix/Share/$name
+localstatedir = $prefix/Share/$name
+prefix = 
+includedir = $prefix/Include/$name
+debug = False
+mandir = $prefix/Share/Help
+bindir = $prefix/Scripts
+compiler = 
+

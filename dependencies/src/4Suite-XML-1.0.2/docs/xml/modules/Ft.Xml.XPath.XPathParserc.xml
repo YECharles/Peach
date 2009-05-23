@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<module name="Ft.Xml.XPath.XPathParserc">
+  <modification-date>2009-05-18 15:41:45</modification-date>
+  <abstract/>
+  <description/>
+  <functions>
+    <function public="yes" name="XPathParserConsole" id="XPathParserConsole">
+      <abstract>XPathParserConsole()
+Starts an interactive parser console.</abstract>
+      <description/>
+      <arguments>
+        <unknown/>
+      </arguments>
+    </function>
+  </functions>
+</module>

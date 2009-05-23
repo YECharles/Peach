@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<module name="Ft.Lib._win32con">
+  <modification-date>2009-05-18 15:42:05</modification-date>
+  <abstract>Functions for accessing a Windows console.
+Copyright 2004 Fourthought, Inc. (USA).
+Detailed license and copyright information: http://4suite.org/COPYRIGHT
+Project home, documentation, distributions: http://4suite.org/</abstract>
+  <description/>
+  <functions>
+    <function public="yes" name="GetConsoleScreenBufferInfo" id="GetConsoleScreenBufferInfo">
+      <abstract/>
+      <description/>
+      <arguments>
+        <unknown>...</unknown>
+      </arguments>
+    </function>
+    <function public="yes" name="SetConsoleTextAttribute" id="SetConsoleTextAttribute">
+      <abstract/>
+      <description/>
+      <arguments>
+        <unknown>...</unknown>
+      </arguments>
+    </function>
+  </functions>
+  <globals>
+    <global public="yes" name="BACKGROUND" id="BACKGROUND">
+      <value>240</value>
+    </global>
+    <global public="yes" name="BACKGROUND_BLUE" id="BACKGROUND_BLUE">
+      <value>16</value>
+    </global>
+    <global public="yes" name="BACKGROUND_GREEN" id="BACKGROUND_GREEN">
+      <value>32</value>
+    </global>
+    <global public="yes" name="BACKGROUND_RED" id="BACKGROUND_RED">
+      <value>64</value>
+    </global>
+    <global public="yes" name="FOREGROUND" id="FOREGROUND">
+      <value>15</value>
+    </global>
+    <global public="yes" name="FOREGROUND_BLUE" id="FOREGROUND_BLUE">
+      <value>1</value>
+    </global>
+    <global public="yes" name="FOREGROUND_GREEN" id="FOREGROUND_GREEN">
+      <value>2</value>
+    </global>
+    <global public="yes" name="FOREGROUND_INTENSITY" id="FOREGROUND_INTENSITY">
+      <value>8</value>
+    </global>
+    <global public="yes" name="FOREGROUND_RED" id="FOREGROUND_RED">
+      <value>4</value>
+    </global>
+  </globals>
+</module>
