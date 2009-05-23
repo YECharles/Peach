@@ -170,7 +170,8 @@ class IncomingString3TestCase(utils.PeachSendAndRecvTestCase):
 		# Test
 		value = '123456789\0'
 		self.peachUtils.SetSendAndReceiveData(value)
-		self.peachUtils.RunPeachXml("incomingString3.xml")
+		#self.peachUtils.RunPeachXml("incomingString3.xml")
+		self.peachUtils.RunDebugPeachXml("incomingString3.xml")
 		ret = self.peachUtils.GetListenerData()
 		assert ret == value, 'incomingString3.xml failed, instead [%s]' % repr(ret)
 

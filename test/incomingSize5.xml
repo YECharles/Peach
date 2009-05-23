@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Peach xmlns="http://phed.org/2008/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://phed.org/2008/Peach ../../../../../peach/peach.xsd" version="1.0"
+	xsi:schemaLocation="http://phed.org/2008/Peach ../peach.xsd" version="1.0"
 	author="Michael Eddington" description="Hello World Example">
 	
 	<Include ns="default" src="file:defaults.xml" />
 	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="TestTemplate">
-		<Number size="16" signed="false">
+		<Number name="SizeOfTheBlock" size="16" signed="false">
 			<Relation type="size" of="TheBlock"/>
 		</Number>
 		

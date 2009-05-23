@@ -7,11 +7,11 @@
 	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="GetTemplate">
-		<String name="data" length="10" nullTerminated="true" />
+		<String name="data" length="9" nullTerminated="true" />
 	</DataModel>
 	
 	<DataModel name="EchoTemplate">
-		<String name="data" />
+		<Blob name="data" />
 	</DataModel>
 	
 	<StateModel name="TestState" initialState="Initial">

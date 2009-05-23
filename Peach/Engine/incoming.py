@@ -651,7 +651,7 @@ class DataCracker:
 					# double deleteing.
 					
 					try:
-						r.parent.__delitem__(r.name)
+						del r.parent[r.name]
 					except:
 						pass
 					
@@ -842,7 +842,7 @@ class DataCracker:
 					
 					# Add back our parent
 					node.parent = parent
-					node.realParent = None
+					delattr(node, "realParent")
 					node.pos = pos
 					node.rating = rating
 					
@@ -901,6 +901,20 @@ class DataCracker:
 		
 		node.relationOf = None
 		return (rating, pos)
+		
+	def _verifyParents(self, node):
+		
+		print node.name
+		if node.name == 'Lqcd':
+			print "Found Lqcd", node.parent
+		
+		for child in node:
+			if child.parent == None:
+				print "Child (%s) of (%s) has Null parent" % (child.name, node.name)
+			elif child.parent != node:
+				print "Child (%s) of (%s) has wrong parent" % (child.name, node.name)
+			
+			self._verifyParents(child)
 	
 	def _lookAhead(self, node, buff, pos, parent, minMax = True):
 		'''
@@ -931,10 +945,7 @@ class DataCracker:
 		origParent = parent
 		
 		## First lets copy the data model
-		
 		root = origNode.getRootOfDataMap().copy(None)
-		root._FixParents()
-		
 		node = root.findDataElementByName(origNode.getFullDataName())
 		sibling = self._nextNode(node)
 		
@@ -966,14 +977,6 @@ class DataCracker:
 				DataCracker._tabLevel -= 1
 				return rating
 				
-			#except NeedMoreData:
-			#	self.lookAheadDepth -= 1
-			#	if self.lookAheadDepth == 0:
-			#		self.lookAhead = False
-			#	
-			#	DataCracker._tabLevel -= 1
-			#	return 4
-		
 		## Now lets try that sibling if we can
 		
 		if sibling == None:

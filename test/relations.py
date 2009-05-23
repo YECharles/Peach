@@ -90,7 +90,7 @@ class RelationCount2TestCase(utils.PeachTcpTestCase):
 		# Test
 		self.peachUtils.RunPeachXml("relationsCount2.xml")
 		ret = self.peachUtils.GetListenerData()
-		assert ret == '4Hello World!Hello World!Hello World!Hello World!', 'relationsCount2.xml failed, instead [%s]' % repr(ret)
+		assert ret == '3Hello World!Hello World!Hello World!', 'relationsCount2.xml failed, instead [%s]' % repr(ret)
 
 class RelationCount3TestCase(utils.PeachTcpTestCase):
 	

@@ -977,7 +977,7 @@ class ParseTemplate:
 						raise PeachException("Error, default value for String.lengthType incorrect.")
 
 				if child.hasAttributeNS(None, 'padCharacter'):
-					String.defaultPadCharacter = self._getAttribute(child, 'padCharacter')
+					String.defaultPadCharacter = child.getAttributeNS(None, 'padCharacter')
 					
 				if child.hasAttributeNS(None, 'type'):
 					String.defaultType = self._getAttribute(child, 'type')
@@ -1665,9 +1665,9 @@ class ParseTemplate:
 		# padCharacter
 		
 		if node.hasAttributeNS(None, 'padCharacter'):
-			val = str(self._getAttribute(node, 'padCharacter'))
+			val = node.getAttributeNS(None, 'padCharacter')
 			val = val.replace("'", "\\'")
-			string.padCharacter = eval("'''" + val + "'''")
+			string.padCharacter = eval("u'''" + val + "'''")
 		
 		# type
 		
@@ -1682,9 +1682,6 @@ class ParseTemplate:
 			else:
 				string.type = type
 		
-		if string.type == 'wchar':
-			string.padCharacter = string.padCharacter * 2
-
 		# nullTerminated (optional)
 		
 		if node.hasAttributeNS(None, 'nullTerminated'):

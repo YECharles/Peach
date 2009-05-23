@@ -100,10 +100,13 @@ class Element(object):
 		#: Parent of Element
 		self.parent = parent
 		#self._parent = parent
+		
 		#: If element has children
 		self.hasChildren = False
+		
 		#: Type of this element
 		self.elementType = None
+		
 		#: Fullname cache
 		self.fullName = None
 		
@@ -112,7 +115,9 @@ class Element(object):
 		
 		if self.name == None or len(self.name) == 0:
 			self.name = self.getUniqueName()
-	
+
+	## The following are used for debugging purposes only
+	#
 	#def getParent(self):
 	#	return self._parent
 	#def setParent(self, parent):
@@ -490,8 +495,57 @@ class Element(object):
 	
 	def copy(self, parent):
 		
+		# We need to remove realParents before we can perform
+		# the copy and then replace then.
+		
+		while True:
+			# 1. Find root
+			
+			root = self
+			while root.parent != None:
+				root = root.parent
+			
+				# Catch the already "fixed" realParents
+				if hasattr(root, 'realParent') and root.realParent != None and root.parent != None:
+					root.realParent = object()
+			
+			# Current realParents
+			if hasattr(root, 'realParent') and root.realParent != None:
+				root.parent = root.realParent
+				root.realParent = object()
+			else:
+				break
+		
+		# Perform actual copy
+		
 		newSelf = deepcopy(self)
 		self._FixParents(newSelf, parent)
+
+		# replace realParent on origional node
+		realParents = []
+		root = self
+		while root.parent != None:
+			root = root.parent
+			
+			if hasattr(root, 'realParent') and root.realParent != None:
+				root.realParent = root.parent
+				realParents.append(root)
+		
+		for root in realParents:
+			root.parent = None
+		
+		# replace realParent on new node
+		realParents = []
+		root = newSelf
+		while root.parent != None:
+			root = root.parent
+			
+			if hasattr(root, 'realParent') and root.realParent != None:
+				root.realParent = root.parent
+				realParents.append(root)
+		
+		for root in realParents:
+			root.parent = None
 		
 		return newSelf
 	
@@ -1802,9 +1856,8 @@ class DataElement(Mutatable):
 						continue
 					
 					if type == None or r.type == type:
-						#print "Found of relation for", self.getFullDataName()
 						obj = self.findDataElementByName(r.From)
-					
+						
 						if obj == None:
 							raise Exception("Mismatched relations? Can't find r.From: '%s'" % r.From)
 						
@@ -1812,24 +1865,23 @@ class DataElement(Mutatable):
 							for rel in obj.relations:
 								if rel.type == type:
 									return rel
-					
+							
 							raise Exception("Mismatched relations???")
 						
 						for rel in obj.relations:
 							if rel.type == 'when':
 								continue
-					
+							
 							return rel
-			
+						
 						raise Exception("MIssmatched relations2???")
-		
-				#print "Not for", self.getFullDataName()
+				
 				return None
 			
 			if self.relationCache != None:
 				root = self.getRootOfDataMap()
 				name = self.getFullnameInDataModel()
-			
+				
 				if root.relationOfCache.has_key(name):
 					for r in root.relationOfCache[name]:
 						r = self.find(r)
@@ -1838,8 +1890,7 @@ class DataElement(Mutatable):
 
 				return None
 		
-			# Faster by some
-			#rel = cPeach.getRelationOfThisElement(self, type)
+			# Back to native python due to bug fixes
 			for r in self.getRelationsOfThisElement():
 				if r.type == type:
 					return r
@@ -1898,7 +1949,7 @@ class DataElement(Mutatable):
 
 		self._fixRealParent(self)
 		if self.relationCache != None:
-			#print "Using relation cache!"
+			print "getRelationsOfThisElement: Using relation cache!"
 			root = self.getRootOfDataMap()
 			name = self.getFullnameInDataModel()
 			
@@ -1911,18 +1962,17 @@ class DataElement(Mutatable):
 			self._unFixRealParent(self)
 			return relations
 		
-		for r in self._genRelationsInDataModelFromHere(self):
+		for r in self._genRelationsInDataModelFromHere(self, False):
 			# Huh, do we break something here?
 			if r.parent == None:
 				raise Exception("Relation with no parent!")
-				continue
 			
 			if r.type == 'when' or r.of == None:
 				continue
 			
-			# The last part of both names must match
-			# for it to ever be the same
-			if self.getLastNamePart(r.of) != self.name:
+			## The last part of both names must match
+			## for it to ever be the same
+			if r.of.split(".")[-1] != self.name:
 				continue
 			
 			if r.getOfElement() == self:
@@ -1940,7 +1990,7 @@ class DataElement(Mutatable):
 		names = name.split('.')
 		return names[-1]
 
-	def _genRelationsInDataModelFromHere(self, node = None):
+	def _genRelationsInDataModelFromHere(self, node = None, useCache = True):
 		'''
 		Instead of returning all relations starting with
 		root we will walk up looking for relations.
@@ -1951,18 +2001,20 @@ class DataElement(Mutatable):
 		
 		# Check if we are the top of the data model
 		if not isinstance(node.parent, DataElement):
-			for r in self._getAllRelationsInDataModel(node):
+			for r in self._getAllRelationsInDataModel(node, useCache):
 				if r == None:
 					continue
+				print "r", r.parent.name
 				yield r
 			
 		else:
 			# If not start searching
 			cur = node.parent
 			while cur != None and isinstance(cur, DataElement):
-				for r in self._getAllRelationsInDataModel(cur):
+				for r in self._getAllRelationsInDataModel(cur, useCache):
 					if r == None:
 						continue
+					
 					yield r
 				
 				cur = cur.parent
@@ -1985,8 +2037,6 @@ class DataElement(Mutatable):
 				
 				if obj == None:
 					continue
-					#print "Can't find:",s,parentName
-					#DomPrint(0, root)
 				
 				for r in obj:
 					if r.name == relName:
@@ -1996,13 +2046,11 @@ class DataElement(Mutatable):
 		
 		for r in node.relations:
 			if r.From == None:
-				#print "_getAllRelationsInDataModel: Yielding self"
 				yield r
 		
-		if isinstance(node, DataElement):
-			for child in node._children:
+		for child in node._children:
+			if isinstance(child,DataElement):
 				for r in self._getAllRelationsInDataModel(child, useCache):
-					#print "_getAllRelationsInDataModel: Yielding"
 					yield r
 	
 	def isArray(self):
