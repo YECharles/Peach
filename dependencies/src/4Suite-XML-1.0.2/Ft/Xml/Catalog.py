@@ -579,9 +579,10 @@ def GetDefaultCatalog(basename='default.cat'):
                     sys.stderr.flush()
                 catalog.catalogs.append(Catalog(uri, quiet))
         except UriException, e:
-            warnings.warn("Catalog resource (%s) disabled: %s" % (uri,
-                                                                  e.message),
-                          FtWarning)
+            #warnings.warn("Catalog resource (%s) disabled: %s" % (uri,
+            #                                                      e.message),
+            #              FtWarning)
+            pass
 
     if not quiet:
         sys.stderr.write('Done. Result is %r\n' % catalog)
