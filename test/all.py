@@ -2,6 +2,10 @@
 Run all of the unit tests
 '''
 
+import warnings, exceptions
+## Note: this will disable all deprication warnings!  For v2.6 compat.
+warnings.filterwarnings('ignore', message='', category=exceptions.DeprecationWarning)
+
 import sys
 
 #if sys.version.find("AMD64") > -1:

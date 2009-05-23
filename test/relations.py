@@ -12,8 +12,8 @@ def suite():
 	suite.addTest(RelationSize3TestCase())
 	suite.addTest(RelationSize4TestCase())
 	suite.addTest(RelationSize5TestCase())
-	#suite.addTest(RelationSize6TestCase())
-	#suite.addTest(RelationSize7TestCase())
+	##suite.addTest(RelationSize6TestCase())
+	##suite.addTest(RelationSize7TestCase())
 	suite.addTest(RelationCount1TestCase())
 	suite.addTest(RelationCount2TestCase())
 	suite.addTest(RelationCount3TestCase())
@@ -60,21 +60,21 @@ class RelationSize5TestCase(utils.PeachTcpTestCase):
 		ret = self.peachUtils.GetListenerData()
 		assert ret == '\x0B1234567890', 'relationsSize5.xml failed, instead [%s]' % repr(ret)
 
-class RelationSize6TestCase(utils.PeachTcpTestCase):
-	
-	def runTest(self):
-		# Test
-		self.peachUtils.RunPeachXml("relationsSize6.xml")
-		ret = self.peachUtils.GetListenerData()
-		assert ret == '60Hello World!Hello World!Hello World!Hello World!Hello World!', 'relationsSize6.xml failed, instead [%s]' % repr(ret)
-
-class RelationSize7TestCase(utils.PeachTcpTestCase):
-	
-	def runTest(self):
-		# Test
-		self.peachUtils.RunPeachXml("relationsSize7.xml")
-		ret = self.peachUtils.GetListenerData()
-		assert ret == '36Hello World!Hello World!Hello World!', 'relationsSize7.xml failed, instead [%s]' % repr(ret)
+#class RelationSize6TestCase(utils.PeachTcpTestCase):
+#	
+#	def runTest(self):
+#		# Test
+#		self.peachUtils.RunPeachXml("relationsSize6.xml")
+#		ret = self.peachUtils.GetListenerData()
+#		assert ret == '60Hello World!Hello World!Hello World!Hello World!Hello World!', 'relationsSize6.xml failed, instead [%s]' % repr(ret)
+#
+#class RelationSize7TestCase(utils.PeachTcpTestCase):
+#	
+#	def runTest(self):
+#		# Test
+#		self.peachUtils.RunPeachXml("relationsSize7.xml")
+#		ret = self.peachUtils.GetListenerData()
+#		assert ret == '36Hello World!Hello World!Hello World!', 'relationsSize7.xml failed, instead [%s]' % repr(ret)
 
 class RelationCount1TestCase(utils.PeachTcpTestCase):
 	

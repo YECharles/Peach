@@ -21,7 +21,7 @@
 			<Action type="connect" />
 			
 			<Action type="output" name="SendTest">
-				<DataModel ref="TestTemplate" />
+				<DataModel name="TestTemplate" ref="TestTemplate" />
 			</Action>			
 			
 			<Action type="close" />
