@@ -75,7 +75,20 @@ class XmlAnalyzer(Analyzer):
 		
 		Should return a DataElement such as Block, Number or String.
 		'''
-		raise Exception("asDataElement not supported")
+		
+		dom = _Xml2Dom().xml2Dom(dataBuffer)
+		
+		# Replace parent with new dom
+		
+		dom.name = parent.name
+		parentOfParent = parent.parent
+		
+		indx = parentOfParent.index(parent)
+		del parentOfParent[parent.name]
+		parentOfParent.insert(indx, dom)
+		
+		# now just cross our fingers :)
+		
 	
 	def asCommandLine(self, args):
 		'''
@@ -253,12 +266,6 @@ class _Xml2Peach(object):
 		if doc == None:
 			doc = parent
 
-		#print "--- Attributes ---"
-		#if node.attributes != None:
-		#	for attrib in node.attributes:
-		#		print attrib, node.attributes[attrib]
-		#print "------------------"
-		
 		## Element
 		
 		element = doc.createElementNS(None, "XmlElement")
@@ -315,6 +322,92 @@ class _Xml2Peach(object):
 		string = doc.createElementNS(None, "String")
 		string.setAttributeNS(None, "value", attribObj.value)
 		element.appendChild(string)
+		
+		return element
+	
+class _Xml2Dom(object):
+	'''
+	Convert an XML Documnet into Peach DOM
+	'''
+	
+	def xml2Dom(self, data):
+		doc = Ft.Xml.Parse(data)
+		root = self.handleElement(doc.firstChild, None)
+		
+		return root
+		
+	def handleElement(self, node, parent):
+		'''
+		Handle an XML element, children and attributes.
+		Returns an XmlElement object.
+		'''
+		
+		doc = parent.ownerDocument
+		if doc == None:
+			doc = parent
+
+		## Element
+		
+		element = XmlElement(None, parent)
+		element.elementName = node.nodeName
+		
+		if node.namespaceURI != None:
+			element.xmlNamespace = node.namespaceURI
+		
+		## Element attributes
+		
+		if node.attributes != None:
+			for attrib in node.attributes:
+				attribElement = self.handleAttribute(attrib, node.attributes[attrib], element)
+				element.append(attribElement)
+		
+		## Element children
+		
+		for child in node.childNodes:
+			if child.nodeName == "#text":
+				if len(child.nodeValue.strip('\n\r\t\x10 ')) > 0:
+					# This is node's value!
+					string = String(None, element)
+					string.defaultValue = child.nodeValue
+					element.append(string)
+					
+					# Look like a number? then add correct hint :)
+					try:
+						i = long(string.defaultValue)
+						hint = Hint("NumericalString", string)
+						hint.value = "true"
+						string.hints.append(hint)
+					except:
+						pass
+				
+			elif child.nodeName == "#comment":
+				# xml comment
+				pass
+			
+			else:
+				childElement = self.handleElement(child, element)
+				element.append(childElement)
+		
+		return element
+	
+	def handleAttribute(self, attrib, attribObj, parent):
+		'''
+		Handle an XML attribute.   Returns an XmlAttribute object.
+		'''
+		
+		## Attribute
+		
+		element = XmlAttribute(None, parent)
+		element.attributeName = attribObj.name
+		
+		if attrib[0] != None:
+			element.xmlNamespace = attrib[0]
+		
+		## Attribute value
+		
+		string = String(None, element)
+		string.defaultValue = attribObj.value
+		element.append(string)
 		
 		return element
 	

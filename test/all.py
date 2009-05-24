@@ -34,7 +34,7 @@ import flags
 import data
 import state
 import blobs
-import numbers
+import numberz
 import strings
 import parsing
 import unittest
@@ -55,7 +55,7 @@ allModules = [
 	flags,
 	data,
 	blobs,
-	numbers,
+	numberz,
 	strings,
 	# These are slow and should be last.
 	#mutators,

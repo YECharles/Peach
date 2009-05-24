@@ -71,9 +71,6 @@ but already exposes several abilities to the end-user such as performing
 simple fuzzer runs, converting WireShark captures into Peach XML and
 performing parsing tests of Peach XML files.
 
-All features exposed by this interface can also be accessed via the
-Python API.
-
 Please submit any bugs to Michael Eddington <mike@phed.org>.
 
 Syntax:
