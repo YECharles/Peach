@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3 Beta 1"
-  OutFile "Peach-2.3-BETA1-py.exe"
+  Name "Peach 2.3 Beta 2"
+  OutFile "Peach-2.3-BETA2-py25.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"

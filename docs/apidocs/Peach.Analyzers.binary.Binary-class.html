@@ -61,26 +61,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Binary</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Analyzers.binary-pysrc.html#Binary">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_an_2" name="uml_class_diagram_for_peach_an_2">
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html" title="Analyzes binary blobs to build data models" alt="" coords="16,99,296,344"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#supportParser" title="Does analyzer support asParser()" alt="" coords="17,116,295,135"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#supportDataElement" title="Does analyzer support asDataElement()" alt="" coords="17,135,295,153"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#supportCommandLine" title="Does analyzer support asCommandLine()" alt="" coords="17,153,295,172"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#supportTopLevel" title="Does analyzer support asTopLevel()" alt="" coords="17,172,295,191"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#__init__" title="x.__init__(...) initializes x; see x.__class__.__doc__ for signature" alt="" coords="17,193,295,212"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#locateStrings" title="Peach.Analyzers.binary.Binary.locateStrings" alt="" coords="17,212,295,231"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#locateStringLengths" title="Peach.Analyzers.binary.Binary.locateStringLengths" alt="" coords="17,231,295,249"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#locateCompressedSegments" title="Peach.Analyzers.binary.Binary.locateCompressedSegments" alt="" coords="17,249,295,268"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#analyzeBlob" title="Will analyze a binary blob and return a Block data element containing the  split up blob." alt="" coords="17,268,295,287"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#asDataElement" title="Called when Analyzer is used in a data model." alt="" coords="17,287,295,305"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#asCommandLine" title="Called when Analyzer is used from command line." alt="" coords="17,305,295,324"/>
-<area shape="rect" href="Peach.Analyzers.binary.Binary&#45;class.html#asTopLevel" title="Called when Analyzer is used from top level." alt="" coords="17,324,295,343"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html" title="Analyzers produce data and state models." alt="" coords="99,11,213,69"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#DefaultParser" title="Default parser analyzer to use" alt="" coords="100,28,212,47"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#asParser" title="Called when Analyzer is used as default PIT parser." alt="" coords="100,49,212,68"/>
-</map>
-  <img src="uml_class_diagram_for_peach_an_2.gif" alt='' usemap="#uml_class_diagram_for_peach_an_2" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Analyzes binary blobs to build data models</p>
@@ -267,6 +248,7 @@
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
@@ -274,7 +256,9 @@
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -300,32 +284,28 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportParser"></a><span class="summary-name">supportParser</span> = <code title="False">False</code><br />
-      Does analyzer support asParser()
+        <a name="supportParser"></a><span class="summary-name">supportParser</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportDataElement"></a><span class="summary-name">supportDataElement</span> = <code title="True">True</code><br />
-      Does analyzer support asDataElement()
+        <a name="supportDataElement"></a><span class="summary-name">supportDataElement</span> = <code title="True">True</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportCommandLine"></a><span class="summary-name">supportCommandLine</span> = <code title="False">False</code><br />
-      Does analyzer support asCommandLine()
+        <a name="supportCommandLine"></a><span class="summary-name">supportCommandLine</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportTopLevel"></a><span class="summary-name">supportTopLevel</span> = <code title="True">True</code><br />
-      Does analyzer support asTopLevel()
+        <a name="supportTopLevel"></a><span class="summary-name">supportTopLevel</span> = <code title="True">True</code>
     </td>
   </tr>
   <tr>
@@ -512,7 +492,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:42 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:07 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

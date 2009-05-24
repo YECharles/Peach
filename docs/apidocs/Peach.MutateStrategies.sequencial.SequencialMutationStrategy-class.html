@@ -61,18 +61,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class SequencialMutationStrategy</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.MutateStrategies.sequencial-pysrc.html#SequencialMutationStrategy">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_mu_4" name="uml_class_diagram_for_peach_mu_4">
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html" title="Perform a sequencial mutation strategy." alt="" coords="16,72,304,205"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#isFinite" title="Is this a finite strategy?" alt="" coords="17,89,303,108"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#__init__" title="Peach.MutateStrategies.sequencial.SequencialMutationStrategy.__init__" alt="" coords="17,111,303,129"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#getCount" title="Return the number of test cases" alt="" coords="17,129,303,148"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#next" title="Peach.MutateStrategies.sequencial.SequencialMutationStrategy.next" alt="" coords="17,148,303,167"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#currentMutator" title="Return the current Mutator in use" alt="" coords="17,167,303,185"/>
-<area shape="rect" href="Peach.MutateStrategies.sequencial.SequencialMutationStrategy&#45;class.html#onDataModelGetValue" title="Called before getting a value from a data model" alt="" coords="17,185,303,204"/>
-<area shape="rect" href="javascript:void(0);" title="??&#45;564" alt="" coords="137,11,183,43"/>
-</map>
-  <img src="uml_class_diagram_for_peach_mu_4.gif" alt='' usemap="#uml_class_diagram_for_peach_mu_4" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Perform a sequencial mutation strategy.</p>
@@ -183,98 +172,6 @@
     </td>
   </tr>
 </table>
-<!-- ==================== INSTANCE VARIABLES ==================== -->
-<a name="section-InstanceVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Instance Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-InstanceVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="isFinite"></a><span class="summary-name">isFinite</span><br />
-      Is this a finite strategy?
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_count"></a><span class="summary-name">_count</span><br />
-      Number of fields to change
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_dataModels"></a><span class="summary-name">_dataModels</span><br />
-      Data models (by fullname)
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_dataModelFields"></a><span class="summary-name">_dataModelFields</span><br />
-      Data fields (key is data model fullname, value is array of data 
-      names)
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_fieldMutators"></a><span class="summary-name">_fieldMutators</span><br />
-      Key is field fullname, value is array of mutators, position 0 is 
-      current
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_isFirstTestCase"></a><span class="summary-name">_isFirstTestCase</span><br />
-      Is initial test case?
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_dataModelIndex"></a><span class="summary-name">_dataModelIndex</span><br />
-      Data model selected for change
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_fieldIndex"></a><span class="summary-name">_fieldIndex</span><br />
-      Current data model field
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_mutatorIndex"></a><span class="summary-name">_mutatorIndex</span><br />
-      Current mutator for field
-    </td>
-  </tr>
-</table>
 <!-- ==================== METHOD DETAILS ==================== -->
 <a name="section-MethodDetails"></a>
 <table class="details" border="1" cellpadding="3"
@@ -351,7 +248,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:55 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:09 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

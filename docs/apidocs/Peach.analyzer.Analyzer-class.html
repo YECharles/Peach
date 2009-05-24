@@ -59,21 +59,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Analyzer</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.analyzer-pysrc.html#Analyzer">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_an_11" name="uml_class_diagram_for_peach_an_11">
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html" title="Analyzers produce data and state models." alt="" coords="16,11,296,219"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#DefaultParser" title="Default parser analyzer to use" alt="" coords="17,28,295,47"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#supportParser" title="Does analyzer support asParser()" alt="" coords="17,47,295,65"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#supportDataElement" title="Does analyzer support asDataElement()" alt="" coords="17,65,295,84"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#supportCommandLine" title="Does analyzer support asCommandLine()" alt="" coords="17,84,295,103"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#supportTopLevel" title="Does analyzer support asTopLevel()" alt="" coords="17,103,295,121"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#__init__" title="x.__init__(...) initializes x; see x.__class__.__doc__ for signature" alt="" coords="17,124,295,143"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#asParser" title="Called when Analyzer is used as default PIT parser." alt="" coords="17,143,295,161"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#asDataElement" title="Called when Analyzer is used in a data model." alt="" coords="17,161,295,180"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#asCommandLine" title="Called when Analyzer is used from command line." alt="" coords="17,180,295,199"/>
-<area shape="rect" href="Peach.analyzer.Analyzer&#45;class.html#asTopLevel" title="Called when Analyzer is used from top level." alt="" coords="17,199,295,217"/>
-</map>
-  <img src="uml_class_diagram_for_peach_an_11.gif" alt='' usemap="#uml_class_diagram_for_peach_an_11" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Analyzers produce data and state models.  Examples of analyzers would 
@@ -193,6 +179,7 @@
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
@@ -200,7 +187,9 @@
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -226,40 +215,35 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="DefaultParser"></a><span class="summary-name">DefaultParser</span> = <code title="None">None</code><br />
-      Default parser analyzer to use
+        <a name="DefaultParser"></a><span class="summary-name">DefaultParser</span> = <code title="None">None</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportParser"></a><span class="summary-name">supportParser</span> = <code title="False">False</code><br />
-      Does analyzer support asParser()
+        <a name="supportParser"></a><span class="summary-name">supportParser</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportDataElement"></a><span class="summary-name">supportDataElement</span> = <code title="False">False</code><br />
-      Does analyzer support asDataElement()
+        <a name="supportDataElement"></a><span class="summary-name">supportDataElement</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportCommandLine"></a><span class="summary-name">supportCommandLine</span> = <code title="False">False</code><br />
-      Does analyzer support asCommandLine()
+        <a name="supportCommandLine"></a><span class="summary-name">supportCommandLine</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="supportTopLevel"></a><span class="summary-name">supportTopLevel</span> = <code title="False">False</code><br />
-      Does analyzer support asTopLevel()
+        <a name="supportTopLevel"></a><span class="summary-name">supportTopLevel</span> = <code title="False">False</code>
     </td>
   </tr>
 </table>
@@ -453,7 +437,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:54:01 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:10 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

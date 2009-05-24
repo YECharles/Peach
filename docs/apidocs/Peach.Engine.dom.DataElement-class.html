@@ -60,75 +60,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class DataElement</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_en_15" name="uml_class_diagram_for_peach_en_15">
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html" title="Data elements compose the Data Modle." alt="" coords="17,803,271,1384"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#isPointer" title="Is this a ctypes pointer to something? (Defaults to False)" alt="" coords="19,820,269,839"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#pointerDepth" title="What is out pointer depth? (e.g." alt="" coords="19,839,269,857"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#constraint" title="Optional constraint used during data cracking, python expression" alt="" coords="19,857,269,876"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#isMutable" title="Should element be mutated?" alt="" coords="19,876,269,895"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#modelHasOffsetRelation" title="Does data model have an offset relation?" alt="" coords="19,895,269,913"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#relationCache" title="Cache of relation, list of full data names (String) of each relation from  here down." alt="" coords="19,913,269,932"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#relationOfCache" title="Key is full data name of &quot;of&quot; element (string), value is list of relation  full data names (String)." alt="" coords="19,932,269,951"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#onArrayNext" title="Event that occurs prior to parsing the next array element." alt="" coords="19,951,269,969"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#transformer" title="Transformers to apply" alt="" coords="19,969,269,988"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#fixup" title="Fixup if any" alt="" coords="19,988,269,1007"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#placement" title="Placement if any" alt="" coords="19,1007,269,1025"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#relations" title="Relations this element has" alt="" coords="19,1025,269,1044"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#occurs" title="Fixed occurs" alt="" coords="19,1044,269,1063"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#maxOccurs" title="Maximum occurences (property)" alt="" coords="19,1081,269,1100"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#__init__" title="x.__init__(...) initializes x; see x.__class__.__doc__ for signature" alt="" coords="19,1103,269,1121"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#get_pos" title="Getter for pos property." alt="" coords="19,1121,269,1140"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#set_pos" title="Setter for pos property" alt="" coords="19,1140,269,1159"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#get_possiblePos" title="Getter for pos property." alt="" coords="19,1159,269,1177"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#set_possiblePos" title="Setter for pos property" alt="" coords="19,1177,269,1196"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#asCType" title="Returns a ctypes module type for this DataElement." alt="" coords="19,1196,269,1215"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#pickleModel" title="Peach.Engine.dom.DataElement.pickleModel" alt="" coords="19,1215,269,1233"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#unpickleModel" title="Peach.Engine.dom.DataElement.unpickleModel" alt="" coords="19,1233,269,1252"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#setDefaults" title="Set data elements defaultValue based on a Data object." alt="" coords="19,1252,269,1271"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#BuildFullNameCache" title="Figure out our fullname and fullname in data model" alt="" coords="19,1271,269,1289"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#BuildRelationCache" title="Build the relation cache for this data element and it&#39;s children." alt="" coords="19,1289,269,1308"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#get_minOccurs" title="Peach.Engine.dom.DataElement.get_minOccurs" alt="" coords="19,1308,269,1327"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#set_minOccurs" title="Peach.Engine.dom.DataElement.set_minOccurs" alt="" coords="19,1327,269,1345"/>
-<area shape="rect" href="Peach.Engine.dom.DataElement&#45;class.html#calcLength" title="Calculate length" alt="" coords="19,1364,269,1383"/>
-<area shape="rect" href="Peach.Engine.dom.Mutatable&#45;class.html" title="To mark a DOM object as mutatable(fuzzable) or not" alt="" coords="72,728,216,773"/>
-<area shape="rect" href="Peach.Engine.dom.Mutatable&#45;class.html#setMutable" title="Update this element and all childrens isMutable." alt="" coords="73,753,215,772"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html" title="Element in our template tree." alt="" coords="40,11,248,349"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#name" title="Name of Element, cannot include &quot;.&quot;s" alt="" coords="41,28,247,47"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#parent" title="Parent of Element" alt="" coords="41,47,247,65"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#hasChildren" title="If element has children" alt="" coords="41,65,247,84"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#elementType" title="Type of this element" alt="" coords="41,84,247,103"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#fullName" title="Fullname cache" alt="" coords="41,103,247,121"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#node" title="Our XML node" alt="" coords="41,121,247,140"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#ref" title="The reference that made us, or None" alt="" coords="41,140,247,159"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#GuidRegex" title="Peach.Engine.dom.Element.GuidRegex" alt="" coords="41,159,247,177"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#__deepcopy__" title="Copying objects in our DOM is a crazy business." alt="" coords="41,180,247,199"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getUniqueName" title="Provide a unique default name for elements." alt="" coords="41,199,247,217"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullDataName" title="Return fully qualified name inside of data map" alt="" coords="41,217,247,236"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getRoot" title="Get the root of this DOM tree" alt="" coords="41,236,247,255"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#compareTree" title="This method will compare two ElementWithChildren object tree&#39;s." alt="" coords="41,255,247,273"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#copy" title="Peach.Engine.dom.Element.copy" alt="" coords="41,273,247,292"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullname" title="Peach.Engine.dom.Element.getFullname" alt="" coords="41,292,247,311"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#nextSibling" title="Get the next sibling or return None" alt="" coords="41,311,247,329"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#previousSibling" title="Get the prior sibling or return None" alt="" coords="41,329,247,348"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html" title="Contains functions that cause Element to act as a hash table and array for children." alt="" coords="16,379,272,699"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#children" title="Children object, has children as attributes by name" alt="" coords="17,396,271,415"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#getByName" title="Internal helper method, not for use!" alt="" coords="17,417,271,436"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#getElementsByType" title="Will return array of a specific type in the tree starting with us." alt="" coords="17,436,271,455"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#printDomMap" title="Print out a map of the dom." alt="" coords="17,455,271,473"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#verifyDomMap" title="Verify parent child relationship across DOM Tree" alt="" coords="17,473,271,492"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#toXmlDom" title="Convert to an XML DOM boject tree for use in xpath queries." alt="" coords="17,492,271,511"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#toXmlDomLight" title="Convert to an XML DOM boject tree for use in xpath queries." alt="" coords="17,511,271,529"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#updateFromXmlDom" title="Update our object based on an XML DOM object." alt="" coords="17,529,271,548"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#append" title="Peach.Engine.dom.ElementWithChildren.append" alt="" coords="17,548,271,567"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#index" title="Peach.Engine.dom.ElementWithChildren.index" alt="" coords="17,567,271,585"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#insert" title="Peach.Engine.dom.ElementWithChildren.insert" alt="" coords="17,585,271,604"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#firstChild" title="Peach.Engine.dom.ElementWithChildren.firstChild" alt="" coords="17,604,271,623"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#lastChild" title="Peach.Engine.dom.ElementWithChildren.lastChild" alt="" coords="17,623,271,641"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#has_key" title="Peach.Engine.dom.ElementWithChildren.has_key" alt="" coords="17,641,271,660"/>
-<area shape="rect" href="Peach.Engine.dom.ElementWithChildren&#45;class.html#__contains__" title="Peach.Engine.dom.ElementWithChildren.__contains__" alt="" coords="17,679,271,697"/>
-</map>
-  <img src="uml_class_diagram_for_peach_en_15.gif" alt='' usemap="#uml_class_diagram_for_peach_en_15" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Data elements compose the Data Modle.  This is the base class for 
@@ -165,6 +97,138 @@
       x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_DefaultValue"></a><span class="summary-sig-name">get_DefaultValue</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.get_DefaultValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="set_DefaultValue"></a><span class="summary-sig-name">set_DefaultValue</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">value</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.set_DefaultValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_CurrentValue"></a><span class="summary-sig-name">get_CurrentValue</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.get_CurrentValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="set_CurrentValue"></a><span class="summary-sig-name">set_CurrentValue</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">value</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.set_CurrentValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_Value"></a><span class="summary-sig-name">get_Value</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.get_Value">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="set_Value"></a><span class="summary-sig-name">set_Value</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">value</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.set_Value">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_FinalValue"></a><span class="summary-sig-name">get_FinalValue</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.get_FinalValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="set_FinalValue"></a><span class="summary-sig-name">set_FinalValue</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">value</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.set_FinalValue">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -788,6 +852,23 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="getAllPlacementsInDataModel"></a><span class="summary-sig-name">getAllPlacementsInDataModel</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      As the name says, recurse looking for placements</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.getAllPlacementsInDataModel">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="getDataElementByName"></a><span class="summary-sig-name">getDataElementByName</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">name</span>)</span><br />
       Get an element relative to here with a qualified name</td>
@@ -824,10 +905,45 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="getRelationByName"></a><span class="summary-sig-name">getRelationByName</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.getRelationByName">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="getRelationsOfThisElement"></a><span class="summary-sig-name">getRelationsOfThisElement</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Locate and return a relation of this element.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.getRelationsOfThisElement">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Engine.dom.DataElement-class.html#getLastNamePart" class="summary-sig-name">getLastNamePart</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>)</span><br />
+      Return the last part of a name:</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.getLastNamePart">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -842,7 +958,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="_genRelationsInDataModelFromHere"></a><span class="summary-sig-name">_genRelationsInDataModelFromHere</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">node</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">node</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">useCache</span>=<span class="summary-sig-default">True</span>)</span><br />
       Instead of returning all relations starting with root we will walk up
       looking for relations.</td>
           <td align="right" valign="top">
@@ -1204,7 +1321,8 @@
       <code><a href="Peach.Engine.dom.Element-class.html#getFullname">getFullname</a></code>,
       <code><a href="Peach.Engine.dom.Element-class.html#getRoot">getRoot</a></code>,
       <code><a href="Peach.Engine.dom.Element-class.html#nextSibling">nextSibling</a></code>,
-      <code><a href="Peach.Engine.dom.Element-class.html#previousSibling">previousSibling</a></code>
+      <code><a href="Peach.Engine.dom.Element-class.html#previousSibling">previousSibling</a></code>,
+      <code><a href="Peach.Engine.dom.Element-class.html#updateRelationParents">updateRelationParents</a></code>
       </p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b> (private):
       <code><a href="Peach.Engine.dom.Element-class.html#_FixParents" onclick="show_private();">_FixParents</a></code>,
@@ -1215,6 +1333,7 @@
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
@@ -1222,7 +1341,9 @@
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -1273,6 +1394,34 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="defaultValue"></a><span class="summary-name">defaultValue</span> = <code title="property(get_DefaultValue, set_DefaultValue, None)">property(get_DefaultValue, set_DefaultValue, None)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="currentValue"></a><span class="summary-name">currentValue</span> = <code title="property(get_CurrentValue, set_CurrentValue, None)">property(get_CurrentValue, set_CurrentValue, None)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="value"></a><span class="summary-name">value</span> = <code title="property(get_Value, set_Value, None)">property(get_Value, set_Value, None)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="finalValue"></a><span class="summary-name">finalValue</span> = <code title="property(get_FinalValue, set_FinalValue, None)">property(get_FinalValue, set_FinalValue, None)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="pos"></a><span class="summary-name">pos</span> = <code title="property(get_pos, set_pos, None)">property(get_pos, set_pos, None)</code>
     </td>
   </tr>
@@ -1287,16 +1436,14 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="minOccurs"></a><span class="summary-name">minOccurs</span> = <code title="property(get_minOccurs, set_minOccurs)">property(get_minOccurs, set_minOccurs)</code><br />
-      Minimum occurences (property)
+        <a name="minOccurs"></a><span class="summary-name">minOccurs</span> = <code title="property(get_minOccurs, set_minOccurs)">property(get_minOccurs, set_minOccurs)</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="maxOccurs"></a><span class="summary-name">maxOccurs</span> = <code title="property(get_maxOccurs, set_maxOccurs)">property(get_maxOccurs, set_maxOccurs)</code><br />
-      Maximum occurences (property)
+        <a name="maxOccurs"></a><span class="summary-name">maxOccurs</span> = <code title="property(get_maxOccurs, set_maxOccurs)">property(get_maxOccurs, set_maxOccurs)</code>
     </td>
   </tr>
   <tr>
@@ -1324,161 +1471,6 @@
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="isPointer"></a><span class="summary-name">isPointer</span><br />
-      Is this a ctypes pointer to something? (Defaults to False)
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="Peach.Engine.dom.DataElement-class.html#pointerDepth" class="summary-name">pointerDepth</a><br />
-      What is out pointer depth? (e.g.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="constraint"></a><span class="summary-name">constraint</span><br />
-      Optional constraint used during data cracking, python expression
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="isMutable"></a><span class="summary-name">isMutable</span><br />
-      Should element be mutated?
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="modelHasOffsetRelation"></a><span class="summary-name">modelHasOffsetRelation</span><br />
-      Does data model have an offset relation?
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="Peach.Engine.dom.DataElement-class.html#relationCache" class="summary-name">relationCache</a><br />
-      Cache of relation, list of full data names (String) of each relation 
-      from here down.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="Peach.Engine.dom.DataElement-class.html#relationOfCache" class="summary-name">relationOfCache</a><br />
-      Key is full data name of &quot;of&quot; element (string), value is 
-      list of relation full data names (String).
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="onArrayNext"></a><span class="summary-name">onArrayNext</span><br />
-      Event that occurs prior to parsing the next array element.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="transformer"></a><span class="summary-name">transformer</span><br />
-      Transformers to apply
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="fixup"></a><span class="summary-name">fixup</span><br />
-      Fixup if any
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="placement"></a><span class="summary-name">placement</span><br />
-      Placement if any
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="relations"></a><span class="summary-name">relations</span><br />
-      Relations this element has
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="occurs"></a><span class="summary-name">occurs</span><br />
-      Fixed occurs
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_minOccurs"></a><span class="summary-name">_minOccurs</span><br />
-      Minimum occurences
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_maxOccurs"></a><span class="summary-name">_maxOccurs</span><br />
-      Maximum occurences
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="defaultValue"></a><span class="summary-name">defaultValue</span><br />
-      Default value to use
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="currentValue"></a><span class="summary-name">currentValue</span><br />
-      Override default value
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="value"></a><span class="summary-name">value</span><br />
-      Current value
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="when"></a><span class="summary-name">when</span><br />
-      Expression used by data cracker to determin if element should be 
-      included in cracking.
-    </td>
-  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -1519,46 +1511,6 @@
       The max occurences in the array
     </td>
   </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_pos"></a><span class="summary-name">_pos</span><br />
-      Position in data stream item was parsed at
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="rating"></a><span class="summary-name">rating</span><br />
-      Parse rating for element
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="isStatic"></a><span class="summary-name">isStatic</span><br />
-      Is this element a static token?
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="relationStringBuffer"></a><span class="summary-name">relationStringBuffer</span><br />
-      A StringBuffer used to determin offset relations
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="fullNameDataModel"></a><span class="summary-name">fullNameDataModel</span><br />
-      Fullname in data model
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.ElementWithChildren-class.html">ElementWithChildren</a></code></b>:
@@ -1569,12 +1521,7 @@
       <code><a href="Peach.Engine.dom.ElementWithChildren-class.html#_childrenHash" onclick="show_private();">_childrenHash</a></code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.Engine.dom.Element-class.html">Element</a></code></b>:
-      <code><a href="Peach.Engine.dom.Element-class.html#elementType">elementType</a></code>,
-      <code><a href="Peach.Engine.dom.Element-class.html#fullName">fullName</a></code>,
-      <code><a href="Peach.Engine.dom.Element-class.html#hasChildren">hasChildren</a></code>,
-      <code><a href="Peach.Engine.dom.Element-class.html#name">name</a></code>,
       <code><a href="Peach.Engine.dom.Element-class.html#node">node</a></code>,
-      <code><a href="Peach.Engine.dom.Element-class.html#parent">parent</a></code>,
       <code><a href="Peach.Engine.dom.Element-class.html#ref">ref</a></code>
       </p>
     </td>
@@ -1821,6 +1768,27 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="getLastNamePart"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getLastNamePart</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">name</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#DataElement.getLastNamePart">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the last part of a name:</p>
+  <p>foo.bar.hello -- return hello</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <a name="getCount"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1947,42 +1915,6 @@
   </td>
 </tr>
 </table>
-<a name="pointerDepth"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">pointerDepth</h3>
-  <p>What is out pointer depth? (e.g. void** p is 2), (Defaults to 1)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="relationCache"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">relationCache</h3>
-  <p>Cache of relation, list of full data names (String) of each relation 
-  from here down.  cache is build post incoming.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="relationOfCache"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">relationOfCache</h3>
-  <p>Key is full data name of &quot;of&quot; element (string), value is 
-  list of relation full data names (String). cache is bulid post 
-  incoming.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="array"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -2026,7 +1958,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:44 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:08 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

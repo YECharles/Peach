@@ -60,34 +60,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Element</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Element">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_en_16" name="uml_class_diagram_for_peach_en_16">
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html" title="Element in our template tree." alt="" coords="16,11,272,461"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#name" title="Name of Element, cannot include &quot;.&quot;s" alt="" coords="17,28,271,47"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#parent" title="Parent of Element" alt="" coords="17,47,271,65"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#hasChildren" title="If element has children" alt="" coords="17,65,271,84"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#elementType" title="Type of this element" alt="" coords="17,84,271,103"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#fullName" title="Fullname cache" alt="" coords="17,103,271,121"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#node" title="Our XML node" alt="" coords="17,121,271,140"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#ref" title="The reference that made us, or None" alt="" coords="17,140,271,159"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#GuidRegex" title="Peach.Engine.dom.Element.GuidRegex" alt="" coords="17,159,271,177"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#__init__" title="x.__init__(...) initializes x; see x.__class__.__doc__ for signature" alt="" coords="17,180,271,199"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#__deepcopy__" title="Copying objects in our DOM is a crazy business." alt="" coords="17,199,271,217"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getElementsByType" title="Will return an array all elements of a specific type in the tree starting  with us." alt="" coords="17,217,271,236"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getUniqueName" title="Provide a unique default name for elements." alt="" coords="17,236,271,255"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullDataName" title="Return fully qualified name inside of data map" alt="" coords="17,255,271,273"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getRoot" title="Get the root of this DOM tree" alt="" coords="17,273,271,292"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#printDomMap" title="Print out a map of the dom." alt="" coords="17,292,271,311"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#toXmlDom" title="Convert to an XML DOM object tree for use in xpath queries." alt="" coords="17,311,271,329"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#toXmlDomLight" title="Convert to an XML DOM object tree for use in xpath queries." alt="" coords="17,329,271,348"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#updateFromXmlDom" title="Update our object based on an XML DOM object." alt="" coords="17,348,271,367"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#compareTree" title="This method will compare two ElementWithChildren object tree&#39;s." alt="" coords="17,367,271,385"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#copy" title="Peach.Engine.dom.Element.copy" alt="" coords="17,385,271,404"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#getFullname" title="Peach.Engine.dom.Element.getFullname" alt="" coords="17,404,271,423"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#nextSibling" title="Get the next sibling or return None" alt="" coords="17,423,271,441"/>
-<area shape="rect" href="Peach.Engine.dom.Element&#45;class.html#previousSibling" title="Get the prior sibling or return None" alt="" coords="17,441,271,460"/>
-</map>
-  <img src="uml_class_diagram_for_peach_en_16.gif" alt='' usemap="#uml_class_diagram_for_peach_en_16" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Element in our template tree.</p>
@@ -139,6 +112,23 @@
       Copying objects in our DOM is a crazy business.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Element.__deepcopy__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="updateRelationParents"></a><span class="summary-sig-name">updateRelationParents</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Recurse through dom fixing relation's parents</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Engine.dom-pysrc.html#Element.updateRelationParents">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -462,6 +452,7 @@
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
@@ -469,7 +460,9 @@
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -560,46 +553,6 @@
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="name"></a><span class="summary-name">name</span><br />
-      Name of Element, cannot include &quot;.&quot;s
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="parent"></a><span class="summary-name">parent</span><br />
-      Parent of Element
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="hasChildren"></a><span class="summary-name">hasChildren</span><br />
-      If element has children
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="elementType"></a><span class="summary-name">elementType</span><br />
-      Type of this element
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="fullName"></a><span class="summary-name">fullName</span><br />
-      Fullname cache
-    </td>
-  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -917,7 +870,7 @@ re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{<span clas
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:44 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:08 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

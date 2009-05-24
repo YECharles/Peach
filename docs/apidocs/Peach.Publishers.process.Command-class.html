@@ -61,25 +61,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Command</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Publishers.process-pysrc.html#Command">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_pu_12" name="uml_class_diagram_for_peach_pu_12">
-<area shape="rect" href="Peach.Publishers.process.Command&#45;class.html" title="Run a command line program passing generated data as parameters." alt="" coords="101,285,248,331"/>
-<area shape="rect" href="Peach.Publishers.process.Command&#45;class.html#call" title="Call method on COM object." alt="" coords="103,311,247,329"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html" title="The Publisher object(s) implement a way to send and/or receave data by some means." alt="" coords="16,11,333,256"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#withNode" title="Indicates which method should be called." alt="" coords="17,28,332,47"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#__init__" title="Peach.publisher.Publisher.__init__" alt="" coords="17,49,332,68"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#start" title="Change state such that send/receave will work." alt="" coords="17,68,332,87"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#stop" title="Change state such that send/receave will not work." alt="" coords="17,87,332,105"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#send" title="Publish some data" alt="" coords="17,105,332,124"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#sendWithNode" title="Publish some data" alt="" coords="17,124,332,143"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#receive" title="Receive some data." alt="" coords="17,143,332,161"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#callWithNode" title="Call a method using arguments." alt="" coords="17,161,332,180"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#property" title="Get or set property" alt="" coords="17,180,332,199"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#propertyWithNode" title="Get or set property" alt="" coords="17,199,332,217"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#accept" title="Accept incoming connection." alt="" coords="17,217,332,236"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#close" title="Close current stream/connection." alt="" coords="17,236,332,255"/>
-</map>
-  <img src="uml_class_diagram_for_peach_pu_12.gif" alt='' usemap="#uml_class_diagram_for_peach_pu_12" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Run a command line program passing generated data as parameters.</p>
@@ -127,6 +109,7 @@
       <code><a href="Peach.publisher.Publisher-class.html#accept">accept</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#callWithNode">callWithNode</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#close">close</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#hexPrint">hexPrint</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#property">property</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#propertyWithNode">propertyWithNode</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#receive">receive</a></code>,
@@ -134,31 +117,6 @@
       <code><a href="Peach.publisher.Publisher-class.html#sendWithNode">sendWithNode</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#start">start</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#stop">stop</a></code>
-      </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== INSTANCE VARIABLES ==================== -->
-<a name="section-InstanceVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Instance Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-InstanceVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.publisher.Publisher-class.html">publisher.Publisher</a></code></b>:
-      <code><a href="Peach.publisher.Publisher-class.html#withNode">withNode</a></code>
       </p>
     </td>
   </tr>
@@ -244,7 +202,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:57 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:10 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

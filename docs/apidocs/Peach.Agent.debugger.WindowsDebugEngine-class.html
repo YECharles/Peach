@@ -61,32 +61,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class WindowsDebugEngine</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Agent.debugger-pysrc.html#WindowsDebugEngine">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_ag_3" name="uml_class_diagram_for_peach_ag_3">
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html" title="Windows debugger agent." alt="" coords="67,296,237,472"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#__init__" title="Constructor." alt="" coords="68,321,236,340"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#OnTestStarting" title="Called right before start of test." alt="" coords="68,340,236,359"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#PublisherCall" title="Called when a call action is being performed." alt="" coords="68,359,236,377"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#OnTestFinished" title="Called right after a test case or varation" alt="" coords="68,377,236,396"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#GetMonitorData" title="Get any monitored data." alt="" coords="68,396,236,415"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#DetectedFault" title="Check if a fault was detected." alt="" coords="68,415,236,433"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#OnFault" title="Called when a fault was detected." alt="" coords="68,433,236,452"/>
-<area shape="rect" href="Peach.Agent.debugger.WindowsDebugEngine&#45;class.html#OnShutdown" title="Called when Agent is shutting down." alt="" coords="68,452,236,471"/>
-<area shape="rect" href="Peach.agent.Monitor&#45;class.html" title="Extend from this to implement a Monitor." alt="" coords="16,147,107,192"/>
-<area shape="rect" href="Peach.agent.Monitor&#45;class.html#StopRun" title="Return True to force test run to fail." alt="" coords="17,172,105,191"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread" alt="" coords="157,72,331,267"/>
-<area shape="rect" href="javascript:void(0);" title="repr(x)" alt="" coords="159,97,329,116"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.start" alt="" coords="159,116,329,135"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.run" alt="" coords="159,135,329,153"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.join" alt="" coords="159,153,329,172"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.getName" alt="" coords="159,172,329,191"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.setName" alt="" coords="159,191,329,209"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.isAlive" alt="" coords="159,209,329,228"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.isDaemon" alt="" coords="159,228,329,247"/>
-<area shape="rect" href="javascript:void(0);" title="threading.Thread.setDaemon" alt="" coords="159,247,329,265"/>
-<area shape="rect" href="javascript:void(0);" title="threading._Verbose" alt="" coords="184,11,304,43"/>
-</map>
-  <img src="uml_class_diagram_for_peach_ag_3.gif" alt='' usemap="#uml_class_diagram_for_peach_ag_3" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <pre class="literalblock">
@@ -311,30 +286,38 @@ supports the following features:
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b>:
       <code>__repr__</code>,
+      <code>daemon</code>,
       <code>getName</code>,
+      <code>ident</code>,
       <code>isAlive</code>,
       <code>isDaemon</code>,
+      <code>is_alive</code>,
       <code>join</code>,
+      <code>name</code>,
       <code>run</code>,
       <code>setDaemon</code>,
       <code>setName</code>,
       <code>start</code>
       </p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
-      <code>_set_daemon</code>
+      <code>_set_daemon</code>,
+      <code>_set_ident</code>
       </p></div>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading._Verbose</code></b> (private):
       <code>_note</code>
       </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__setattr__</code>,
-      <code>__str__</code>
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
       </p>
     </td>
   </tr>
@@ -603,7 +586,7 @@ supports the following features:
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:40 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:07 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

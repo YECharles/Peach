@@ -61,30 +61,7 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class FileWriterLauncher</h1><p class="nomargin-top"><span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_peach_pu_6" name="uml_class_diagram_for_peach_pu_6">
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html" title="Writes a file to disk and then launches a program." alt="" coords="16,173,368,424"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#__init__" title="Peach.Publishers.file.FileWriterLauncher.__init__" alt="" coords="17,199,367,217"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#getFilename" title="Get current filename." alt="" coords="17,217,367,236"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#setFilename" title="Set new filename." alt="" coords="17,236,367,255"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#start" title="Change state such that send/receave will work." alt="" coords="17,255,367,273"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#connect" title="Peach.Publishers.file.FileWriterLauncher.connect" alt="" coords="17,273,367,292"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#stop" title="Change state such that send/receave will not work." alt="" coords="17,292,367,311"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#mkdir" title="Peach.Publishers.file.FileWriterLauncher.mkdir" alt="" coords="17,311,367,329"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#close" title="Close current stream/connection." alt="" coords="17,329,367,348"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#send" title="Publish some data" alt="" coords="17,348,367,367"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#receive" title="Receive some data." alt="" coords="17,367,367,385"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#FindChildrenOf" title="Peach.Publishers.file.FileWriterLauncher.FindChildrenOf" alt="" coords="17,385,367,404"/>
-<area shape="rect" href="Peach.Publishers.file.FileWriterLauncher&#45;class.html#call" title="Launch program to consume file" alt="" coords="17,404,367,423"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html" title="The Publisher object(s) implement a way to send and/or receave data by some means." alt="" coords="33,11,351,144"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#withNode" title="Indicates which method should be called." alt="" coords="35,28,349,47"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#sendWithNode" title="Publish some data" alt="" coords="35,49,349,68"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#callWithNode" title="Call a method using arguments." alt="" coords="35,68,349,87"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#property" title="Get or set property" alt="" coords="35,87,349,105"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#propertyWithNode" title="Get or set property" alt="" coords="35,105,349,124"/>
-<area shape="rect" href="Peach.publisher.Publisher&#45;class.html#accept" title="Accept incoming connection." alt="" coords="35,124,349,143"/>
-</map>
-  <img src="uml_class_diagram_for_peach_pu_6.gif" alt='' usemap="#uml_class_diagram_for_peach_pu_6" ismap="ismap" class="graph-without-title" />
-</center>
+
 </center>
 <hr />
 <p>Writes a file to disk and then launches a program.</p>
@@ -307,9 +284,47 @@
           <td><span class="summary-sig"><a href="Peach.Publishers.file.FileWriterLauncher-class.html#call" class="summary-sig-name">call</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">method</span>,
         <span class="summary-sig-arg">args</span>)</span><br />
-      Launch program to consume file</td>
+      Call a method using arguments.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher.call">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Publishers.file.FileWriterLauncher-class.html#callUnix" class="summary-sig-name">callUnix</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">method</span>,
+        <span class="summary-sig-arg">args</span>)</span><br />
+      Launch program to consume file</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher.callUnix">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Peach.Publishers.file.FileWriterLauncher-class.html#callWindows" class="summary-sig-name">callWindows</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">method</span>,
+        <span class="summary-sig-arg">args</span>)</span><br />
+      Launch program to consume file</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher.callWindows">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -322,34 +337,10 @@
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.publisher.Publisher-class.html">publisher.Publisher</a></code></b>:
       <code><a href="Peach.publisher.Publisher-class.html#accept">accept</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#callWithNode">callWithNode</a></code>,
+      <code><a href="Peach.publisher.Publisher-class.html#hexPrint">hexPrint</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#property">property</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#propertyWithNode">propertyWithNode</a></code>,
       <code><a href="Peach.publisher.Publisher-class.html#sendWithNode">sendWithNode</a></code>
-      </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== INSTANCE VARIABLES ==================== -->
-<a name="section-InstanceVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Instance Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-InstanceVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="Peach.publisher.Publisher-class.html">publisher.Publisher</a></code></b>:
-      <code><a href="Peach.publisher.Publisher-class.html#withNode">withNode</a></code>
       </p>
     </td>
   </tr>
@@ -594,6 +585,38 @@
     </td>
   </tr></table>
   
+  <p>Call a method using arguments.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>method</code></strong> - Method to call</li>
+        <li><strong class="pname"><code>args</code></strong> - Array of strings as arguments</li>
+    </ul></dd>
+    <dt>Returns: string</dt>
+        <dd>data returned (if any)</dd>
+    <dt>Overrides:
+        <a href="Peach.publisher.Publisher-class.html#call">publisher.Publisher.call</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="callUnix"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">callUnix</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">method</span>,
+        <span class="sig-arg">args</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher.callUnix">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
   <p>Launch program to consume file</p>
   <dl class="fields">
     <dt>Parameters:</dt>
@@ -601,11 +624,32 @@
         <li><strong class="pname"><code>method</code></strong> (string) - Command to execute</li>
         <li><strong class="pname"><code>args</code></strong> (array of objects) - Arguments to pass</li>
     </ul></dd>
-    <dt>Returns: string</dt>
-        <dd>data returned (if any)</dd>
-    <dt>Overrides:
-        <a href="Peach.publisher.Publisher-class.html#call">publisher.Publisher.call</a>
-    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="callWindows"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">callWindows</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">method</span>,
+        <span class="sig-arg">args</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Peach.Publishers.file-pysrc.html#FileWriterLauncher.callWindows">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Launch program to consume file</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>method</code></strong> (string) - Command to execute</li>
+        <li><strong class="pname"><code>args</code></strong> (array of objects) - Arguments to pass</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -641,7 +685,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar 08 16:53:56 2009
+    Generated by Epydoc 3.0.1 on Sat May 23 23:02:10 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

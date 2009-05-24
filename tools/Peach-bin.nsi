@@ -1,7 +1,7 @@
 ;
-; Peach 2.2 Installer
+; Peach 2.3 Installer
 ;
-; Copyright (c) 2007-2008 Michael Eddington
+; Copyright (c) 2007-2009 Michael Eddington
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy 
 ; of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3 DEV"
-  OutFile "Peach-2.3-DEV.exe"
+  Name "Peach 2.3 BETA2"
+  OutFile "Peach-2.3-BETA2.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
