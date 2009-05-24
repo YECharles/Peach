@@ -14,7 +14,7 @@
 			<String name="Type" length="4"/>
 			<Blob name="Data" value=""/>
 		</Block>
-		<Number name="CRC" size="32" signed="false" endian="network">
+		<Number name="CRC" size="32" signed="true" endian="network">
 			<Fixup class="checksums.Crc32Fixup">
 				<Param name="ref" value="Core"/>
 			</Fixup>

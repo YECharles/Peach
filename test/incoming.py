@@ -71,10 +71,14 @@ class IncomingPngTestCase(utils.PeachSendAndRecvTestCase):
 		fd.close()
 		
 		self.peachUtils.SetSendAndReceiveData(data)
-		#self.peachUtils.RunPeachXml("incomingPng.xml")
-		self.peachUtils.RunDebugPeachXml("incomingPng.xml")
+		self.peachUtils.RunPeachXml("incomingPng.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingPng.xml")
 		ret = self.peachUtils.GetListenerData()
-		assert ret == data, 'incomingPng.xml failed. %s' % repr(ret)
+		if ret != data:
+			fd = open("out1.bin", "wb+")
+			fd.write(ret)
+			fd.close()
+		assert ret == data, 'incomingPng.xml failed. %d, %d' % (len(ret), len(data))
 
 class IncomingNumber1TestCase(utils.PeachSendAndRecvTestCase):
 	
@@ -170,10 +174,10 @@ class IncomingString3TestCase(utils.PeachSendAndRecvTestCase):
 		# Test
 		value = '123456789\0'
 		self.peachUtils.SetSendAndReceiveData(value)
-		#self.peachUtils.RunPeachXml("incomingString3.xml")
-		self.peachUtils.RunDebugPeachXml("incomingString3.xml")
+		self.peachUtils.RunPeachXml("incomingString3.xml")
+		#self.peachUtils.RunDebugPeachXml("incomingString3.xml")
 		ret = self.peachUtils.GetListenerData()
-		assert ret == value, 'incomingString3.xml failed, instead [%s]' % repr(ret)
+		assert ret == value[:-1], 'incomingString3.xml failed, instead [%s]' % repr(ret)
 
 class IncomingString4TestCase(utils.PeachSendAndRecvTestCase):
 	

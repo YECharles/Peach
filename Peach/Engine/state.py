@@ -375,7 +375,7 @@ class StateEngine:
 			# Crack data
 			cracker = DataCracker(self.engine.peach)
 			(rating, pos) = cracker.crackData(action.template, buff, "setDefaultValue")
-						
+			
 			if rating > 2:
 				raise SoftException("Was unble to crack incoming data into %s data model." % action.template.name)
 			
@@ -601,8 +601,15 @@ class StateEngine:
 					
 					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
 					
-					setElement.currentValue = valueElement.currentValue
-					setElement.defaultValue = valueElement.defaultValue
+					# Some elements like Block do not have a current or default value
+					if valueElement.currentValue == None and valueElement.defaultValue == None:
+						setElement.currentValue = None
+						setElement.defaultValue = valueElement.getValue()
+					
+					else:
+						setElement.currentValue = valueElement.currentValue
+						setElement.defaultValue = valueElement.defaultValue
+					
 					setElement.value = None
 				
 				else:

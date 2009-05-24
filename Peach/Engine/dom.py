@@ -960,13 +960,13 @@ class DataElement(Mutatable):
 		self._maxOccurs = 1
 		
 		#: Default value to use
-		self.defaultValue = None
+		self._defaultValue = None
 		#: Mutated value prior to packing and transformers
-		self.currentValue = None
+		self._currentValue = None
 		#: Mutated value after everything but transformers
-		self.finalValue = None
+		self._finalValue = None
 		#: Current value
-		self.value = None
+		self._value = None
 		
 		#: Expression used by data cracker to determin
 		#: if element should be included in cracking.
@@ -994,6 +994,33 @@ class DataElement(Mutatable):
 	
 		#: Fullname in data model
 		self.fullNameDataModel = None
+	
+	def get_DefaultValue(self):
+		return self._defaultValue
+	def set_DefaultValue(self, value):
+		self._defaultValue = value
+		#self._currentValue = None
+		self._value = None
+		self._finalValue = None
+	defaultValue = property(get_DefaultValue, set_DefaultValue, None)
+	def get_CurrentValue(self):
+		return self._currentValue
+	def set_CurrentValue(self, value):
+		self._currentValue = value
+		self._value = None
+		self._finalValue = None
+	currentValue = property(get_CurrentValue, set_CurrentValue, None)
+	def get_Value(self):
+		return self._value
+	def set_Value(self, value):
+		self._value = value
+		self._finalValue = None
+	value = property(get_Value, set_Value, None)
+	def get_FinalValue(self):
+		return self._finalValue
+	def set_FinalValue(self, value):
+		self._finalValue = value
+	finalValue = property(get_FinalValue, set_FinalValue, None)
 	
 	def get_pos(self):
 		'''
@@ -2004,7 +2031,7 @@ class DataElement(Mutatable):
 			for r in self._getAllRelationsInDataModel(node, useCache):
 				if r == None:
 					continue
-				print "r", r.parent.name
+				
 				yield r
 			
 		else:
