@@ -60,8 +60,12 @@ class NumericalVarianceMutator(Mutator):
 		self._values = range(0 - self._n, self._n)
 		self._currentCount = 0
 		
-		self._minValue = node.getMinValue()
-		self._maxValue = node.getMaxValue()
+		if isinstance(node, String):
+			self._minValue = 0
+			self._maxValue = 4294967295
+		else:
+			self._minValue = node.getMinValue()
+			self._maxValue = node.getMaxValue()
 	
 	def _getN(self, node, n):
 		for c in node.hints:
@@ -84,6 +88,12 @@ class NumericalVarianceMutator(Mutator):
 	
 	def supportedDataElement(e):
 		
+		if isinstance(e, String):
+			# Look for NumericalString
+			for hint in e.hints:
+				if hint.name == "NumericalString":
+					return True
+		
 		if isinstance(e, Number) and e.isMutable:
 			return True
 		
@@ -97,11 +107,15 @@ class NumericalVarianceMutator(Mutator):
 			return
 		
 		node.currentValue = long(node.getInternalValue()) - self._values[self._currentCount]
+		if isinstance(node, String):
+			node.currentValue = unicode(node.currentValue)
 	
 	def randomMutation(self, node):
 		try:
 			count = self._random.choice(self._values)
 			node.currentValue = str(long(node.getInternalValue()) + count)
+			if isinstance(node, String):
+				node.currentValue = unicode(node.currentValue)
 		except ValueError:
 			# Okay to skip, another mutator probably
 			# changes this value already (like a datatree one)
@@ -131,13 +145,21 @@ class NumericalEdgeCaseMutator(Mutator):
 		if self._values == None:
 			self._populateValues()
 		
-		self._size = node.size
+		if isinstance(node, String):
+			self._size = 32
+		else:
+			self._size = node.size
+		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
 		self._currentCount = 0
 		
-		self._minValue = node.getMinValue()
-		self._maxValue = node.getMaxValue()
+		if isinstance(node, String):
+			self._minValue = 0
+			self._maxValue = 4294967295
+		else:
+			self._minValue = node.getMinValue()
+			self._maxValue = node.getMaxValue()
 
 	def _populateValues(self):
 		NumericalEdgeCaseMutator._values = {}
@@ -208,6 +230,12 @@ class NumericalEdgeCaseMutator(Mutator):
 
 	def supportedDataElement(e):
 		
+		if isinstance(e, String):
+			# Look for NumericalString
+			for hint in e.hints:
+				if hint.name == "NumericalString":
+					return True
+		
 		if isinstance(e, Number) and e.isMutable:
 			return True
 		
@@ -225,10 +253,16 @@ class NumericalEdgeCaseMutator(Mutator):
 		return n
 
 	def sequencialMutation(self, node):
-		node.currentValue = self._values[self._size][self._currentCount]
+		if isinstance(node, String):
+			node.currentValue = unicode(self._values[self._size][self._currentCount])
+		else:
+			node.currentValue = self._values[self._size][self._currentCount]
 	
 	def randomMutation(self, node):
-		node.currentValue = self._random.choice(self._values[self._size])
+		if isinstance(node, String):
+			node.currentValue = unicode(self._random.choice(self._values[self._size]))
+		else:
+			node.currentValue = self._random.choice(self._values[self._size])
 
 
 
@@ -252,8 +286,12 @@ class FiniteRandomNumbersMutator(Mutator):
 		self._n = self._getN(node, 500)
 		self._currentCount = 0
 		
-		self._minValue = node.getMinValue()
-		self._maxValue = node.getMaxValue()
+		if isinstance(node, String):
+			self._minValue = 0
+			self._maxValue = 4294967295
+		else:
+			self._minValue = node.getMinValue()
+			self._maxValue = node.getMaxValue()
 
 	def next(self):
 		self._currentCount += 1
@@ -264,6 +302,12 @@ class FiniteRandomNumbersMutator(Mutator):
 		return self._n
 	
 	def supportedDataElement(e):
+		
+		if isinstance(e, String):
+			# Look for NumericalString
+			for hint in e.hints:
+				if hint.name == "NumericalString":
+					return True
 		
 		if isinstance(e, Number) and e.isMutable:
 			return True
@@ -281,11 +325,17 @@ class FiniteRandomNumbersMutator(Mutator):
 		
 		return n
 	
-	def sequencialMutation(self, node): 
-		node.currentValue = self._random.randint(self._minValue, self._maxValue)
+	def sequencialMutation(self, node):
+		if isinstance(node, String):
+			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
+		else:
+			node.currentValue = self._random.randint(self._minValue, self._maxValue)
 	
 	def randomMutation(self, node):
-		node.currentValue = self._random.randint(self._minValue, self._maxValue)
+		if isinstance(node, String):
+			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
+		else:
+			node.currentValue = self._random.randint(self._minValue, self._maxValue)
 
 
 
