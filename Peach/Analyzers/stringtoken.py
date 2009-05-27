@@ -6,7 +6,7 @@ Analyzers that produce data models from Strings
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) 2008-2009 Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ class StringTokenAnalyzer(Analyzer):
 	#: Does analyzer support asDataElement()
 	supportDataElement = True
 	#: Does analyzer support asCommandLine()
-	supportCommandLine = True
+	supportCommandLine = False
 	#: Does analyzer support asTopLevel()
 	supportTopLevel = True
 	
@@ -125,6 +125,17 @@ class StringTokenAnalyzer(Analyzer):
 			node = String()
 			node.type = self.stringType
 			node.defaultValue = stringNode.string
+			
+			# Check for numerical string and add
+			# proper hint
+			try:
+				i = long(node.defaultValue)
+				
+				hint = Hint("NumericalString", node)
+				hint.value = "true"
+				node.hints.append(hint)
+			except:
+				pass
 			
 			return node
 		

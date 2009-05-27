@@ -96,6 +96,8 @@ class XmlAnalyzer(Analyzer):
 		should produce Peach PIT XML as output.
 		'''
 		
+		print args
+		
 		try:
 			inFile = args["xmlfile"]
 			outFile = args["out"]

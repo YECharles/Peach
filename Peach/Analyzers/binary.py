@@ -170,7 +170,7 @@ class Binary(Analyzer):
 				numberNode = Number(None, None)
 				numberNode.size = l.size
 				numberNode.endian = l.endian
-				numberNode.defaultValue = str(n.value)
+				numberNode.defaultValue = str(l.value)
 				root.append(numberNode)
 				
 				relation = Relation()
@@ -240,6 +240,87 @@ class Binary(Analyzer):
 		'''
 		raise Exception("asTopLevel not supported")
 
+
+class OleStructuredStorage(Analyzer):
+	'''
+	Builds out a data model based on OLE Structured Storage.
+	'''
+	
+	#: Does analyzer support asParser()
+	supportParser = False
+	#: Does analyzer support asDataElement()
+	supportDataElement = True
+	#: Does analyzer support asCommandLine()
+	supportCommandLine = False
+	#: Does analyzer support asTopLevel()
+	supportTopLevel = True
+	
+	def __init__(self):
+		pass
+	
+	def asDataElement(self, parent, args, dataBuffer):
+		'''
+		Called when Analyzer is used in a data model.
+		
+		Should return a DataElement such as Block, Number or String.
+		'''
+		dom = self.analyzeBlob(dataBuffer)
+		
+		# Replace parent with new dom
+		
+		parentOfParent = parent.parent
+		dom.name = parent.name
+		
+		indx = parentOfParent.index(parent)
+		del parentOfParent[parent.name]
+		parentOfParent.insert(indx, dom)
+		
+		# now just cross our fingers :)
+	
+	def asCommandLine(self, args):
+		'''
+		Called when Analyzer is used from command line.  Analyzer
+		should produce Peach PIT XML as output.
+		'''
+		raise Exception("asCommandLine not supported")
+	
+	## NOTES: Use Hint's to store OLE information needed to build doc
+	##  This will save us from needed custom types!
+	##
+	##  <Hint name="OleRootEntry" value="GUID" />
+	##  <Hint name="OleStorage" value="NAME" />
+	##  <Hint name="OleStream" value="NAME" />
+	##  <Hint name="OleStreamProperties" value="NAME" />
+	##  <Hint name="OleStreamProperty" value="NAME" />
+	##  <Hint name="OleStreamPropertyKind" value="PRSPEC_LPWSTR" />
+	##  <Hint name="OleStreamPropertyPid" value="1" />
+
+	def asTopLevel(self, peach, args):
+		'''
+		Called when Analyzer is used from top level.
+		
+		From the top level producing zero or more data models and
+		state models is possible.
+		'''
+		raise Exception("asTopLevel not supported")
+
+	def handleOleDocument(self, fileName):
+		
+		ole = OleFileIO(fileName, raise_defects=DEFECT_INCORRECT)
+		for streamname in ole.listdir():
+			if streamname[-1][0] == '\005':
+				# Found properties
+				self.handleOleProperties(ole, streamname)
+			
+			else:
+				self.handleOleStream(ole, streamname)
+		
+	
+	def handleOleProperties(self, ole, streamname):
+		pass
+	
+	def handleOleStream(self, ole, streamname):
+		pass
 
 if __name__ == "__main__":
 
