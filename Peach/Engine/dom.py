@@ -3165,14 +3165,28 @@ class Number(DataElement):
 		self.elementType = 'number'
 		
 		self.size = Number.defaultSize
-		self.endian = Number.defaultEndian
 		self.signed = Number.defaultSigned
 		self.valueType = Number.defaultValueType
+		
+		# When None, the property method will
+		# return the default.  This allows tricky users
+		# to change Endian ness after we start cracking
+		# a template file.
+		self._endian = None
 		
 		self.ref = None
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
+	
+	def getEndian(self):
+		if self._endian == None:
+			return Number.defaultEndian
+		
+		return self._endian
+	def setEndian(self, value):
+		self._endian = value
+	endian = property(getEndian, setEndian, None)
 	
 	def asCType(self):
 		
