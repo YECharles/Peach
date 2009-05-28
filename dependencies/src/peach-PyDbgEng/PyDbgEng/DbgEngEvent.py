@@ -55,6 +55,10 @@ class DebuggerException(Exception):
 ##
 ##
 
+#import logging
+#LOG_FILENAME = '/DbgEngEvent.out.txt'
+#logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
+
 import comtypes
 from ctypes import *
 import comtypes.server
@@ -65,6 +69,7 @@ from comtypes.hresult import S_OK
 from comtypes.automation import IID
 from comtypes.gen import DbgEng
 import comtypes.gen.DbgEng
+import comtypes.server.localserver
 
 import sys
 import struct
@@ -74,19 +79,14 @@ from PyDbgEng import PyDbgEng
 
 from comtypes.gen import DbgEng
 
-#class DbgEngEventCallbacks(CoClass):
-class DbgEngEventCallbacks(
-	DbgEng.IDebugEventCallbacks,
-	DbgEng.IDebugOutputCallbacks,
-	comtypes.server.connectionpoints.ConnectableObjectMixin
-	):
+class DbgEngEventCallbacks(CoClass):
 	
 	_reg_clsid_ = GUID('{EAC5ACAA-7BD0-4f1f-8DEB-DF2862A7E85B}')
 	_reg_threading_ = "Both"
 	_reg_progid_ = "PyDbgEngLib.DbgEngEventCallbacks.1"
 	_reg_novers_progid_ = "PyDbgEngLib.DbgEngEventCallbacks"
 	_reg_desc_ = "Callback class!"
-	_reg_clsctx_ = comtypes.CLSCTX_INPROC_SERVER | comtypes.CLSCTX_LOCAL_SERVER
+	_reg_clsctx_ = comtypes.CLSCTX_INPROC_SERVER
 	
 	_com_interfaces_ = [DbgEng.IDebugEventCallbacks, DbgEng.IDebugOutputCallbacks,
 						comtypes.typeinfo.IProvideClassInfo2,
