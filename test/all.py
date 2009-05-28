@@ -19,6 +19,7 @@ import sys
 
 # 1. Add your module to this import list
 
+import analyzers
 import path
 import offset
 import fixups
@@ -43,6 +44,7 @@ import os, coverage, coverage_color
 # 2. Add your module to this array
 
 allModules = [
+	analyzers,
 	#path,
 	offset,
 	fixups,
