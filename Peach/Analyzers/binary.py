@@ -149,9 +149,6 @@ class Binary(Analyzer):
 			if s in lengths:
 				startPos = lengths[s].startPos
 			
-			print "pos:",pos
-			print "startPos:", startPos
-			
 			if startPos > pos:
 				# Need a Blob filler
 				b = Blob(None, None)
@@ -173,13 +170,13 @@ class Binary(Analyzer):
 				numberNode.defaultValue = str(l.value)
 				root.append(numberNode)
 				
-				relation = Relation()
+				relation = Relation(None, None)
 				relation.type = "size"
 				relation.of = stringNode.name
 				
 				numberNode.relations.append(relation)
 				
-				relation = Relation()
+				relation = Relation(None, None)
 				relation.type = "size"
 				relation.From = numberNode.name
 				

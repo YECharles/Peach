@@ -1775,7 +1775,7 @@ class ParseTemplate:
 			number.endian = self._getAttribute(node, 'endian')
 			if number.endian == 'network':
 				number.endian = 'big'
-		
+			
 			if number.endian != 'little' and number.endian != 'big':
 				raise PeachException("invalid endian %s" % number.endian)
 	
@@ -1785,7 +1785,7 @@ class ParseTemplate:
 			signed = self._getAttribute(node, 'signed')
 			if signed == None or len(signed) == 0:
 				signed = Number.defaultSigned
-		
+			
 			if signed.lower() == 'true':
 				number.signed = True
 			elif signed.lower() == 'false':

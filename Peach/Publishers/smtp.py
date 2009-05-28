@@ -81,7 +81,7 @@ class EmailAttachment(Publisher):
 		part = MIMEBase('application', 'octet-stream')
 		part.set_payload(data)
 		Encoders.encode_base64(part)
-		port.add_header('Content-Disposition', 'attachment; filename="%s"' % fileName)
+		part.add_header('Content-Disposition', 'attachment; filename="%s"' % self.fileName)
 		msg.attach(part)
 		
 		# Send email

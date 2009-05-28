@@ -266,7 +266,14 @@ class Publisher:
 		@param	valueNode: data model root node that produced value.
 		'''
 		raise PeachException("Action 'property' not supported by publisher")
-	
+
+	def connect(self):
+		'''
+		Called to connect or open a connection/file.
+		'''
+		
+		raise PeachException("Action 'connect' not supported by publisher")
+		
 	def accept(self):
 		'''
 		Accept incoming connection.  Blocks until incoming connection
