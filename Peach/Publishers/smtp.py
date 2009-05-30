@@ -102,6 +102,11 @@ class EmailAttachment(Publisher):
 		'''
 		pass
 
+class _OleStorage(object):
+	'''
+	This class wraps OLE Storage APIs
+	'''
+	pass
 
 # end
 

@@ -388,7 +388,11 @@ class ParseTemplate:
 				objs.append(child)
 			
 		for child in objs:
-			analyzer = eval("%s()" % child.analyzer)
+			try:
+				analyzer = eval("%s()" % child.analyzer)
+			except:
+				analyzer = eval("PeachXml_"+"%s()" % child.analyzer)
+				
 			analyzer.asDataElement(child, {}, child.defaultValue)
 		
 		# We suck, so fix this up
