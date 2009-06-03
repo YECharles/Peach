@@ -1976,7 +1976,7 @@ class DataElement(Mutatable):
 
 		self._fixRealParent(self)
 		if self.relationCache != None:
-			print "getRelationsOfThisElement: Using relation cache!"
+			#print "Using relation cache!"
 			root = self.getRootOfDataMap()
 			name = self.getFullnameInDataModel()
 			

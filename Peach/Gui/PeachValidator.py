@@ -194,6 +194,9 @@ class PeachValidatorGui(gui.PeachValidation):
 		self.treeDataTree.DeleteChildren(self.root)
 		self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeTemplate)
 		
+		# Lets add the path of this file to our python path :)
+		sys.path.append(os.path.dirname(self.textPeachXmlFilename.GetValue()))
+		
 		try:
 			self.p = parser.ParseTemplate()
 			self.p.dontCrack = True
