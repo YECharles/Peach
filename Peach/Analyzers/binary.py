@@ -208,11 +208,6 @@ class Binary(Analyzer):
 		
 		Should return a DataElement such as Block, Number or String.
 		'''
-		
-		#print "============"
-		#traceback.print_stack()
-		#print "============"
-		
 		dom = self.analyzeBlob(dataBuffer)
 		
 		# Replace parent with new dom

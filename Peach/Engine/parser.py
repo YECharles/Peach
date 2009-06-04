@@ -387,8 +387,6 @@ class ParseTemplate:
 			if child.analyzer != None and child.defaultValue != None and child not in objs:
 				objs.append(child)
 			
-		#DomPrint(0, peach)
-		
 		for child in objs:
 			try:
 				analyzer = eval("%s()" % child.analyzer)
