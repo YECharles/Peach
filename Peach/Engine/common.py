@@ -142,6 +142,29 @@ def buildImports(node, g, l):
 			else:
 				g[importStr] = __import__(importStr, globals(), locals(), [], -1)
 				
+def peachPrint(msg):
+	print "Print: ", msg
+	
+	return True
+
+def changeDefaultEndian(endian):
+	if endian not in ['little', 'big']:
+		raise PeachException("Called ChangeEndian with invalid paramter [%s]", endian)
+	
+	from Peach.Engine.dom import Number
+	Number.defaultEndian = endian
+	
+	return True
+
+def domPrint(node):
+	from Peach.Engine.dom import DomPrint
+	
+	print "vv[ DomPrint ]vvvvvvvvvvvvvvvv"
+	DomPrint(0, node)
+	print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+	
+	return True
+
 def evalEvent(code, environment, node = None):
 	'''
 	Eval python code returning result.
@@ -150,8 +173,16 @@ def evalEvent(code, environment, node = None):
 	environment - Dictionary, keys are variables to place in local scope
 	'''
 	
-	globalScope = {}
-	localScope = {}
+	globalScope = {
+		'Print' : peachPrint,
+		'ChangeDefaultEndian' : changeDefaultEndian,
+		'DomPrint' : domPrint,
+		}
+	localScope = {
+		'Print' : peachPrint,
+		'ChangeDefaultEndian' : changeDefaultEndian,
+		'DomPrint' : domPrint,
+		}
 	
 	if node != None:
 		buildImports(node, globalScope, localScope)

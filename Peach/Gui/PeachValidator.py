@@ -262,6 +262,7 @@ class PeachValidatorGui(gui.PeachValidation):
 		self.treeDataTree.DeleteChildren(self.root)
 		self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeTemplate)
 		
+		# Now open'er up!
 		fd = open(self.textFilename.GetValue(), "rb")
 		data = fd.read()
 		fd.close()
