@@ -381,12 +381,14 @@ class ParseTemplate:
 		objs = []
 		
 		for child in peach.getElementsByType(Blob):
-			if child.analyzer != None and child.defaultValue != None:
+			if child.analyzer != None and child.defaultValue != None and child not in objs:
 				objs.append(child)
 		for child in peach.getElementsByType(String):
-			if child.analyzer != None and child.defaultValue != None:
+			if child.analyzer != None and child.defaultValue != None and child not in objs:
 				objs.append(child)
 			
+		#DomPrint(0, peach)
+		
 		for child in objs:
 			try:
 				analyzer = eval("%s()" % child.analyzer)

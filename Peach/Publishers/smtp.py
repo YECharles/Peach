@@ -78,7 +78,7 @@ class EmailAttachment(Publisher):
 		msg.attach(MIMEText(self.msgText))
 		
 		# Attach file
-		part = MIMEBase('application', 'octet-stream')
+		part = MIMEBase('application', 'pdf')
 		part.set_payload(data)
 		Encoders.encode_base64(part)
 		part.add_header('Content-Disposition', 'attachment; filename="%s"' % self.fileName)

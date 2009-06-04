@@ -32,7 +32,7 @@ Analyzers that produce data models from Binary blobs
 
 # $Id$
 
-import sys, os, re, struct
+import sys, os, re, struct, traceback
 
 sys.path.append("c:/peach")
 
@@ -208,6 +208,11 @@ class Binary(Analyzer):
 		
 		Should return a DataElement such as Block, Number or String.
 		'''
+		
+		#print "============"
+		#traceback.print_stack()
+		#print "============"
+		
 		dom = self.analyzeBlob(dataBuffer)
 		
 		# Replace parent with new dom

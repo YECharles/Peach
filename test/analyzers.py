@@ -9,7 +9,7 @@ import utils
 
 def suite():
 	suite = unittest.TestSuite()
-	suite.addTest(IncomingString1TestCase())
+	suite.addTest(AnalyzersBinaryTestCase())
 	
 	return suite
 

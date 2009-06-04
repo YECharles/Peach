@@ -780,6 +780,7 @@ class ElementWithChildren(Element):
 		# If we have the key we need to replace it
 		if self._childrenHash.has_key(obj.name):
 			self[obj.name] = obj
+			obj.parent = self
 			return
 		
 		# Otherwise add it at the end
@@ -787,6 +788,7 @@ class ElementWithChildren(Element):
 		if obj.name != None:
 			self._childrenHash[obj.name] = obj
 			setattr(self.children, obj.name, obj)
+			obj.parent = self
 	
 	def index(self, obj):
 		return self._children.index(obj)
