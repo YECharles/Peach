@@ -110,7 +110,6 @@ class Element(object):
 		#: Fullname cache
 		self.fullName = None
 		
-		self.node = None	#: Our XML node
 		self.ref = None		#: The reference that made us, or None
 		
 		if self.name == None or len(self.name) == 0:
@@ -153,19 +152,13 @@ class Element(object):
 		#  - Set our __deepcopy__ attributes
 		#  - Fixup our toXml functions
 		
-		#sys.stderr.write("PeachDeepCopy: %s\n" % self)
-		
-		node = self.node
 		parent = self.parent
-		# Null out 4Suite XML node (why do we keep this?)
-		self.node = None
 		self.parent = None
 		
-		# Only copy _children
+		# Only copy _children array
 		if isinstance(self, ElementWithChildren):
-			# Save children
+			# Save other children collections
 			_childrenHash = self._childrenHash
-			_children = self._children
 			children = self.children
 			
 			# Null out children except for array
@@ -177,7 +170,6 @@ class Element(object):
 			toXml = getattr(self, 'toXml')
 			setattr(self, 'toXml', None)
 		
-		#sys.stderr.write("PeachDeepCopy(1): %s\n" % self)
 		setattr(self, '__deepcopy__dont_use__', "true")
 		
 		## Perform actual copy
@@ -188,73 +180,47 @@ class Element(object):
 		
 		delattr(e, '__deepcopy__dont_use__')
 		delattr(self, '__deepcopy__dont_use__')
-		#sys.stderr.write("PeachDeepCopy(2): %s\n" % self)
 		
-		try:
-			if e.elementType == 'block':
-				e.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, e, e.__class__)
-				setattr(self, 'toXml', toXml)
-			
-			#elif e.elementType == 'namespace':
-			#	e.toXml = new.instancemethod(PeachModule.Engine.dom.NamespaceToXml, e, e.__class__)
-			#	setattr(self, 'toXml', toXml)
-		except:
-			#sys.stderr.write("PeachDeepCopy(2.1): %s\n" % self)
-			print dir(e)
-			raise
+		if e.elementType == 'block':
+			e.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, e, e.__class__)
+			setattr(self, 'toXml', toXml)
 		
-		#sys.stderr.write("PeachDeepCopy(2.2): %s\n" % self)
 		if isinstance(self, ElementWithChildren):
-			# Don't copy kids yet
+			# Set back other children collections
 			self._childrenHash = _childrenHash
-			self._children = _children
 			self.children = children
 		
-			#sys.stderr.write("PeachDeepCopy(2.2.1): %s\n" % self)
 			# Fixup ElementWithChildren types
 			# We need to try and keep things in order
 			# and not have to many duplicated elements
-			# GAR, this isn't working...
 			children = e._children
 			
 			e._children = []
 			e._childrenHash = {}
-			#sys.stderr.write("PeachDeepCopy(2.2.1.1): %s\n" % self)
 			e.children = PeachModule.Engine.engine.Empty()
 			
-			#sys.stderr.write("PeachDeepCopy(2.2.2): %s\n" % children)
-			
 			for c in children:
-				#sys.stderr.write("PeachDeepCopy(2.2.3): %s\n" % self)
 				if not hasattr(c, "name") or c.name == None:
 					c.name = "Lost Element"
 				
 				e.append(c)
 		
-		#sys.stderr.write("PeachDeepCopy(2.3): %s\n" % self)
-		self.node = node
 		self.parent = parent
-		#setattr(self, '__deepcopy__', me)
 		
-		# fixup copies relations
-		# This may be overkill, we can probably
-		# just update "e" and be OKAY
-		#if isinstance(e, DataElement):
-		#	e.updateRelationParents()
-		
-		if isinstance(e, DataElement): #hasattr(e, "relations"):
+		# Fixup DataElements
+		if isinstance(e, DataElement):
 			for r in e.relations:
 				r.parent = e
 			
-		if hasattr(e, "placement") and e.placement != None:
-			e.placement.parent = e
+			if e.placement != None:
+				e.placement.parent = e
 		
-		if hasattr(e, "hints"):
 			for h in e.hints:
 				h.parent = e
 		
-		#sys.stderr.write("PeachDeepCopy(3): %s\n" % self)
-		#sys.stderr.write("PeachDeepCopy: Returning: %s\n" % e)
+			if e.transformer != None:
+				e.transformer.parent = e
+		
 		return e
 
 	def updateRelationParents(self):
@@ -339,7 +305,8 @@ class Element(object):
 			owner = parent
 		
 		if hasattr(self, 'ref') and self.ref != None:
-			node = owner.createElementNS(None, self.ref)
+			ref = self.ref.replace(":", "_")
+			node = owner.createElementNS(None, ref)
 		else:
 			try:
 				name = self.name.replace(":", "_")
@@ -498,54 +465,39 @@ class Element(object):
 		# We need to remove realParents before we can perform
 		# the copy and then replace then.
 		
-		while True:
-			# 1. Find root
+		if isinstance(self, DataElement):
 			
-			root = self
-			while root.parent != None:
-				root = root.parent
+			if hasattr(self, 'realParent'):
+				selfRealParent = self.realParent
+				self.realParent = object()
 			
-				# Catch the already "fixed" realParents
-				if hasattr(root, 'realParent') and root.realParent != None and root.parent != None:
-					root.realParent = object()
-			
-			# Current realParents
-			if hasattr(root, 'realParent') and root.realParent != None:
-				root.parent = root.realParent
-				root.realParent = object()
-			else:
-				break
+			for child in self.getAllChildDataElements():
+				if hasattr(child, 'realParent') and child.realParent != None:
+					child.parent = child.realParent
+					child.realParent = object()
 		
 		# Perform actual copy
 		
 		newSelf = deepcopy(self)
+		newSelf.parent = parent
 		self._FixParents(newSelf, parent)
 
-		# replace realParent on origional node
-		realParents = []
-		root = self
-		while root.parent != None:
-			root = root.parent
+		if isinstance(self, DataElement):
 			
-			if hasattr(root, 'realParent') and root.realParent != None:
-				root.realParent = root.parent
-				realParents.append(root)
+			if hasattr(self, 'realParent'):
+				self.realParent = selfRealParent
 		
-		for root in realParents:
-			root.parent = None
+			for child in self.getAllChildDataElements():
+				if hasattr(child, 'realParent') and child.realParent != None:
+					child.realParent = child.parent
 		
-		# replace realParent on new node
-		realParents = []
-		root = newSelf
-		while root.parent != None:
-			root = root.parent
+			for child in newSelf.getAllChildDataElements():
+				if hasattr(child, 'realParent') and child.realParent != None:
+					child.realParent = child.parent
 			
-			if hasattr(root, 'realParent') and root.realParent != None:
-				root.realParent = root.parent
-				realParents.append(root)
-		
-		for root in realParents:
-			root.parent = None
+			# Not sure if we realy want todo this.
+			if self.parent == None and parent == None and hasattr(self, 'realParent'):
+				newSelf.realParent = self.realParent
 		
 		return newSelf
 	
@@ -564,8 +516,6 @@ class Element(object):
 			for child in start._children:
 				self._FixParents(child, start)
 		
-		#print "<--"
-	
 	def getFullname(self):
 		
 		if self.fullName != None:
@@ -796,6 +746,9 @@ class ElementWithChildren(Element):
 	def insert(self, index, obj):
 		if obj in self._children:
 			raise Exception("object already child of element")
+		
+		# Update parent
+		obj.parent = self
 		
 		self._children.insert(index, obj)
 		if obj.name != None:
@@ -1822,10 +1775,6 @@ class DataElement(Mutatable):
 		obj = node
 		for i in range(1, len(names)):
 			if not obj.has_key(names[i]):
-				#print "_checkDottedName: no %s" % (names[i])
-				#for c in obj:
-				#	print "_checkDottedName: c.name: %s" % c.name
-				#	
 				return None
 			
 			obj = obj[names[i]]
@@ -2366,32 +2315,53 @@ class DataElement(Mutatable):
 				self.resetDataModel(c)
 	
 	def _fixRealParent(self, node):
+		'''
+		Look for realParent attributes and
+		enable that nodes correct parent.
 		
-		# 1. Find root
+		We could have multiple layers of realParents
+		to deal with, so keep going until we find no more.
+		'''
 		
-		root = node
-		while root.parent != None:
-			root = root.parent
+		while True:
+			# 1. Find root
 		
-		# 2. Check if has a realParent
+			root = node
+			while root.parent != None:
+				root = root.parent
 		
-		if hasattr(root, 'realParent') and root.realParent != None:
-			root.parent = root.realParent
+			# 2. Check if has a realParent
+		
+			if hasattr(root, 'realParent') and root.realParent != None:
+				root.parent = root.realParent
+			else:
+				break
 		
 		# done!
 	
 	def _unFixRealParent(self, node):
+		'''
+		Locate any realParent attributes in our
+		parent chain and enable them by setting
+		that nodes parent to None.
 		
-		# 1. Look for fake root
+		We could have several layers of realParents
+		so check out each of our parents back to
+		root.
+		'''
+		
+		parents = [node]
 		
 		root = node
-		while not hasattr(root, 'realParent') and root.parent != None:
+		while root.parent != None and not isinstance(root.parent, DataElement):
 			root = root.parent
+			parents.append(root)
 		
-		# 2. Remove parent link
-		
-		if hasattr(root, 'realParent') and root.realParent != None:
-			root.parent = None
+		for parent in parents:
+			# 1. Look for fake root
+			if hasattr(parent, 'realParent') and parent.parent != None:
+				# 2. Remove parent link
+				parent.parent = None
 
 	def	calcLength(self):
 		'''

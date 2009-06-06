@@ -323,34 +323,6 @@ class DataCracker:
 		
 		return root
 	
-	def _fixRealParent(self, node):
-		
-		# 1. Find root
-		
-		root = node
-		while root.parent != None:
-			root = root.parent
-		
-		# 2. Check if has a realParent
-		
-		if hasattr(root, 'realParent'):
-			#print "_fixRealParent(): Found fake root: ", root.name
-			root.parent = root.realParent
-		
-		# done!
-	
-	def _unFixRealParent(self, node):
-		
-		# 1. Look for fake root
-		
-		root = node
-		while not hasattr(root, 'realParent') and root.parent != None:
-			root = root.parent
-		
-		# 2. Remove parent link
-		#print "_unFixRealParent(): Found fake root: ", root.name
-		root.parent = None
-	
 	def _handleArray(self, node, buff, pos, parent = None, doingMinMax = False):
 		'''
 		This method is used when an array has been located (an element with
@@ -638,7 +610,7 @@ class DataCracker:
 				}
 			
 			Debug(1, "_handleNode: When: Running expression")
-			self._fixRealParent(node)
+			node._fixRealParent(node)
 			
 			if not evalEvent(rel.when, environment, node):
 				# Remove this node from data tree
@@ -661,7 +633,7 @@ class DataCracker:
 						except:
 							pass
 				
-				self._unFixRealParent(node)
+				node._unFixRealParent(node)
 				del node.parent[node.name]
 				
 				Debug(1, "_handleNode: When: Returned False.  Removing and returning 1.")
@@ -669,7 +641,7 @@ class DataCracker:
 				node.relationOf = None
 				return (1, pos)
 		
-			self._unFixRealParent(node)
+			node._unFixRealParent(node)
 			Debug(1, "_handleNode: When: Returned True.")
 		
 		## Skipp around if we have an offset relations
@@ -790,6 +762,7 @@ class DataCracker:
 					
 					# We need to remove the parent temporarily to
 					# avoid a recursion issue.
+						
 					parent = node.parent
 					node.parent = None
 					node.realParent = parent
