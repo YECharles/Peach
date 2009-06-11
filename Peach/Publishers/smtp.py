@@ -33,14 +33,19 @@ SMTP/Email publishers
 
 # $Id$
 
-import sys, smtplib, os
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.MIMEText import MIMEText
+import string,time,sys,os,smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
 from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 
 from Peach.publisher import Publisher
+
+# Imports to make py2exe happy
+import email.iterators
+import email.generator
+#
 
 class EmailAttachment(Publisher):
 	'''

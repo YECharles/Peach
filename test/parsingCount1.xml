@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Peach>
   <Include src="file:defaults.xml" ns="default"/>
-  <Include src="file:PeachTypes.xml" ns="pt"/>
   <Import from="Peach.Generators.dictionary" import="*" />
   <DataModel name="TestTemplate">
     <String name="TestString">

@@ -4,7 +4,6 @@
 	author="Michael Eddington" description="Hello World Example">
 	
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="TestTemplate">
 		<Number name="SizeOfTheBlock" size="16" signed="false">

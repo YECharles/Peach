@@ -16,7 +16,6 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="HelloWorldTemplate">
 		<String isStatic="true" value="Hello from phed.org!" />

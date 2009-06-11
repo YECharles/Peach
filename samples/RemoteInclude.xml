@@ -24,7 +24,6 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<!-- Include a file from a web-site -->
 	<Include ns="example" src="http://phed.org/Peach/Example.xml" />

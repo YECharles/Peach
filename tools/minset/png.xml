@@ -4,7 +4,7 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
+	
 	
 	<DataModel name="Chunk">
 		<Number name="Length" size="32" endian="network" signed="false">

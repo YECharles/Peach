@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3 BETA2"
-  OutFile "Peach-2.3-BETA2.exe"
+  Name "Peach 2.3 x86"
+  OutFile "Peach-2.3-x86.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
@@ -82,6 +82,9 @@ Section "Dummy Section" SecDummy
   CreateShortCut "$SMPROGRAMS\Peach\Peach Validation.lnk" "$INSTDIR\bin\peachvalidator.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
   CreateShortCut "$SMPROGRAMS\Peach\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
+  ; Register DbgEngEvent.dll
+  RegDLL "$INSTDIR\bin\DbgEngEvent.dll"
+  
   ;Store installation folder
   WriteRegStr HKCU "Software\Peach" "" $INSTDIR
   
@@ -106,7 +109,8 @@ SectionEnd
 
 Section "Uninstall"
 
-  ;ADD YOUR OWN FILES HERE...
+  ; Unregister com
+  UnRegDLL "$INSTDIR\bin\DbgEngEvent.dll"
   
   Delete "$INSTDIR\Uninstall.exe"
 

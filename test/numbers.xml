@@ -4,7 +4,6 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="TestTemplate">
 		<Number isStatic="true"  size="8" value="100" endian="little" />

@@ -12,7 +12,6 @@
     -->
 
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 
     <DataModel name="SipSimpleSubscribe">
         <String value="SUBSCRIBE sip:dd2@192.168.1.194 SIP/2.0\r\nVia: SIP/2.0/TCP 192.168.6.1:5060;branch=z9hG4bK754C13CB260F1EA425F4\r\nFrom: &lt;sip:dd@192.168.1.194&gt;;tag=806527798;epid=1234567890\r\nTo: &lt;sip:dd2@192.168.1.194&gt;\r\nMax-Forwards: 10\r\nCSeq: 4 SUBSCRIBE\r\nUser-Agent: Purple/2.0.2\r\nCall-ID: " />

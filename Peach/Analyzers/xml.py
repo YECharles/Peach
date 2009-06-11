@@ -197,7 +197,6 @@ class _Xml2Peach(object):
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<DataModel name="TheDataModel">
 %s

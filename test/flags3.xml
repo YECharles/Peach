@@ -3,7 +3,6 @@
 	xsi:schemaLocation="http://phed.org/2008/Peach /peach/peach.xsd" author="Michael Eddington">
 	
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	
 	<!-- 11000010 11111111 -->
 	<DataModel name="Chunk">

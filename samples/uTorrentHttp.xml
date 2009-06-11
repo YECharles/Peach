@@ -27,7 +27,6 @@
     
     <!-- Import defaults for Peach instance -->
     <Include ns="default" src="file:defaults.xml" />
-    <Include ns="pt" src="file:PeachTypes.xml" />
     
     <DataModel name="HttpRequest">
         <String value="GET /gui/?list=1&amp;cid=2049540159&amp;getmsg=1 HTTP/1.1\r\nVia: 1.1 Snark\r\nHost: 127.0.0.1:8181\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11\r\nAccept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\nKeep-Alive: 300\r\nReferer: http://127.0.0.1:8181/gui/\r\nAuthorization: Basic YWRtaW46aGVscG1l\r\nConnection: keep-alive\r\n\r\n" />

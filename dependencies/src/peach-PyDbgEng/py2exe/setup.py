@@ -7,6 +7,13 @@
 # "build" and "dist".  The .dll or .exe in dist is what you are looking for.
 ##############################################################################
 
+# Change list
+# -----------
+#
+# 06/11/09 - ctypes_com_server tried.  Looks like this is working now SHIP IT!
+# ???????? - tried console, dll, etc.  No love.
+#
+
 from distutils.core import setup
 import py2exe
 import sys
@@ -21,5 +28,7 @@ setup(
 	author_email="mike@phed.org",
 	packages=["PyDbgEng"],
 	package_data={'PyDbgEng': ['data/*']},
-	dll=['PyDbgEng/DbgEngEvent.py']
+	ctypes_com_server=['PyDbgEng.DbgEngEvent']
 	)
+
+# end

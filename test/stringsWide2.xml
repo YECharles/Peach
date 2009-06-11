@@ -5,7 +5,7 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
+	
 	
 	<!--
 	Regression test for bug were a sized block would cause recursion

@@ -5,7 +5,6 @@
 	
 	<!-- Import defaults for Peach instance -->
 	<Include ns="default" src="file:defaults.xml" />
-	<Include ns="pt" src="file:PeachTypes.xml" />
 	<Include ns="a" src="file:data6a.xml" />
 	
 	<Data name="TheData" template="a:TestCase">
