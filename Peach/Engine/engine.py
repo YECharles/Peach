@@ -409,10 +409,10 @@ class Engine(object):
 				elif skipToTest and test.name == skipToTestName:
 					skipToTest = False
 				
-				if PROFILE:
-					profile.runctx("self._runTest(run, test)", globals(), {"self":self, "run":run,"test":test})
-				else:
-					self._runTest(run, test)
+				#if PROFILE:
+				#	profile.runctx("self._runTest(run, test)", globals(), {"self":self, "run":run,"test":test})
+				#else:
+				self._runTest(run, test)
 		
 		else:
 			# Handle parallel fuzzing
@@ -565,7 +565,7 @@ class Engine(object):
 					testCount += 1
 					
 					if PROFILE:
-						if testCount > 200:
+						if testCount > 2:
 							break
 					
 					# What if we are just counting?
@@ -613,6 +613,11 @@ class Engine(object):
 						
 					# Run the test
 					try:
+						#if testCount > 1:
+						#	print "WITH PROFILER"
+						#	profile.runctx("actionValues = stateEngine.run(mutator)", globals(), {"stateEngine":stateEngine, "mutator":mutator})
+						#else:
+						#	print "WITHOUT PROFILER"
 						actionValues = stateEngine.run(mutator)
 					
 					except RedoTestException:

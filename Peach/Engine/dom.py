@@ -165,7 +165,6 @@ class Element(object):
 			self._childrenHash = None
 			self.children = None
 		
-		
 		if self.elementType == 'block' or self.elementType == 'namespace':
 			toXml = getattr(self, 'toXml')
 			setattr(self, 'toXml', None)
@@ -200,9 +199,6 @@ class Element(object):
 			e.children = PeachModule.Engine.engine.Empty()
 			
 			for c in children:
-				if not hasattr(c, "name") or c.name == None:
-					c.name = "Lost Element"
-				
 				e.append(c)
 		
 		self.parent = parent
@@ -214,10 +210,10 @@ class Element(object):
 			
 			if e.placement != None:
 				e.placement.parent = e
-		
+			
 			for h in e.hints:
 				h.parent = e
-		
+			
 			if e.transformer != None:
 				e.transformer.parent = e
 		
@@ -724,8 +720,9 @@ class ElementWithChildren(Element):
 	
 	def append(self, obj):
 
-		if obj in self._children:
-			raise Exception("object already child of element")
+		## remove for speed
+		#if obj in self._children:
+		#	raise Exception("object already child of element")
 		
 		# If we have the key we need to replace it
 		if self._childrenHash.has_key(obj.name):
@@ -735,10 +732,11 @@ class ElementWithChildren(Element):
 		
 		# Otherwise add it at the end
 		self._children.append(obj)
-		if obj.name != None:
-			self._childrenHash[obj.name] = obj
-			setattr(self.children, obj.name, obj)
-			obj.parent = self
+		self._childrenHash[obj.name] = obj
+		setattr(self.children, obj.name, obj)
+		
+		# Reset parent relationship
+		obj.parent = self
 	
 	def index(self, obj):
 		return self._children.index(obj)
