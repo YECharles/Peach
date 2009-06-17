@@ -38,7 +38,7 @@ from Peach.mutatestrategies import *
 
 class _RandomMutator(object):
 	name = "chosen randomly"
-
+	
 class RandomMutationStrategy(MutationStrategy):
 	'''
 	This mutation strategy will randomly select N fields
@@ -73,7 +73,7 @@ class RandomMutationStrategy(MutationStrategy):
 		self._random = random.Random()
 	
 		self._mutator = _RandomMutator()
-	
+		
 	def next(self):
 		pass
 	
@@ -109,8 +109,8 @@ class RandomMutationStrategy(MutationStrategy):
 		@param	stateEngine: StateEngine instance in use
 		'''
 		
-		## Select the data model to change
 		if not self._isFirstTestCase:
+			## Select the data model to change
 			self._dataModelToChange = self._random.choice(self._dataModels.keys())
 	
 	
@@ -128,6 +128,7 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		self._isFirstTestCase = False
 		self._dataModelToChange = None
+		
 	
 	
 	def onDataModelGetValue(self, action, dataModel):
@@ -142,6 +143,7 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		if self._isFirstTestCase:
 			fullName = dataModel.getFullname()
+			
 			if fullName not in self._dataModels:
 				self._dataModels[fullName] = self._getNodeCount(dataModel)
 				
@@ -160,41 +162,42 @@ class RandomMutationStrategy(MutationStrategy):
 			
 			return
 		
-		## Is this data model we are changing?
-		if dataModel.getFullname() != self._dataModelToChange:
-			return
-		
-		## Select fields to modify
-		nodes = dataModel.getAllChildDataElements()
-		nodes.append(dataModel)
-		
-		# Remove non-mutable fields
-		for node in nodes:
-			if not node.isMutable:
-				nodes.remove(node)
-		
-		# Select nodes we will modify
-		if len(nodes) <= self._n:
-			fields = nodes
 		else:
-			fields = self._random.sample(nodes, self._n)
-		
-		# Now perform mutations on fields
-		for node in fields:
-			try:
-				mutator = self._random.choice(self._fieldMutators[node.getFullname()])
-				
-				# Note: Since we are applying multiple mutations
-				#       sometimes a mutation will fail.  We should
-				#       ignore those failures.
+			## Is this data model we are changing?
+			if dataModel.getFullname() != self._dataModelToChange:
+				return
+			
+			## Select fields to modify
+			nodes = dataModel.getAllChildDataElements()
+			nodes.append(dataModel)
+			
+			# Remove non-mutable fields
+			for node in nodes:
+				if not node.isMutable:
+					nodes.remove(node)
+			
+			# Select nodes we will modify
+			if len(nodes) <= self._n:
+				fields = nodes
+			else:
+				fields = self._random.sample(nodes, self._n)
+			
+			# Now perform mutations on fields
+			for node in fields:
 				try:
-					mutator.randomMutation(node)
+					mutator = self._random.choice(self._fieldMutators[node.getFullname()])
+					
+					# Note: Since we are applying multiple mutations
+					#       sometimes a mutation will fail.  We should
+					#       ignore those failures.
+					try:
+						mutator.randomMutation(node)
+					except:
+						pass
+				
 				except:
 					pass
 			
-			except:
-				pass
-		
 		# all done!
 
 #MutationStrategy.DefaultStrategy = RandomMutationStrategy

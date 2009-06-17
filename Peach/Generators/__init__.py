@@ -35,7 +35,7 @@ Default included Generators.
 # $Id$
 
 import block, dictionary, incrementor, repeater, static, null
-import unicode, flipper, data, xmlstuff, uri
+import flipper, data, xmlstuff, uri
 
 __all__ = ["block",
 		   "dictionary",
@@ -43,7 +43,7 @@ __all__ = ["block",
 		   "repeater",
 		   "static",
 		   "null",
-		   "unicode",
+		   #"unicode",
 		   "flipper",
 		   "data",
 		   "xmlstuff",

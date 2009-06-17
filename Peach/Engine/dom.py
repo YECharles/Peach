@@ -1032,6 +1032,59 @@ class DataElement(Mutatable):
 		return self._possiblePos
 	possiblePos = property(get_possiblePos, set_possiblePos, None)
 	
+	def clone(self, obj):
+		
+		if obj == None:
+			raise Exception("Generic clone needs object instance!")
+		
+		obj.isPointer = self.isPointer
+		obj.pointerDepth = self.pointerDepth
+		obj.constraint = self.constraint
+		obj.isMutable = self.isMutable
+		obj.modelHasOffsetRelation = self.modelHasOffsetRelation
+		
+		if self.relationCache != None:
+			obj.relationCache = self.relationCache[:]
+		if self.relationOfCache != None:
+			obj.relationOfCache = self.relationOfCache.copy()
+			
+		obj.onArrayNext = self.onArrayNext
+		
+		if self.transformer != None:
+			obj.transformer = self.transformer.clone()
+		if self.fixup != None:
+			obj.fixup = self.fixup.clone()
+		if self.placement != None:
+			obj.placement = self.placement.clone()
+		
+		for r in self.relations:
+			obj.relations.append( r.clone() )
+		
+		for h in self.hints:
+			obj.hints.append( h.clone() )
+		
+		obj.occurs = self.occurs
+		obj._minOccurs = self._minOccurs
+		obj._maxOccurs = self._maxOccurs
+		obj._defaultValue = self._defaultValue
+		obj._currentValue = self._currentValue
+		obj._finalValue = self._finalValue
+		obj._value = self._value
+		obj.when = self.when
+		obj._inInternalValue = self._inInternalValue
+		obj.array = self.array
+		obj.arrayPosition = self.arrayPosition
+		obj.arrayMinOccurs = self.arrayMinOccurs
+		obj.arrayMaxOccurs = self.arrayMaxOccurs
+		obj._pos = self._pos
+		obj._possiblePos = self._possiblePos
+		obj.rating = self.rating
+		obj.isStatic = self.isStatic
+		obj.fullNameDataModel = self.fullNameDataModel
+		
+		return obj
+		
+	
 	def asCType(self):
 		'''
 		Returns a ctypes module type for this DataElement.
@@ -2391,6 +2444,14 @@ class Transformer(ElementWithChildren):
 		# Class string used to create transformer instance
 		self.classStr = None
 	
+	def clone(self, obj = None):
+		if obj == None:
+			obj = Transformer(self.parent, self.transformer)
+		
+		obj.classStr = self.classStr
+		
+		return obj
+	
 	def changesSize(self):
 		return self.transformer.changesSize()
 	
@@ -2403,16 +2464,38 @@ class Fixup(ElementWithChildren):
 		self.elementType = 'fixup'
 		self.classStr = None
 		self.fixup = fixup
+		
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Fixup(self.parent, self.fixup)
+		
+		obj.elementType = self.elementType
+		obj.classStr = self.classStr
+		
+		return obj
+	
 	
 class Placement(ElementWithChildren):
 	'''
 	Indicates were a block goes after cracking.
 	'''
-	def __init__(self, parent, fixup = None):
+	def __init__(self, parent):
 		ElementWithChildren.__init__(self, None, parent)
 		self.elementType = 'placement'
 		self.after = None
 		self.before = None
+		
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Placement(self.parent)
+		
+		obj.elementType = self.elementType
+		obj.after = self.after
+		obj.before = self.before
+		
+		return obj
 
 class Param(ElementWithChildren):
 	def __init__(self, parent):
@@ -2567,6 +2650,22 @@ class Template(DataElement):
 		self.ref = None
 		self.length = None
 		self.lengthType = None
+	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Template(self.name)
+		
+		DataElement.clone(self, obj)
+		
+		obj.ref = self.ref
+		obj.length = self.length
+		obj.lengthType = self.lengthType
+		
+		for c in self:
+			obj.append( c.clone() )
+		
+		return obj
 	
 	def asCType(self):
 		
@@ -2774,6 +2873,23 @@ class Choice(DataElement):
 		self.length = None
 		self.lengthType = None
 	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Choice(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.currentElement = self.currentElement
+		obj.elementType = self.elementType
+		obj.length = self.length
+		obj.lengthType = self.lengthType
+		
+		for c in self:
+			obj.append( c.clone() )
+		
+		return obj
+	
 	def asCType(self):
 		
 		self.getValue()
@@ -2912,6 +3028,22 @@ class Block(DataElement):
 		self.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, self, self.__class__)
 		self.length = None
 		self.lengthType = None
+		
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Block(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.elementType = self.elementType
+		obj.length = self.length
+		obj.lengthType = self.lengthType
+		
+		for c in self:
+			obj.append( c.clone() )
+		
+		return obj
 	
 	def asCType(self):
 		
@@ -3148,6 +3280,22 @@ class Number(DataElement):
 		self.currentValue = None
 		self.generatedValue = None
 		self.insideRelation = False
+	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Number(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.size = self.size
+		obj.signed = self.signed
+		obj.valueType = self.valueType
+		obj._endian = self._endian
+		obj.ref = self.ref
+		obj.insideRelation = self.insideRelation
+		
+		return obj
 	
 	def getEndian(self):
 		if self._endian == None:
@@ -3391,6 +3539,20 @@ try:
 			self.insideRelation = False
 			self.asn1Type = ""
 			self.encodeType = "ber"
+			
+		def clone(self, obj = None):
+			
+			if obj == None:
+				obj = Asn1Type(self.name, self.parent)
+			
+			DataElement.clone(self, obj)
+			
+			obj.elementType = self.elementType
+			obj.insideRelation = self.insideRelation
+			obj.asn1Type = self.asn1Type
+			obj.encodeType = self.encodeType
+			
+			return obj
 		
 		def asCType(self):
 			# TODO: Should support Ctype, return a string or something...
@@ -3641,6 +3803,25 @@ class String(DataElement):
 		#: DEPRICATED, Use hint instead
 		self.tokens = None
 	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = String(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.valueType = self.valueType
+		obj.length = self.length
+		obj.lengthType = self.lengthType
+		obj.lengthCalc = self.lengthCalc
+		obj.insideRelation = self.insideRelation
+		obj.analyzer = self.analyzer
+		obj.padCharacter = self.padCharacter
+		obj.type = self.type
+		obj.nullTerminated = self.nullTerminated
+		
+		return obj
+	
 	def asCType(self):
 		
 		if self.type == 'wchar':
@@ -3785,6 +3966,21 @@ class Flags(DataElement):
 		self.length = None	# called size
 		self.endian = Flags.defaultEndian
 
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Flags(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.endian = self.endian
+		obj.length = self.length
+		
+		for c in self:
+			obj.append( c.clone() )
+		
+		return obj
+	
 	def asCType(self):
 		
 		value = int(self.getInternalValue())
@@ -3996,6 +4192,18 @@ class Flag(DataElement):
 		self.position = None
 		self.length = None	# called size
 	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Flag(self.name, self.parent)
+		
+		DataElement.clone(self, obj)
+		
+		obj.position = self.position
+		obj.length = self.length
+		
+		return obj
+	
 	def getInternalValue(self):
 		'''
 		Return the internal value of this date element.  This
@@ -4061,6 +4269,17 @@ class Seek(ElementWithChildren):
 		self.maxOccurs = 1
 		self.currentValue = None
 		self.defaultValue = None
+	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Seek(self.name, self.parent)
+		
+		obj.expression = self.expression
+		obj.position = self.position
+		obj.relative = self.relative
+		
+		return obj
 	
 	def HasWhenRelation(self):
 		return False
@@ -4152,7 +4371,23 @@ class Blob(DataElement):
 		self.lengthType = Blob.defaultLengthType
 		self.length = None
 		self.lengthCalc = None
-
+	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			blob = Blob(self.name, self.parent)
+		else:
+			blob = obj
+		
+		DataElement.clone(self, blob)
+		blob.elementType = self.elementType
+		blob.valueType = self.valueType
+		blob.lengthType = self.lengthType
+		blob.length = self.length
+		blob.lengthCalc = self.lengthCalc
+		
+		return blob
+	
 	def asCType(self):
 		
 		value = self.getValue()
@@ -4162,7 +4397,7 @@ class Blob(DataElement):
 			ret[i] = value[i]
 		
 		return ret
-		
+	
 	def getInternalValue(self, sout = None):
 		'''
 		Return the internal value of this date element.  This
@@ -4301,6 +4536,21 @@ class Relation(Element):
 		self.expressionGet = None
 		#: Expression to apply to relation when setting value
 		self.expressionSet = None
+	
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Relation(self.name, self.parent)
+		
+		obj.type = self.type
+		obj.of = self.of
+		obj.From = self.From
+		obj.relative = self.relative
+		obj.relativeTo = self.relativeTo
+		obj.expressionGet = self.expressionGet
+		obj.expressionSet = self.expressionSet
+		
+		return obj
 	
 	def getFullnameInDataModel(self):
 		'''
@@ -4709,6 +4959,16 @@ class Hint(ElementWithChildren):
 		ElementWithChildren.__init__(self, name, parent)
 		self.elementType = 'hint'
 		self.value = None
+		
+	def clone(self, obj = None):
+		
+		if obj == None:
+			obj = Hint(self.name, self.parent)
+		
+		obj.elementType = self.elementType
+		obj.value = self.value
+		
+		return obj
 	
 class Custom(DataElement):
 	

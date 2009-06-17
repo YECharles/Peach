@@ -44,7 +44,7 @@ The engine component currently does the following:
 
 ## NOTE: imports are at the bottom.
 
-PROFILE = False
+PROFILE = True
 
 if PROFILE:
 	print " --- ENGINE PROFILING ENABLED ---- "
