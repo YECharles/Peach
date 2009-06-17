@@ -59,6 +59,8 @@ class StringTokenAnalyzer(Analyzer):
 		if not isinstance(parent, String):
 			raise PeachException("Error, StringTokenAnalyzer can only be attached to String data elements.")
 		
+		data = unicode(data, 'latin-1')
+		
 		self.stringType = parent.type
 		dom = self._tokenizeString(data, None)
 		
@@ -108,8 +110,8 @@ class StringTokenAnalyzer(Analyzer):
 		
 		if tokens == None:
 			# Tokens in order of precidence
-			tokens = ['\0', '\n', '\r', '<', '>', '?', ' ', ';',',', '|', '@', ':', '(', ')',
-					  '{', '}', '[', ']', '/', '\\', '&', '=', '-', '+', '.']
+			tokens = [u'\0', u'\n', u'\r', u'<', u'>', u'?', u' ', u';',u',', u'|', u'@', u':', u'(', u')',
+					  u'{', u'}', u'[', u']', u'/', u'\\', u'&', u'=', u'-', u'+', u'.']
 		
 		topNode = _StringNode(None, string)
 		
@@ -197,7 +199,7 @@ class StringTokenAnalyzer(Analyzer):
 			node = self._topNode
 		
 		if node.string == None:
-			ret = ''
+			ret = u''
 			
 			for child in node.children:
 				ret += self.buildString(child)

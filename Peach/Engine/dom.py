@@ -3199,6 +3199,9 @@ class Block(DataElement):
 						value += c.getValue(sout)
 					
 					except:
+						print c
+						print repr(value)
+						print repr(c.getValue(sout))
 						print "c.getValue(sout) failed." + repr(sys.exc_info())
 						print "c.name: %s" % c.name
 						traceback.print_stack()
@@ -3761,7 +3764,7 @@ class XmlAttribute(DataElement):
 		'''
 		
 		if parent == None:
-			return ""
+			return u""
 		
 		value = ""
 		for c in self:
@@ -3883,7 +3886,7 @@ class String(DataElement):
 			return self.currentValue
 			
 		# 1. Init value
-		value = u""
+		value = ""
 		
 		# 3. default value?
 		if self.defaultValue != None:
@@ -3934,15 +3937,8 @@ class String(DataElement):
 			if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
 				value += '\0'
 			
-			# Encode
-		
-			if not (type(value) == str and self.type == 'char'):
-				try:
-					value = value.encode(self.EncodeAs[self.type])
-				except:
-					print type(value)
-					print "ENcoding:",self.EncodeAs[self.type]
-					raise
+		# Encode
+		value = value.encode(self.EncodeAs[self.type])
 		
 		# Output
 		
