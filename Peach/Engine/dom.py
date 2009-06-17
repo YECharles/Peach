@@ -101,6 +101,13 @@ class Element(object):
 		self.parent = parent
 		#self._parent = parent
 		
+		#: Used instead of isinstance which is slow
+		self.isDataElement = False
+		#: Used instead of isinstance which is slow
+		self.isElementWithChildren = False
+		#: Used instead of isinstance which is slow
+		self.isElement = True
+		
 		#: If element has children
 		self.hasChildren = False
 		
@@ -184,6 +191,8 @@ class Element(object):
 			e.toXml = new.instancemethod(PeachModule.Engine.dom.BlockToXml, e, e.__class__)
 			setattr(self, 'toXml', toXml)
 		
+		self.parent = parent
+
 		if isinstance(self, ElementWithChildren):
 			# Set back other children collections
 			self._childrenHash = _childrenHash
@@ -201,21 +210,19 @@ class Element(object):
 			for c in children:
 				e.append(c)
 		
-		self.parent = parent
-		
-		# Fixup DataElements
-		if isinstance(e, DataElement):
-			for r in e.relations:
-				r.parent = e
-			
-			if e.placement != None:
-				e.placement.parent = e
-			
-			for h in e.hints:
-				h.parent = e
-			
-			if e.transformer != None:
-				e.transformer.parent = e
+			# Fixup DataElements
+			if e.isDataElement:
+				for r in e.relations:
+					r.parent = e
+				
+				if e.placement != None:
+					e.placement.parent = e
+				
+				for h in e.hints:
+					h.parent = e
+				
+				if e.transformer != None:
+					e.transformer.parent = e
 		
 		return e
 
@@ -461,7 +468,7 @@ class Element(object):
 		# We need to remove realParents before we can perform
 		# the copy and then replace then.
 		
-		if isinstance(self, DataElement):
+		if self.isDataElement:
 			
 			if hasattr(self, 'realParent'):
 				selfRealParent = self.realParent
@@ -478,7 +485,7 @@ class Element(object):
 		newSelf.parent = parent
 		self._FixParents(newSelf, parent)
 
-		if isinstance(self, DataElement):
+		if self.isDataElement:
 			
 			if hasattr(self, 'realParent'):
 				self.realParent = selfRealParent
@@ -508,7 +515,7 @@ class Element(object):
 		if parent != None:
 			start.parent = parent
 		
-		if isinstance(start, ElementWithChildren):
+		if start.isElementWithChildren:
 			for child in start._children:
 				self._FixParents(child, start)
 		
@@ -612,6 +619,13 @@ class ElementWithChildren(Element):
 		self._childrenHash = {}		#: Dicitonary of children (by name)
 		self.children = Empty()		#: Children object, has children as attributes by name
 		self.hasChildren = True
+		
+		#: Used instead of isinstance which is slow
+		self.isDataElement = False
+		#: Used instead of isinstance which is slow
+		self.isElementWithChildren = True
+		#: Used instead of isinstance which is slow
+		self.isElement = True
 	
 		
 	def getByName(self, name):
@@ -649,7 +663,7 @@ class ElementWithChildren(Element):
 			ret.append(self)
 			
 		for child in self:
-			if isinstance(child, ElementWithChildren):
+			if child.isElementWithChildren:
 				child.getElementsByType(type, ret)
 		
 		return ret
@@ -865,6 +879,14 @@ class DataElement(Mutatable):
 		
 		if name != None and (name.find(".") > -1 or name.find(":") > -1):
 			raise PeachException("Name '%s' contains characters not allowed in names such as period (.) or collen (:)" % name)
+		
+		
+		#: Used instead of isinstance which is slow
+		self.isDataElement = True
+		#: Used instead of isinstance which is slow
+		self.isElementWithChildren = True
+		#: Used instead of isinstance which is slow
+		self.isElement = True
 		
 		#: Is this a ctypes pointer to something? (Defaults to False)
 		self.isPointer = False
@@ -1354,7 +1376,7 @@ class DataElement(Mutatable):
 					# cracker does, so lets match that behaviour.
 					remove = []
 					for child in obj.parent:
-						if isinstance(child, DataElement) and child != obj:
+						if child.isDataElement and child != obj:
 							remove.append(child)
 					
 					for child in remove:
@@ -1495,7 +1517,7 @@ class DataElement(Mutatable):
 			ret = []
 		
 		for child in self:
-			if isinstance(child, DataElement):
+			if child.isDataElement:
 				ret.append(child)
 				child.getAllChildDataElements(ret)
 		
@@ -1612,7 +1634,7 @@ class DataElement(Mutatable):
 		name = self.name
 		node = self
 		
-		while node.parent != None and isinstance(node.parent, DataElement):
+		while node.parent != None and node.parent.isDataElement:
 			node = node.parent
 			name = "%s.%s" % (node.name, name)
 		
@@ -1628,7 +1650,7 @@ class DataElement(Mutatable):
 		#return cPeach.getRootOfDataMap(self)
 
 		root = self
-		while root.parent != None and isinstance(root.parent, DataElement):
+		while root.parent != None and root.parent.isDataElement:
 			root = root.parent
 
 		return root
@@ -1684,12 +1706,12 @@ class DataElement(Mutatable):
 		
 		# look at each child
 		for child in node._children:
-			if isinstance(child, DataElement) and child.array == name and child.arrayPosition == 0:
+			if child.isDataElement and child.array == name and child.arrayPosition == 0:
 				return child
 		
 		# search down each child path
 		for child in node._children:
-			if isinstance(child, DataElement):
+			if child.isDataElement:
 				obj = self._findArrayByName(child, name)
 				if obj != None:
 					return obj
@@ -1784,7 +1806,7 @@ class DataElement(Mutatable):
 		if isinstance(obj, Block) or isinstance(obj, Template):
 			ret.append(obj)
 		
-		while obj.parent != None and isinstance(obj.parent, DataElement):
+		while obj.parent != None and obj.parent.isDataElement:
 			obj = obj.parent
 			ret.append(obj)
 			
@@ -1808,7 +1830,7 @@ class DataElement(Mutatable):
 		
 		# search down each child path
 		for child in node._children:
-			if isinstance(child, DataElement):
+			if child.isDataElement:
 				for n in self._findDataElementByName(child, name):
 					yield n
 		
@@ -2029,7 +2051,7 @@ class DataElement(Mutatable):
 			node = self
 		
 		# Check if we are the top of the data model
-		if not isinstance(node.parent, DataElement):
+		if not node.parent.isDataElement:
 			for r in self._getAllRelationsInDataModel(node, useCache):
 				if r == None:
 					continue
@@ -2039,7 +2061,7 @@ class DataElement(Mutatable):
 		else:
 			# If not start searching
 			cur = node.parent
-			while cur != None and isinstance(cur, DataElement):
+			while cur != None and cur.isDataElement:
 				for r in self._getAllRelationsInDataModel(cur, useCache):
 					if r == None:
 						continue
@@ -2057,7 +2079,7 @@ class DataElement(Mutatable):
 			node = self.getRootOfDataMap()
 		
 		# Use cache if we have it
-		if useCache and isinstance(node, DataElement) and node.relationCache != None:
+		if useCache and node.isDataElement and node.relationCache != None:
 			root = self.getRootOfDataMap()
 			for s in node.relationCache:
 				relName = s[s.rfind(".")+1:]
@@ -2078,7 +2100,7 @@ class DataElement(Mutatable):
 				yield r
 		
 		for child in node._children:
-			if isinstance(child,DataElement):
+			if child.isDataElement:
 				for r in self._getAllRelationsInDataModel(child, useCache):
 					yield r
 	
@@ -2100,7 +2122,7 @@ class DataElement(Mutatable):
 		
 		maxPos = int(self.arrayPosition)
 		for c in self.parent:
-			if isinstance(c, DataElement) and c.array == self.array:
+			if c.isDataElement and c.array == self.array:
 				if int(c.arrayPosition) > maxPos:
 					maxPos = int(c.arrayPosition)
 		
@@ -2115,7 +2137,7 @@ class DataElement(Mutatable):
 			return None
 		
 		for c in self.parent:
-			if isinstance(c, DataElement) and c.array == self.array and int(c.arrayPosition) == num:
+			if c.isDataElement and c.array == self.array and int(c.arrayPosition) == num:
 				return c
 		
 		return None
@@ -2362,7 +2384,7 @@ class DataElement(Mutatable):
 		node.reset()
 		
 		for c in node._children:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				self.resetDataModel(c)
 	
 	def _fixRealParent(self, node):
@@ -2404,7 +2426,7 @@ class DataElement(Mutatable):
 		parents = [node]
 		
 		root = node
-		while root.parent != None and not isinstance(root.parent, DataElement):
+		while root.parent != None and not root.parent.isDataElement:
 			root = root.parent
 			parents.append(root)
 		
@@ -2679,7 +2701,7 @@ class Template(DataElement):
 		values = []
 		fields = []
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				cValue = c.asCType()
 				fields.append((c.name, type(cValue)))
 				values.append((c.name, cValue))
@@ -2717,7 +2739,7 @@ class Template(DataElement):
 		
 		size = 0
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				size += c.getSize()
 		
 		return size
@@ -2771,9 +2793,8 @@ class Template(DataElement):
 		
 		# Check children
 		for c in self:
-			if isinstance(c, DataElement):
-				if c.isInvalidated():
-					return True
+			if c.isDataElement and c.isInvalidated():
+				return True
 		
 		# Return false
 		return False
@@ -2808,7 +2829,7 @@ class Template(DataElement):
 		# 2. Get value from children
 		
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				try:
 					if self.fixup != None or self.transformer != None:
 						value += c.getValue()
@@ -2984,7 +3005,7 @@ class Choice(DataElement):
 		else:
 			if self.currentElement == None:
 				for n in self:
-					if isinstance(n, DataElement):
+					if n.isDataElement:
 						self.currentElement = n
 						break
 			
@@ -3057,7 +3078,7 @@ class Block(DataElement):
 		values = []
 		fields = []
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				cValue = c.asCType()
 				fields.append( (c.name, type(cValue) ) )
 				values.append((c.name, cValue))
@@ -3095,7 +3116,7 @@ class Block(DataElement):
 		
 		size = 0
 		for c in self._children:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				size += c.getSize()
 		
 		return size
@@ -3135,7 +3156,7 @@ class Block(DataElement):
 		
 		# Check children
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				if c.isInvalidated():
 					return True
 		
@@ -3173,7 +3194,7 @@ class Block(DataElement):
 		
 		if self.transformer == None and self.fixup == None:
 			for c in self:
-				if isinstance(c, DataElement):
+				if c.isDataElement:
 					try:
 						value += c.getValue(sout)
 					
@@ -3195,7 +3216,7 @@ class Block(DataElement):
 			self.relationStringBuffer = stringBuffer
 			
 			for c in self:
-				if isinstance(c, DataElement):
+				if c.isDataElement:
 					try:
 						value += c.getValue(stringBuffer)
 					
@@ -3210,7 +3231,7 @@ class Block(DataElement):
 			value = ""
 			
 			for c in self:
-				if isinstance(c, DataElement):
+				if c.isDataElement:
 					try:
 						value += c.getValue(stringBuffer)
 					
@@ -3590,7 +3611,7 @@ try:
 				if isinstance(c, Asn1Type):
 					childAsn1Objs.append(c.getInternalValue(None, self))
 				
-				elif self.asn1Type == 'BitString' and isinstance(c, DataElement):
+				elif self.asn1Type == 'BitString' and c.isDataElement:
 					b = c.getValue()
 					b = self.blob2bin(b)
 					if b[:8] == '00000000':
@@ -3601,7 +3622,7 @@ try:
 				elif isinstance(c, Number):
 					value = c.getInternalValue()
 				
-				elif isinstance(c, DataElement):
+				elif c.isDataElement:
 					value = c.getValue()
 			
 			if value != None:
@@ -3693,7 +3714,7 @@ class XmlElement(DataElement):
 			elif isinstance(c, XmlElement):
 				c.getInternalValue(None, node)
 				
-			elif isinstance(c, DataElement):
+			elif c.isDataElement:
 				node.appendChild(doc.createTextNode(c.getValue().decode('latin-1').encode('utf8')))
 		
 		if not haveParent:
@@ -3744,7 +3765,7 @@ class XmlAttribute(DataElement):
 		
 		value = ""
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				value = c.getValue()
 				break
 		
@@ -4060,7 +4081,7 @@ class Flags(DataElement):
 		
 		# Check children
 		for c in self:
-			if isinstance(c, DataElement):
+			if c.isDataElement:
 				if c.isInvalidated():
 					return True
 		
@@ -4561,7 +4582,7 @@ class Relation(Element):
 		name = self.name
 		node = self
 		
-		while node.parent != None and isinstance(node.parent, DataElement):
+		while node.parent != None and node.parent.isDataElement:
 			node = node.parent
 			name = "%s.%s" % (node.name, name)
 		
