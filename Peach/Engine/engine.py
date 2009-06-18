@@ -256,6 +256,8 @@ class Engine(object):
 	justOne = False
 	#: Use the native cDeepCopy
 	nativeDeepCopy = True
+	#: Test range
+	testRange = None
 	
 	def __init__(self):
 		self.noCount = True
@@ -409,10 +411,7 @@ class Engine(object):
 				elif skipToTest and test.name == skipToTestName:
 					skipToTest = False
 				
-				#if PROFILE:
-				#	profile.runctx("self._runTest(run, test)", globals(), {"self":self, "run":run,"test":test})
-				#else:
-				self._runTest(run, test)
+				self._runTest(run, test, False, self.testRange)
 		
 		else:
 			# Handle parallel fuzzing

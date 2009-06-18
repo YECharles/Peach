@@ -43,7 +43,6 @@
 		<StateModel ref="State"/>
 		<!-- Display test cases to the console -->
 		<Publisher class="stdout.Stdout" />
-		<Mutator class="blob.BitFlipperMutator" />
 	</Test>
 
 	<!-- Configure a single run -->

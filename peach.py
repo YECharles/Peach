@@ -79,7 +79,8 @@ Syntax:
   peach.py -c peach_xml_file [run_name]
   peach.py -g
   peach.py [--skipto #] peach_xml_flie [run_name]
-  peach.py -p 10,2 [--skipto #] peach_xml_flie [run_name]
+  peach.py -p 10,2 [--skipto #] peach_xml_file [run_name]
+  peach.py --range 100,200 peach_xml_file [run_name]
   peach.py -t peach_xml_file
 
   -1                         Perform a single iteration
@@ -93,6 +94,7 @@ Syntax:
                              cryptic sometimes.
   --skipto N                 Skip to a specific test #.  This replaced -r
                              for restarting a Peach run.
+  --range N,M                Provide a range of test #'s to be run.
 
 Peach Agent
 
@@ -109,12 +111,15 @@ Performing Fuzzing Run
 
   Syntax: peach.py peach_xml_flie [run_name]
   Syntax: peach.py --skipto 1234 peach_xml_flie [run_name]
+  Syntax: peach.py --range 100,200 peach_xml_flie [run_name]
   
   A fuzzing run is started by by specifying the Peach XML file and the
   name of a run to perform.
   
   If a run is interupted for some reason it can be restarted using the
   --skipto parameter and providing the test # to start at.
+  
+  Additionally a range of test cases can be specified using --range.
 
 Performing A Parellel Fuzzing Run
 
@@ -174,7 +179,8 @@ try:
 	(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:1", ['strategy=','analyzer=', 'parallel=',
 																 'restart=', 'parser=',
 																 'test', 'count', 'web', 'agent',
-																 'gui', 'debug', 'new', 'skipto='])
+																 'gui', 'debug', 'new', 'skipto=',
+																 'range'])
 except:
 	usage()
 
@@ -292,10 +298,36 @@ for i in range(len(optlist)):
 		print "[*] Performing single iteration"
 		engine.Engine.justOne = True
 		
+	elif optlist[i][0] == '--range':
+		
+		# use the new match relation stuffs
+		
+		from Peach.Engine import *
+		from Peach.Engine.common import *
+		
+		try:
+			range = optlist[i][1].split(',')
+			range[0] = long(range[0])
+			range[1] = long(range[1])
+		except:
+			range = [long(args[0]), long(args[1])]
+			args = args[2:]
+		
+		if range[0] < 0:
+			print "Error: Count must be positive."
+			sys.exit(0)
+		
+		if range[0] >= range[1]:
+			print "Error: Range must be 1 or larger."
+			sys.exit(0)
+			
+		print "[*] Performing tests %d -> %d" % (range[0], range[1])
+		engine.Engine.testRange = range
+		
 	elif optlist[i][0] == '--test' or optlist[i][0] == '-t':
 
 		# do a parse test
-
+		
 		from Peach.Engine import *
 		from Peach.Engine.common import *
 		
@@ -374,11 +406,8 @@ for i in range(len(optlist)):
 		
 		# Restarting a fuzzer run
 		
-		print "Error, -r/--restart is no longer supported.  Instead please say \"--skipto N\" where N is the test count."
+		print "Error, -r/--restart is no longer supported.  Instead say \"--skipto N\" where N is the test count."
 		sys.exit(0)
-
-		#restartFuzzer = True
-		#restartFuzzerFile = optlist[i][1]
 		
 	elif optlist[i][0] == '--skipto':
 		
@@ -390,9 +419,13 @@ for i in range(len(optlist)):
 		
 		# Parallel fuzzing run
 		
-		parallel = optlist[i][1].split(',')
-		parallel[0] = int(parallel[0])
-		parallel[1] = int(parallel[1])
+		try:
+			parallel = optlist[i][1].split(',')
+			parallel[0] = long(parallel[0])
+			parallel[1] = long(parallel[1])
+		except:
+			parallel = [long(optlist[i][1]), long(args[0])]
+			args = args[1:]
 		
 		if parallel[0] < 1:
 			print "Error: Machine count must be >= 2."
