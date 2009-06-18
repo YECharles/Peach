@@ -50,7 +50,7 @@
 			<Action type="close" />
 			
 			<!-- Launch the file consumer -->
-			<Action type="call" method="notepad.exe"/>
+			<Action type="call" method="ScoobySnacks"/>
 			
 		</State>
 	</StateModel>
@@ -64,9 +64,13 @@
 			<Param name="CommandLine" value="c:\windows\system32\notepad.exe fuzzfile.bin" />
 			
 			<!-- This parameter will cause the debugger to wait for an action-call in
-				the state model with a method="notepad.exe" before running
-				program.  -->
-			<Param name="StartOnCall" value="notepad.exe" />
+				the state model with a method="ScoobySnacks" before running
+				program.
+				
+				Note: You will also need to add a parameter to the publisher called
+				    "debugger" and set it to "true"!
+				-->
+			<Param name="StartOnCall" value="ScoobySnacks" />
 			
 		</Monitor>
 		
