@@ -69,7 +69,6 @@ try:
 			This method also exists in process.PageHeap!
 			'''
 			
-			import win32api, win32con
 			try:
 				hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
 			except:
@@ -392,20 +391,20 @@ try:
 				if ourPid == pid:
 					continue
 				
-			try:
-				hPid = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 0, pid)
-				
 				try:
-					mids = win32process.EnumProcessModules(hPid)
-					for mid in mids:
-						name = str(win32process.GetModuleFileNameEx(hPid, mid))
-						if name.lower().find(procname) != -1:
-							return pid
+					hPid = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 0, pid)
 					
-				finally:
-					win32api.CloseHandle(hPid)
-			except:
-				pass
+					try:
+						mids = win32process.EnumProcessModules(hPid)
+						for mid in mids:
+							name = str(win32process.GetModuleFileNameEx(hPid, mid))
+							if name.lower().find(procname) != -1:
+								return pid
+						
+					finally:
+						win32api.CloseHandle(hPid)
+				except:
+					pass
 			
 			return None
 	
