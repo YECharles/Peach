@@ -612,11 +612,6 @@ class Engine(object):
 						
 					# Run the test
 					try:
-						#if testCount > 1:
-						#	print "WITH PROFILER"
-						#	profile.runctx("actionValues = stateEngine.run(mutator)", globals(), {"stateEngine":stateEngine, "mutator":mutator})
-						#else:
-						#	print "WITHOUT PROFILER"
 						actionValues = stateEngine.run(mutator)
 					
 					except RedoTestException:
@@ -710,10 +705,9 @@ class Engine(object):
 		
 		finally:
 			
+			# We no longer actually save our state as it's not needed
+			# instead, we will clean up.
 			if saveState:
-				### Save our state and exit
-				##stateFilename = "RunSpotSave_%s.peach" % time.strftime("%m%d%y_%H%M%S")
-				
 				print "-- Shutting down publisher(s)"
 				
 				try:
@@ -728,13 +722,6 @@ class Engine(object):
 				except:
 					pass
 				
-				##print "-- Saving position to restart file: %s" % stateFilename
-				##
-				##state = [ test.name, testCount ]
-				##fd = open(stateFilename, "wb+")
-				##fd.write(pickle.dumps(state))
-				##fd.close()
-				##
 				print "-- Done"
 				print "-- Exiting"
 				

@@ -3938,7 +3938,8 @@ class String(DataElement):
 				value += '\0'
 			
 		# Encode
-		value = value.encode(self.EncodeAs[self.type])
+		if type(value) != str:
+			value = value.encode(self.EncodeAs[self.type])
 		
 		# Output
 		

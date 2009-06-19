@@ -46,12 +46,6 @@ sys.path.append(".")
 ## Note: this will disable all deprication warnings!  For v2.6 compat.
 warnings.filterwarnings('ignore', message='', category=exceptions.DeprecationWarning)
 
-PROFILE = False
-
-if PROFILE:
-	print " --- PROFILING ENABLED ---- "
-	import profile
-
 try:
 	import Ft
 except:
@@ -369,15 +363,9 @@ for i in range(len(optlist)):
 		
 		engine = engine.Engine()
 		if len(args) > 1:
-			if PROFILE:
-				profile.run("engine.Count(args[0], args[1])")
-			else:
-				engine.Count(args[0], args[1])
+			engine.Count(args[0], args[1])
 		else:
-			if PROFILE:
-				profile.run("engine.Count(args[0], None)")
-			else:
-				engine.Count(args[0], None)
+			engine.Count(args[0], None)
 		
 		sys.exit(0)
 		
@@ -481,16 +469,10 @@ try:
 		watcher = PeachWebWatcher()
 	
 	if len(args) > 1:
-		if PROFILE:
-			profile.run("engine.Run(args[0], args[1], verbose, watcher, restartFuzzerFile, noCount, parallel)")
-		else:
-			engine.Run(args[0], args[1], verbose, watcher, restartFuzzerFile, noCount, parallel, startNum)
+		engine.Run(args[0], args[1], verbose, watcher, restartFuzzerFile, noCount, parallel, startNum)
 	
 	else:
-		if PROFILE:
-			profile.run("engine.Run(args[0], None, verbose, watcher, restartFuzzerFile, noCount, parallel)")
-		else:
-			engine.Run(args[0], None, verbose, watcher, restartFuzzerFile, noCount, parallel, startNum)
+		engine.Run(args[0], None, verbose, watcher, restartFuzzerFile, noCount, parallel, startNum)
 
 except PeachException, pe:
 	print ""
