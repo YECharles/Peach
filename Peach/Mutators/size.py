@@ -137,19 +137,19 @@ class SizedVaranceMutator(Mutator):
 				nodeOf.currentValue = ""
 		
 		# Verify things worked out okay
-		try:
-			assert((n == long(node.getInternalValue()) and (n-diff) == len(nodeOf.getValue())) or n < 0)
-		except:
-			print "realSize:", realSize
-			print "diff:", diff
-			print "node.name:", node.name
-			print "nodeOf.name:", nodeOf.name
-			print "nodeOf:", nodeOf
-			print "n:", n
-			print "long(node.getInternalValue()):",long(node.getInternalValue())
-			print "len(nodeOf.getValue()):", len(nodeOf.getValue())
-			print "repr(nodeOf.getValue()):", repr(nodeOf.getValue())
-			raise
+		#try:
+		#	assert((n == long(node.getInternalValue()) and (n-diff) == len(nodeOf.getValue())) or n < 0)
+		#except:
+		#	print "realSize:", realSize
+		#	print "diff:", diff
+		#	print "node.name:", node.name
+		#	print "nodeOf.name:", nodeOf.name
+		#	print "nodeOf:", nodeOf
+		#	print "n:", n
+		#	print "long(node.getInternalValue()):",long(node.getInternalValue())
+		#	print "len(nodeOf.getValue()):", len(nodeOf.getValue())
+		#	print "repr(nodeOf.getValue()):", repr(nodeOf.getValue())
+		#	raise
 
 
 class SizedNumericalEdgeCasesMutator(Mutator):

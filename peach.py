@@ -144,7 +144,7 @@ Debug Peach XML File
 """)
 	sys.exit(0)
 
-printError("\n] Peach 2.3 Runtime")
+printError("\n] Peach 2.3.1 Runtime")
 printError("] Copyright (c) Michael Eddington\n")
 
 if sys.version[:3] not in ['2.5', '2.6']:

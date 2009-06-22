@@ -514,6 +514,10 @@ try:
 			'''
 			Called right before start of test.
 			'''
+			
+			# Clear out output buffer
+			_DbgEventHandler.buff = ""
+			
 			if not self.StartOnCall and not self._IsDebuggerAlive():
 				self._StartDebugger()
 			elif self.StartOnCall:
