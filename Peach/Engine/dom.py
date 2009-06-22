@@ -3939,7 +3939,6 @@ class String(DataElement):
 			
 		# Encode
 		if type(value) != str or self.type != 'char':
-			print "Encoding as:", self.EncodeAs[self.type]
 			value = value.encode(self.EncodeAs[self.type])
 		
 		# Output
