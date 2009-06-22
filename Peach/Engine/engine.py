@@ -59,6 +59,10 @@ class EngineWatcher(object):
 	in the Peach Engine.
 	'''
 	
+	isElement = False
+	isElementWithChildren = False
+	isDataElement = False
+	
 	def setTotalVariations(self, totalVariations):
 		self.totalVariations = totalVariations
 		

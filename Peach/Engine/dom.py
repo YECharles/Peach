@@ -702,7 +702,8 @@ class ElementWithChildren(Element):
 		node = Element.toXmlDom(self, parent, dict)
 		
 		for child in self._children:
-			child.toXmlDom(node, dict)
+			if hasattr(child, 'toXmlDom'):
+				child.toXmlDom(node, dict)
 		
 		return node
 	
@@ -716,7 +717,8 @@ class ElementWithChildren(Element):
 		node = Element.toXmlDomLight(self, parent, dict)
 		
 		for child in self._children:
-			child.toXmlDomLight(node, dict)
+			if hasattr(child, 'toXmlDomLight'):
+				child.toXmlDomLight(node, dict)
 		
 		return node
 	
