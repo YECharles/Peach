@@ -206,8 +206,8 @@ class StateEngine:
 						
 						# Make a fresh copy of the template
 						del c[c.template.name]
-						#c.template = c.origionalTemplate.copy(c)
-						c.template = c.origionalTemplate.clone()
+						c.template = c.origionalTemplate.copy(c)
+						#c.template = c.origionalTemplate.clone()
 						c.append(c.template)
 				
 				continue
@@ -221,8 +221,8 @@ class StateEngine:
 			
 			# Make a fresh copy of the template
 			del action[action.template.name]
-			#action.template = action.origionalTemplate.copy(action)
-			action.template = action.origionalTemplate.clone()
+			action.template = action.origionalTemplate.copy(action)
+			#action.template = action.origionalTemplate.clone()
 			action.append(action.template)
 		
 		
