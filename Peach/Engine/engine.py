@@ -560,6 +560,7 @@ class Engine(object):
 		redoCount = 0
 		saveState = False
 		exitImmediate = False
+		actionValues = None
 		
 		try:
 			
@@ -701,6 +702,14 @@ class Engine(object):
 			print "-- User canceled run"
 			saveState = True
 			exitImmediate = True
+		
+		except PeachException, e:
+			if e.msg.find("Unable to reconnect to Agent") > -1:
+				results = {
+					"_Bucket" : "AgentConnectionFailed"
+				}
+				self.watcher.OnFault(run, test, testCount, results, actionValues)
+			raise
 		
 		except:
 			# Always save state on exceptions
