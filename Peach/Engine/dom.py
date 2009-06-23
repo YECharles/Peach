@@ -936,6 +936,8 @@ class DataElement(Mutatable):
 		#: Maximum occurences
 		self._maxOccurs = 1
 		
+		self.generatedOccurs = 1
+		
 		#: Default value to use
 		self._defaultValue = None
 		#: Mutated value prior to packing and transformers
@@ -1061,6 +1063,17 @@ class DataElement(Mutatable):
 		if obj == None:
 			raise Exception("Generic clone needs object instance!")
 		
+		obj.name = self.name
+		obj.parent = self.parent
+		obj.isDataElement = self.isDataElement
+		obj.isElementWithChildren = self.isElementWithChildren
+		obj.isElement = self.isElement
+		obj.hasChildren = self.hasChildren
+		obj.elementType = self.elementType
+		obj.fullName = self.fullName
+		obj.ref = self.ref
+		obj.generatedOccurs = self.generatedOccurs
+		
 		obj.isPointer = self.isPointer
 		obj.pointerDepth = self.pointerDepth
 		obj.constraint = self.constraint
@@ -1090,10 +1103,12 @@ class DataElement(Mutatable):
 		obj.occurs = self.occurs
 		obj._minOccurs = self._minOccurs
 		obj._maxOccurs = self._maxOccurs
+		
 		obj._defaultValue = self._defaultValue
 		obj._currentValue = self._currentValue
 		obj._finalValue = self._finalValue
 		obj._value = self._value
+		
 		obj.when = self.when
 		obj._inInternalValue = self._inInternalValue
 		obj.array = self.array
@@ -3066,6 +3081,13 @@ class Block(DataElement):
 		for c in self:
 			obj.append( c.clone() )
 		
+		if obj.getValue() != self.getValue():
+			print "Value missmatch"
+			sys.exit(0)
+		for item in dir(self):
+			if not hasattr(obj, item):
+				print "Missing:", item
+				sys.exit(0)
 		return obj
 	
 	def asCType(self):
@@ -3939,7 +3961,7 @@ class String(DataElement):
 			if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
 				value += '\0'
 			
-		# Encode
+		# Encode, but only when needed or we get errorzZzz
 		if type(value) != str or self.type != 'char':
 			value = value.encode(self.EncodeAs[self.type])
 		
