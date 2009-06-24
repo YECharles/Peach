@@ -78,14 +78,14 @@ class Wifi(Publisher):
 		self.beaconThread = None
 		self.beaconStopEvent = threading.Event()
 		self.beaconStopEvent.clear()
-		
+	
 	def start(self):
 		self.pcap = cdll.winpcap.pcap_open_live(self.device, 65536, 1, 1000, errbuff)
 		self.air = cdll.winpcap.pcap_get_airpcap_handle(self.pcap)
 		cdll.airpcap.AirpcapSetDeviceChannel(self.air, self.channel)
 		cdll.airpcap.AirpcapSetLinkType(self.air, AIRPCAP_LT_802_11)
 		self.beaconStopEvent.clear()
-		
+	
 	def stop(self):
 		if self.pcap != None:
 			cdll.winpcap.pcap_close(self.pcap)
@@ -147,7 +147,7 @@ class Wifi(Publisher):
 			self._startBeacon()
 		
 		raise PeachException("Action 'call' not supported by publisher")
-
+	
 	def connect(self):
 		'''
 		Called to connect or open a connection/file.
