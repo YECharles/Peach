@@ -7,10 +7,14 @@ but I'm going to try and start :)
 v2.3.1
 ------
 
- - Improve start time of mutators
- - SMTP Publisher
- - AirPcap publisher
- - Generate fault log when agent connection fails.
+ - New: Improved start time of mutators
+ - New: SMTP Publisher
+ - New: AirPcap publisher
+ - New: Generate fault log when agent connection fails.
+ - Depricated: Peach Builder -- To far out of date currently
+ - Bug: Removed assert checks from mutators
+ - Bug: Reset debugger log buffer on each test
+ - Bug: Misc bugs found testing with complex fuzzer definitions
  - Bug: Unicode bug fixes
  - Bug: self.find('element') failed when inside of two sized Blocks.
 
