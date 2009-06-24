@@ -1,7 +1,7 @@
 @echo off
 
 msiexec /qn /i cPeach-0.2.win32-py2.5.msi
-msiexec /qn /i cDeepCopy-0.2.win32-py2.5
+msiexec /qn /i cDeepCopy-0.2.win32-py2.5.msi
 msiexec /qn /i 4Suite-XML-1.0.2.win32-py2.5.msi
 msiexec /qn /i pyasn1-0.0.7a.win32-py2.5.msi
 msiexec /qn /i pyvmware-0.1.win32-py2.5.msi
