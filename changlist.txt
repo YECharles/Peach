@@ -12,6 +12,7 @@ v2.3.1
  - New: AirPcap publisher
  - New: Generate fault log when agent connection fails.
  - Depricated: Peach Builder -- To far out of date currently
+ - Bug: Win32 Dependencies batch files, fixed broken names
  - Bug: Removed assert checks from mutators
  - Bug: Reset debugger log buffer on each test
  - Bug: Misc bugs found testing with complex fuzzer definitions
