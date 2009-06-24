@@ -1,0 +1,49 @@
+Peach Changlist
+===============
+
+I've never been good about keeping change lists,
+but I'm going to try and start :)
+
+v2.3.1
+------
+
+ - Improve start time of mutators
+ - SMTP Publisher
+ - AirPcap publisher
+ - Generate fault log when agent connection fails.
+ - Bug: Unicode bug fixes
+ - Bug: self.find('element') failed when inside of two sized Blocks.
+
+v2.3
+----
+
+ - Analyzers.  Asn1, Xml, Binary, StringToken, WireShark
+ - Mutation Strategies.  Sequencial is default, also "random"
+ - Standardized common methods in expressions
+ - XmlElement and XmlAttribute type
+ - Asn1Type
+ - Hint: NumericalString
+ - Binary Analyzer checks to see if string is number and apply
+   NumericalString hint
+ - StringToken Analyzer adds NumericalString hint
+ - XmlElement/XmlAttribute add NumericalString hint
+ - Constraints (v2.2? or 2.3?)
+ - Complex structures with pointers using CTypes
+ - Data sets can set arrays
+ - Data sets can select Choice child
+ - Unicode mutators
+ - Added true unicode support
+ - UTF8 support
+ - Internally all strings are unicode
+ 
+ - Bug fixes.  More bug fixes than you can shake a stick at.
+
+v2.2
+----
+
+ [ Incomplete ]
+
+ - Removed Application Verifier support
+
+
+= END =
