@@ -200,13 +200,13 @@ class StdoutWatcher(EngineWatcher):
 													 str(self.remaingTime),
 													 test.mutator.currentMutator().name)
 		
-		if self.startTime == None and variationCount > 20:
+		if self.startTime == None and variationCount > 1:
 			self.startTime = time.time()
 			self.startVariationCount = variationCount
 		
 		try:
-			if variationCount % 50 == 0:
-				count = variationCount - self.startVariationCount
+			if variationCount % 20 == 0:
+				count = variationCount - (self.startVariationCount - 1)
 				elaps = time.time() - self.startTime
 				perTest = elaps / count
 				remaining = (int(self.totalVariations) - variationCount) * perTest

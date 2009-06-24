@@ -736,7 +736,7 @@ class AgentClient:
 					raise PeachException("Error connecting to remote agent %s, invalid response." % self._name)
 				
 				self._id = msg.id
-				break
+				return
 				
 			except:
 				if i == 9:

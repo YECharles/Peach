@@ -12,6 +12,7 @@ v2.3.1
  - New: SMTP Publisher
  - New: AirPcap publisher
  - New: Generate fault log when agent connection fails.
+ - Change: Estimated complete time updated every 20 iterations instead of 40.
  - Depricated: Peach Builder -- To far out of date currently
  - Bug: Fixed command line parsing for -p from batch files
  - Bug: Win32 Dependencies batch files, fixed broken names
