@@ -33,10 +33,26 @@ AirPcap publisher for wifi fuzzing.
 
 # $Id$
 
+import sys, os, threading, time
 from Peach.publisher import *
 
 try:
 	from ctypes import *
+	
+	class pcap_pkthdr(Structure):
+		'''
+		struct pcap_pkthdr {
+			struct timeval ts;	/* time stamp */
+			bpf_u_int32 caplen;	/* length of portion present */
+			bpf_u_int32 len;	/* length this packet (off wire) */
+		};
+		'''
+		_fields_ = {
+			'ts': c_uint64,
+			'caplen' : c_uint,
+			'len' : c_uint
+			}
+	
 except:
 	pass
 
@@ -45,31 +61,43 @@ class Wifi(Publisher):
 	AirPcap I/O inteface.  Supports sending beacons and standard I/O.
 	'''
 	
-	def __init__(self, device, channel = 5):
+	PCAP_ERRBUF_SIZE = 256
+	AIRPCAP_LT_802_11 = 1				# plain 802.11 link type. Every packet in the buffer contains the raw 802.11 frame, including MAC FCS.
+	AIRPCAP_LT_802_11_PLUS_RADIO = 2	# 802.11 plus radiotap link type. Every packet in the buffer contains a radiotap header followed by the 802.11 frame. MAC FCS is included.
+	AIRPCAP_LT_UNKNOWN = 3				# Unknown link type. You should see it only in case of error.
+	AIRPCAP_LT_802_11_PLUS_PPI = 4		# 802.11 plus PPI header link type. Every packet in the buffer contains a PPI header followed by the 802.11 frame. MAC FCS is included.
+	
+	def __init__(self, mac, device, channel = 5):
 		Publisher.__init__(self)
+		self.mac = mac
 		self.device = device
 		self.channel = channel
 		self.pcap = None
 		self.air = None
+		self.beacon = None
+		self.beaconThread = None
+		self.beaconStopEvent = threading.Event()
+		self.beaconStopEvent.clear()
 		
 	def start(self):
 		self.pcap = cdll.winpcap.pcap_open_live(self.device, 65536, 1, 1000, errbuff)
 		self.air = cdll.winpcap.pcap_get_airpcap_handle(self.pcap)
 		cdll.airpcap.AirpcapSetDeviceChannel(self.air, self.channel)
 		cdll.airpcap.AirpcapSetLinkType(self.air, AIRPCAP_LT_802_11)
+		self.beaconStopEvent.clear()
 		
 	def stop(self):
 		if self.pcap != None:
 			cdll.winpcap.pcap_close(self.pcap)
 			self.pcap = None
+		if self.beaconThread != None:
+			self.beaconStopEvent.set()
+			self.beaconThread.join()
+			self.beaconThread = None
+			self.beaconStopEvent.clear()
+			self.beacon = None
 	
 	def send(self, data):
-		'''
-		Publish some data
-		
-		@type	data: string
-		@param	data: Data to publish
-		'''
 		cdll.pcap.pcap_sendpacket(self.pcap, data, len(data))
 	
 	def receive(self, size = None):
@@ -83,13 +111,34 @@ class Wifi(Publisher):
 		'''
 		
 		while True:
+			#header = POINTER(POINTER(pcap_pkthdr()))
 			res = cdll.winpcap.pcap_next_ex(self.pcap, header, pkt_data)
 			
-			# if broadcast or to us
-			#   return
-			# else
-			#   keep reading.
+			# Convert byte array to binary string
+			data = ""
+			for i in range(header.len):
+				data += chr(pkt_data[i])
+			
+			# Check mac destination, assumes we want broadcasts
+			dest_mac = data[:]
+			if not (dest_mac == '\xff\xff\xff\xff\xff\xff' or dest_mac == self.mac):
+				continue
+			
+			return data
+	
+	def _sendBeacon():
+		while not self.beaconStopEvent.isSet():
+			cdll.pcap.pcap_sendpacket(self.pcap, self.beacon, len(self.beacon))
+			time.sleep(0.1)
+	
+	def _startBeacon():
+		if self.beacon == None:
+			return
+		if self.beaconThread != None:
+			return
 		
+		self.beaconThread = threading.Thread(target=self._sendBeacon, args=[self])
+		self.beaconThread.start()
 	
 	def call(self, method, args):
 		
