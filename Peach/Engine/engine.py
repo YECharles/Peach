@@ -96,6 +96,30 @@ class EngineWatcher(object):
 		'''
 		pass
 	
+	def OnStateEnter(self, state):
+		'''
+		Called as we enter a state
+		'''
+		pass
+	
+	def OnStateExit(self, state):
+		'''
+		Called as we exit a state
+		'''
+		pass
+	
+	def OnActionStart(self, action):
+		'''
+		Called as we start an action
+		'''
+		pass
+	
+	def OnActionComplete(self, action):
+		'''
+		Called after we completed action
+		'''
+		pass
+	
 	def OnTestCaseReceived(self, run, test, variationCount, value):
 		'''
 		Called when data is received from test case.
@@ -168,6 +192,23 @@ class EngineWatchPlexer(EngineWatcher):
 	def OnFault(self, run, test, variationCount, monitorData, value):
 		for w in self.watchers:
 			w.OnFault(run, test, variationCount, monitorData, value)
+
+	def OnStateEnter(self, state):
+		for w in self.watchers:
+			w.OnStateEnter(state)
+	
+	def OnStateExit(self, state):
+		for w in self.watchers:
+			w.OnStateExit(state)
+	
+	def OnActionStart(self, action):
+		for w in self.watchers:
+			w.OnActionStart(action)
+	
+	def OnActionComplete(self, action):
+		for w in self.watchers:
+			w.OnActionComplete(action)
+	
 
 
 class StdoutWatcher(EngineWatcher):

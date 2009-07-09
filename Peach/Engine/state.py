@@ -186,6 +186,7 @@ class StateEngine:
 		'''
 		
 		Debug(1, "StateEngine._runState: %s" % state.name)
+		Engine.context.watcher.OnStateEnter(state)
 		
 		# First up we need to copy all the action's templates
 		# otherwise values can leak all over the place!
@@ -289,6 +290,7 @@ class StateEngine:
 				evalEvent(state.onExit, environment, self.engine.peach)
 				
 			mutator.onStateFinished(self, state)
+			Engine.context.watcher.OnStateExit(state)
 			
 		except StateChangeStateException, e:
 			
@@ -306,6 +308,7 @@ class StateEngine:
 				evalEvent(state.onExit, environment, self.engine.peach)
 			
 			mutator.onStateFinished(self, state)
+			Engine.context.watcher.OnStateExit(state)
 			newState = mutator.onStateChange(state, e.state)
 			if newState == None:
 				newState = e.state
@@ -342,6 +345,8 @@ class StateEngine:
 				return
 			else:
 				Debug(1, "Action when passed: " + action.when)
+		
+		Engine.context.watcher.OnActionStart(action)
 		
 		# EVENT: onStart
 		if action.onStart != None:
@@ -683,6 +688,7 @@ class StateEngine:
 			evalEvent(action.onComplete, environment, self.engine.peach)
 		
 		mutator.onActionFinished(action.parent, action)
+		Engine.context.watcher.OnActionComplete(action)
 	
 	def _resetXmlNodes(self, node):
 		'''
