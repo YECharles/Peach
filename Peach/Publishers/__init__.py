@@ -36,11 +36,12 @@ Collection of default included Publishers
 
 
 import file, sql, stdout, tcp, udp, com, process, http, icmp, raw, remote, dll, smtp
+import wifi
 
 __all__ = ["file", "sql", "stdout", 
 	"tcp", "udp", "com", "process",
 	"http", "icmp", "raw", "remote",
-	"dll", "smtp"]
+	"dll", "smtp", "wifi"]
 
 # end
 

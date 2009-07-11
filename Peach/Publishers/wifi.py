@@ -67,7 +67,7 @@ class Wifi(Publisher):
 	AIRPCAP_LT_UNKNOWN = 3				# Unknown link type. You should see it only in case of error.
 	AIRPCAP_LT_802_11_PLUS_PPI = 4		# 802.11 plus PPI header link type. Every packet in the buffer contains a PPI header followed by the 802.11 frame. MAC FCS is included.
 	
-	def __init__(self, mac, device, channel = 5):
+	def __init__(self, mac = "\xca\xce\xca\xce\xca\xce", device = "\\\\.\\airpcap00", channel = 5):
 		Publisher.__init__(self)
 		self.mac = mac
 		self.device = device
@@ -76,19 +76,32 @@ class Wifi(Publisher):
 		self.air = None
 		self.beacon = None
 		self.beaconThread = None
-		self.beaconStopEvent = threading.Event()
-		self.beaconStopEvent.clear()
+		self.beaconStopEvent = None
+		
+		# Don't initalize here to avoid a deepcopy
+		# issue!
+		#self.beaconStopEvent = threading.Event()
+		#self.beaconStopEvent.clear()
 	
 	def start(self):
-		self.pcap = cdll.winpcap.pcap_open_live(self.device, 65536, 1, 1000, errbuff)
-		self.air = cdll.winpcap.pcap_get_airpcap_handle(self.pcap)
+		
+		if self.beaconStopEvent == None:
+			self.beaconStopEvent = threading.Event()
+		
+		errbuff = c_char_p("A"*1024) # Must pre-alloc memory for error message
+		self.pcap = cdll.wpcap.pcap_open_live(self.device, 65536, 1, 1000, errbuff)
+		
+		if self.pcap == 0:
+			raise Exception( errbuff.value )
+			
+		self.air = cdll.wpcap.pcap_get_airpcap_handle(self.pcap)
 		cdll.airpcap.AirpcapSetDeviceChannel(self.air, self.channel)
-		cdll.airpcap.AirpcapSetLinkType(self.air, AIRPCAP_LT_802_11)
+		cdll.airpcap.AirpcapSetLinkType(self.air, self.AIRPCAP_LT_802_11)
 		self.beaconStopEvent.clear()
 	
 	def stop(self):
 		if self.pcap != None:
-			cdll.winpcap.pcap_close(self.pcap)
+			cdll.wpcap.pcap_close(self.pcap)
 			self.pcap = None
 		if self.beaconThread != None:
 			self.beaconStopEvent.set()
@@ -98,7 +111,7 @@ class Wifi(Publisher):
 			self.beacon = None
 	
 	def send(self, data):
-		cdll.pcap.pcap_sendpacket(self.pcap, data, len(data))
+		cdll.wpcap.pcap_sendpacket(self.pcap, data, len(data))
 	
 	def receive(self, size = None):
 		'''
@@ -112,7 +125,7 @@ class Wifi(Publisher):
 		
 		while True:
 			#header = POINTER(POINTER(pcap_pkthdr()))
-			res = cdll.winpcap.pcap_next_ex(self.pcap, header, pkt_data)
+			res = cdll.wpcap.pcap_next_ex(self.pcap, header, pkt_data)
 			
 			# Convert byte array to binary string
 			data = ""
@@ -126,18 +139,18 @@ class Wifi(Publisher):
 			
 			return data
 	
-	def _sendBeacon():
+	def _sendBeacon(self):
 		while not self.beaconStopEvent.isSet():
-			cdll.pcap.pcap_sendpacket(self.pcap, self.beacon, len(self.beacon))
+			cdll.wpcap.pcap_sendpacket(self.pcap, self.beacon, len(self.beacon))
 			time.sleep(0.1)
 	
-	def _startBeacon():
+	def _startBeacon(self):
 		if self.beacon == None:
 			return
 		if self.beaconThread != None:
 			return
 		
-		self.beaconThread = threading.Thread(target=self._sendBeacon, args=[self])
+		self.beaconThread = threading.Thread(target=self._sendBeacon)
 		self.beaconThread.start()
 	
 	def call(self, method, args):
@@ -146,7 +159,6 @@ class Wifi(Publisher):
 			self.beacon = args[0]
 			self._startBeacon()
 		
-		raise PeachException("Action 'call' not supported by publisher")
 	
 	def connect(self):
 		'''
