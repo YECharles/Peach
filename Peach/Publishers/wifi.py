@@ -47,11 +47,11 @@ try:
 			bpf_u_int32 len;	/* length this packet (off wire) */
 		};
 		'''
-		_fields_ = {
-			'ts': c_uint64,
-			'caplen' : c_uint,
-			'len' : c_uint
-			}
+		_fields_ = [
+			('ts', c_uint64),
+			('caplen', c_uint),
+			('len', c_uint)
+			]
 	
 except:
 	pass
@@ -67,7 +67,7 @@ class Wifi(Publisher):
 	AIRPCAP_LT_UNKNOWN = 3				# Unknown link type. You should see it only in case of error.
 	AIRPCAP_LT_802_11_PLUS_PPI = 4		# 802.11 plus PPI header link type. Every packet in the buffer contains a PPI header followed by the 802.11 frame. MAC FCS is included.
 	
-	def __init__(self, mac = "\xca\xce\xca\xce\xca\xce", device = "\\\\.\\airpcap00", channel = 5):
+	def __init__(self, channel = 5, mac = "\xca\xce\xca\xce\xca\xce", device = "\\\\.\\airpcap00"):
 		Publisher.__init__(self)
 		self.mac = mac
 		self.device = device
@@ -93,7 +93,7 @@ class Wifi(Publisher):
 		
 		if self.pcap == 0:
 			raise Exception( errbuff.value )
-			
+		
 		self.air = cdll.wpcap.pcap_get_airpcap_handle(self.pcap)
 		cdll.airpcap.AirpcapSetDeviceChannel(self.air, self.channel)
 		cdll.airpcap.AirpcapSetLinkType(self.air, self.AIRPCAP_LT_802_11)
@@ -123,19 +123,51 @@ class Wifi(Publisher):
 		@return: data received
 		'''
 		
+		cdll.wpcap.pcap_next_ex.argtypes = [
+			c_void_p,
+			POINTER(POINTER(pcap_pkthdr)),
+			POINTER(POINTER(c_ubyte))
+			]
+		
+		header = pointer(pcap_pkthdr())
+		header.len = 0
+		header.caplen = 0
+		pkt_data = POINTER(c_ubyte)()
+		
 		while True:
-			#header = POINTER(POINTER(pcap_pkthdr()))
-			res = cdll.wpcap.pcap_next_ex(self.pcap, header, pkt_data)
+			res = cdll.wpcap.pcap_next_ex(self.pcap, byref(header), byref(pkt_data))
+			if res < 0:
+				# error reading packets
+				error = cdll.wpcap.pcap_geterr(self.pcap)
+				raise Exception(error)
+			
+			elif res == 0:
+				# timeout hit
+				continue
 			
 			# Convert byte array to binary string
+			
 			data = ""
-			for i in range(header.len):
-				data += chr(pkt_data[i])
+			cnt = 0
+			for b in pkt_data:
+				if cnt >= header.contents.len:
+					break
+				cnt += 1
+				data += chr(b)
 			
 			# Check mac destination, assumes we want broadcasts
-			dest_mac = data[:]
+			
+			dest_mac = data[4:10]
+			src_mac = data[10:16]
+			
+			if src_mac == self.mac:
+				continue
+			
 			if not (dest_mac == '\xff\xff\xff\xff\xff\xff' or dest_mac == self.mac):
 				continue
+			
+			if hasattr(self, "publisherBuffer"):
+				self.publisherBuffer.haveAllData = True
 			
 			return data
 	
