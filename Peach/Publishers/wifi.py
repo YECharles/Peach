@@ -88,7 +88,7 @@ class Wifi(Publisher):
 		if self.beaconStopEvent == None:
 			self.beaconStopEvent = threading.Event()
 		
-		errbuff = c_char_p("A"*1024) # Must pre-alloc memory for error message
+		errbuff = c_char_p("A"*self.PCAP_ERRBUF_SIZE) # Must pre-alloc memory for error message
 		self.pcap = cdll.wpcap.pcap_open_live(self.device, 65536, 1, 1000, errbuff)
 		
 		if self.pcap == 0:

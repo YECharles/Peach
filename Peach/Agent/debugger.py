@@ -190,7 +190,7 @@ try:
 				
 				# 4. Write dump file
 				
-				dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
+				dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_DEFAULT)
 				minidump = None
 				
 				try:
@@ -227,7 +227,7 @@ try:
 				WindowsDebugEngine.lock.acquire()
 				
 				if minidump:
-					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff, 'MiniDump.dmp' : minidump }
+					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff, 'Dump.dmp' : minidump }
 				else:
 					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff }
 				
@@ -332,7 +332,12 @@ try:
 					
 					# Make sure service is running
 					if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
-						win32serviceutil.StartService(self.Service)
+						try:
+							# Some services auto-restart, if they do
+							# this call will fail.
+							win32serviceutil.StartService(self.Service)
+						except:
+							pass
 						
 						while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
 							time.sleep(0.25)
