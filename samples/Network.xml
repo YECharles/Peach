@@ -47,11 +47,10 @@
 		</State>
 	</StateModel>
 
-	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
+	<Agent name="LocalAgent">
 
-		<Monitor name="Debugger" class="debugger.WindowsDebugger">
-			<Param name="Command" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe"/>
-			<Param name="Params" value="192.168.1.195"/>
+		<Monitor name="Debugger" class="debugger.WindowsDebugEngine">
+			<Param name="CommandLine" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4242"/>
 		</Monitor>
 
 		<Monitor name="Network" class="network.PcapMonitor">
@@ -59,21 +58,21 @@
 		</Monitor>
 	</Agent>
 
-	<Test name="HttpRequestTest" description="HTTP Request GET Test">
+	<Test name="NetworkTest">
 		<Agent ref="LocalAgent" />
 		<StateModel ref="TheStateModel"/>
 
 		<Publisher class="tcp.Tcp">
-			<Param name="host" value="192.168.1.195" />
+			<Param name="host" value="127.0.0.1" />
 			<Param name="port" value="4242" />
 		</Publisher>
 	</Test>
 
-	<Run name="DefaultRun" description="HTTP Request Run">
-		<Test ref="HttpRequestTest" />
+	<Run name="DefaultRun">
+		<Test ref="NetworkTest" />
 
 		<Logger class="logger.Filesystem">
-			<Param name="path" value="c:\peach\logtest" />
+			<Param name="path" value="logs" />
 		</Logger>
 	</Run>
 

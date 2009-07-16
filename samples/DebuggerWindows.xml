@@ -54,7 +54,7 @@
 
 	<Agent name="LocalAgent">
 		<Monitor class="debugger.WindowsDebugEngine">
-			<Param name="CommandLine" value="C:\Peach\samples\CrashableServer\x64\release\CrashableServer.exe 127.0.0.1 4242" />
+			<Param name="CommandLine" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4242" />
 		</Monitor>
 	</Agent>
 
