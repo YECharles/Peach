@@ -614,4 +614,94 @@ class bitfield(object):
 		assert len(ret) == bits
 		return ret
 
+import threading
+
+class DomBackgroundCopier(object):
+	'''
+	This class spins up a thread that makes
+	copies of Data Models.  This should
+	allow us to take advantage of multi-core
+	CPUs and increase fuzzing speed.
+	'''
+	
+	copyThread = None
+	stop = None
+	
+	def __init__(self):
+		self.doms = []
+		self.copies = {}
+		DomBackgroundCopier.copyThread = threading.Thread(target=self.copier)
+		DomBackgroundCopier.stop = threading.Event()
+		self.minCopies = 1
+		self.maxCopies = 10
+		self.copiesLock = threading.Lock()
+		self.copyThread.start()
+		
+	def copier(self):
+		while not self.stop.isSet():
+			for dom in self.doms:
+				self.copiesLock.acquire()
+				if len(self.copies[dom]) < self.minCopies:
+					self.copiesLock.release()
+					
+					domCopy = dom.copy(None)
+					
+					self.copiesLock.acquire()
+					self.copies[dom].append(domCopy)
+					self.copiesLock.release()
+				else:
+					self.copiesLock.release()
+			
+			for dom in self.doms:
+				self.copiesLock.acquire()
+				if len(self.copies[dom]) < self.maxCopies:
+					self.copiesLock.release()
+					
+					domCopy = dom.copy(None)
+					
+					self.copiesLock.acquire()
+					self.copies[dom].append(domCopy)
+					self.copiesLock.release()
+					
+				else:
+					self.copiesLock.release()
+	
+	def addDom(self, dom):
+		if dom in self.doms:
+			return
+		
+		self.copiesLock.acquire()
+		try:
+			self.doms.append(dom)
+			self.copies[dom] = []
+		finally:
+			self.copiesLock.release()
+	
+	def getCopy(self, dom):
+		if not dom in self.doms:
+			return None
+		
+		if len(self.copies[dom]) == 0:
+			return None
+		
+		self.copiesLock.acquire()
+		try:
+			c = self.copies[dom][0]
+			self.copies[dom] = self.copies[dom][1:]
+			return c
+		finally:
+			self.copiesLock.release()
+	
+	def removeDom(self, dom):
+		if not dom in self.doms:
+			return
+		
+		self.copiesLock.acquire()
+		try:
+			self.doms.remove(dom)
+			del self.copies[dom]
+		finally:
+			self.copiesLock.release()
+		
+
 # end

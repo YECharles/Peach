@@ -484,5 +484,12 @@ except Ft.Xml.ReaderException, e:
 
 except:
 	raise
+
+finally:
+	if DomBackgroundCopier.copyThread != None:
+		DomBackgroundCopier.stop.set()
+		DomBackgroundCopier.copyThread.join()
+		DomBackgroundCopier.copyThread = None
+
 	
 # end

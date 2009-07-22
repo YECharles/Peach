@@ -86,6 +86,9 @@ class StateEngine:
 		
 		#: Cache of generated XML
 		self.cachedXml = None
+		
+		#: Background dom copier
+		self.domCopier = DomBackgroundCopier()
 	
 	def getXml(self):
 		'''
@@ -204,10 +207,15 @@ class StateEngine:
 							c.origionalTemplate.BuildRelationCache()
 							c.origionalTemplate.resetDataModel()
 							c.origionalTemplate.getValue()
+							self.domCopier.addDom(c.origionalTemplate)
 						
 						# Make a fresh copy of the template
 						del c[c.template.name]
-						c.template = c.origionalTemplate.copy(c)
+						c.template = None
+						while c.template == None:
+							c.template = self.domCopier.getCopy(c.origionalTemplate)
+						#if c.template == None:
+						#	c.template = c.origionalTemplate.copy(c)
 						#c.template = c.origionalTemplate.clone()
 						c.append(c.template)
 				
@@ -219,10 +227,14 @@ class StateEngine:
 				action.origionalTemplate.BuildRelationCache()
 				action.origionalTemplate.resetDataModel()
 				action.origionalTemplate.getValue()
+				self.domCopier.addDom(action.origionalTemplate)
 			
 			# Make a fresh copy of the template
 			del action[action.template.name]
-			action.template = action.origionalTemplate.copy(action)
+			action.template = None
+			while action.template == None:
+				action.template = self.domCopier.getCopy(action.origionalTemplate)
+			#action.template = action.origionalTemplate.copy(action)
 			#action.template = action.origionalTemplate.clone()
 			action.append(action.template)
 		
