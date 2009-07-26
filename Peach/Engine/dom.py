@@ -2068,7 +2068,7 @@ class DataElement(Mutatable):
 			node = self
 		
 		# Check if we are the top of the data model
-		if not node.parent.isDataElement:
+		if node.parent == None or not node.parent.isDataElement:
 			for r in self._getAllRelationsInDataModel(node, useCache):
 				if r == None:
 					continue
