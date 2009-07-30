@@ -1095,6 +1095,14 @@ def DoTheShark(fileName,  proto):
 	
 	ret += """
 	</DataModel>
+	
+	<Test name="MyTest">
+	   %s
+	</Test>
+	
+	<Run name="DefaultRun">
+		<Test ref="MyTest" />
+	</Run>
 
 """ % shark.figureOutPublisher(doc)
 	
