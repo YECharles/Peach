@@ -4971,8 +4971,8 @@ class ActionParam(ElementWithChildren):
 		self.value = None
 
 class ActionResult(ElementWithChildren):
-	def __init__(self):
-		ElementWithChildren.__init__(self, None, None)
+	def __init__(self, name, parent):
+		ElementWithChildren.__init__(self, name, parent)
 		self.elementType = 'actionresult'
 		self.template = None
 		self.value = None
