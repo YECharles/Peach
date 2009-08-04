@@ -498,7 +498,7 @@ class StateEngine:
 			for c in action:
 				if c.elementType == 'actionresult':
 					self.dirtyXmlCache()
-			
+					
 					cracker = DataCracker(self.engine.peach)
 					#cracker.haveAllData = True
 					(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,ret))

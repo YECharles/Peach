@@ -2799,7 +2799,18 @@ class ParseTemplate:
 
 				data = self.HandleData(child, action)
 				action.data = data
+			
+			elif child.nodeName == 'Result':
+				if not action.type in ['call']:
+					raise PeachException("Parser: Result is an invalid child of Action of type 'call'.")
 				
+				result = self.HandleActionResult(child, action)
+				
+				if action.has_key(result.name):
+					raise PeachException("Error, duplicate Result name [%s] found in Action [%s]." % (param.name, action.name))
+				
+				action.append(result)
+					
 			else:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
 		
@@ -2863,6 +2874,30 @@ class ParseTemplate:
 		# Verify param has data model
 		if param.template == None:
 			raise PeachException("Parser: Action Param must have DataModel as child element.")
+		
+		return param
+	
+	def HandleActionResult(self, node, parent):
+		
+		result = ActionResult(self._getAttribute(node, 'name'), parent)
+		
+		for child in node.childNodes:
+			
+			if child.nodeName == 'Template' or child.nodeName == 'DataModel':
+				
+				if not child.hasAttributeNS(None, 'ref'):
+					raise PeachException("Parser: When Template is a child of ActionParam it must have the ref attribute.")
+				
+				obj = self.HandleTemplate(child, param)
+				result.template = obj
+				result.append(obj)
+			
+			else:
+				raise PeachException("Parser: Action Result has unknown child [%s]" % PeachStr(child.nodeName))
+		
+		# Verify param has data model
+		if result.template == None:
+			raise PeachException("Parser: Action Result must have DataModel as child element.")
 		
 		return param
 	
