@@ -2888,7 +2888,7 @@ class ParseTemplate:
 				if not child.hasAttributeNS(None, 'ref'):
 					raise PeachException("Parser: When Template is a child of ActionParam it must have the ref attribute.")
 				
-				obj = self.HandleTemplate(child, param)
+				obj = self.HandleTemplate(child, result)
 				result.template = obj
 				result.append(obj)
 			
