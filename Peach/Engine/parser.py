@@ -2899,7 +2899,7 @@ class ParseTemplate:
 		if result.template == None:
 			raise PeachException("Parser: Action Result must have DataModel as child element.")
 		
-		return param
+		return result
 	
 	def _HandleValueType(self, value, valueType):
 		'''
