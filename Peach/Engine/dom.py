@@ -2739,6 +2739,36 @@ class Template(DataElement):
 		
 		return ret
 	
+	def asCTypeType(self):
+		
+		Template.ctypeClassName += 1
+		ctypeClassName = Template.ctypeClassName
+		
+		exec("""class TemplateTempClass%d(ctypes.Structure):
+	pass
+""" % ctypeClassName)
+		
+		values = []
+		fields = []
+		for c in self:
+			if c.isDataElement:
+				cValue = c.asCType()
+				fields.append((c.name, type(cValue)))
+				values.append((c.name, cValue))
+		
+		exec("TemplateTempClass%d._fields_ = fields" % ctypeClassName)
+		exec("ret = TemplateTempClass%d" % ctypeClassName)
+		
+		# Are we a pointer?
+		if self.isPointer:
+			if self.pointerDepth != None:
+				for i in range(int(self.pointerDepth)):
+					ret = ctypes.POINTER(ret)
+			else:
+				ret = ctypes.POINTER(ret)
+		
+		return ret
+	
 	def getSize(self):
 		'''
 		Return the length of this data element.  Try and
@@ -3120,6 +3150,36 @@ class Block(DataElement):
 					ret = ctypes.pointer(ret)
 			else:
 				ret = ctypes.pointer(ret)
+		
+		return ret
+	
+	def asCTypeType(self):
+		
+		Block.ctypeClassName += 1
+		ctypeClassName = Block.ctypeClassName
+		
+		exec("""class BlockTempClass%d(ctypes.Structure):
+	pass
+""" % ctypeClassName)
+		
+		values = []
+		fields = []
+		for c in self:
+			if c.isDataElement:
+				cValue = c.asCType()
+				fields.append( (c.name, type(cValue) ) )
+				values.append((c.name, cValue))
+		
+		exec("BlockTempClass%d._fields_ = fields" % ctypeClassName)
+		exec("ret = BlockTempClass%d" % ctypeClassName)
+		
+		# Are we a pointer?
+		if self.isPointer:
+			if self.pointerDepth != None:
+				for i in range(int(self.pointerDepth)):
+					ret = ctypes.POINTER(ret)
+			else:
+				ret = ctypes.POINTER(ret)
 		
 		return ret
 	

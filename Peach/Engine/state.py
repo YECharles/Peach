@@ -35,7 +35,7 @@ Will try and run a state machine.
 
 # $Id$
 
-import sys, re, types, time
+import sys, re, types, time, struct, ctypes
 import traceback
 ##import cProfile as profile
 
@@ -499,11 +499,35 @@ class StateEngine:
 				if c.elementType == 'actionresult':
 					self.dirtyXmlCache()
 					
-					cracker = DataCracker(self.engine.peach)
-					#cracker.haveAllData = True
-					(rating, pos) = cracker.crackData(action.template, PublisherBuffer(None,ret))
-					if rating > 2:
-						raise SoftException("Was unble to crack result data into %s data model." % action.template.name)
+					print "RET:",ret,type(ret)
+					
+					data = None
+					if type(ret) == 'int':
+						data = struct.pack("i", ret)
+					elif type(ret) == 'long':
+						data = struct.pack("q", ret)
+					elif type(ret) == 'str':
+						data = ret
+					
+					if c.template.isPointer:
+						print "Found ctypes pointer...trying to cast..."
+						retCtype = c.template.asCTypeType()
+						retCast = ctypes.cast(ret, retCtype)
+						#print retCast
+						#print dir(retCast)
+						#print retCast.contents
+						for i in range(len(retCast.contents._fields_)):
+							(key, value) = retCast.contents._fields_[i]
+							value = eval("retCast.contents.%s" % key)
+							c.template[key].defaultValue = value
+							print "Set [%s=%s]" % (key, value)
+					
+					else:
+						cracker = DataCracker(self.engine.peach)
+						cracker.haveAllData = True
+						(rating, pos) = cracker.crackData(c.template, PublisherBuffer(None,data))
+						if rating > 2:
+							raise SoftException("Was unble to crack result data into %s data model." % c.template.name)
 			
 			self.actionValues.append( [ action.name, 'call', method, actionParams ] )
 		
