@@ -4493,7 +4493,7 @@ class Blob(DataElement):
 	def asCType(self):
 		
 		value = self.getValue()
-		ret = ctypes.c_ubyte * len(value)
+		ret = (ctypes.c_ubyte * len(value))()
 		
 		for i in xrange(len(value)):
 			ret[i] = value[i]

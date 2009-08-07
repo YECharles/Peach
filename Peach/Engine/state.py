@@ -512,7 +512,9 @@ class StateEngine:
 					if c.template.isPointer:
 						print "Found ctypes pointer...trying to cast..."
 						retCtype = c.template.asCTypeType()
+						#print type(retCtype)
 						retCast = ctypes.cast(ret, retCtype)
+						#print type(retCast)
 						#print retCast
 						#print dir(retCast)
 						#print retCast.contents
