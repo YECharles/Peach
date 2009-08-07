@@ -4496,7 +4496,7 @@ class Blob(DataElement):
 		ret = (ctypes.c_ubyte * len(value))()
 		
 		for i in xrange(len(value)):
-			ret[i] = value[i]
+			ret[i] = ord(value[i])
 		
 		return ret
 	
