@@ -4498,6 +4498,14 @@ class Blob(DataElement):
 		for i in xrange(len(value)):
 			ret[i] = ord(value[i])
 		
+		# Are we a pointer?
+		if self.isPointer:
+			if self.pointerDepth != None:
+				for i in range(int(self.pointerDepth)):
+					ret = ctypes.pointer(ret)
+			else:
+				ret = ctypes.pointer(ret)
+				
 		return ret
 	
 	def getInternalValue(self, sout = None):
