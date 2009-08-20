@@ -18,16 +18,24 @@ CTYPESHELPER_API int TestCase1(struct TestCase1 value)
 	return 0;
 }
 
-CTYPESHELPER_API int TestCase1_1(struct TestCase1* value)
+CTYPESHELPER_API struct Context* TestCase1_1(struct TestCase1* value)
 {
+	struct Context* c;
+
 	if(value->Val1 == 0xffe && value->Val2 == 0xfffffe)
 	{
-		printf("TestCase1_1 Passed\n");
-		return 1;
+
+		c = (struct Context*) malloc(sizeof(struct Context));
+		c->connection = 1;
+		c->context = 2;
+		c->tlscontext = 4;
+
+		printf("TestCase1_1 Passed %u\n", c);
+		return c;
 	}
 
 	printf("TestCase1_1 Failed\n");
-	return 0;
+	return NULL;
 }
 
 CTYPESHELPER_API int TestCase2(struct TestCase2 value)

@@ -37,8 +37,15 @@ struct TestCase4
 	char	byte2;
 };
 
+struct Context
+{
+	DWORD context;
+	DWORD tlscontext;
+	DWORD connection;
+};
+
 CTYPESHELPER_API int TestCase1(struct TestCase1 value);
-CTYPESHELPER_API int TestCase1_1(struct TestCase1* value);
+CTYPESHELPER_API struct Context* TestCase1_1(struct TestCase1* value);
 CTYPESHELPER_API int TestCase2(struct TestCase2 value);
 CTYPESHELPER_API int TestCase3(struct TestCase3 value);
 CTYPESHELPER_API int TestCase4(struct TestCase4 value);

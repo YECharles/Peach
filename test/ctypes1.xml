@@ -44,22 +44,36 @@
 		<Block ref="TestCase1" pointer="true" />
 		<Number size="8" valueType="hex" value="ef" />
 	</DataModel>
+    
+    <DataModel name="Context" pointer="true">
+        <Number name="context" size="32" />
+        <Number name="tlscontext" size="32" />
+        <Number name="connect" size="32" />
+    </DataModel>
 
 	<!-- TODO: Create state model -->
 	<StateModel name="TheState" initialState="Initial">
 		<State name="Initial">
-			
+			<!--
 			<Action type="call" method="TestCase1">
 				<Param name="value" type="in">
 					<DataModel ref="TestCase1"/>
 				</Param>
+                <Result name="ret">
+                    <DataModel ref="Return" />
+                </Result>
 			</Action>
-			
-			<Action type="call" method="TestCase1_1">
+-->
+            <Action type="call" method="TestCase1_1">
 				<Param name="value" type="in">
 					<DataModel ref="TestCase1_1"/>
 				</Param>
+                <Result name="ret">
+                    <DataModel ref="Context" />
+                </Result>
 			</Action>
+            
+            <!--
 			
 			<Action type="call" method="TestCase2">
 				<Param name="value" type="in">
@@ -84,6 +98,7 @@
 					<DataModel ref="TestCase4_1"/>
 				</Param>
 			</Action>
+            -->
 		</State>
 	</StateModel>
 	
@@ -95,9 +110,8 @@
 		<!-- <Agent ref="LocalAgent"/> -->
 		<StateModel ref="TheState" />
 		<Publisher class="dll.Dll">
-			<Param name="library" value="C:\\peach\\test\\CtypesHelper\\Debug\\CtypesHelper.dll"/>
+			<Param name="library" value="C:\\peach\\test\\CtypesHelper\\x64\\Debug\\CtypesHelper.dll"/>
 		</Publisher>
-		<Mutator class="default.NullMutator"/>
 	</Test>
 	
 	<!-- Configure a single run -->

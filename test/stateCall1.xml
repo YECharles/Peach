@@ -10,6 +10,9 @@
 	<DataModel name="TestCase">
 		<String name="data" value="1234567890" isStatic="true" length="10" />
 	</DataModel>
+    <DataModel name="BlobModel">
+    <Blob/>
+    </DataModel>
 	
 	<StateModel name="TestState" initialState="Initial">
 		<State name="Initial">
@@ -22,6 +25,9 @@
 						<Field name="data" value="Data1     " />
 					</Data>
 				</Param>
+                <Result name="ret">
+                    <DataModel ref="BlobModel" />
+                </Result>
 			</Action>
 			<Action name="CallMethod4" type="call" method="Method4" />
 			
