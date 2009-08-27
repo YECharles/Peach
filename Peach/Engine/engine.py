@@ -730,7 +730,10 @@ class Engine(object):
 					mutator.next()
 				
 				# Have we completed our range?
-				if (testRange != None and testCount > endCount) or Engine.justOne:
+				if (testRange != None and testCount > endCount) or \
+					(Engine.justOne and startCount == None) or \
+					(Engine.justOne and startCount == testCount):
+					
 					print "-- Completed our iteration range, exiting"
 					break
 				
