@@ -630,12 +630,17 @@ class DomBackgroundCopier(object):
 	def __init__(self):
 		self.doms = []
 		self.copies = {}
-		DomBackgroundCopier.copyThread = threading.Thread(target=self.copier)
-		DomBackgroundCopier.stop = threading.Event()
 		self.minCopies = 1
 		self.maxCopies = 10
 		self.copiesLock = threading.Lock()
-		self.copyThread.start()
+		DomBackgroundCopier.copyThread = None
+		DomBackgroundCopier.stop = threading.Event()
+		
+		self.singleThread = True
+		if os.getenv("PEACH_SINGLETHREAD") == None:
+			self.singleThread = False
+			DomBackgroundCopier.copyThread = threading.Thread(target=self.copier)
+			self.copyThread.start()
 		
 	def copier(self):
 		while not self.stop.isSet():
@@ -678,6 +683,10 @@ class DomBackgroundCopier(object):
 			self.copiesLock.release()
 	
 	def getCopy(self, dom):
+		# If using a single thread just return a copy
+		if self.singleThread == True:
+			return dom.copy(None)
+		
 		if not dom in self.doms:
 			return None
 		
