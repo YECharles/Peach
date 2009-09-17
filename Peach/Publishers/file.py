@@ -251,7 +251,7 @@ class FileWriterLauncher(Publisher):
 	stream publisher.  Close, than call a program (or two).
 	'''
 	
-	def __init__(self, filename, debugger = "False", waitTime = 180):
+	def __init__(self, filename, debugger = "False", waitTime = 3):
 		'''
 		@type	filename: string
 		@param	filename: Filename to write to
