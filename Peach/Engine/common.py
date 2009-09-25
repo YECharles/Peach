@@ -633,6 +633,7 @@ class DomBackgroundCopier(object):
 		self.minCopies = 1
 		self.maxCopies = 10
 		self.copiesLock = threading.Lock()
+		DomBackgroundCopier.needcopies = threading.Event()
 		DomBackgroundCopier.copyThread = None
 		DomBackgroundCopier.stop = threading.Event()
 		
@@ -660,6 +661,7 @@ class DomBackgroundCopier(object):
 			for dom in self.doms:
 				self.copiesLock.acquire()
 				if len(self.copies[dom]) < self.maxCopies:
+					#print "DOM[%s]: %d copies < %d" % (dom, len(self.copies[dom]), self.maxCopies)
 					self.copiesLock.release()
 					
 					domCopy = dom.copy(None)
@@ -670,7 +672,10 @@ class DomBackgroundCopier(object):
 					
 				else:
 					self.copiesLock.release()
-	
+			
+			DomBackgroundCopier.needcopies.wait()
+			DomBackgroundCopier.needcopies.clear()
+			
 	def addDom(self, dom):
 		if dom in self.doms:
 			return
@@ -681,6 +686,7 @@ class DomBackgroundCopier(object):
 			self.copies[dom] = []
 		finally:
 			self.copiesLock.release()
+		DomBackgroundCopier.needcopies.set()
 	
 	def getCopy(self, dom):
 		# If using a single thread just return a copy
@@ -692,6 +698,9 @@ class DomBackgroundCopier(object):
 		
 		if len(self.copies[dom]) == 0:
 			return None
+		
+		if len(self.copies[dom]) < (self.maxCopies/2):
+			DomBackgroundCopier.needcopies.set()
 		
 		self.copiesLock.acquire()
 		try:
