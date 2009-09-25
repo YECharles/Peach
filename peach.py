@@ -488,6 +488,7 @@ except:
 finally:
 	if DomBackgroundCopier.copyThread != None:
 		DomBackgroundCopier.stop.set()
+		DomBackgroundCopier.needcopies.set()
 		DomBackgroundCopier.copyThread.join()
 		DomBackgroundCopier.copyThread = None
 
