@@ -2038,9 +2038,6 @@ class ParseTemplate:
 		
 		# name
 		
-		if not node.hasAttributeNS(None, 'name'):
-			raise PeachException(PeachStr('Error: Data element must have name attribute!'))
-		
 		name = self._getAttribute(node, 'name')
 		
 		# ref
@@ -2059,8 +2056,10 @@ class ParseTemplate:
 		else:
 			data = Data(name)
 		
+			if name == None or len(name) == 0:
+				raise PeachException(PeachStr("Error: Data element must have name attribute!"))
+		
 		data.elementType = 'data'
-		#data.node = node
 		
 		# fileName
 		
@@ -2113,9 +2112,9 @@ class ParseTemplate:
 		field.valueType = self._getValueType(node)
 		
 		if parent.has_key(field.name):
-			raise PeachException("Error, a field of name [%s] already exists in data set [%s]." % (field.name, parent.name))
-		
-		parent.append(field)
+			parent[field.name] = field
+		else:
+			parent.append(field)
 		
 		return field
 
@@ -2690,12 +2689,6 @@ class ParseTemplate:
 				
 				state.append(action)
 				foundAction = True
-			elif child.nodeName == 'Choice': 
-				choice = self.HandleStateChoice(child, state)
-				if state.has_key(choice.name):
-					raise PeachException("Found duplicate Choice name [%s]!" % choice.name)
-				
-				state.append(choice)
 			
 			else:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
@@ -2705,27 +2698,6 @@ class ParseTemplate:
 		
 		return state
 	
-	def HandleStateChoice(self, node, parent):
-		choice = StateChoice(parent)
-	
-		for child in node.childNodes:
-			choice.append(self.HandleStateChoiceAction(child, node))
-		
-		return choice
-	
-	def HandleStateChoiceAction(self, node, parent):
-		
-		if not node.hasAttributeNS(None, "ref"):
-			raise PeachException("Parser: State::Choice::Action missing ref attribute")
-		
-		if not node.hasAttributeNS(None, "type"):
-			raise PeachException("Parser: State::Choice::Action missing type attribute")
-		
-		ref = self._getAttribute(node, "ref")
-		type = self._getAttribute(node, "type")
-		
-		return StateChoiceAction(ref, type, parent)
-		  	
 	def HandleAction(self, node, parent):
 		
 		if not node.hasAttributeNS(None, "type"):
