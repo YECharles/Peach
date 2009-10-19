@@ -6,7 +6,7 @@ Mutation Strategies
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -201,4 +201,38 @@ class RandomMutationStrategy(MutationStrategy):
 		# all done!
 
 #MutationStrategy.DefaultStrategy = RandomMutationStrategy
+
+class SingleRandomMutationStrategy(RandomMutationStrategy):
+	'''
+	This mutation strategy will randomly select N fields
+	from a data model to fuzz on each test case.
+	
+	Note: This strategy does not affect the state model
+	Note: First test case will not be modified
+	'''
+	
+	def __init__(self, args):
+		RandomMutationStrategy.__init__(self, args)
+		
+		#: Number of fields to change
+		self._n = 1
+
+
+class DoubleRandomMutationStrategy(RandomMutationStrategy):
+	'''
+	This mutation strategy will randomly select N fields
+	from a data model to fuzz on each test case.
+	
+	Note: This strategy does not affect the state model
+	Note: First test case will not be modified
+	'''
+	
+	def __init__(self, args):
+		RandomMutationStrategy.__init__(self, args)
+		
+		#: Number of fields to change
+		self._n = 2
+		
+
+
 # end
