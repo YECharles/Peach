@@ -628,7 +628,7 @@ class Engine(object):
 						# Skip ahead to start range, but not if we are
 						# restoring saved state.
 						print "-- Skipping ahead to iteration %d" % startCount
-						testCount -= 1
+						#testCount -= 1
 						for i in range(testCount, startCount):
 							mutator.next()
 							testCount+=1
