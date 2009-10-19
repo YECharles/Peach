@@ -21,6 +21,7 @@ v2.3.1
  - Bug: Misc bugs found testing with complex fuzzer definitions
  - Bug: Unicode bug fixes
  - Bug: self.find('element') failed when inside of two sized Blocks.
+ - Bug: Fixed off-by-one error on --skipto
 
 v2.3
 ----
