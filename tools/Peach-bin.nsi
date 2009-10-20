@@ -1,7 +1,7 @@
 ;
-; Peach 2.3 Installer
+; Peach Windows x86 Binary Installer
 ;
-; Copyright (c) 2007-2009 Michael Eddington
+; Copyright (c) Michael Eddington
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy 
 ; of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3 x86"
-  OutFile "Peach-2.3-x86.exe"
+  Name "Peach 2.3.1 x86"
+  OutFile "Peach-2.3.1-x86.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
@@ -78,12 +78,12 @@ Section "Dummy Section" SecDummy
   
   CreateDirectory "$SMPROGRAMS\Peach"
   CreateShortCut "$SMPROGRAMS\Peach\Peach Documentation.lnk" "$INSTDIR\readme.html" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
-  CreateShortCut "$SMPROGRAMS\Peach\Peach Builder.lnk" "$INSTDIR\bin\peachbuilder.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
+  ;CreateShortCut "$SMPROGRAMS\Peach\Peach Builder.lnk" "$INSTDIR\bin\peachbuilder.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
   CreateShortCut "$SMPROGRAMS\Peach\Peach Validation.lnk" "$INSTDIR\bin\peachvalidator.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
   CreateShortCut "$SMPROGRAMS\Peach\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
   ; Register DbgEngEvent.dll
-  RegDLL "$INSTDIR\bin\DbgEngEvent.dll"
+  ;RegDLL "$INSTDIR\bin\DbgEngEvent.dll"
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Peach" "" $INSTDIR
@@ -110,7 +110,7 @@ SectionEnd
 Section "Uninstall"
 
   ; Unregister com
-  UnRegDLL "$INSTDIR\bin\DbgEngEvent.dll"
+  ;UnRegDLL "$INSTDIR\bin\DbgEngEvent.dll"
   
   Delete "$INSTDIR\Uninstall.exe"
 
