@@ -9,7 +9,7 @@ detect faults.  Would be nice to also eventually do other things like
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ from threading import Thread, Event, Lock
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re
+import gc
 
 try:
 	
@@ -101,6 +102,7 @@ try:
 				return None
 			
 			val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
+			win32api.RegCloseKey(hkey)
 			return val
 
 		
@@ -149,7 +151,7 @@ try:
 			if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
 				# We are already handling, so skip
 				#sys.stdout.write("_DbgEventHandler::Exception(): handlingFault set, skipping.\n")
-				return DbgEng.DEBUG_STATUS_NO_CHANGE
+				return DbgEng.DEBUG_STATUS_BREAK
 			
 			try:
 				
@@ -170,6 +172,7 @@ try:
 				dbg.idebug_registers.OutputRegisters(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, DbgEng.DEBUG_REGISTERS_ALL)
 				_DbgEventHandler.buff += "\n\n"
 				
+				
 				# 3. Ouput stack trace
 				
 				frames_count = 100
@@ -177,7 +180,11 @@ try:
 				frames_buffer_ptr = cast(frames_buffer, POINTER(DbgEng._DEBUG_STACK_FRAME))
 				
 				dbg.idebug_control.GetStackTrace(0, 0, 0, frames_buffer_ptr, frames_count)
-				dbg.idebug_control.OutputStackTrace(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, frames_buffer_ptr, frames_filled,
+				dbg.idebug_control.OutputStackTrace(
+					DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+					frames_buffer_ptr,
+					frames_filled,
+					
 					DbgEng.DEBUG_STACK_ARGUMENTS |
 					DbgEng.DEBUG_STACK_FUNCTION_INFO |
 					DbgEng.DEBUG_STACK_SOURCE_LINE |
@@ -203,14 +210,16 @@ try:
 				except:
 					pass
 				
+				
 				# 5. !analyze -v
 				
 				handle = None
 				try:
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
-				
+					pass
 				except:
 					raise
+				
 				
 				## 6. Bang-Exploitable
 				
@@ -218,7 +227,8 @@ try:
 				try:
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
-				
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".unload msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
+					pass
 				except:
 					pass
 				
@@ -281,13 +291,15 @@ try:
 			
 			WindowsDebugEngine.handledFault.set()
 			
-			#return DbgEng.DEBUG_STATUS_BREAK
-			return DbgEng.DEBUG_STATUS_NO_CHANGE
+			return DbgEng.DEBUG_STATUS_BREAK
+			#return DbgEng.DEBUG_STATUS_NO_CHANGE
 
 
 	class WindowsDebugEngineThread(Thread):
 		def run(self):
 			WindowsDebugEngine.handlingFault.clear()
+			
+			print "run()"
 			
 			# Hack for comtypes early version
 			comtypes._ole32.CoInitializeEx(None, comtypes.COINIT_APARTMENTTHREADED)
@@ -366,17 +378,23 @@ try:
 				WindowsDebugEngineThread.Quit = Event()
 				WindowsDebugEngine.started.set()
 				
-				self.dbg.event_loop_with_user_callback(self.Callback, 10)
-				self.dbg.__del__()
-			
+				self.dbg.event_loop_with_quit_event(WindowsDebugEngineThread.Quit)
+				
 			finally:
+				# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
+				#      if run when after we handle an exception/fault.
+				#      Have not been able to track down, this is a work around.
+				#      This work arround causes a small memoryleek :(
+				if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
+					self.dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
+					self.dbg.idebug_client.Release()
+				else:
+					self.dbg.__del__();
+				
+				self.dbg = None
+				
 				comtypes._ole32.CoUninitialize()
 		
-		def Callback(self = None, stuff = None, stuff2 = None):
-			PumpEvents(0.1)
-			if WindowsDebugEngineThread.Quit.isSet():
-				self.dbg.idebug_client.TerminateProcesses()
-				return True
 		
 		def GetProcessIdByName(self, procname):
 			'''
@@ -507,9 +525,12 @@ try:
 		def _StopDebugger(self):
 			print "_StopDebugger"
 			if self.thread != None and self.thread.isAlive():
+				#print "_StopDebugger - Setting Quit"
 				WindowsDebugEngineThread.Quit.set()
 				WindowsDebugEngine.started.clear()
+				#print "_StopDebugger - Joining thread"
 				self.thread.join()
+				#print "_StopDebugger - Breathing"
 				time.sleep(0.25) # Take a breath
 		
 		def _IsDebuggerAlive(self):

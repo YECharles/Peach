@@ -309,13 +309,13 @@ class FileWriterLauncher(Publisher):
 		if os.path.sep not in self._filename:
 			return
 		
-		paths = os.path.dirname(self.filename).split(os.path.sep)
+		paths = os.path.dirname(self._filename).split(os.path.sep)
 		curpath = ""
 		for p in paths:
 			if len(curpath) == 0:
 				curpath = p
 			else:
-				os.join(curpath,p)
+				os.path.join(curpath,p)
 			
 			try:
 				os.mkdir(p)

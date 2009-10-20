@@ -22,11 +22,11 @@ rmdir /s/q build
 del /q setup.py
 
 rem Build DbgProxyEvent
-cd c:\peach\dependencies\src\peach-PyDbgEng
-rmdir /s/q build dist
-python py2exe\setup.py py2exe
-copy /y dist\* c:\peach\bin
-cd c:\peach
+rem cd c:\peach\dependencies\src\peach-PyDbgEng
+rem rmdir /s/q build dist
+rem python py2exe\setup.py py2exe
+rem copy /y dist\* c:\peach\bin
+rem cd c:\peach
 
 rem Extra re-dist files
 copy C:\Python25\lib\site-packages\wx-2.8-msw-ansi\wx\gdiplus.dll bin

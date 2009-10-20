@@ -2056,7 +2056,7 @@ class ParseTemplate:
 		else:
 			data = Data(name)
 		
-			if name == None or len(name) == 0:
+			if (not isinstance(parent, Action)) and (name == None or len(name) == 0):
 				raise PeachException(PeachStr("Error: Data element must have name attribute!"))
 		
 		data.elementType = 'data'
