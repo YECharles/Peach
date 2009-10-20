@@ -104,7 +104,6 @@ try:
 			val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
 			win32api.RegCloseKey(hkey)
 			return val
-
 		
 		def Output(self, this, Mask, Text):
 			#sys.stdout.write(Text)
@@ -124,8 +123,13 @@ try:
 			
 			# Only capture dangerouse first chance exceptions
 			if FirstChance:
+				if self.IgnoreFirstChanceGardPage and ExceptionCode == 0x80000001:
+					# Ignore, sometimes used as anti-debugger
+					# by Adobe Flash.
+					return DbgEng.DEBUG_STATUS_NO_CHANGE
+				
 				# Guard page or illegal op
-				if ExceptionCode == 0x80000001 or ExceptionCode == 0xC000001D:
+				elif ExceptionCode == 0x80000001 or ExceptionCode == 0xC000001D:
 					pass
 				elif ExceptionCode == 0xC0000005:
 					# is av on eip?
@@ -306,6 +310,7 @@ try:
 			
 			try:
 				self._eventHandler = _DbgEventHandler()
+				self._eventHandler.IgnoreFirstChanceGardPage = self.IgnoreFirstChanceGardPage
 				
 				if self.KernelConnectionString:
 					self.dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
@@ -381,15 +386,16 @@ try:
 				self.dbg.event_loop_with_quit_event(WindowsDebugEngineThread.Quit)
 				
 			finally:
-				# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
-				#      if run when after we handle an exception/fault.
-				#      Have not been able to track down, this is a work around.
-				#      This work arround causes a small memoryleek :(
-				if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
-					self.dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
-					self.dbg.idebug_client.Release()
-				else:
-					self.dbg.__del__();
+				if self.dbg != None:
+					# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
+					#      if run when after we handle an exception/fault.
+					#      Have not been able to track down, this is a work around.
+					#      This work arround causes a small memoryleek :(
+					if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
+						self.dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
+						self.dbg.idebug_client.Release()
+					else:
+						self.dbg.__del__();
 				
 				self.dbg = None
 				
@@ -487,6 +493,11 @@ try:
 				
 			else:
 				self.StartOnCall = False
+				
+			if args.has_key("IgnoreFirstChanceGardPage"):
+				self.IgnoreFirstChanceGardPage = True
+			else:
+				self.IgnoreFirstChanceGardPage = False
 			
 			if self.Service == None and self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
 				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or KernelConnectionString parameter.")
@@ -512,6 +523,7 @@ try:
 			self.thread.ProcessName = self.ProcessName
 			self.thread.KernelConnectionString = self.KernelConnectionString
 			self.thread.SymbolsPath = self.SymbolsPath
+			self.thread.IgnoreFirstChanceGardPage = self.IgnoreFirstChanceGardPage
 			
 			# Kick off our thread:
 			self.thread.start()
