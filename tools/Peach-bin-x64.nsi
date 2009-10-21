@@ -74,16 +74,20 @@ Section "Dummy Section" SecDummy
   SetOutPath "$INSTDIR"
   
   ;ADD YOUR OWN FILES HERE...
-  File /r /x "docs" /x ".svn" /x "peach.py" /x "*.pyw" /x "*.ncb" /x "*.pch" /x "dependencies" /x "test" /x "Peach" /x "Peach-2*.exe" /x "logtest" /x "tools\www" "c:\peach\*.*"
+  File /r /x "docs" /x ".svn" /x "peach.py" /x "*.pyw" /x "*.ncb" \
+    /x "*.pch" /x "dependencies" /x "test" /x "Peach" /x "Peach-2*.exe" \
+    /x "logtest" \
+    /x "tools\*.bat" /x "tools\*.nsi" /x "tools\setup.py" /x "tools\peach.kpf" \
+    /x "tools\compilepeach.py" /x "tools\deb-ubuntu" \
+    "c:\peach\*.*"
   
+  ; Remove old links
+  RMDir /r "$SMPROGRAMS\Peach"
+  ; Add program menu links
   CreateDirectory "$SMPROGRAMS\Peach"
-  CreateShortCut "$SMPROGRAMS\Peach\Peach Documentation.lnk" "$INSTDIR\readme.html" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
-  ;CreateShortCut "$SMPROGRAMS\Peach\Peach Builder.lnk" "$INSTDIR\bin\peachbuilder.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
-  ;CreateShortCut "$SMPROGRAMS\Peach\Peach Validation.lnk" "$INSTDIR\bin\peachvalidator.exe" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
+  CreateShortCut "$SMPROGRAMS\Peach\Peach Documentation.lnk" "http://peachfuzzer.com" "" "$INSTDIR\bin\icons\peach20x20.ico"
+  ;CreateShortCut "$SMPROGRAMS\Peach\Peach Validator.lnk" "$INSTDIR\bin\peachvalidator.exe" "" "$INSTDIR\bin\icons\peach20x20.ico"
   CreateShortCut "$SMPROGRAMS\Peach\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  
-  ; Register DbgEngEvent.dll
-  ;RegDLL "$INSTDIR\bin\DbgEngEvent.dll"
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Peach" "" $INSTDIR
