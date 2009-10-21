@@ -389,7 +389,7 @@ try:
 				self.dbg.event_loop_with_quit_event(WindowsDebugEngineThread.Quit)
 				
 			finally:
-				if self.dbg != None:
+				if hasattr(self, "dbg") and self.dbg != None:
 					# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
 					#      if run when after we handle an exception/fault.
 					#      Have not been able to track down, this is a work around.
