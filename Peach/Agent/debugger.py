@@ -121,6 +121,8 @@ try:
 				ExceptionInformation11, ExceptionInformation12, ExceptionInformation13,
 				ExceptionInformation14, FirstChance):
 			
+			WindowsDebugEngine.TriggeredException = True
+			
 			# Only capture dangerouse first chance exceptions
 			if FirstChance:
 				if self.IgnoreFirstChanceGardPage and ExceptionCode == 0x80000001:
@@ -302,6 +304,7 @@ try:
 	class WindowsDebugEngineThread(Thread):
 		def run(self):
 			WindowsDebugEngine.handlingFault.clear()
+			WindowsDebugEngine.TriggeredException = False
 			
 			print "run()"
 			
@@ -391,7 +394,7 @@ try:
 					#      if run when after we handle an exception/fault.
 					#      Have not been able to track down, this is a work around.
 					#      This work arround causes a small memoryleek :(
-					if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
+					if WindowsDebugEngine.TriggeredException:
 						self.dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
 						self.dbg.idebug_client.Release()
 					else:

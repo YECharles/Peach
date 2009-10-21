@@ -665,6 +665,7 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 		
 		return self._publishers[name].receive(size)
 
+import imp, os, sys
 
 class AgentClient:
 	'''
@@ -698,11 +699,16 @@ class AgentClient:
 		if agentUri == "LocalAgent":
 			# Swan up our own agent instance!
 			agentUri = self._agentUri = "http://127.0.0.1:9000"
-			
+
+			# Only Windows on windows, this covers both 32bit & 64bit			
 			if sys.platform == "win32":
-				# Figure out were Peach is!
-				peachPath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-				os.system("start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a" % (sys.executable, peachPath))
+				if self.main_is_frozen():
+					# We are in py2exe
+					os.system("start \"Local Peach Agent\" \"%s\" -a" % (sys.argv[0]))
+				else:
+					# Figure out were Peach is!
+					peachPath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+					os.system("start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a" % (sys.executable, peachPath))
 			else:
 				raise PeachException("Sorry, we only support auto starting agents on Windows.  Please configure all agents with location uris and pre-launch any Agent processes.")
 			
@@ -714,6 +720,16 @@ class AgentClient:
 			raise PeachException("Please make sure your agent location string is a valid http URL.")
 		
 		self.Connect()
+	
+	def main_is_frozen(self):
+		return (hasattr(sys, "frozen") or # new py2exe
+			hasattr(sys, "importers") # old py2exe
+			or imp.is_frozen("__main__")) # tools/freeze
+
+	def get_main_dir(self):
+		if main_is_frozen():
+			return os.path.dirname(sys.executable)
+		return os.path.dirname(sys.argv[0])
 	
 	def Connect(self):
 		'''
