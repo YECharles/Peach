@@ -74,12 +74,13 @@ Section "Dummy Section" SecDummy
   SetOutPath "$INSTDIR"
   
   ;ADD YOUR OWN FILES HERE...
-  File /r /x "docs" /x ".svn" /x "peach.py" /x "*.pyw" /x "*.ncb" \
-    /x "*.pch" /x "dependencies" /x "test" /x "Peach" /x "Peach-2*.exe" \
-    /x "logtest" \
-    /x "tools\*.bat" /x "tools\*.nsi" /x "tools\setup.py" /x "tools\peach.kpf" \
-    /x "tools\compilepeach.py" /x "tools\deb-ubuntu" \
-    "c:\peach\*.*"
+  File /r /x docs /x .svn /x peach.py /x *.pyw /x *.ncb \
+    /x *.pch /x dependencies /x test /x Peach /x Peach-2*.exe \
+    /x logtest /x build.bat /x gendocs.bat \
+    /x *.nsi /x PeachSimple.gadget \
+    /x setup.py /x peach.kpf \
+    /x compilepeach.py /x deb-ubuntu \
+    c:\peach\*.*
   
   ; Remove old links
   RMDir /r "$SMPROGRAMS\Peach"
