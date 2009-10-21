@@ -74,7 +74,7 @@ Section "Dummy Section" SecDummy
   SetOutPath "$INSTDIR"
   
   ;ADD YOUR OWN FILES HERE...
-  File /r /x docs /x ".svn" /x "peach.py" /x "*.pyw" /x "*.ncb" /x "*.pch" /x "dependencies" /x "test" /x "Peach" /x "Peach-2*.exe" /x "logtest" /x "tools\www" "c:\peach\*.*"
+  File /r /x "docs" /x ".svn" /x "peach.py" /x "*.pyw" /x "*.ncb" /x "*.pch" /x "dependencies" /x "test" /x "Peach" /x "Peach-2*.exe" /x "logtest" /x "tools\www" "c:\peach\*.*"
   
   CreateDirectory "$SMPROGRAMS\Peach"
   CreateShortCut "$SMPROGRAMS\Peach\Peach Documentation.lnk" "$INSTDIR\readme.html" "" "$INSTDIR\Peach\Gui\icons\peach20x20.ico"
