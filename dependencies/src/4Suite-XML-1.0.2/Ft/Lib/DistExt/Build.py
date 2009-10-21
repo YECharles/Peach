@@ -15,7 +15,6 @@ class Build(build.build):
         ('build-lib=', None, "build directory for all distributions"),
         ('build-scripts=', None, "build directory for scripts"),
         ('build-temp=', 't', "temporary build directory"),
-        ('build-docs=', None, 'build directory for documents'),
         ('build-l10n=', None, 'build directory for binary message catalogs'),
         ('compiler=', 'c', "specify the compiler type"),
         ('ldflags=', 'l', "specify additional linker options"),
@@ -39,7 +38,6 @@ class Build(build.build):
         self.build_lib = None
         self.build_temp = None
         self.build_scripts = None
-        self.build_docs = None
         self.build_l10n = None
         self.compiler = None
         self.ldflags = None
@@ -72,10 +70,6 @@ class Build(build.build):
             self.build_scripts = plat_build % 'scripts'
 
         # all platforms (no compiled objects)
-        if self.build_docs is None:
-            self.build_docs = os.path.join(self.build_base, 'docs')
-
-        # all platforms (no compiled objects)
         if self.build_l10n is None:
             self.build_l10n = os.path.join(self.build_base, 'locale')
         return
@@ -106,6 +100,5 @@ class Build(build.build):
 
     # a list of commands this command might have to run to do its work.
     sub_commands = build.build.sub_commands + [
-        ('build_docs', has_docs),
         ('build_l10n', has_l10n),
         ]

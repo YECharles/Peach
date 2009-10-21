@@ -205,43 +205,6 @@ scripts = [
            application='XUpdateCommandLineApp'),
     ]
 
-doc_files = [
-    File('README'),
-
-    Document('docs/xml/index.doc', 'sdocbook',
-             title='4Suite Documentation Index',
-             flags=['noindex', 'shortcut']),
-    Document('docs/xml/COPYRIGHT.doc', 'sdocbook',
-             flags=['noindex']),
-    Document('docs/xml/licenses.doc', 'sdocbook',
-             title='Licenses and Acknowledgements'),
-    Document('docs/xml/history.doc', 'sdocbook',
-             title='Release History'),
-    Document('docs/xml/CoreManual.doc', 'docbook',
-             title='Users Manual',
-             flags=['shortcut']),
-    Document('docs/xml/HowTos/4SuiteCVS.doc', 'sdocbook',
-             title='4Suite CVS access'),
-    Document('docs/xml/HowTos/UNIX.doc', 'sdocbook',
-             title='Installing 4Suite on UNIX'),
-    Document('docs/xml/HowTos/Windows.doc', 'sdocbook',
-             title='Installing 4Suite on Windows'),
-
-    ModulesDocument('4Suite XML API Reference', packages),
-
-    ExtensionsDocument('XPathBuiltins',
-                       modules=['Ft.Xml.XPath.BuiltInExtFunctions',
-                                'Ft.Xml.XPath.MathFunctions',
-                                ],
-                       title='Built-in XPath Extensions'),
-    ExtensionsDocument('XsltBuiltins',
-                       modules=['Ft.Xml.Xslt.BuiltInExtElements',
-                                'Ft.Xml.Xslt.BuiltInExtFunctions',
-                                'Ft.Xml.Xslt.Exslt',
-                                ],
-                       title='Built-in XSLT Extensions'),
-    ]
-
 # -- install ----------------------------------------------------------
 
 data_files = [

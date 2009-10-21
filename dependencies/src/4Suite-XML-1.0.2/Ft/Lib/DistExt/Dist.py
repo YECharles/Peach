@@ -62,7 +62,6 @@ class Dist(Distribution):
         'build_ext' : 'BuildExt',
         'build_clib' : None,
         'build_scripts' : 'BuildScripts',
-        'build_docs' : 'BuildDocs',                     # only in 4Suite
         'build_l10n' : 'BuildL10n',                     # only in 4Suite
 
         'clean' : None,
@@ -78,7 +77,6 @@ class Dist(Distribution):
         'install_devel' : 'InstallDevel',               # only in 4Suite
         #'install_man' : 'InstallMan',                   # only in 4Suite
         'install_text' : 'InstallText',                 # only in 4Suite
-        'install_html' : 'InstallHtml',                 # only in 4Suite
         #'install_info' : 'InstallInfo',                 # only in 4Suite
         'install_l10n' : 'InstallL10n',                 # only in 4Suite
         'install_config' : 'InstallConfig',             # only in 4Suite
@@ -103,7 +101,6 @@ class Dist(Distribution):
         }
 
     command_aliases = {
-        'install_docs' : 'install_html',
         'bdist_wininst' : 'bdist_inno',
         }
 

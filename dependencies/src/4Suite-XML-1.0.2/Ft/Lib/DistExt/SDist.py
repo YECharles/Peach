@@ -130,7 +130,7 @@ class SDist(sdist.sdist):
         install = self.reinitialize_command('install')
         install.install_docs = base_dir
         install.ensure_finalized()
-        for command_name in ('install_text', 'install_html'):
+        for command_name in ('install_text'):
             command = self.reinitialize_command(command_name)
             command.ensure_finalized()
             command.run()

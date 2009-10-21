@@ -18,7 +18,6 @@ INSTALL_LOCATIONS = {
     'install_localstate' : 'Machine-specific variable data space',
     'install_devel' : 'Developer files (regression tests)',
     'install_text' : 'Text documentation',
-    'install_html' : 'HTML documentation',
     'install_l10n' : 'Natural language message catalogs',
     }
 
@@ -444,7 +443,6 @@ class Install(install.install):
         ('install_devel', has_devel),
         #('install_man', has_scripts),
         ('install_text', has_text),
-        ('install_html', has_docs),
         #('install_info', has_docs),
         ('install_l10n', has_l10n),
         ('install_config', has_config),

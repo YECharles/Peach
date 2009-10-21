@@ -53,7 +53,6 @@ PKGINFO_FORMAT = {
     'libraries' : list,         # build_clib
     'ext_modules' : list,       # build_ext
     'scripts' : list,           # build_scripts
-    'doc_files' : list,         # build_docs
     'l10n' : list,              # build_l10n
 
     # install fields
