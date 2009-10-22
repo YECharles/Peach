@@ -421,7 +421,7 @@ class FileWriterLauncher(Publisher):
 			pid = os.spawnv(os.P_NOWAIT, method, realArgs)
 			
 			for i in range(0, long(self.waitTime/0.15)):
-				(pid, ret) = os.wait(pid, os.WNOHANG)
+				(pid, ret) = os.waitpid(pid, os.WNOHANG)
 				if not (pid == 0 and ret == 0):
 					break
 				
