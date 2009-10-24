@@ -14,7 +14,7 @@ performing parsing tests of Peach XML files.
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -144,7 +144,7 @@ Debug Peach XML File
 """)
 	sys.exit(0)
 
-printError("\n] Peach 2.3.1 DEV Runtime")
+printError("\n] Peach 2.3.2 DEV Runtime")
 printError("] Copyright (c) Michael Eddington\n")
 
 if sys.version[:3] not in ['2.5', '2.6']:
