@@ -6,7 +6,7 @@ Analyzers that produce data models from Strings
 '''
 
 #
-# Copyright (c) 2008-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ class StringTokenAnalyzer(Analyzer):
 		if not isinstance(parent, String):
 			raise PeachException("Error, StringTokenAnalyzer can only be attached to String data elements.")
 		
-		data = unicode(data, 'latin-1')
+		#data = unicode(data, 'latin-1')
 		
 		self.stringType = parent.type
 		dom = self._tokenizeString(data, None)
