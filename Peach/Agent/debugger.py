@@ -390,6 +390,8 @@ try:
 				
 			finally:
 				if hasattr(self, "dbg") and self.dbg != None:
+					self.dbg.idebug_client.TerminateProcesses()
+					
 					# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
 					#      if run when after we handle an exception/fault.
 					#      Have not been able to track down, this is a work around.

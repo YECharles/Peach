@@ -12,7 +12,7 @@ Todo:
 '''
 
 #
-# Copyright (c) 2007 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -93,23 +93,35 @@ class PingMonitor(Monitor):
 		'''
 		Check if a fault was detected.
 		'''
-		pipe = os.popen("ping -n 2 " + self.hostname)
+		
+		if sys.platform == "win32":
+				ping_send_command = "ping -n 2 "
+				ping_send_command3 = "ping -n 3 "
+				ping_reply_regex = r"Reply from \d+\.\d+\.\d+\.\d+: bytes="
+		elif sys.platform == "linux2":
+				ping_send_command = "ping -c 2 "
+				ping_send_command3 = "ping -c 3 "
+				ping_reply_regex = r"64 bytes from \d+\.\d+\.\d\.\d+:"
+		else:
+				raise Exception("PingAgent running on unsupported platform %s" % sys.platform)
+		
+		pipe = os.popen(ping_send_command + self.hostname)
 		buff = pipe.read()
 		pipe.close()
 		
-		if re.compile(r"Reply from \d+\.\d+\.\d+\.\d+: bytes=", re.M).search(buff) != None:
+		if re.compile(ping_reply_regex, re.M).search(buff) != None:
 			return False
 		
 		# If we didn't see a ping, lets try again with 3 pings just to make sure
-		
-		pipe = os.popen("ping -n 3 " + self.hostname)
+
+		pipe = os.popen(ping_send_command3 + self.hostname)
 		buff = pipe.read()
 		pipe.close()
-		
-		if re.compile(r"Reply from \d+\.\d+\.\d+\.\d+: bytes=", re.M).search(buff) != None:
+
+		if re.compile(ping_reply_regex, re.M).search(buff) != None:
 			return False
-		
-		return True	
+
+		return True
 
 
 class PcapThread(threading.Thread):
