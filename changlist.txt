@@ -4,6 +4,12 @@ Peach Changlist
 I've never been good about keeping change lists,
 but I'm going to try and start :)
 
+v2.3.2
+------
+
+ - Change: Windows debugger runs in seprate process
+ - Change: Patch for Linux Ping Monitor support
+
 v2.3.1
 ------
 
