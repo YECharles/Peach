@@ -36,7 +36,6 @@ detect faults.  Would be nice to also eventually do other things like
 # $Id$
 
 import struct, sys, time
-from threading import Thread, Event, Lock
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re
@@ -55,6 +54,7 @@ try:
 	import win32serviceutil
 	import win32service
 	import win32api, win32con
+	from multiprocessing import *
 	
 
 	# ###############################################################################################
@@ -106,11 +106,9 @@ try:
 			return val
 		
 		def Output(self, this, Mask, Text):
-			#sys.stdout.write(Text)
-			_DbgEventHandler.buff += Text
+			self.buff += Text
 		
 		def GetInterestMask(self):
-			#sys.stdout.write("_DbgEventHandler::GetInterestMask\n")
 			return PyDbgEng.DbgEng.DEBUG_EVENT_EXCEPTION | PyDbgEng.DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT
 		
 		def Exception(self, dbg, ExceptionCode, ExceptionFlags, ExceptionRecord,
@@ -120,8 +118,6 @@ try:
 				ExceptionInformation8, ExceptionInformation9, ExceptionInformation10,
 				ExceptionInformation11, ExceptionInformation12, ExceptionInformation13,
 				ExceptionInformation14, FirstChance):
-			
-			WindowsDebugEngine.TriggeredException = True
 			
 			# Only capture dangerouse first chance exceptions
 			if FirstChance:
@@ -154,14 +150,14 @@ try:
 					return DbgEng.DEBUG_STATUS_NO_CHANGE
 					
 			
-			if WindowsDebugEngine.handlingFault.isSet() or WindowsDebugEngine.handledFault.isSet():
+			if self.handlingFault.is_set() or self.handledFault.is_set():
 				# We are already handling, so skip
 				#sys.stdout.write("_DbgEventHandler::Exception(): handlingFault set, skipping.\n")
 				return DbgEng.DEBUG_STATUS_BREAK
 			
 			try:
-				
-				WindowsDebugEngine.handlingFault.set()
+				self.crashInfo = {}
+				self.handlingFault.set()
 				
 				# 1. Calculate no. of frames
 				
@@ -176,7 +172,7 @@ try:
 				# 2. Output registers
 				
 				dbg.idebug_registers.OutputRegisters(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, DbgEng.DEBUG_REGISTERS_ALL)
-				_DbgEventHandler.buff += "\n\n"
+				self.buff += "\n\n"
 				
 				
 				# 3. Ouput stack trace
@@ -199,7 +195,7 @@ try:
 					DbgEng.DEBUG_STACK_FRAME_NUMBERS |
 					DbgEng.DEBUG_STACK_PARAMETERS )
 				
-				_DbgEventHandler.buff += "\n\n"
+				self.buff += "\n\n"
 				
 				# 4. Write dump file
 				
@@ -221,7 +217,7 @@ try:
 				
 				handle = None
 				try:
-					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
+					#dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
 					pass
 				except:
 					raise
@@ -240,23 +236,21 @@ try:
 				
 				## Now off to other things...
 				
-				WindowsDebugEngine.lock.acquire()
-				
 				if minidump:
-					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff, 'Dump.dmp' : minidump }
+					self.crashInfo = { 'StackTrace.txt' : self.buff, 'Dump.dmp' : minidump }
 				else:
-					WindowsDebugEngine.crashInfo = { 'StackTrace.txt' : _DbgEventHandler.buff }
+					self.crashInfo = { 'StackTrace.txt' : self.buff }
 				
 				# Build bucket string
 				try:
-					bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(_DbgEventHandler.buff).group(1)
-					exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
-					exceptionCode = re.compile("ExceptionCode: ([^\s\b]+)").search(_DbgEventHandler.buff).group(1)
+					bucketId = re.compile("DEFAULT_BUCKET_ID:\s+([A-Za-z_]+)").search(self.buff).group(1)
+					exceptionAddress = re.compile("ExceptionAddress: ([^\s\b]+)").search(self.buff).group(1)
+					exceptionCode = re.compile("ExceptionCode: ([^\s\b]+)").search(self.buff).group(1)
 					
 					exceptionType = "AV"
-					if re.compile("READ_ADDRESS").search(_DbgEventHandler.buff) != None:
+					if re.compile("READ_ADDRESS").search(self.buff) != None:
 						exceptionType = "ReadAV"
-					elif re.compile("WRITE_ADDRESS").search(_DbgEventHandler.buff) != None:
+					elif re.compile("WRITE_ADDRESS").search(self.buff) != None:
 						exceptionType = "WriteAV"
 				
 					bucket = "%s_at_%s" % (exceptionType, exceptionAddress)
@@ -265,15 +259,15 @@ try:
 					# Sometimes !analyze -v fails
 					bucket = "Unknown"
 				
-				WindowsDebugEngine.crashInfo["Bucket"] = bucket
+				self.crashInfo["Bucket"] = bucket
 				
 				## Do we have !exploitable?
 				
 				try:
-					majorHash = re.compile("^MAJOR_HASH:(0x.*)$", re.M).search(_DbgEventHandler.buff).group(1)
-					minorHash = re.compile("^MINOR_HASH:(0x.*)$", re.M).search(_DbgEventHandler.buff).group(1)
-					classification = re.compile("^CLASSIFICATION:(.*)$", re.M).search(_DbgEventHandler.buff).group(1)
-					shortDescription = re.compile("^SHORT_DESCRIPTION:(.*)$", re.M).search(_DbgEventHandler.buff).group(1)
+					majorHash = re.compile("^MAJOR_HASH:(0x.*)$", re.M).search(self.buff).group(1)
+					minorHash = re.compile("^MINOR_HASH:(0x.*)$", re.M).search(self.buff).group(1)
+					classification = re.compile("^CLASSIFICATION:(.*)$", re.M).search(self.buff).group(1)
+					shortDescription = re.compile("^SHORT_DESCRIPTION:(.*)$", re.M).search(self.buff).group(1)
 					
 					if majorHash != None and minorHash != None:
 						
@@ -282,168 +276,174 @@ try:
 							majorHash,
 							minorHash)
 						
-						WindowsDebugEngine.crashInfo["Bucket"] = bucket
+						self.crashInfo["Bucket"] = bucket
 					
 				except:
 					pass
 				
 				# Done
-				WindowsDebugEngine.fault = True
-				WindowsDebugEngine.lock.release()
 				
 			except:
-				sys.stdout.write(repr(sys.exc_info()[0]) + "\n")
+				sys.stdout.write(repr(sys.exc_info()) + "\n")
 				raise
 			
-			WindowsDebugEngine.handledFault.set()
+			self.buff = ""
+			self.fault = True
+			self.handledFault.set()
+			
+			# send needs to match with recv, so place
+			# after we notify that fault was handled
+			self.pipe.send(self.crashInfo)
+			self.pipe.close()
 			
 			return DbgEng.DEBUG_STATUS_BREAK
-			#return DbgEng.DEBUG_STATUS_NO_CHANGE
 
 
-	class WindowsDebugEngineThread(Thread):
-		def run(self):
-			WindowsDebugEngine.handlingFault.clear()
-			WindowsDebugEngine.TriggeredException = False
+	def WindowsDebugEngineProcess_run(*args, **kwargs):
+		
+		started = kwargs['Started']
+		handlingFault = kwargs['HandlingFault']
+		handledFault = kwargs['HandledFault']
+		CommandLine = kwargs.get('CommandLine', None)
+		Service = kwargs.get('Service', None)
+		ProcessName = kwargs.get('ProcessName', None)
+		KernelConnectionString = kwargs.get('KernelConnectionString', None)
+		SymbolsPath = kwargs.get('SymbolsPath', None)
+		IgnoreFirstChanceGardPage = kwargs.get('IgnoreFirstChanceGardPage', None)
+		pipe = kwargs['Pipe']
+		quit = kwargs['Quit']
+		dbg = None
+		
+		print "run()"
+		
+		# Hack for comtypes early version
+		comtypes._ole32.CoInitializeEx(None, comtypes.COINIT_APARTMENTTHREADED)
+		
+		try:
+			_eventHandler = _DbgEventHandler()
+			_eventHandler.handlingFault = handlingFault
+			_eventHandler.handledFault = handledFault
+			_eventHandler.pipe = pipe
+			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
 			
-			print "run()"
+			if KernelConnectionString:
+				dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
+					follow_forks = True,
+					event_callbacks_sink = _eventHandler,
+					output_callbacks_sink = _eventHandler,
+					symbols_path = SymbolsPath)
 			
-			# Hack for comtypes early version
-			comtypes._ole32.CoInitializeEx(None, comtypes.COINIT_APARTMENTTHREADED)
+			elif CommandLine:
+				dbg = PyDbgEng.ProcessCreator(command_line = CommandLine,
+					follow_forks = True,
+					event_callbacks_sink = _eventHandler,
+					output_callbacks_sink = _eventHandler,
+					symbols_path = SymbolsPath)
 			
-			try:
-				self._eventHandler = _DbgEventHandler()
-				self._eventHandler.IgnoreFirstChanceGardPage = self.IgnoreFirstChanceGardPage
+			elif ProcessName:
 				
-				if self.KernelConnectionString:
-					self.dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
-						follow_forks = True,
-						event_callbacks_sink = self._eventHandler,
-						output_callbacks_sink = self._eventHandler,
-						symbols_path = self.SymbolsPath)
-				
-				elif self.CommandLine:
-					self.dbg = PyDbgEng.ProcessCreator(command_line = self.CommandLine,
-						follow_forks = True,
-						event_callbacks_sink = self._eventHandler,
-						output_callbacks_sink = self._eventHandler,
-						symbols_path = self.SymbolsPath)
-				
-				elif self.ProcessName:
+				pid = None
+				for x in range(10):
+					print "WindowsDebugEngineThread: Attempting to locate process by name..."
+					pid = GetProcessIdByName(ProcessName)
+					if pid != None:
+						break
 					
-					pid = None
-					for x in range(10):
-						print "WindowsDebugEngineThread: Attempting to locate process by name..."
-						pid = self.GetProcessIdByName(self.ProcessName)
-						if pid != None:
-							break
-						
+					time.sleep(0.25)
+				
+				if pid == None:
+					raise Exception("Error, unable to locate process '%s'" % ProcessName)
+				
+				dbg = PyDbgEng.ProcessAttacher(pid,
+					event_callbacks_sink = _eventHandler,
+					output_callbacks_sink = _eventHandler,
+					symbols_path = SymbolsPath)
+			
+			elif Service:
+				
+				# Make sure service is running
+				if win32serviceutil.QueryServiceStatus(Service)[1] != 4:
+					try:
+						# Some services auto-restart, if they do
+						# this call will fail.
+						win32serviceutil.StartService(Service)
+					except:
+						pass
+					
+					while win32serviceutil.QueryServiceStatus(Service)[1] == 2:
 						time.sleep(0.25)
-					
-					if pid == None:
-						raise Exception("Error, unable to locate process '%s'" % self.ProcessName)
-					
-					self.dbg = PyDbgEng.ProcessAttacher(pid,
-						event_callbacks_sink = self._eventHandler,
-						output_callbacks_sink = self._eventHandler,
-						symbols_path = self.SymbolsPath)
-				
-				elif self.Service:
-					
-					# Make sure service is running
-					if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
-						try:
-							# Some services auto-restart, if they do
-							# this call will fail.
-							win32serviceutil.StartService(self.Service)
-						except:
-							pass
 						
-						while win32serviceutil.QueryServiceStatus(self.Service)[1] == 2:
-							time.sleep(0.25)
-							
-						if win32serviceutil.QueryServiceStatus(self.Service)[1] != 4:
-							raise Exception("WindowsDebugEngine: Unable to start service!")
-					
-					# Determin PID of service
-					scm = win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
-					hservice = win32service.OpenService(scm, self.Service, 0xF01FF)
-					
-					status = win32service.QueryServiceStatusEx(hservice)
-					pid = status["ProcessId"]
-					
-					win32service.CloseServiceHandle(hservice)
-					win32service.CloseServiceHandle(scm)
-					
-					self.dbg = PyDbgEng.ProcessAttacher(pid,
-						event_callbacks_sink = self._eventHandler,
-						output_callbacks_sink = self._eventHandler,
-						symbols_path = self.SymbolsPath)
+					if win32serviceutil.QueryServiceStatus(Service)[1] != 4:
+						raise Exception("WindowsDebugEngine: Unable to start service!")
 				
-				else:
-					raise Exception("Didn't find way to start debugger... bye bye!!")
+				# Determin PID of service
+				scm = win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
+				hservice = win32service.OpenService(scm, Service, 0xF01FF)
 				
-				WindowsDebugEngineThread.Quit = Event()
-				WindowsDebugEngine.started.set()
+				status = win32service.QueryServiceStatusEx(hservice)
+				pid = status["ProcessId"]
 				
-				self.dbg.event_loop_with_quit_event(WindowsDebugEngineThread.Quit)
+				win32service.CloseServiceHandle(hservice)
+				win32service.CloseServiceHandle(scm)
 				
-			finally:
-				if hasattr(self, "dbg") and self.dbg != None:
-					self.dbg.idebug_client.TerminateProcesses()
-					
-					# Bug: THere is a bug in self.dbg.__del__() that will cause a crash
-					#      if run when after we handle an exception/fault.
-					#      Have not been able to track down, this is a work around.
-					#      This work arround causes a small memoryleek :(
-					if WindowsDebugEngine.TriggeredException:
-						self.dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
-						self.dbg.idebug_client.Release()
-					else:
-						self.dbg.__del__();
-				
-				self.dbg = None
-				
-				comtypes._ole32.CoUninitialize()
-		
-		
-		def GetProcessIdByName(self, procname):
-			'''
-			Try and get pid for a process by name.
-			'''
+				dbg = PyDbgEng.ProcessAttacher(pid,
+					event_callbacks_sink = _eventHandler,
+					output_callbacks_sink = _eventHandler,
+					symbols_path = SymbolsPath)
 			
-			ourPid = -1
-			procname = procname.lower()
+			else:
+				raise Exception("Didn't find way to start debugger... bye bye!!")
+			
+			started.set()
+			dbg.event_loop_with_quit_event(quit)
+			
+		finally:
+			if dbg != None:
+				dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
+				dbg.idebug_client.Release()
+			
+			dbg = None
+			
+			comtypes._ole32.CoUninitialize()
+	
+	
+	def GetProcessIdByName(procname):
+		'''
+		Try and get pid for a process by name.
+		'''
+		
+		ourPid = -1
+		procname = procname.lower()
+		
+		try:
+			ourPid = win32api.GetCurrentProcessId()
+		
+		except:
+			pass
+		
+		pids = win32process.EnumProcesses()
+		for pid in pids:
+			if ourPid == pid:
+				continue
 			
 			try:
-				ourPid = win32api.GetCurrentProcessId()
-			
-			except:
-				pass
-			
-			pids = win32process.EnumProcesses()
-			for pid in pids:
-				if ourPid == pid:
-					continue
+				hPid = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 0, pid)
 				
 				try:
-					hPid = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, 0, pid)
+					mids = win32process.EnumProcessModules(hPid)
+					for mid in mids:
+						name = str(win32process.GetModuleFileNameEx(hPid, mid))
+						if name.lower().find(procname) != -1:
+							return pid
 					
-					try:
-						mids = win32process.EnumProcessModules(hPid)
-						for mid in mids:
-							name = str(win32process.GetModuleFileNameEx(hPid, mid))
-							if name.lower().find(procname) != -1:
-								return pid
-						
-					finally:
-						win32api.CloseHandle(hPid)
-				except:
-					pass
-			
-			return None
+				finally:
+					win32api.CloseHandle(hPid)
+			except:
+				pass
+		
+		return None
 	
-	class WindowsDebugEngine(Monitor, Thread):
+	class WindowsDebugEngine(Monitor):
 		'''
 		Windows debugger agent.  This debugger agent is based on the windbg engine and
 		supports the following features:
@@ -455,16 +455,15 @@ try:
 		
 		'''
 		def __init__(self, args):
-			Thread.__init__(self)
-			WindowsDebugEngine.started = Event()
+			Monitor.__init__(self, args)
 			
+			self.started = None
 			# Set at start of exception handling
-			WindowsDebugEngine.handlingFault = Event()
+			self.handlingFault = None
 			# Set when collection finished
-			WindowsDebugEngine.handledFault = Event()
-			WindowsDebugEngine.lock = Lock()
-			WindowsDebugEngine.crashInfo = None
-			WindowsDebugEngine.fault = False
+			self.handledFault = None
+			self.crashInfo = None
+			self.fault = False
 			self.thread = None
 			
 			if args.has_key('CommandLine'):
@@ -510,56 +509,62 @@ try:
 		
 		def _StartDebugger(self):
 			
-			# Need to reinitialize in another thread.
-			# Note: This must occur on every PyDbgEng restart to properly
-			#       clear out the old state.  A matching initialize call
-			#       is performed in the created thread.
-			comtypes._ole32.CoUninitialize()
-			
 			# Clear all our event handlers
-			WindowsDebugEngine.started.clear()
-			WindowsDebugEngine.handlingFault.clear()
-			WindowsDebugEngine.handledFault.clear()
+			self.started = Event()
+			self.quit = Event()
+			self.handlingFault = Event()
+			self.handledFault = Event()
+			self.crashInfo = None
+			self.fault = False
+			self.pipe, self.pipe_child = Pipe()
 			
-			self.thread = WindowsDebugEngineThread()
-			
-			self.thread.CommandLine = self.CommandLine
-			self.thread.Service = self.Service
-			self.thread.ProcessName = self.ProcessName
-			self.thread.KernelConnectionString = self.KernelConnectionString
-			self.thread.SymbolsPath = self.SymbolsPath
-			self.thread.IgnoreFirstChanceGardPage = self.IgnoreFirstChanceGardPage
+			self.thread = Process(group = None, target = WindowsDebugEngineProcess_run, kwargs = {
+				'Started':self.started,
+				'HandlingFault' : self.handlingFault,
+				'HandledFault' : self.handledFault,
+				'CommandLine':self.CommandLine,
+				'Service':self.Service,
+				'ProcessName':self.ProcessName,
+				'KernelConnectionString':self.KernelConnectionString,
+				'SymbolsPath':self.SymbolsPath,
+				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
+				'Pipe':self.pipe_child,
+				'Quit':self.quit
+				})
 			
 			# Kick off our thread:
 			self.thread.start()
 			
 			# Wait it...!
-			WindowsDebugEngine.started.wait()
+			self.started.wait()
 			
 			# Let things get spun up
 			time.sleep(2)
 		
 		def _StopDebugger(self):
 			print "_StopDebugger"
-			if self.thread != None and self.thread.isAlive():
-				#print "_StopDebugger - Setting Quit"
-				WindowsDebugEngineThread.Quit.set()
-				WindowsDebugEngine.started.clear()
-				#print "_StopDebugger - Joining thread"
-				self.thread.join()
-				#print "_StopDebugger - Breathing"
+			if self.thread != None and self.thread.is_alive():
+				
+				self.quit.set()
+				self.started.clear()
+				
+				self.thread.join(5)
+				
+				if self.thread.is_alive():
+					self.thread.terminate()
+					self.thread.join()
+				
 				time.sleep(0.25) # Take a breath
+			
+			self.thread = None
 		
 		def _IsDebuggerAlive(self):
-			return self.thread and self.thread.isAlive()
+			return self.thread and self.thread.is_alive()
 		
 		def OnTestStarting(self):
 			'''
 			Called right before start of test.
 			'''
-			
-			# Clear out output buffer
-			_DbgEventHandler.buff = ""
 			
 			if not self.StartOnCall and not self._IsDebuggerAlive():
 				self._StartDebugger()
@@ -584,15 +589,12 @@ try:
 			'''
 			Get any monitored data.
 			'''
-			WindowsDebugEngine.lock.acquire()
-			if WindowsDebugEngine.crashInfo != None:
-				ret = WindowsDebugEngine.crashInfo
-				WindowsDebugEngine.crashInfo = None
-				_DbgEventHandler.buff = ""
-				WindowsDebugEngine.lock.release()
+			self.crashInfo = self.pipe.recv()
+			if self.crashInfo != None:
+				ret = self.crashInfo
+				self.crashInfo = None
 				return ret
 			
-			WindowsDebugEngine.lock.release()
 			return None
 		
 		def DetectedFault(self):
@@ -602,20 +604,14 @@ try:
 			
 			time.sleep(0.15)
 
-			if not WindowsDebugEngine.handlingFault.isSet():
+			if not self.handlingFault.is_set():
 				return False
 			
-			WindowsDebugEngine.handledFault.wait()
-			WindowsDebugEngine.lock.acquire()
+			self.handledFault.wait()
 			
-			if WindowsDebugEngine.fault or not self.thread.isAlive():
-				print ">>>>>> RETURNING FAULT <<<<<<<<<"
-				WindowsDebugEngine.fault = False
-				WindowsDebugEngine.lock.release()
-				return True
+			print ">>>>>> RETURNING FAULT <<<<<<<<<"
 			
-			WindowsDebugEngine.lock.release()
-			return False
+			return True
 		
 		def OnFault(self):
 			'''
@@ -637,6 +633,7 @@ except:
 try:
 	
 	import vtrace, envi
+	from threading import Thread, Event, Lock
 	
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
@@ -831,7 +828,7 @@ try:
 			
 			time.sleep(0.25)
 
-			if not UnixDebugger.handlingFault.isSet():
+			if not UnixDebugger.handlingFault.is_set():
 				return False
 			
 			UnixDebugger.handledFault.wait()
@@ -863,189 +860,5 @@ except:
 	if sys.platform != 'win32':
 		print "Warning: Unix debugger failed to load: ", sys.exc_info()
 
-	##class WindowsAppVerifier(Monitor):
-	##	'''
-	##	Agent that uses the Microsoft AppVerifier tool to detect faults on
-	##	running processes.  AppVerifier can be downloaded from Microsoft via
-	##	the following url: http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx
-	##	'''
-	##	
-	##	def __init__(self, args):
-	##		self._image = str(args['Application']).replace("'''", "")
-	##		
-	##		if args.has_key('Manual') and str(args['Manual']).replace("'''", "").lower() in ["true", "1"]:
-	##			self._manual = True
-	##		else:
-	##			self._manual = False
-	##		
-	##		self.checks = ["COM", "Exceptions", "Handles", "Heaps", "Locks", "Memory", "RPC", "Threadpool", "TLS"]
-	##		self.stops = {}
-	##		# self.stops = {"COM":["10","1032"]}
-	##		
-	##		if args.has_key("Checks"):
-	##			self.checks = args["Checks"].replace("'''", "").split(",")
-	##			for i in range(len(self.checks)):
-	##				self.checks[i] = self.checks[i].strip()
-	##		
-	##		if args.has_key("Stops"):
-	##			checks = args["Stops"].replace("'''", "").split(";")
-	##			for check in checks:
-	##				check, stops = check.split(":")
-	##				self.stops[check] = stops.split(",")
-	##			
-	##		print "WindowsAppVerifier: Enabling the following Checks:"
-	##		for c in self.checks:
-	##			print "WindowsAppVerifier: Check: %s" % c
-	##		
-	##		print "WindowsAppVerifier: Disabling the following Stops:"
-	##		for c in self.stops:
-	##			for s in self.stops[c]:
-	##				print "%s: %s" % (c, s)
-	##		
-	##		self._appManager = CreateObject("{597c1ef7-fc28-451e-8273-417c6c9244ed}")
-	##		
-	##		self._RemoveImageLogs(self._image)
-	##		self._DisableImage(self._image)
-	##		self._EnableImage(self._image)
-	##	
-	##	def _EnableImage(self, image):
-	##		'''
-	##		Enables the default checks for an image (exe).
-	##		'''
-	##			
-	##		if not self._manual:
-	##			image = self._appManager.Images.Add(image)
-	##			for check in image.Checks:
-	##				if check.Name in self.checks:
-	##					check.Enabled = True
-	##				else:
-	##					check.Enabled = False
-	##				
-	##				if self.stops.has_key(check.Name):
-	##					stops = self.stops[check.Name]
-	##					for stop in check.Stops:
-	##						if str(stop.StopCode) in stops:
-	##							print "Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-	##							stop.Active = False
-	##						else:
-	##							print "NOT Marking stop %s non-active for check %s" % (str(stop.StopCode), check.Name)
-	##	
-	##	def _DisableImage(self, image):
-	##		try:
-	##			if not self._manual:
-	##				self._appManager.Images.Remove(image)
-	##		except:
-	##			pass
-	##	
-	##	def _GetImageLogs(self, image):
-	##		'''
-	##		Get lof files for an image
-	##		'''
-	##		
-	##		logFiles = []
-	##		for log in self._appManager.Logs(image):
-	##			
-	##			try:
-	##				os.unlink("appVerifierTmp.xml")
-	##			except:
-	##				pass
-	##			
-	##			try:
-	##				log.SaveAsXML("appVerifierTmp.xml", "SRV*http://msdl.microsoft.com/download/symbols")
-	##			except:
-	##				pass
-	##			
-	##			fd = open("appVerifierTmp.xml","rb+")
-	##			logFiles.append(fd.read())
-	##			fd.close()
-	##			os.unlink("appVerifierTmp.xml")
-	##		
-	##		return logFiles
-	##	
-	##	def _RemoveImageLogs(self, image):
-	##		try:
-	##			logs = self._appManager.Logs(image)
-	##			for idx in range(logs.Count):
-	##				try:
-	##					logs.Remove(0)
-	##				except:
-	##					print "Warning: Caught error removing App Verifier logs."
-	##					pass
-	##		except:
-	##			pass
-	##		
-	##	def OnTestStarting(self):
-	##		'''
-	##		Called right before start of test.
-	##		'''
-	##		
-	##		# We should not do this on every test
-	##		# instead just on startup.
-	##		#self._EnableImage(self._image)
-	##		pass
-	##	
-	##	def OnTestFinished(self):
-	##		'''
-	##		Called right after a test.
-	##		'''
-	##		
-	##		# We should not do this on every test
-	##		# instead just on shutdown.
-	##		#self._DisableImage(self._image)
-	##		pass
-	##	
-	##	def GetMonitorData(self):
-	##		'''
-	##		Get any monitored data.
-	##		'''
-	##		ret = {}
-	##		count = 0
-	##		logs = self.imageLogs
-	##		
-	##		if logs == None:
-	##			logs = self.imageLogs = self._GetImageLogs(self._image)
-	##		
-	##		self._RemoveImageLogs(self._image)
-	##		
-	##		for log in logs:
-	##			count += 1
-	##			ret["AppVerifier_%d.xml" % count] = log
-	##		
-	##		return ret
-	##	
-	##	def DetectedFault(self):
-	##		'''
-	##		Check if a fault was detected.
-	##		'''
-	##		
-	##		time.sleep(0.15) # Pause a sec
-	##		
-	##		self.imageLogs = self._GetImageLogs(self._image)
-	##		self._RemoveImageLogs(self._image)
-	##		
-	##		for log in self.imageLogs:
-	##			if len(log) > 300:
-	##				print "WindowsAppVerifier: Detected fault"
-	##				return True
-	##		
-	##		self.imageLogs = None
-	##		print "WindowsAppVerifier: Did not detect fault"
-	##		return False
-	##	
-	##	def OnFault(self):
-	##		'''
-	##		Called when a fault was detected.
-	##		'''
-	##		pass
-	##	
-	##	def OnShutdown(self):
-	##		'''
-	##		Called when Agent is shutting down.
-	##		'''
-	##		try:
-	##			self._DisableImage(self._image)
-	##		except:
-	##			pass
-	
 	
 # end
