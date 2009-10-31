@@ -9,7 +9,7 @@ it is capable of using well defined templates to crack data.
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -1909,6 +1909,7 @@ class DataCracker:
 		# Now, do the Flag portions
 		
 		if node.endian == 'little':
+			##print "Flipping bytes"
 			value = self.flipBitsByByte(value, node.length)
 		
 		##print "start value:", self.binaryFormatter(value, node.length)
@@ -1918,19 +1919,23 @@ class DataCracker:
 			if child.elementType != 'flag':
 				continue
 			
-			childValue = value >> child.position
+			childValue = value
+
+			mask = 0x00 << node.length - (child.position + child.length)
+			cnt = (node.length - child.position) - 1
+			for i in range(child.length):
+				mask |= 1 << cnt
+				cnt -= 1
 			
-			mask = 0
-			for i in range(0, child.length):
-				mask += 1 << i
-			
-			##preValue = childValue
+			preValue = childValue
 			childValue = childValue & mask
 			##print "mask: %s pre-value: %s post-value: %d" % (
 			##	self.binaryFormatter(mask, node.length),
 			##	self.binaryFormatter(preValue, node.length),
 			##	childValue
 			##	)
+			
+			childValue = childValue >> (node.length - child.position) - child.length
 			
 			Debug(1, "Found child flag %s value of %s" % (child.name, str(childValue)))
 			

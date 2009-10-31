@@ -37,7 +37,8 @@ from Peach.Engine.engine import Engine
 from Peach.mutatestrategies import *
 
 class _RandomMutator(object):
-	name = "chosen randomly"
+	name = "Random"
+	changedName = "N/A"
 	
 class RandomMutationStrategy(MutationStrategy):
 	'''

@@ -4,6 +4,13 @@ Peach Changlist
 I've never been good about keeping change lists,
 but I'm going to try and start :)
 
+v2.3.3
+------
+
+ - Bug: Flags parsing backwards
+ - Changed: Console output now shows element being modified
+
+
 v2.3.2
 ------
 

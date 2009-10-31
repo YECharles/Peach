@@ -6,7 +6,7 @@ Mutation Strategies
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ from Peach.mutator import *
 
 class _Unknown(object):
 	name = "N/A"
+	changedName = "N/A"
 
 class SequencialMutationStrategy(MutationStrategy):
 	'''

@@ -61,6 +61,7 @@ class Mutator(object):
 	def __init__(self):
 		self.name = "Mutator"
 		self._count = None
+		self.changedName = "N/A"
 		
 		#: Is mutator finite?
 		self.isFinite = False

@@ -102,6 +102,7 @@ class NumericalVarianceMutator(Mutator):
 	
 	def sequencialMutation(self, node):
 		
+		self.changedName = node.getFullnameInDataModel()
 		# Sometimes self._n == 0, catch that here
 		if self._currentCount >= len(self._values):
 			return
@@ -111,6 +112,7 @@ class NumericalVarianceMutator(Mutator):
 			node.currentValue = unicode(node.currentValue)
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		try:
 			count = self._random.choice(self._values)
 			node.currentValue = str(long(node.getInternalValue()) + count)
@@ -253,12 +255,14 @@ class NumericalEdgeCaseMutator(Mutator):
 		return n
 
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
 			node.currentValue = unicode(self._values[self._size][self._currentCount])
 		else:
 			node.currentValue = self._values[self._size][self._currentCount]
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
 			node.currentValue = unicode(self._random.choice(self._values[self._size]))
 		else:
@@ -326,12 +330,14 @@ class FiniteRandomNumbersMutator(Mutator):
 		return n
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
 			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
 		else:
 			node.currentValue = self._random.randint(self._minValue, self._maxValue)
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
 			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
 		else:

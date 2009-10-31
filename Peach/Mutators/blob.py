@@ -7,7 +7,7 @@ Mutators that operate on blob types.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -81,9 +81,11 @@ class DWORDSliderMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._position)
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.randint(0, self._len-1)
 		self._performMutation(node, count)
 
@@ -163,6 +165,7 @@ class BitFlipperMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		for i in range(self._random.randint(0, 10)):
 			if self._len - 1 <= 0:
 				count = 0
@@ -172,6 +175,7 @@ class BitFlipperMutator(Mutator):
 			node.currentValue = self._performMutation(node, count)
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		for i in range(self._random.randint(0, 10)):
 			if self._len -1 <= 0:
 				count = 0

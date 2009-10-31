@@ -236,10 +236,13 @@ class StdoutWatcher(EngineWatcher):
 	
 	def OnTestCaseStarting(self, run, test, variationCount):
 		
-		print "[%d:%s:%s] Running test with mutator %s" % (variationCount,
-													 str(self.totalVariations),
-													 str(self.remaingTime),
-													 test.mutator.currentMutator().name)
+		prefix = "[%d:%s:%s] " % (variationCount,
+								 str(self.totalVariations),
+								 str(self.remaingTime))
+		
+		print prefix+"Element: %s" % (test.mutator.currentMutator().changedName)
+		
+		print (" "*len(prefix)) + "Mutator: %s\n" % (test.mutator.currentMutator().name)
 		
 		if self.startTime == None and variationCount > 1:
 			self.startTime = time.time()

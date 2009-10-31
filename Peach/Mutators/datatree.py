@@ -7,7 +7,7 @@ Mutators that modify the data tree structure.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -64,9 +64,11 @@ class DataTreeRemoveMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		node.setValue("")
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		node.setValue("")
 
 
@@ -102,9 +104,11 @@ class DataTreeDuplicateMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		node.setValue( node.getValue() * self._cnt )
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.randint(0, self._cnt)
 		node.setValue( node.getValue() * count )
 
@@ -175,6 +179,7 @@ class DataTreeSwapNearNodesMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		nextNode = self._nextNode(node)
 		if nextNode != None:
 			
@@ -185,6 +190,7 @@ class DataTreeSwapNearNodesMutator(Mutator):
 			nextNode.setValue(v1)
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self.sequencialMutation(node)
 
 # end

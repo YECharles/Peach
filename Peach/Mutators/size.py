@@ -87,9 +87,11 @@ class SizedVaranceMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.choice(self._range)
 		self._performMutation(node, count)
 	
@@ -242,9 +244,11 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.choice(self._range)
 		self._performMutation(node, count)
 	
@@ -358,9 +362,11 @@ class SizedDataVaranceMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.choice(self._range)
 		self._performMutation(node, count)
 	
@@ -486,9 +492,11 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.choice(self._range)
 		self._performMutation(node, count)
 	

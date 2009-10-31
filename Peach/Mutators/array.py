@@ -7,7 +7,7 @@ Mutators that operate on arrays and count relations.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ class ArrayVarianceMutator(Mutator):
 		self._arrayCount = node.getArrayCount()
 		self._minCount = self._arrayCount - self._n
 		self._maxCount = self._arrayCount + self._n
+		self.changedName = ""
 		
 		if self._minCount < 0:
 			self._minCount = 0
@@ -120,6 +121,7 @@ class ArrayVarianceMutator(Mutator):
 		Perform a sequencial mutation
 		'''
 		
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._currentCount)
 	
 	def randomMutation(self, node):
@@ -127,6 +129,7 @@ class ArrayVarianceMutator(Mutator):
 		Perform a random mutation
 		'''
 		
+		self.changedName = node.getFullnameInDataModel()
 		count = self._random.randint(self._minCount, self._maxCount)
 		self._performMutation(node, count)
 	
@@ -240,9 +243,11 @@ class ArrayReverseOrderMutator(ArrayVarianceMutator):
 		return 1
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node)
 
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node)
 
 	def _performMutation(self, node):
@@ -279,9 +284,11 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 		return self._n
 	
 	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node)
 
 	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node)
 
 	def _performMutation(self, node):

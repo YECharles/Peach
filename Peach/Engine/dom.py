@@ -4196,7 +4196,7 @@ class Flags(DataElement):
 			else:
 				flagPosition = flag.position
 				
-			#print "Flag from %d to %d" % (flag.position, flagPosition)
+			##print "Flag from %d to %d" % (flag.position, flagPosition)
 			flagLength = flag.length
 
 			mask = 0x00 << self.length - (flagPosition + flag.length)
@@ -4213,18 +4213,19 @@ class Flags(DataElement):
 				flagValue = 0
 				
 			premask = flagValue << ((self.length - flagPosition) - flag.length)
-			#print "premask: %s" % self.binaryFormatter(premask, self.length)
+			##print "premask: %s" % self.binaryFormatter(premask, self.length)
 				
 			ret |= (mask & premask)
 				
-			#print "flag.pos: %d flag.length: %d" % (flagPosition, flag.length)
-			#print "ret: %s mask: %s value: %s\n" % (
-			#	self.binaryFormatter(ret, self.length),
-			#	self.binaryFormatter(mask, self.length),
-			#	self.binaryFormatter(flagValue, flag.length)
-			#	)
+			##print "flag.pos: %d flag.length: %d" % (flagPosition, flag.length)
+			##print "ret: %s mask: %s value: %s\n" % (
+			##	self.binaryFormatter(ret, self.length),
+			##	self.binaryFormatter(mask, self.length),
+			##	self.binaryFormatter(flagValue, flag.length)
+			##	)
 			
 		if self.endian == "little":
+			##print "Flipping bits"
 			ret = self.flipBitsByByte(ret, self.length)
 		
 		# 4. do we fixup?
