@@ -21,7 +21,7 @@ tools\gendocs.bat.  Output ends up in docs\apidocs\index.html.
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -4294,6 +4294,34 @@ class Flag(DataElement):
 		self.defaultValue = None
 		self.position = None
 		self.length = None	# called size
+		self.signed = False
+	
+	def getSize(self):
+		return self.length
+	def setSize(self, size):
+		self.length = size
+	size = property(fget=getSize, fset=setSize)
+	
+	def getMinValue(self):
+		'''
+		Get the minimum value this number can have.
+		'''
+		
+		if not self.signed:
+			return 0
+		
+		min = 0 - (pow(2, self.length)-1)
+		return min
+	
+	def getMaxValue(self):
+		'''
+		Get the maximum value for this number.
+		'''
+		max = pow(2, self.length)-1
+		if self.signed:
+			return max/2
+		
+		return max
 	
 	def clone(self, obj = None):
 		

@@ -94,7 +94,7 @@ class NumericalVarianceMutator(Mutator):
 				if hint.name == "NumericalString":
 					return True
 		
-		if isinstance(e, Number) and e.isMutable:
+		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable:
 			return True
 		
 		return False
@@ -131,6 +131,7 @@ class NumericalEdgeCaseMutator(Mutator):
 	'''
 	
 	_values = None
+	_allowedSizes = [8, 16, 24, 32, 64]
 	
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
@@ -151,6 +152,13 @@ class NumericalEdgeCaseMutator(Mutator):
 			self._size = 32
 		else:
 			self._size = node.size
+		
+		# For flags, pick the next proper size up
+		if self._size not in self._allowedSizes:
+			for s in self._allowedSizes:
+				if self._size <= s:
+					self._size = s
+					break
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
@@ -238,7 +246,7 @@ class NumericalEdgeCaseMutator(Mutator):
 				if hint.name == "NumericalString":
 					return True
 		
-		if isinstance(e, Number) and e.isMutable:
+		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable:
 			return True
 		
 		return False
@@ -307,7 +315,7 @@ class FiniteRandomNumbersMutator(Mutator):
 	
 	def supportedDataElement(e):
 		
-		if isinstance(e, String):
+		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable:
 			# Look for NumericalString
 			for hint in e.hints:
 				if hint.name == "NumericalString":
