@@ -139,11 +139,12 @@
 	</xs:element>
 	<xs:complexType name="tBlock">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element ref="Block" minOccurs="0" />
-			<xs:element ref="Number" minOccurs="0" />
+      <xs:element ref="Block" minOccurs="0" />
+      <xs:element ref="Number" minOccurs="0" />
 			<xs:element ref="String" minOccurs="0" />
 			<xs:element ref="Flags" minOccurs="0" />
-			<xs:element ref="Blob" minOccurs="0" />
+      <xs:element ref="Flag" minOccurs="0" />
+      <xs:element ref="Blob" minOccurs="0" />
 			<xs:element ref="Seek" minOccurs="0" />
 			<xs:element ref="Choice" minOccurs="0" />
 			<xs:element ref="Custom" minOccurs="0" />
@@ -466,8 +467,9 @@
 			<xs:element ref="Block" minOccurs="0" />
 			<xs:element ref="Number" minOccurs="0" />
 			<xs:element ref="String" minOccurs="0" />
-			<xs:element ref="Flags" minOccurs="0" />
-			<xs:element ref="Blob" minOccurs="0" />
+      <xs:element ref="Flags" minOccurs="0" />
+      <xs:element ref="Flag" minOccurs="0" />
+      <xs:element ref="Blob" minOccurs="0" />
 			<xs:element ref="Seek" minOccurs="0" />
 			<xs:element ref="Choice" minOccurs="0" />
 			<xs:element ref="Custom" minOccurs="0" />
@@ -592,6 +594,19 @@
 						<xs:enumeration value="little" />
 						<xs:enumeration value="big" />
 						<xs:enumeration value="network" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="rightToLeft">
+				<xs:annotation>
+					<xs:documentation>After reading bits interpret them from right to left
+					instead of left to right.  The default for this attribute is false.  Note:
+					this should not be confused for setting endian byte order.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true" />
+						<xs:enumeration value="false" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
