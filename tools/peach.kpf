@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="ab4b7f35-e386-4c14-9e8b-926c99b5839f" kpf_version="4" name="peach.kpf">
+<file id="8510831a-0c1f-4e0b-95c6-33d0067d5b06" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="swf.py" url="file:///c:/adobe/swf.py">
+</file>
+<file id="debeb0f6-a25f-48f6-b853-9825c471cfe1" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="bits.py" url="file:///C:/adobe/bits.py">
+</file>
 <preference-set idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f">
   <string id="import_dirname">C:\peach</string>
   <string id="import_exclude_matches">*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;*%*;tmp*.html;.DS_Store</string>

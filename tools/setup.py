@@ -6,7 +6,7 @@ import glob
 setup(
 	options={"py2exe": {"optimize":2, "bundle_files":3}},
 	console=['peach.py'],
-	windows=['peachvalidator.pyw'],
+	#windows=['peachvalidator.pyw'],
 	
 	#zipfile = None,
 	
