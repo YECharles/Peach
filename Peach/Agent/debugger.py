@@ -38,7 +38,7 @@ detect faults.  Would be nice to also eventually do other things like
 import struct, sys, time
 from Peach.agent import Monitor
 
-import struct, sys, time, os, re
+import struct, sys, time, os, re, pickle
 import gc
 
 try:
@@ -289,13 +289,13 @@ try:
 			
 			self.buff = ""
 			self.fault = True
+			
+			print "Exception: Writing to file"
+			fd = open(".peach_crashInfo.bin", "wb+")
+			fd.write(pickle.dumps(self.crashInfo))
+			fd.close()
+			
 			self.handledFault.set()
-			
-			# send needs to match with recv, so place
-			# after we notify that fault was handled
-			self.pipe.send(self.crashInfo)
-			self.pipe.close()
-			
 			return DbgEng.DEBUG_STATUS_BREAK
 
 
@@ -310,7 +310,6 @@ try:
 		KernelConnectionString = kwargs.get('KernelConnectionString', None)
 		SymbolsPath = kwargs.get('SymbolsPath', None)
 		IgnoreFirstChanceGardPage = kwargs.get('IgnoreFirstChanceGardPage', None)
-		pipe = kwargs['Pipe']
 		quit = kwargs['Quit']
 		dbg = None
 		
@@ -323,7 +322,6 @@ try:
 			_eventHandler = _DbgEventHandler()
 			_eventHandler.handlingFault = handlingFault
 			_eventHandler.handledFault = handledFault
-			_eventHandler.pipe = pipe
 			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
 			
 			if KernelConnectionString:
@@ -396,6 +394,19 @@ try:
 			
 			started.set()
 			dbg.event_loop_with_quit_event(quit)
+			
+			#if handledFault.is_set():
+			#	print "!!! Waiting for thread sync"
+			#	while True:
+			#		try:
+			#			print ".",
+			#			inQueue.get(True, 1)
+			#			break
+			#		except:
+			#			pass
+			#	
+			#	print "!!! Putting crashInfo into queue"
+			#	outQueue.put(_eventHandler.crashInfo)
 			
 		finally:
 			if dbg != None:
@@ -516,7 +527,6 @@ try:
 			self.handledFault = Event()
 			self.crashInfo = None
 			self.fault = False
-			self.pipe, self.pipe_child = Pipe()
 			
 			self.thread = Process(group = None, target = WindowsDebugEngineProcess_run, kwargs = {
 				'Started':self.started,
@@ -528,7 +538,6 @@ try:
 				'KernelConnectionString':self.KernelConnectionString,
 				'SymbolsPath':self.SymbolsPath,
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
-				'Pipe':self.pipe_child,
 				'Quit':self.quit
 				})
 			
@@ -542,7 +551,8 @@ try:
 			time.sleep(2)
 		
 		def _StopDebugger(self):
-			print "_StopDebugger"
+			print "_StopDebugger()"
+			
 			if self.thread != None and self.thread.is_alive():
 				
 				self.quit.set()
@@ -589,7 +599,23 @@ try:
 			'''
 			Get any monitored data.
 			'''
-			self.crashInfo = self.pipe.recv()
+			#print "GetMonitorData(): Queuing start command"
+			#self.outQueue.put("GO!")
+			#
+			#print "GetMonitorData(): Waiting for length"
+			#self.crashInfo = self.inQueue.get()
+			
+			print "GetMonitorData(): Loading from file"
+			fd = open(".peach_crashInfo.bin", "rb+")
+			self.crashInfo = pickle.loads(fd.read())
+			fd.close()
+			
+			try:
+				os.unlink(".peach_crashInfo.bin")
+			except:
+				pass
+			
+			print "GetMonitorData(): Got it!"
 			if self.crashInfo != None:
 				ret = self.crashInfo
 				self.crashInfo = None
@@ -601,6 +627,8 @@ try:
 			'''
 			Check if a fault was detected.
 			'''
+			
+			print "DetectedFault()"
 			
 			time.sleep(0.15)
 
