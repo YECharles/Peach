@@ -4067,6 +4067,7 @@ class Flags(DataElement):
 		self.elementType = 'flags'
 		self.length = None	# called size
 		self.endian = Flags.defaultEndian
+		self.rightToLeft = False
 
 	def clone(self, obj = None):
 		
@@ -4179,7 +4180,7 @@ class Flags(DataElement):
 		'''
 		# 1. Init our value
 		
-		ret = 0 << self.length
+		ret = 0
 		
 		# 3. Build our flags up
 		
@@ -4188,42 +4189,23 @@ class Flags(DataElement):
 			if n.elementType == 'flag':
 				flags.append(n)
 		
-			
+		bits = BitBuffer("", self.rightToLeft)
+		bits.writebits(0xff, self.length)
+		
 		for flag in flags:
 			
 			if self.endian == "little":
 				flagPosition = (self.length - flag.position) - flag.length
 			else:
 				flagPosition = flag.position
-				
-			##print "Flag from %d to %d" % (flag.position, flagPosition)
-			flagLength = flag.length
-
-			mask = 0x00 << self.length - (flagPosition + flag.length)
 			
-			cnt = (self.length - flagPosition) - 1
-			for i in range(flag.length):
-				mask |= 1 << cnt
-				cnt -= 1
-				
-			flagValue = flag.getValue()
-			try:
-				flagValue = long(flagValue)
-			except:
-				flagValue = 0
-				
-			premask = flagValue << ((self.length - flagPosition) - flag.length)
-			##print "premask: %s" % self.binaryFormatter(premask, self.length)
-				
-			ret |= (mask & premask)
-				
-			##print "flag.pos: %d flag.length: %d" % (flagPosition, flag.length)
-			##print "ret: %s mask: %s value: %s\n" % (
-			##	self.binaryFormatter(ret, self.length),
-			##	self.binaryFormatter(mask, self.length),
-			##	self.binaryFormatter(flagValue, flag.length)
-			##	)
+			bits.seek(flagPosition)
 			
+			bits.writebits(int(flag.getValue()), flag.length)
+		
+		bits.seek(0)
+		ret = bits.readbits(self.length)
+		
 		if self.endian == "little":
 			##print "Flipping bits"
 			ret = self.flipBitsByByte(ret, self.length)

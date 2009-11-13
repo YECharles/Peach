@@ -8,7 +8,7 @@ object that contians things like templates, namespaces, etc.
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -1404,6 +1404,8 @@ class ParseTemplate:
 			self.HandleNumber(child, parent)
 		elif child.nodeName == 'Flags':
 			self.HandleFlags(child, parent)
+		elif child.nodeName == 'Flag':
+			self.HandleFlag(child, parent)
 		elif child.nodeName == 'Blob':
 			self.HandleBlob(child, parent)
 		elif child.nodeName == 'Choice':
@@ -1836,6 +1838,18 @@ class ParseTemplate:
 			if not ( flags.endian == 'little' or flags.endian == 'big' ):
 				raise PeachException("Invalid endian type on Flags element")
 		
+		# rightToLeft
+		
+		if node.hasAttributeNS(None, 'rightToLeft'):
+			if self._getAttribute(node, 'rightToLeft').lower() == "true":
+				flags.rightToLeft = True
+			
+			elif self._getAttribute(node, 'rightToLeft').lower() == "false":
+				flags.rightToLeft = False
+			
+			else:
+				raise PeachException("Flags attribute rightToLeft must be 'true' or 'false'.")
+		
 		# constraint
 		flags.constraint = self._getAttribute(node, "constraint")
 
@@ -1851,6 +1865,10 @@ class ParseTemplate:
 						raise PeachException("Error, found duplicate Flag name in Flags set [%s]" % flags.name)
 				
 				self.HandleFlag(child, flags)
+			
+			elif child.nodeName == 'Relation':
+				self.HandleRelation(child, flags)
+				
 			else:
 				raise PeachException(PeachStr("found unexpected node in Flags: %s" % child.nodeName))
 		

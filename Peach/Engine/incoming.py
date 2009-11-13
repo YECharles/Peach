@@ -1892,50 +1892,41 @@ class DataCracker:
 		
 		# Now, unpack the integer
 		
-		fmt = '>'
+		fmt2 = '>'
+		if node.endian == 'little':
+			fmt = '<'
+		else:
+			fmt = '>'
+		
 		if node.length == 8:
 			fmt += 'B'
+			fmt2 += 'B'
 		elif node.length == 16:
 			fmt += 'H'
+			fmt2 += 'H'
 		elif node.length == 32:
 			fmt += 'I'
+			fmt2 += 'I'
 		elif node.length == 64:
 			fmt += 'Q'
+			fmt2 += 'Q'
 		
-		##print "formatter:", fmt
 		value = int(struct.unpack(fmt, value)[0])
-		##print "_handleFlags(): Value: %d" % value
+		# Repack with correct byte order for BitBuffer
+		value = struct.pack(fmt2, value)
 		
 		# Now, do the Flag portions
-		
-		if node.endian == 'little':
-			##print "Flipping bytes"
-			value = self.flipBitsByByte(value, node.length)
-		
-		##print "start value:", self.binaryFormatter(value, node.length)
+	
 		rating = 2
+		
+		bits = BitBuffer(value, node.rightToLeft)
 		
 		for child in node._children:
 			if child.elementType != 'flag':
 				continue
 			
-			childValue = value
-
-			mask = 0x00 << node.length - (child.position + child.length)
-			cnt = (node.length - child.position) - 1
-			for i in range(child.length):
-				mask |= 1 << cnt
-				cnt -= 1
-			
-			preValue = childValue
-			childValue = childValue & mask
-			##print "mask: %s pre-value: %s post-value: %d" % (
-			##	self.binaryFormatter(mask, node.length),
-			##	self.binaryFormatter(preValue, node.length),
-			##	childValue
-			##	)
-			
-			childValue = childValue >> (node.length - child.position) - child.length
+			bits.seek(child.position)
+			childValue = bits.readbits(child.length)
 			
 			Debug(1, "Found child flag %s value of %s" % (child.name, str(childValue)))
 			
