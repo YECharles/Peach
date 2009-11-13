@@ -4335,10 +4335,7 @@ class Flag(DataElement):
 		# 2. Default value?
 		
 		if self.defaultValue != None:
-			try:
-				value = int(self.defaultValue)
-			except:
-				value = ord(self.defaultValue)
+			value = self.defaultValue
 		
 		# 3. Relations
 		
@@ -4358,6 +4355,10 @@ class Flag(DataElement):
 			value = self.currentValue
 		
 		# 6. Return value
+		try:
+			value = int(value)
+		except:
+			value = ord(value)
 		
 		return value
 
