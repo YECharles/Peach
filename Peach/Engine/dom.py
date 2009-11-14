@@ -4358,7 +4358,10 @@ class Flag(DataElement):
 		try:
 			value = int(value)
 		except:
-			value = ord(value)
+			try:
+				value = ord(value)
+			except:
+				value = 0
 		
 		return value
 
