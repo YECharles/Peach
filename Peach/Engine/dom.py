@@ -3196,7 +3196,12 @@ class Block(DataElement):
 			return len(self.getValue())
 		
 		if self.currentValue != None:
-			return len(self.getValue())
+			try:
+				return len(self.getValue())
+			except:
+				print "getSize(): self:", self
+				print "getSize(): self.getFullDataName:", self.getFullDataName()
+				print "getSize(): self.getValue:", self.getValue()
 		
 		size = 0
 		for c in self._children:
