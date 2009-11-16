@@ -2333,7 +2333,7 @@ class DataElement(Mutatable):
 		
 		## If we have a cached value for ourselves, use it!
 		if self.elementType not in ['template', 'block', 'choice', 'flags', \
-									'xmlelement', 'xmlattribute', 'asn1type']:
+									'xmlelement', 'xmlattribute', 'asn1type', 'custom']:
 			if self.value != None and self.finalValue == None \
 					and self.currentValue == None and self.fixup == None \
 					and not self.hasRelation():
@@ -2341,9 +2341,13 @@ class DataElement(Mutatable):
 				if sout != None:
 					sout.write(self.value)
 				
+				#print "getValue(%s): Using self.value" % self.name
+				
 				return self.value
 		
 		if self.transformer != None:
+			#print "getValue(%s): Transformer will be applied" % self.name
+			
 			value = self.getRawValue()
 			value = self.transformer.transformer.encode(value)
 			
@@ -2351,12 +2355,14 @@ class DataElement(Mutatable):
 				sout.write(value)
 		
 		else:
+			#print "getValue(%s): Using getrawvalue" % self.name
 			value = self.getRawValue(sout)
 		
 		# See if we need to repeat ourselvs.
 		if not self.isArray():
 			count = self.getCount()
 			if count > 1:
+				#print "getValue(%s): Item is array" % self.name
 				origValue = value
 				value = value * count
 				
@@ -2365,6 +2371,21 @@ class DataElement(Mutatable):
 		
 		if value == None:
 			raise Exception("value is None for %s type %s" % (self.name, self.elementType))
+		
+		if self.elementType != 'flag' and type(value) == type(5):
+			print "getValue(%s): WHOA, Returning integer!!!" % self.name
+			print "self:",self
+			print "self.name:",self.name
+			print "self.getfullname", self.getFullDataName()
+			print "self.maxOccurs", self.maxOccurs
+			print "self.ref:",self.ref
+			print "self.getInternalValue", self.getInternalValue()
+			print "len(self._children)", len(self._children)
+			for child in self:
+				print "child:", child
+				print "child.name", child.name
+				print "child.getValue", child.getValue()
+			raise Exception("WHOA, Returning integer!!")
 		
 		self.value = value
 		return self.value
@@ -2858,6 +2879,7 @@ class Template(DataElement):
 		@param	sout: Output stream
 		'''
 		
+		#print "getInternalValue(%s)" % self.name
 		value = ""
 		
 		# 0. If using a stream store our location
@@ -2867,6 +2889,8 @@ class Template(DataElement):
 		# 1. Override with currentValue
 		
 		if self.currentValue != None:
+			#print "getInternalValue(%s): using currentValue" % self.name
+			
 			value = self.currentValue
 			if sout != None:
 				sout.write(value, self.getFullDataName())
@@ -2879,15 +2903,40 @@ class Template(DataElement):
 			if c.isDataElement:
 				try:
 					if self.fixup != None or self.transformer != None:
-						value += c.getValue()
+						cv = c.getValue()
+						
+						#if type(cv) == type(5):
+						#	print "getInternalValue(%s): int value for" % self.name, c
 					
+						value += c.cv
 					else:
-						value += c.getValue(sout)
+						cv = c.getValue(sout)
+						
+						#if type(cv) == type(5):
+						#	print "getInternalValue(%s): int value for" % self.name, c
+						#	print "c.name", c.name
+						#	print "c.ref", c.ref
+						
+						value += cv
 				
 				except:
+					print "value:", type(value)
 					#print "value: [%s]" % repr(value)
-					#print "c.name: %s" % c.name
-					#print "c.type: %s" % c.elementType
+					print "c", c
+					print "c.name: %s" % c.name
+					print "c.type: %s" % c.elementType
+					if c.elementType == 'block':
+						try:
+							print "c[0]", c[0]
+							print "c.ref", c.ref
+							if c[0].elementType == 'choice':
+								print "c[0].currentElement", c[0].currentElement
+								print "c[0].currentElement.name", c[0].currentElement.name
+								print "c[0].currentElement.ref", c[0].currentElement.ref
+								#print "c[0].currentElement[0]", c[0].currentElement[0]
+						except:
+							pass
+					
 					raise
 		
 		# 3. Fixup
@@ -2900,6 +2949,13 @@ class Template(DataElement):
 				if sout != None:
 					sout.write(value, self.getFullDataName())
 		
+		#if type(value) == type(5):
+		#	print "WARNING: Returning integer from block!!!!"
+		#	print self
+		#	print self.name
+		#	print self.ref
+		#	raise Exception("ERROR, RETURNING INT!")
+		
 		return value
 
 	def getRawValue(self, sout = None):
@@ -2909,7 +2965,8 @@ class Template(DataElement):
 		Performs any needed transforms to produce
 		value.
 		'''
-			
+		
+		#print "getRawValue(%s)" % self.name
 		return self.getInternalValue(sout)
 		
 	def setValue(self, value):
@@ -3058,12 +3115,12 @@ class Choice(DataElement):
 			
 			value = self.currentElement.getValue(sout)
 			
-			if value == None:
-				print "Choice.getRawValue: value is null!"
-				print "Choice.getRawValue: ", self.currentElement.getFullname()
-				print "Choice.getRawValue: ", self.currentElement.elementType
-				print "Choice.getRawValue: ", self.currentElement
-				raise Exception("Value should not be null!")
+		if value == None or type(value) != type(""):
+			print "Choice.getRawValue: value is null or string!", type(value)
+			print "Choice.getRawValue: ", self.currentElement.getFullname()
+			print "Choice.getRawValue: ", self.currentElement.elementType
+			print "Choice.getRawValue: ", self.currentElement
+			raise Exception("Value should not be null or string!")
 		
 		return value
 
@@ -3264,6 +3321,7 @@ class Block(DataElement):
 		@param	sout: Output stream
 		'''
 		
+		#print "Block.getInternalValue(%s)" % self.name
 		value = ""
 		
 		# 0. If using a stream store our location
@@ -3273,7 +3331,8 @@ class Block(DataElement):
 		# 1. Override with currentValue
 		
 		if self.currentValue != None:
-			value = self.currentValue
+			#print "Block.getInternalValue(%s): Using currentValue" % self.name
+			value = str(self.currentValue)
 			if sout != None:
 				sout.write(value, self.getFullDataName())
 		
@@ -3310,6 +3369,7 @@ class Block(DataElement):
 			for c in self:
 				if c.isDataElement:
 					try:
+						#print "Block.getInternalValue(%s): Getting child value" % self.name
 						value += c.getValue(stringBuffer)
 					
 					except:
@@ -3336,6 +3396,7 @@ class Block(DataElement):
 		# 3. Fixup
 		
 		if self.fixup != None:
+			#print "Block.getInternalValue(%s): Using fixup" % self.name
 			self.fixup.fixup.context = self
 			ret = self.fixup.fixup.dofixup()
 			if ret != None:
@@ -4214,7 +4275,7 @@ class Flags(DataElement):
 		if self.endian == "little":
 			##print "Flipping bits"
 			ret = self.flipBitsByByte(ret, self.length)
-		
+			
 		# 4. do we fixup?
 		
 		if self.fixup != None:
@@ -4240,8 +4301,6 @@ class Flags(DataElement):
 		## 2. Get our transformer
 		isSigned = 0
 		isLittleEndian = 0
-		##if self.endian == 'little':
-		##	isLittleEndian = 1
 		
 		if self.length == 8:
 			trans = Transformers.type.AsInt8(isSigned, isLittleEndian)
@@ -4260,8 +4319,10 @@ class Flags(DataElement):
 		
 		if ret != '' and ret != None:
 			ret = trans.encode(ret)
+		#else:
+		#	print "DID NOT TRASNFORM RET", ret
 		
-		#print "AFTERPACK:", repr(ret)
+		#print "AFTERPACK:", repr(ret), type(ret)
 			
 		# 7. Return value
 		
