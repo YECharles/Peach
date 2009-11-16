@@ -644,6 +644,7 @@ try:
 			if not self.handlingFault.is_set():
 				return False
 			
+			print "DetectedFault(): Waiting for handledFault"
 			self.handledFault.wait()
 			
 			print ">>>>>> RETURNING FAULT <<<<<<<<<"
