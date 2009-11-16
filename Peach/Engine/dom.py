@@ -4391,9 +4391,6 @@ class Flag(DataElement):
 		
 		For Numbers this is the python int value.
 		'''
-		return self.getRawValue()
-		
-	def getRawValue(self, sout = None):
 		# 1. Init our value
 		
 		value = 0
@@ -4430,7 +4427,13 @@ class Flag(DataElement):
 				value = 0
 		
 		return value
-
+		
+	def getRawValue(self, sout = None):
+		# We shouldn't ever be here since flag
+		# should always be hidden behind Flags
+		# but sometimes things get re-arranged.
+		return str(self.getInternalValue())
+		
 
 class Seek(ElementWithChildren):
 	'''
