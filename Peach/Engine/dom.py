@@ -1931,9 +1931,16 @@ class DataElement(Mutatable):
 						
 						if type != None:
 							for rel in obj.relations:
-								if rel.type == type:
+								if rel.type == type and rel.of.endswith(r.parent.name):
 									return rel
 							
+							print "obj", obj
+							print "obj.fullname", obj.getFullname()
+							print "self.fullname", self.getFullname()
+							print "r.From", r.From
+							print "len(obj.relations)", len(obj.relations)
+							for rel in obj.relations:
+								print "rel:", rel.type, rel.of
 							raise Exception("Mismatched relations???")
 						
 						for rel in obj.relations:
@@ -2006,7 +2013,7 @@ class DataElement(Mutatable):
 					raise Exception("Mismatched relations1??? [%s]" % r.From)
 				
 				for rel in obj.relations:
-					if rel.type == 'when':
+					if rel.type == 'when' or not rel.of.endswith(self.name):
 						continue
 					
 					#print rel.of
@@ -4256,24 +4263,15 @@ class Flags(DataElement):
 				flags.append(n)
 		
 		bits = BitBuffer("", self.rightToLeft)
-		bits.writebits(0xff, self.length)
 		
 		for flag in flags:
-			
-			if self.endian == "little":
-				flagPosition = (self.length - flag.position) - flag.length
-			else:
-				flagPosition = flag.position
-			
-			bits.seek(flagPosition)
-			
-			bits.writebits(int(flag.getValue()), flag.length)
+			bits.seek(flag.position)
+			bits.writebits(int(flag.getInternalValue()), flag.length)
 		
 		bits.seek(0)
 		ret = bits.readbits(self.length)
 		
 		if self.endian == "little":
-			##print "Flipping bits"
 			ret = self.flipBitsByByte(ret, self.length)
 			
 		# 4. do we fixup?
