@@ -53,7 +53,7 @@ try:
 	from comtypes.gen import DbgEng
 	import win32serviceutil
 	import win32service
-	import win32api, win32con
+	import win32api, win32con, win32process
 	from multiprocessing import *
 	
 

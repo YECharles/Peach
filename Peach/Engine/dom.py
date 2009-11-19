@@ -4268,8 +4268,9 @@ class Flags(DataElement):
 			bits.seek(flag.position)
 			bits.writebits(int(flag.getInternalValue()), flag.length)
 		
+		l = bits.tell()
 		bits.seek(0)
-		ret = bits.readbits(self.length)
+		ret = bits.readbits(l)
 		
 		if self.endian == "little":
 			ret = self.flipBitsByByte(ret, self.length)
