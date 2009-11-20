@@ -623,7 +623,6 @@ class DataCracker:
 					# double deleteing.
 					
 					try:
-						print "_handleNode: When: Removing relation:", r.of, r.parent.name
 						r.parent.relations.remove(r)
 						del r.parent[r.name]
 					except:
@@ -633,7 +632,6 @@ class DataCracker:
 				for child in node.getAllChildDataElements():
 					for r in child.getRelationsOfThisElement():
 						try:
-							print "_handleNode: When: Removing relation:", r.of, r.parent.name
 							r.parent.relations.remove(r)
 							del r.parent[r.name]
 						except:
