@@ -7,8 +7,7 @@ Some default file publishers.  Output generated data to a file, etc.
 '''
 
 #
-# Copyright (c) 2005-2009 Michael Eddington
-# Copyright (c) 2004-2005 IOActive Inc.
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +36,7 @@ Some default file publishers.  Output generated data to a file, etc.
 import os, sys, time
 from Peach.Engine.engine import Engine
 from Peach.publisher import Publisher
+import base64
 
 try:
 	import win32pdh
@@ -211,12 +211,7 @@ class FileWriterAS3StringRecorder(Publisher):
 		pass
 	
 	def send(self, data):
-		buff = "	String.fromCharCode("
-		for c in data:
-			buff += str(ord(c)) + ","
-		buff = buff[:-1] + "),\n"
-		
-		self._fd.write(buff)
+		self._fd.write("	<string>" + base64.b64encode(data) + "</string>\n")
 	
 	def receive(self, size = None):
 		if size != None:
@@ -262,9 +257,6 @@ class FileWriterAS3NumberRecorder(Publisher):
 		pass
 	
 	def connect(self):
-		if self._state == 1:
-			raise Exception('File::start(): Already started!')
-		
 		if self._fd != None:
 			return
 		
@@ -274,12 +266,7 @@ class FileWriterAS3NumberRecorder(Publisher):
 		self._state = 1
 	
 	def stop(self):
-		if self._state == 0:
-			return
-		
-		self._fd.close()
-		self._fd = None
-		self._state = 0
+		pass
 	
 	def mkdir(self):
 		# lets try and create the folder this file lives in
@@ -303,7 +290,7 @@ class FileWriterAS3NumberRecorder(Publisher):
 		pass
 	
 	def send(self, data):
-		buff = "	" + data + ",\n"
+		buff = "	<number>" + data + "</number>\n";
 		self._fd.write(buff)
 	
 	def receive(self, size = None):
