@@ -4,6 +4,12 @@ Peach Changlist
 I've never been good about keeping change lists,
 but I'm going to try and start :)
 
+v2.3.4
+------
+
+ - New: Support reading bits in different directions
+ - Changed: Moved Flags to use a bit buffer class
+
 v2.3.3
 ------
 
