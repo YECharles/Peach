@@ -2102,6 +2102,7 @@ class DataCracker:
 		
 		# Do we know our length?
 		if node.getLength() != None or length != None:
+			Debug(1, "_handleBlob: Has length")
 			
 			if length == None:
 				length = node.getLength()
@@ -2130,6 +2131,9 @@ class DataCracker:
 					rating = 4
 			
 		else:
+			
+			Debug(1, "_handleBlob: No length found")
+			
 			# If we don't have a sizeof relation, we try for a best fit
 			# by adjusting the position until our look ahead has a rating
 			# of 1 or 2.

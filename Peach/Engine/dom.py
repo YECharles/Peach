@@ -4262,15 +4262,16 @@ class Flags(DataElement):
 			if n.elementType == 'flag':
 				flags.append(n)
 		
+		#print "rightToLeft:", self.rightToLeft
 		bits = BitBuffer("", self.rightToLeft)
 		
 		for flag in flags:
+			#print "%s: %d:, %d, %d" % (flag.name, flag.position, int(flag.getInternalValue()), flag.length)
 			bits.seek(flag.position)
 			bits.writebits(int(flag.getInternalValue()), flag.length)
 		
-		l = bits.tell()
 		bits.seek(0)
-		ret = bits.readbits(l)
+		ret = bits.readbits(self.length)
 		
 		if self.endian == "little":
 			ret = self.flipBitsByByte(ret, self.length)
@@ -4627,6 +4628,7 @@ class Blob(DataElement):
 				
 				if self.length != None and self.length < 0:
 					# SANITY!
+					print "Length Calc is off, setting to None", self.length
 					self.length = None
 			
 			except:
