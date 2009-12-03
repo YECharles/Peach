@@ -335,6 +335,7 @@ class DataCracker:
 		'''
 		
 		Debug(1, "_handleArray(%s): %s >>Enter" % (node.name, node.elementType))
+		Debug(1, "_handleArray(%s): %s" % (node.name, node.getFullname()))
 		
 		Debug(1, "*** Node Occures more then once!")
 		rating = newRating = 1
@@ -537,6 +538,10 @@ class DataCracker:
 						node.maxOccurs = 1
 						
 						node.parent.insert(index, node)
+						
+						# Update relation to have new name
+						if relation != None and relation.of != None:
+							relation.of = node.name
 					
 					else:
 						# Next fix up our copied node
@@ -588,7 +593,7 @@ class DataCracker:
 		## Sanity checking
 		
 		if pos > len(buff.data):
-			raise Exception("Running past data!")
+			raise Exception("Running past data!, pos: %d, len.data: %d" % (pos, len(buff.data)))
 		
 		if node == None:
 			raise Exception("Node is None, bailing!")

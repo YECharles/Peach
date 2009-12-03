@@ -2255,8 +2255,10 @@ class DataElement(Mutatable):
 				# the element to expand into an array?
 				ofElement.getValue()
 				
+				#print "getRelationValue.count: ofElement:", ofElement.getFullname()
 				value = ofElement.getCount()
 				value = relation.setValue(value)
+				#print "getRelationValue.count: getCount:", value
 				#print "COUNT REALTION %s of %s: " % (relation.parent.name, relation.of), value
 					
 			finally:
@@ -4402,7 +4404,9 @@ class Flag(DataElement):
 		
 		# 3. Relations
 		
+		#print self.name + ": Pre-relation:", value
 		value = self.getRelationValue(value)
+		#print self.name + ": Post-relation:", value
 		
 		# 4. Fixup
 		
