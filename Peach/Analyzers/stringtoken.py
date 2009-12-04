@@ -105,48 +105,93 @@ class StringTokenAnalyzer(Analyzer):
 		dom.append(self._tokenizeString)
 		
 		return dom
-	
+
+	def _buildString(self, buff, parent = None):
+		
+		s = String(None, parent)
+		s.type = self.stringType
+		s.defaultValue = buff
+		
+		try:
+			i = long(node.defaultValue)
+			
+			hint = Hint("NumericalString", s)
+			hint.value = "true"
+			s.hints.append(hint)
+		except:
+			pass
+		
+		return s
+
 	def _tokenizeString(self, string, tokens = None):
+		
+		if string == None:
+			return None
 		
 		if tokens == None:
 			# Tokens in order of precidence
-			tokens = [u'\0', u'\n', u'\r', u'<', u'>', u'?', u' ', u';',u',', u'|', u'@', u':', u'(', u')',
-					  u'{', u'}', u'[', u']', u'/', u'\\', u'&', u'=', u'-', u'+', u'.']
+			tokens = [u'\0', u'\n', u'\r', u'<', u'>', u'?', u';',u',', u'|', u'@', u':', u'(', u')',
+					  u'{', u'}', u'[', u']', u'/', u'\\', u'&', u'=', u' ', u'-', u'+', u'.']
 		
-		topNode = _StringNode(None, string)
+		# Tokens that group parts of a string
+		pairs = [
+			[u'{', u'}'],
+			[u'(', u')'],
+			[u'[', u']'],
+			[u'<', u'>'],
+			]
+		
+		topNode = Block(None, None)
+		topNode.append(self._buildString(string))
+		
+		for p in pairs:
+			self._pairTree(p, topNode)
 		
 		for t in tokens:
 			self._tokenTree(t, topNode)
 		
-		# Now build Peach DOM
-		return self._buildDom(topNode, None)
-	
-	def _buildDom(self, stringNode, parent):
+		return topNode
+
+	def _pairTree(self, p, node):
 		
-		if len(stringNode.children) == 0:
-			node = String()
-			node.type = self.stringType
-			node.defaultValue = stringNode.string
+		if isinstance(node, Block):
+			for c in node:
+				self._pairTree(p, c)
 			
-			# Check for numerical string and add
-			# proper hint
-			try:
-				i = long(node.defaultValue)
-				
-				hint = Hint("NumericalString", node)
-				hint.value = "true"
-				node.hints.append(hint)
-			except:
-				pass
-			
-			return node
+			return
 		
-		node = Block(None, None)
-		for c in stringNode.children:
-			node.append(self._buildDom(c, node))
+		string = node.defaultValue
 		
-		return node
-	
+		index1 = string.find(p[0])
+		if index1 == -1:
+			return
+		
+		index2 = string[index1:].find(p[1])
+		if index2 == -1:
+			return
+		index2 += index1
+		
+		block = Block(None, None)
+		
+		pre = string[:index1]
+		tokStart = string[index1]
+		middle = string[index1+1:index2]
+		tokEnd = string[index2]
+		after = string[index2+1:]
+		
+		if len(pre) > 0:
+			block.append(self._buildString(pre))
+		
+		block.append(self._buildString(tokStart))
+		block.append(self._buildString(middle))
+		block.append(self._buildString(tokEnd))
+		
+		if len(after) > 0:
+			block.append(self._buildString(after))
+		
+		block.name = node.name
+		node.parent[node.name] = block
+
 	def _split(self, string, tok):
 		'''
 		A version of split that also returns the tokens.
@@ -172,49 +217,25 @@ class StringTokenAnalyzer(Analyzer):
 	
 	def _tokenTree(self, token, node):
 		
-		if node.string == None:
-			for child in node.children:
-				self._tokenTree(token, child)
+		if isinstance(node, Block):
+			for c in node:
+				self._tokenTree(token, c)
 			
-		else:
-			stuff = self._split(node.string, token)
-			
-			if len(stuff) == 0:
-				return
-			
-			node.string = None
-			
-			if len(stuff) > 0 and len(node.children) > 0:
-				raise Exception("we shouldn't have split a node and have children")
-			
-			for s in stuff:
-				node.children.append( _StringNode(node, s, s == token) )
+			return
+		
+		if len(node.defaultValue) < 2:
+			return
+		
+		stuff = self._split(node.defaultValue, token)
+		
+		if len(stuff) == 0:
+			return
+		
+		block = Block(node.name, None)
+		
+		for s in stuff:
+			block.append(self._buildString(s))
+		
+		node.parent[node.name] = block
 	
-	def buildString(self, node = None):
-		'''
-		Reassemble node tree into a string
-		'''
-		
-		if node == None:
-			node = self._topNode
-		
-		if node.string == None:
-			ret = u''
-			
-			for child in node.children:
-				ret += self.buildString(child)
-			
-			return ret
-		
-		else:
-			return node.string
-
-class _StringNode(object):
-	def __init__(self, parent, string, isToken = False):
-		self.children = []
-		self.parent = parent
-		self.string = string
-		self.isToken = isToken
-
-
 # end

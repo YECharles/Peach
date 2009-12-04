@@ -9,7 +9,7 @@ Will try and run a state machine.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal

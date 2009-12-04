@@ -386,13 +386,13 @@ class ParseTemplate:
 		for child in peach.getElementsByType(String):
 			if child.analyzer != None and child.defaultValue != None and child not in objs:
 				objs.append(child)
-			
+		
 		for child in objs:
 			try:
 				analyzer = eval("%s()" % child.analyzer)
 			except:
 				analyzer = eval("PeachXml_"+"%s()" % child.analyzer)
-				
+			
 			analyzer.asDataElement(child, {}, child.defaultValue)
 		
 		# We suck, so fix this up

@@ -1136,12 +1136,15 @@ class DataCracker:
 		if not isinstance(node, Peach.Engine.dom.DataElement) or \
 			node.elementType == 'template':
 			
-			#Debug(1, "_nextNode(%s): not data element or is template")
+			Debug(1, "_nextNode(%s): not data element or is template")
 			
 			return None
 		
 		# Try and escape Choice blocks.
 		while node.parent != None and node.parent.elementType == 'choice':
+			if node.parent.maxOccurs > 1:
+				return node.parent
+			
 			node = node.parent
 		
 		nextNode = node.nextSibling()

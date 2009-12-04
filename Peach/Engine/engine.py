@@ -16,7 +16,7 @@ The engine component currently does the following:
 '''
 
 #
-# Copyright (c) 2007-2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal

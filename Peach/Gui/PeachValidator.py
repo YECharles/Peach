@@ -289,6 +289,31 @@ class PeachValidatorGui(gui.PeachValidation):
 				self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)
 				
 				# TODO: Display error dialog
+			
+			# Pass 6 -- Analyzers
+			
+			# Simce analyzers can modify the DOM we need to make our list
+			# of objects we will look at first!
+			
+			objs = []
+			
+			for child in self.template.getElementsByType(Blob):
+				if child.analyzer != None and child.defaultValue != None and child not in objs:
+					objs.append(child)
+			for child in self.template.getElementsByType(String):
+				if child.analyzer != None and child.defaultValue != None and child not in objs:
+					objs.append(child)
+			
+			from Peach.Analyzers import *
+			
+			for child in objs:
+				try:
+					analyzer = eval("%s()" % child.analyzer)
+				except:
+					analyzer = eval("PeachXml_"+"%s()" % child.analyzer)
+				
+				analyzer.asDataElement(child, {}, child.defaultValue)
+			
 		except:
 			raise
 			self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)
