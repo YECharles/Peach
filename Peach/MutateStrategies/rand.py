@@ -158,7 +158,7 @@ class RandomMutationStrategy(MutationStrategy):
 					for m in Engine.context.mutators:
 						if m.supportedDataElement(node):
 							# Need to create new instance from class
-							for i in range(m.weight):
+							for i in range(m.weight**4):
 								mutators.append( m(Engine.context,node) )
 			
 			return
@@ -187,6 +187,8 @@ class RandomMutationStrategy(MutationStrategy):
 			for node in fields:
 				try:
 					mutator = self._random.choice(self._fieldMutators[node.getFullname()])
+					
+					#print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
 					
 					# Note: Since we are applying multiple mutations
 					#       sometimes a mutation will fail.  We should

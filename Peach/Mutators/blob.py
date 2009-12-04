@@ -48,7 +48,7 @@ class DWORDSliderMutator(Mutator):
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		#: Weight to be chosen randomly
-		self.weight = 2
+		DWORDSliderMutator.weight = 2
 		
 		self.isFinite = True
 		
@@ -124,7 +124,7 @@ class BitFlipperMutator(Mutator):
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		#: Weight to be chosen randomly
-		self.weight = 3
+		BitFlipperMutator.weight = 3
 		
 		self.isFinite = True
 		self.name = "BitFlipperMutator"

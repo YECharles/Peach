@@ -46,7 +46,7 @@ class NumericalVarianceMutator(Mutator):
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		#: Weight to be chosen randomly
-		self.weight = 2
+		NumericalVarianceMutator.weight = 2
 		
 		self.name = "NumericalVarianceMutator"
 		
@@ -136,7 +136,7 @@ class NumericalEdgeCaseMutator(Mutator):
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		#: Weight to be chosen randomly
-		self.weight = 3
+		NumericalEdgeCaseMutator.weight = 3
 		
 		#: Is mutator finite?
 		self.isFinite = True
@@ -287,7 +287,7 @@ class FiniteRandomNumbersMutator(Mutator):
 	def __init__(self, peach, node):
 		Mutator.__init__(self)
 		#: Weight to be chosen randomly
-		self.weight = 2
+		FiniteRandomNumbersMutator.weight = 2
 		
 		self.name = "FiniteRandomNumbersMutator"
 		self._peach = peach
