@@ -7,6 +7,7 @@ but I'm going to try and start :)
 v2.3.4
 ------
 
+ - Changed: Improved random mutation weighting system
  - Changed: Improved paired token support in StringTokenizer
  - New: Pech Validator now runs Analyzers
  - New: Support reading bits in different directions
