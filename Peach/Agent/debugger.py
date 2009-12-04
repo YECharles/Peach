@@ -109,7 +109,13 @@ try:
 			self.buff += Text
 		
 		def GetInterestMask(self):
-			return PyDbgEng.DbgEng.DEBUG_EVENT_EXCEPTION | PyDbgEng.DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT
+			return PyDbgEng.DbgEng.DEBUG_EVENT_EXCEPTION | PyDbgEng.DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT | \
+				PyDbgEng.DbgEng.DEBUG_EVENT_EXIT_PROCESS
+			
+		def ExitProcess(self, dbg, ExitCode):
+			print "_DbgEventHandler.ExitProcess: Target application has exitted"
+			self.quit.set()
+			return DEBUG_STATUS_NO_CHANGE
 		
 		def Exception(self, dbg, ExceptionCode, ExceptionFlags, ExceptionRecord,
 				ExceptionAddress, NumberParameters, ExceptionInformation0, ExceptionInformation1,
@@ -332,6 +338,7 @@ try:
 			_eventHandler.handlingFault = handlingFault
 			_eventHandler.handledFault = handledFault
 			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
+			_eventHandler.quit = quit
 			
 			if KernelConnectionString:
 				dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
@@ -403,19 +410,6 @@ try:
 			
 			started.set()
 			dbg.event_loop_with_quit_event(quit)
-			
-			#if handledFault.is_set():
-			#	print "!!! Waiting for thread sync"
-			#	while True:
-			#		try:
-			#			print ".",
-			#			inQueue.get(True, 1)
-			#			break
-			#		except:
-			#			pass
-			#	
-			#	print "!!! Putting crashInfo into queue"
-			#	outQueue.put(_eventHandler.crashInfo)
 			
 		finally:
 			if dbg != None:
@@ -555,15 +549,11 @@ try:
 			
 			# Wait it...!
 			self.started.wait()
-			
-			# Let things get spun up
-			time.sleep(2)
 		
 		def _StopDebugger(self):
 			print "_StopDebugger()"
 			
 			if self.thread != None and self.thread.is_alive():
-				
 				self.quit.set()
 				self.started.clear()
 				
@@ -574,6 +564,10 @@ try:
 					self.thread.join()
 				
 				time.sleep(0.25) # Take a breath
+			
+			elif self.thread != None:
+				# quit could be set by event handler now
+				self.thread.join()
 			
 			self.thread = None
 		
@@ -608,11 +602,6 @@ try:
 			'''
 			Get any monitored data.
 			'''
-			#print "GetMonitorData(): Queuing start command"
-			#self.outQueue.put("GO!")
-			#
-			#print "GetMonitorData(): Waiting for length"
-			#self.crashInfo = self.inQueue.get()
 			
 			print "GetMonitorData(): Loading from file"
 			fd = open(".peach_crashInfo.bin", "rb+")
@@ -639,7 +628,8 @@ try:
 			
 			print "DetectedFault()"
 			
-			time.sleep(0.15)
+			if self.thread and self.thread.is_alive():
+				time.sleep(0.15)
 
 			if not self.handlingFault.is_set():
 				return False

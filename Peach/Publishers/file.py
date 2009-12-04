@@ -619,7 +619,6 @@ class FileWriterLauncher(Publisher):
 			
 			Engine.context.agent.OnPublisherCall(method)
 			time.sleep(self.waitTime)
-			print "FileLauncher: Finished waiting"
 		
 		else:
 			# Launch via spawn
