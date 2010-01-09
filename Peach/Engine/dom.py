@@ -3948,6 +3948,9 @@ class String(DataElement):
 		'char':'iso-8859-1',
 		'wchar':'utf-16le',
 		'utf8':'utf-8',
+		'utf-8':'utf-8',
+		'utf-16le' : 'utf-16le',
+		'utf-16be' : 'utf-16be'
 		}
 	
 	#: Default value for valueType

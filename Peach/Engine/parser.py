@@ -1682,8 +1682,8 @@ class ParseTemplate:
 			if type == None or len(type) == 0:
 				string.type = 'char'
 		
-			elif not (type == 'char' or type == 'wchar' or type == 'utf8'):
-				raise PeachException("Unknown type of String")
+			elif not (type in ['char', 'wchar', 'utf8', 'utf-8', 'utf-16le', 'utf-16be']):
+				raise PeachException("Unknown type of String: %s" % type)
 		
 			else:
 				string.type = type
