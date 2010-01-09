@@ -5,7 +5,7 @@ rem Copyright (c) Michael Eddington
 
 cd c:\peach\tools
 
-copy /y setup.py ..
+copy /y setup64.py ..
 
 cd c:\peach
 
@@ -19,7 +19,7 @@ copy C:\Python26\Share\4Suite\Schemata\*.* build\bdist.win-amd64-2.6\msi\Share\4
 
 rem -O0 will cause optmized byte code to
 rem be generated
-c:\python26\python -OO setup.py py2exe
+c:\python26\python -OO setup64.py py2exe
 
 ren dist bin
 rmdir /s/q build
