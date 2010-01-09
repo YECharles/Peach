@@ -39,6 +39,7 @@ rem copy C:\Python25\lib\site-packages\wx-2.8-msw-ansi\wx\MSVCP71.dll bin
 rem copy c:\windows\system32\MFC71.DLL bin
 rem copy c:\windows\SysWOW64\mfc71.dll bin
 del /q bin\iphlpapi.dll
+copy tools\bangexploitable\x64\msec.dll bin
 
 xcopy /s/q c:\peach\Peach\Generators\xmltests c:\peach\bin\xmltests\
 

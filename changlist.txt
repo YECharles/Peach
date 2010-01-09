@@ -4,6 +4,11 @@ Peach Changlist
 I've never been good about keeping change lists,
 but I'm going to try and start :)
 
+v2.3.5
+------
+
+ - New: !exploitable windbg module included in distribution
+
 v2.3.4
 ------
 

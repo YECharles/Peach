@@ -34,6 +34,7 @@ copy C:\Python25\lib\site-packages\wx-2.8-msw-ansi\wx\MSVCP71.dll bin
 copy c:\windows\system32\MFC71.DLL bin
 copy c:\windows\SysWOW64\mfc71.dll bin
 del /q bin\iphlpapi.dll
+copy tools\bangexploitable\x86\msec.dll bin
 
 xcopy /s/q c:\peach\Peach\Generators\xmltests c:\peach\bin\xmltests\
 

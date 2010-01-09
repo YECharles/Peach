@@ -241,12 +241,18 @@ try:
 				
 				handle = None
 				try:
-					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
+					p = None
+					if not (hasattr(sys,"frozen") and sys.frozen == "console_exe"):
+						p = __file__[:-24] + "tools"
+					else:
+						p = os.path.dirname(os.path.abspath(sys.executable))
+					
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load %s\\msec.dll" % p), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".unload msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
 					pass
 				except:
-					pass
+					raise
 				
 				## Now off to other things...
 				print "Exception: Building crashInfo"

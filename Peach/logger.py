@@ -243,45 +243,45 @@ class Filesystem(Logger):
 		if variationCount % self.heartBeat == 0:
 			self._writeMsg("On test variation # %d" % variationCount)
 
-#import xmlrpclib
-#
-#class PeachManagerLogger(Logger):
-#	'''
-#	This logger interacts with the Peach Manager product.
-#	'''
-#	
-#	def __init__(self, params):
-#		self.name = str(uuid.uuid1())
-#		self.elementType = 'logger'
-#		self.params = params
-#		self.heartBeat = 512
-#	
-#	def _getProxy(self):
-#		return xmlrpclib.ServerProxy("http://127.0.0.1:8081/")
-#	
-#	def OnRunStarting(self, run):
-#		self._getProxy().RunFinished(run)
-#	
-#	def OnRunFinished(self, run):
-#		self._getProxy().RunStarting(run)
-#	
-#	def OnTestStarting(self, run, test, totalVariations):
-#		self._getProxy().TestStarting(test)
-#		self.totalVariations = totalVariations
-#	
-#	def OnTestFinished(self, run, test):
-#		self._getProxy().TestFinished(test)
-#	
-#	def OnTestCaseException(self, run, test, variationCount, exception):
-#		self._getProxy().TestCaseException(variationCount, exception)
-#	
-#	def OnFault(self, run, test, variationCount, monitorData, actionValues):
-#		self._getProxy().Fault(variationCount, monitorData, actionValues)
-#	
-#	def OnStopRun(self, run, test, variationCount, monitorData, value):
-#		self._getProxy().StopRun()
-#		
-#	def OnTestCaseStarting(self, run, test, variationCount):
-#		self._getProxy().TestCaseStarting(variationCount, self.totalVariations)
+import xmlrpclib
+
+class PeachManagerLogger(Logger):
+	'''
+	This logger interacts with the Peach Manager product.
+	'''
+	
+	def __init__(self, params):
+		self.name = str(uuid.uuid1())
+		self.elementType = 'logger'
+		self.params = params
+		self.heartBeat = 512
+	
+	def _getProxy(self):
+		return xmlrpclib.ServerProxy("http://127.0.0.1:8081/")
+	
+	def OnRunStarting(self, run):
+		self._getProxy().RunFinished(run)
+	
+	def OnRunFinished(self, run):
+		self._getProxy().RunStarting(run)
+	
+	def OnTestStarting(self, run, test, totalVariations):
+		self._getProxy().TestStarting(test)
+		self.totalVariations = totalVariations
+	
+	def OnTestFinished(self, run, test):
+		self._getProxy().TestFinished(test)
+	
+	def OnTestCaseException(self, run, test, variationCount, exception):
+		self._getProxy().TestCaseException(variationCount, exception)
+	
+	def OnFault(self, run, test, variationCount, monitorData, actionValues):
+		self._getProxy().Fault(variationCount, monitorData, actionValues)
+	
+	def OnStopRun(self, run, test, variationCount, monitorData, value):
+		self._getProxy().StopRun()
+		
+	def OnTestCaseStarting(self, run, test, variationCount):
+		self._getProxy().TestCaseStarting(variationCount, self.totalVariations)
 
 # end
