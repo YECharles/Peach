@@ -10,7 +10,7 @@
 	
 	<DataModel name="GetTemplate">
 		<String value="hello.world.com">
-			<Hint name="type" value="hotname"/>
+			<Hint name="type" value="hostname"/>
 		</String>
 	</DataModel>
 	

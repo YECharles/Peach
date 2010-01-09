@@ -154,7 +154,7 @@ Debug Peach XML File
 """)
 		sys.exit(0)
 	
-	printError("\n] Peach 2.3.4 Runtime")
+	printError("\n] Peach 2.3.5 DEV Runtime")
 	printError("] Copyright (c) Michael Eddington\n")
 	
 	if sys.version[:3] not in ['2.5', '2.6']:
@@ -379,20 +379,20 @@ Debug Peach XML File
 			
 			sys.exit(0)
 			
-		elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
-			
-			# Start peach builder UI
-			
-			from Peach.Engine import *
-			from Peach.Engine.common import *
-	
-			import os
-			from Peach.Gui import PeachGui
-	
-			os.chdir( sys.path[0] + "/peach/gui" )
-	
-			PeachGui.RunPeachEditor()
-			sys.exit(0)
+		#elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
+		#	
+		#	# Start peach builder UI
+		#	
+		#	from Peach.Engine import *
+		#	from Peach.Engine.common import *
+		#
+		#	import os
+		#	from Peach.Gui import PeachGui
+		#
+		#	os.chdir( sys.path[0] + "/peach/gui" )
+		#
+		#	PeachGui.RunPeachEditor()
+		#	sys.exit(0)
 		
 		elif optlist[i][0] == '-w' or optlist[i][0] == '--web':
 			

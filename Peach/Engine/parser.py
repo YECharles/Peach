@@ -1520,19 +1520,19 @@ class ParseTemplate:
 		block.elementType = 'choice'
 		
 		# length (in bytes)
-
+		
 		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':
 			block.lengthType = self._getAttribute(node, 'lengthType')
 			block.lengthCalc = self._getAttribute(node, 'length')
 			block.length = -1
-
+		
 		elif node.hasAttributeNS(None, 'length'):
 			length = self._getAttribute(node, 'length')
 			if length != None and len(length) != 0:
 				block.length = int(length)
 			else:
 				block.length = None
-
+		
 		# common attributes
 		
 		self.HandleCommonDataElementAttributes(node, block)
@@ -1546,17 +1546,19 @@ class ParseTemplate:
 	def HandleXmlElement(self, node, parent):
 
 		# name
-
+		
 		if node.hasAttributeNS(None, 'name'):
 			name = self._getAttribute(node, 'name')
 		else:
 			name = None
-
+		
 		block = XmlElement(name, parent)
 		
 		# elementName
 		
 		block.elementName = self._getAttribute(node, "elementName")
+		if block.elementName == None:
+			raise PeachException("Error: XmlElement without elementName attribute.")
 		
 		# ns
 		
@@ -1579,7 +1581,7 @@ class ParseTemplate:
 		# common attributes
 		
 		self.HandleCommonDataElementAttributes(node, block)
-
+		
 		# children
 		self.HandleDataContainerChildren(node, block)
 		
