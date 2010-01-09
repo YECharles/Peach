@@ -8,7 +8,6 @@ v2.3.4
 ------
 
  - New: Pech Validator now runs Analyzers
- - New: Support reading bits in different directions
  - Changed: Moved Flags to use a bit buffer class
  - Changed: Listening for ExitProcess event in Debugger
  - Changed: Improved random mutation weighting system
