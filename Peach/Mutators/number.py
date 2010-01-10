@@ -61,7 +61,7 @@ class NumericalVarianceMutator(Mutator):
 		self._currentCount = 0
 		
 		if isinstance(node, String):
-			self._minValue = 0
+			self._minValue = -2147483647
 			self._maxValue = 4294967295
 		else:
 			self._minValue = node.getMinValue()
@@ -78,7 +78,6 @@ class NumericalVarianceMutator(Mutator):
 		return n
 	
 	def next(self):
-		
 		self._currentCount += 1
 		if self._currentCount >= len(self._values):
 			raise MutatorCompleted()
@@ -103,11 +102,29 @@ class NumericalVarianceMutator(Mutator):
 	def sequencialMutation(self, node):
 		
 		self.changedName = node.getFullnameInDataModel()
-		# Sometimes self._n == 0, catch that here
-		if self._currentCount >= len(self._values):
-			return
+
+		# If a negative value is passed into struct.pack
+		# we end up generating 0 for that value.  instead
+		# lets verify the generated value against min/max
+		# and skip bad values.
+		while True:
+			# Sometimes self._n == 0, catch that here
+			if self._currentCount >= len(self._values):
+				return
+			
+			node.currentValue = long(node.getInternalValue()) - self._values[self._currentCount]
+			
+			# Is number okay?
+			if node.currentValue >= self._minValue and node.currentValue <= self._maxValue:
+				break
+			
+			# If not lets skip to next iteration
+			try:
+				self.next()
+				
+			except:
+				break
 		
-		node.currentValue = long(node.getInternalValue()) - self._values[self._currentCount]
 		if isinstance(node, String):
 			node.currentValue = unicode(node.currentValue)
 	
@@ -165,7 +182,7 @@ class NumericalEdgeCaseMutator(Mutator):
 		self._currentCount = 0
 		
 		if isinstance(node, String):
-			self._minValue = 0
+			self._minValue = -2147483647
 			self._maxValue = 4294967295
 		else:
 			self._minValue = node.getMinValue()
@@ -264,10 +281,26 @@ class NumericalEdgeCaseMutator(Mutator):
 
 	def sequencialMutation(self, node):
 		self.changedName = node.getFullnameInDataModel()
-		if isinstance(node, String):
-			node.currentValue = unicode(self._values[self._size][self._currentCount])
-		else:
-			node.currentValue = self._values[self._size][self._currentCount]
+		# If a negative value is passed into struct.pack
+		# we end up generating 0 for that value.  instead
+		# lets verify the generated value against min/max
+		# and skip bad values.
+		while True:
+			if isinstance(node, String):
+				node.currentValue = unicode(self._values[self._size][self._currentCount])
+			else:
+				node.currentValue = self._values[self._size][self._currentCount]
+			
+			# Is number okay?
+			if long(node.currentValue) >= self._minValue and long(node.currentValue) <= self._maxValue:
+				break
+			
+			# If not lets skip to next iteration
+			try:
+				self.next()
+				
+			except:
+				break
 	
 	def randomMutation(self, node):
 		self.changedName = node.getFullnameInDataModel()
@@ -276,6 +309,149 @@ class NumericalEdgeCaseMutator(Mutator):
 		else:
 			node.currentValue = self._random.choice(self._values[self._size])
 
+
+#class NumericalEvenDistributionMutator(Mutator):
+#	'''
+#	This mutator will generate numbers evenly distributed through
+#	the total numerical space of the number range.
+#	'''
+#	
+#	_values = None
+#	
+#	def __init__(self, peach, node):
+#		Mutator.__init__(self)
+#		#: Weight to be chosen randomly
+#		self.weight = 3
+#		
+#		#: Is mutator finite?
+#		self.isFinite = True
+#		self.name = "NumericalEdgeCaseMutator"
+#		self._peach = peach
+#		
+#		self._n = self._getN(node, 50)
+#		
+#		if self._values == None:
+#			self._populateValues()
+#		
+#		if isinstance(node, String):
+#			self._size = 32
+#		else:
+#			self._size = node.size
+#		
+#		self._dataElementName = node.getFullname()
+#		self._random = random.Random()
+#		self._currentCount = 0
+#		
+#		if isinstance(node, String):
+#			self._minValue = 0
+#			self._maxValue = 4294967295
+#		else:
+#			self._minValue = node.getMinValue()
+#			self._maxValue = node.getMaxValue()
+#
+#	def _populateValues(self):
+#		NumericalEdgeCaseMutator._values = {}
+#		
+#		nums = []
+#		try:
+#			gen = BadNumbers8()
+#			while True:
+#				nums.append(int(gen.getValue()))
+#				gen.next()
+#		except:
+#			pass
+#		
+#		self._values[8] = nums
+#		
+#		nums = []
+#		try:
+#			
+#			gen = BadNumbers16(None, self._n)
+#			while True:
+#				nums.append(int(gen.getValue()))
+#				gen.next()
+#		except:
+#			pass
+#		
+#		self._values[16] = nums
+#		
+#		nums = []
+#		try:
+#			gen = BadNumbers24(None, self._n)
+#			while True:
+#				nums.append(int(gen.getValue()))
+#				gen.next()
+#		except:
+#			pass
+#		
+#		self._values[24] = nums
+#		
+#		nums = []
+#		try:
+#			gen = BadNumbers32(None, self._n)
+#			while True:
+#				nums.append(int(gen.getValue()))
+#				gen.next()
+#		except:
+#			pass
+#		
+#		self._values[32] = nums
+#		
+#		nums = []
+#		try:
+#			gen = BadNumbers(None, self._n)
+#			while True:
+#				nums.append(int(gen.getValue()))
+#				gen.next()
+#		except:
+#			pass
+#	
+#		self._values[64] = nums
+#	
+#	def next(self):
+#		self._currentCount += 1
+#		if self._currentCount >= len(self._values[self._size]):
+#			raise MutatorCompleted()
+#	
+#	def getCount(self):
+#		return len(self._values[self._size])
+#
+#	def supportedDataElement(e):
+#		
+#		if isinstance(e, String):
+#			# Look for NumericalString
+#			for hint in e.hints:
+#				if hint.name == "NumericalString":
+#					return True
+#		
+#		if isinstance(e, Number) and e.isMutable:
+#			return True
+#		
+#		return False
+#	supportedDataElement = staticmethod(supportedDataElement)
+#
+#	def _getN(self, node, n):
+#		for c in node.hints:
+#			if c.name == 'NumericalEdgeCaseMutator-N':
+#				try:
+#					n = int(c.value)
+#				except:
+#					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
+#		
+#		return n
+#
+#	def sequencialMutation(self, node):
+#		if isinstance(node, String):
+#			node.currentValue = unicode(self._values[self._size][self._currentCount])
+#		else:
+#			node.currentValue = self._values[self._size][self._currentCount]
+#	
+#	def randomMutation(self, node):
+#		if isinstance(node, String):
+#			node.currentValue = unicode(self._random.choice(self._values[self._size]))
+#		else:
+#			node.currentValue = self._random.choice(self._values[self._size])
+#
 
 
 class FiniteRandomNumbersMutator(Mutator):
@@ -304,7 +480,7 @@ class FiniteRandomNumbersMutator(Mutator):
 		else:
 			self._minValue = node.getMinValue()
 			self._maxValue = node.getMaxValue()
-
+	
 	def next(self):
 		self._currentCount += 1
 		if self._currentCount > self._n:
