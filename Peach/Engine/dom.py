@@ -4268,7 +4268,7 @@ class Flags(DataElement):
 				flags.append(n)
 		
 		#print "rightToLeft:", self.rightToLeft
-		bits = BitBuffer("", self.rightToLeft)
+		bits = BitBuffer("\0" * (self.length/8), self.rightToLeft)
 		
 		for flag in flags:
 			#print "%s: %d:, %d, %d" % (flag.name, flag.position, int(flag.getInternalValue()), flag.length)
