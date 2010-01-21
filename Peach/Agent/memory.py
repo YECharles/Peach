@@ -8,7 +8,7 @@ useful for detecting memory leaks within the fuzzing target
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -105,10 +105,10 @@ try:
 				while 1:
 				
 					if args.has_key('StopOnFault'):
-						self._stopOnFault = str(args["StopOnFault"])
+						self._stopOnFault = str(args["StopOnFault"]).replace("'''", "")
 
 					if args.has_key('MemoryLimit'):
-						self._memoryLimit = int(args['MemoryLimit'])
+						self._memoryLimit = int(args['MemoryLimit'].replace("'''", ""))
 						print "Memory: Memory Limit = %d" % self._memoryLimit
 					else:
 						print "Memory: No memory limit specified"					

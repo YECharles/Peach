@@ -177,6 +177,7 @@ class PcapMonitor(Monitor):
 		self.filter = str(args['filter']).replace("'''", "")
 		self.data = None
 		self.tempFile = os.tmpnam()
+		self.thread = None
 	
 	def OnTestStarting(self):
 		self.thread = PcapThread(self, self.device, self.filter, self.tempFile)

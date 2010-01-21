@@ -328,6 +328,7 @@ try:
 		CommandLine = kwargs.get('CommandLine', None)
 		Service = kwargs.get('Service', None)
 		ProcessName = kwargs.get('ProcessName', None)
+		ProcessID = kwargs.get('ProcessID', None)
 		KernelConnectionString = kwargs.get('KernelConnectionString', None)
 		SymbolsPath = kwargs.get('SymbolsPath', None)
 		IgnoreFirstChanceGardPage = kwargs.get('IgnoreFirstChanceGardPage', None)
@@ -379,6 +380,13 @@ try:
 					output_callbacks_sink = _eventHandler,
 					symbols_path = SymbolsPath)
 			
+			elif ProcessID:
+				
+				print "Attaching by pid:", ProcessID
+				pid = ProcessID
+				dbg = PyDbgEng.ProcessAttacher(pid,	event_callbacks_sink = _eventHandler,
+					output_callbacks_sink = _eventHandler, symbols_path = SymbolsPath)
+				
 			elif Service:
 				
 				# Make sure service is running
@@ -501,6 +509,11 @@ try:
 			else:
 				self.ProcessName = None
 			
+			if args.has_key('ProcessID'):
+				self.ProcessID = str(args['ProcessID']).replace("'''", "")
+			else:
+				self.ProcessID = None
+			
 			if args.has_key('KernelConnectionString'):
 				self.KernelConnectionString = str(args['KernelConnectionString']).replace("'''", "")
 			else:
@@ -523,8 +536,9 @@ try:
 			else:
 				self.IgnoreFirstChanceGardPage = False
 			
-			if self.Service == None and self.CommandLine == None and self.ProcessName == None and self.KernelConnectionString == None:
-				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or KernelConnectionString parameter.")
+			if self.Service == None and self.CommandLine == None and self.ProcessName == None \
+					and self.KernelConnectionString == None and self.ProcessID == None:
+				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or ProcessID, or KernelConnectionString parameter.")
 			
 		
 		def _StartDebugger(self):
@@ -544,6 +558,7 @@ try:
 				'CommandLine':self.CommandLine,
 				'Service':self.Service,
 				'ProcessName':self.ProcessName,
+				'ProcessID':int(self.ProcessID),
 				'KernelConnectionString':self.KernelConnectionString,
 				'SymbolsPath':self.SymbolsPath,
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,

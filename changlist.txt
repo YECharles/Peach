@@ -7,7 +7,11 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: Windows debugger module now suppoerts attaching my PID
  - New: !exploitable windbg module included in distribution
+ - Changed: Optmized test cases for small Numbers
+ - Bug: Fixed bug in Memory agent
+ - Bug: Fixed bug in Network Pcap agent
 
 v2.3.4
 ------

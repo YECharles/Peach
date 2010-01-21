@@ -87,13 +87,14 @@ class NumericalVarianceMutator(Mutator):
 	
 	def supportedDataElement(e):
 		
-		if isinstance(e, String):
+		if isinstance(e, String) and e.isMutable:
 			# Look for NumericalString
 			for hint in e.hints:
 				if hint.name == "NumericalString":
 					return True
 		
-		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable:
+		# Disable for 8 bit ints, we try all values already
+		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable and e.size > 8:
 			return True
 		
 		return False
@@ -257,7 +258,7 @@ class NumericalEdgeCaseMutator(Mutator):
 
 	def supportedDataElement(e):
 		
-		if isinstance(e, String):
+		if isinstance(e, String) and e.isMutable:
 			# Look for NumericalString
 			for hint in e.hints:
 				if hint.name == "NumericalString":
@@ -491,14 +492,13 @@ class FiniteRandomNumbersMutator(Mutator):
 	
 	def supportedDataElement(e):
 		
-		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable:
-			# Look for NumericalString
+		if (isinstance(e, Number) or isinstance(e, Flag)) and e.isMutable and e.size > 8:
+			return True
+		
+		if isinstance(e, String) and e.isMutable:
 			for hint in e.hints:
 				if hint.name == "NumericalString":
 					return True
-		
-		if isinstance(e, Number) and e.isMutable:
-			return True
 		
 		return False
 	supportedDataElement = staticmethod(supportedDataElement)

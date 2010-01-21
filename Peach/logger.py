@@ -255,33 +255,39 @@ class PeachManagerLogger(Logger):
 		self.elementType = 'logger'
 		self.params = params
 		self.heartBeat = 512
+		self._getProxy().Initialized()
+		self.totalVariations = 0
 	
 	def _getProxy(self):
-		return xmlrpclib.ServerProxy("http://127.0.0.1:8081/")
+		return xmlrpclib.ServerProxy("http://127.0.0.1:8081/local.rem")
 	
 	def OnRunStarting(self, run):
-		self._getProxy().RunFinished(run)
+		self._getProxy().RunStarting(run.name)
 	
 	def OnRunFinished(self, run):
-		self._getProxy().RunStarting(run)
+		self._getProxy().RunFinished(run.name)
 	
 	def OnTestStarting(self, run, test, totalVariations):
-		self._getProxy().TestStarting(test)
-		self.totalVariations = totalVariations
+		self._getProxy().TestStarting(test.name)
+		
+		try:
+			self.totalVariations = int(totalVariations)
+		except:
+			self.totalVariations = 0
 	
 	def OnTestFinished(self, run, test):
-		self._getProxy().TestFinished(test)
+		self._getProxy().TestFinished(test.name)
 	
 	def OnTestCaseException(self, run, test, variationCount, exception):
-		self._getProxy().TestCaseException(variationCount, exception)
+		self._getProxy().TestCaseException(int(variationCount), str(exception))
 	
 	def OnFault(self, run, test, variationCount, monitorData, actionValues):
-		self._getProxy().Fault(variationCount, monitorData, actionValues)
+		self._getProxy().Fault(int(variationCount), monitorData, actionValues)
 	
 	def OnStopRun(self, run, test, variationCount, monitorData, value):
 		self._getProxy().StopRun()
 		
 	def OnTestCaseStarting(self, run, test, variationCount):
-		self._getProxy().TestCaseStarting(variationCount, self.totalVariations)
+		self._getProxy().TestCaseStarting(int(variationCount), int(self.totalVariations))
 
 # end
