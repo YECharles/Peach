@@ -4099,9 +4099,10 @@ class String(DataElement):
 			if self.nullTerminated and (len(value) == 0 or value[-1] != '\0'):
 				value += '\0'
 			
-		# Encode, but only when needed or we get errorzZzz
-		if type(value) != str or self.type != 'char':
-			value = value.encode(self.EncodeAs[self.type])
+			# Encode, but only when needed or we get errorzZzz
+			if type(value) != str or self.type != 'char':
+				value = value.decode(self.EncodeAs['char'])
+				value = value.encode(self.EncodeAs[self.type])
 		
 		# Output
 		
