@@ -4100,9 +4100,14 @@ class String(DataElement):
 				value += '\0'
 			
 			# Encode, but only when needed or we get errorzZzz
-			if type(value) != str or self.type != 'char':
+			if type(value) != str and self.type == 'char':
 				value = value.decode(self.EncodeAs['char'])
-				value = value.encode(self.EncodeAs[self.type])
+			
+		if self.type != 'char':
+			if type(value) == str:
+				value = value.decode(self.EncodeAs['char'])
+			
+			value = value.encode(self.EncodeAs[self.type])
 		
 		# Output
 		

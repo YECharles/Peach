@@ -126,6 +126,8 @@ class FileWriter(Publisher):
 		self._state = 0
 	
 	def send(self, data):
+		if type(data) != str:
+			data = data.encode('iso-8859-1')
 		self._fd.write(data)
 	
 	def receive(self, size = None):
