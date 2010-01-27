@@ -4103,16 +4103,26 @@ class String(DataElement):
 			if type(value) != str and self.type == 'char':
 				value = value.decode(self.EncodeAs['char'])
 			
-		if self.type != 'char':
-			if type(value) == str:
-				value = value.decode(self.EncodeAs['char'])
-			
-			value = value.encode(self.EncodeAs[self.type])
+			elif self.type != 'char':
+				if type(value) == str:
+					value = value.decode(self.EncodeAs['char'])
+				
+				value = value.encode(self.EncodeAs[self.type])
+		
+		
+		# Even for final values we must return binary strings
+		# this will "encode" them as such
+		if type(value) != str:
+			value = value.encode(self.EncodeAs['char'])
 		
 		# Output
 		
 		if sout != None:
 			sout.write(value, self.getFullDataName())
+			
+		#if type(value) != str:
+		#	print "[%s]" % value
+		#	raise Exception("Whoa, string not str!!")
 		
 		return value
 

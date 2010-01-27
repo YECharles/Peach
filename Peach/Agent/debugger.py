@@ -909,5 +909,17 @@ except:
 	if sys.platform != 'win32':
 		print "Warning: Unix debugger failed to load: ", sys.exc_info()
 
+#class AppleCrashReporter(Monitor):
+#	'''
+#	Use the OS X Crash Reporter to detect faults.
+#	'''
+#	
+#	def __init__(self, args):
+#		
+#		Monitor.__init__(self)
+#		
+#		if args.has_key('Application'):
+#			str(args['']).replace("'''", "")
+			
 	
 # end
