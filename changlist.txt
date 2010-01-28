@@ -7,6 +7,8 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: Tcp publisher has new "throttle" parameter to specify wait
+        time between connections.
  - New: Windows debugger module now suppoerts attaching my PID
  - New: !exploitable windbg module included in distribution
  - Changed: Optmized test cases for small Numbers

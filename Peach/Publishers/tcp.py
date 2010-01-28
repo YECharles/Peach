@@ -57,7 +57,7 @@ class Tcp(Publisher):
 	'''
 	
 	
-	def __init__(self, host, port, timeout = 0.25):
+	def __init__(self, host, port, timeout = 0.25, throttle = 0):
 		'''
 		@type	host: string
 		@param	host: Remote host
@@ -65,6 +65,8 @@ class Tcp(Publisher):
 		@param	port: Remote port
 		@type	timeout: number
 		@param	timeout: How long to wait for reponse
+		@type	throttle: number
+		@param	throttle: How long to wait between connections
 		'''
 		Publisher.__init__(self)
 		self._host = host
@@ -79,6 +81,11 @@ class Tcp(Publisher):
 		except:
 			raise PeachException("The Tcp publisher parameter for timeout was not a valid number.")
 		
+		try:
+			self._throttle = float(throttle)
+		except:
+			raise PeachException("The Tcp publisher parameter for throttle was not a valid number.")
+		
 		self._socket = None
 		
 	def start(self):
@@ -92,6 +99,9 @@ class Tcp(Publisher):
 		Create connection.
 		'''
 		self.close()
+		
+		if self._throttle > 0:
+			time.sleep(self._throttle)
 		
 		# Try connecting many times
 		# before we crash.

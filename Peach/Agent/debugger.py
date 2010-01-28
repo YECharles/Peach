@@ -510,7 +510,7 @@ try:
 				self.ProcessName = None
 			
 			if args.has_key('ProcessID'):
-				self.ProcessID = str(args['ProcessID']).replace("'''", "")
+				self.ProcessID = int(args['ProcessID']).replace("'''", "")
 			else:
 				self.ProcessID = None
 			
@@ -558,7 +558,7 @@ try:
 				'CommandLine':self.CommandLine,
 				'Service':self.Service,
 				'ProcessName':self.ProcessName,
-				'ProcessID':int(self.ProcessID),
+				'ProcessID':self.ProcessID,
 				'KernelConnectionString':self.KernelConnectionString,
 				'SymbolsPath':self.SymbolsPath,
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
