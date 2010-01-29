@@ -14,6 +14,7 @@ v2.3.5
  - Changed: Optmized test cases for small Numbers
  - Bug: Fixed bug in Memory agent
  - Bug: Fixed bug in Network Pcap agent
+ - Bug: Fixed checksum fixup to alwasy return positive crc32
 
 v2.3.4
 ------

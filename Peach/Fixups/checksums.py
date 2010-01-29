@@ -150,7 +150,11 @@ class Crc32Fixup(Fixup):
 		if stuff == None:
 			raise Exception("Error: Crc32Fixup was unable to locate [%s]" % self.ref)
 		
-		return zlib.crc32(stuff)
+		crc = zlib.crc32(stuff)
+		if crc < 0:
+			crc = ~crc ^ 0xffffffff
+		
+		return crc
 
 
 class Crc32DualFixup(Fixup):
