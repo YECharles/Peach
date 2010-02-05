@@ -6,7 +6,7 @@ Analyzers that produce data models from Binary blobs
 '''
 
 #
-# Copyright (c) 2009 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -75,11 +75,70 @@ class Binary(Analyzer):
 		pass
 	
 	def locateStrings(self, data):
-		strs = []
-		for match in re.finditer(r"[\n\r\ta-zA-Z0-9,./<>\?;':\"\[\]\\\{\}|=\-+_\)\(*&^%$#@!~`]{3,}\0?", data):
-			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+		maxLooseStrings = 200
+		cnt = 0
 		
-		return strs
+		strs = []
+		
+		cnt = 0
+		for match in re.finditer(r"[\n\r\ta-zA-Z0-9,./<>\?;':\"\[\]\\\{\}|=\-+_\)\(*&^%$#@!~`]{4,}\0?", data):
+			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+			cnt+=1
+			if cnt > maxLooseStrings:
+				break
+		
+		if cnt < maxLooseStrings:
+			return strs
+		
+		strs = []
+		
+		cnt = 0
+		for match in re.finditer(r"[a-zA-Z0-9,./\?;':\"\\\-_&%$@!]{5,}\0?", data):
+			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+			cnt+=1
+			if cnt > maxLooseStrings:
+				break
+		
+		if cnt < maxLooseStrings:
+			return strs
+		
+		strs = []
+		
+		cnt = 0
+		for match in re.finditer(r"[a-zA-Z0-9,.?:\"&@!]{5,}\0?", data):
+			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+			cnt+=1
+			if cnt > maxLooseStrings:
+				break
+		
+		if cnt < maxLooseStrings:
+			return strs
+		
+		strs = []
+		
+		cnt = 0
+		for match in re.finditer(r"[a-zA-Z0-9.\"]{6,}\0?", data):
+			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+			cnt+=1
+			if cnt > maxLooseStrings:
+				break
+		
+		if cnt < maxLooseStrings:
+			return strs
+
+		strs = []
+		
+		cnt = 0
+		for match in re.finditer(r"[a-zA-Z0-9.\"]{10,}\0?", data):
+			strs.append(_Node('str', match.start(), match.end(), match.group(0)))
+			cnt+=1
+			if cnt > maxLooseStrings:
+				break
+		
+		if cnt < maxLooseStrings:
+			return strs
+		
+		return []
 	
 	def locateStringLengths(self, strs, data):
 		lengths = {}

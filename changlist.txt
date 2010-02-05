@@ -9,12 +9,14 @@ v2.3.5
 
  - New: Tcp publisher has new "throttle" parameter to specify wait
         time between connections.
- - New: Windows debugger module now suppoerts attaching my PID
+ - New: Windows debugger module now suppoerts attaching by PID
  - New: !exploitable windbg module included in distribution
  - Changed: Optmized test cases for small Numbers
+ - Changed: Binary analyzer changes how it locates strings as needed
  - Bug: Fixed bug in Memory agent
  - Bug: Fixed bug in Network Pcap agent
  - Bug: Fixed checksum fixup to alwasy return positive crc32
+ - Bug: Fixed bug were sequencial mutator strategy would throw an exception
 
 v2.3.4
 ------

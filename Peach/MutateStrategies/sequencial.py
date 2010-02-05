@@ -136,7 +136,7 @@ class SequencialMutationStrategy(MutationStrategy):
 		
 		# Fall through to here and move to next available field/mutator
 		
-		while self._mutatorIndex >= len(self._fieldMutators[fieldName]):
+		while fieldName == None or self._mutatorIndex >= len(self._fieldMutators[fieldName]):
 			self._mutatorIndex = 0
 			self._fieldIndex += 1
 			
@@ -150,8 +150,12 @@ class SequencialMutationStrategy(MutationStrategy):
 					raise MutatorCompleted()
 				else:
 					dataModelName = self._dataModels[self._dataModelIndex]
-			else:
+			
+			fieldName = None
+			try:
 				fieldName = self._dataModelFields[dataModelName][self._fieldIndex]
+			except:
+				pass
 	
 	def currentMutator(self):
 		'''
