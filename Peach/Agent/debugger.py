@@ -837,7 +837,7 @@ try:
 		
 		def _StopDebugger(self):
 			
-			if self.thread.isAlive():
+			if self.thread != None and self.thread.isAlive():
 				UnixDebugger.quit.set()
 				UnixDebugger.started.clear()
 				self.thread.trace.kill()
@@ -906,8 +906,9 @@ try:
 
 except:
 	# Only complain on Windows platforms.
-	if sys.platform != 'win32':
-		print "Warning: Unix debugger failed to load: ", sys.exc_info()
+	#if sys.platform != 'win32':
+	#	print "Warning: Unix debugger failed to load: ", sys.exc_info()
+	raise
 
 #class AppleCrashReporter(Monitor):
 #	'''

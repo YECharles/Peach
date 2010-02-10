@@ -47,7 +47,7 @@
 	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
 		<Monitor class="debugger.UnixDebugger">
 			<Param name="Command"
-		value="/Volumes/Untitled/peach/samples/UnixCrashServer/unixcrash" />
+		value="samples/UnixCrashServer/unixcrash" />
 			<Param name="Params" value="" />
 		</Monitor>
 	</Agent>
@@ -60,7 +60,6 @@
 			<Param name="host" value="127.0.0.1" />
 			<Param name="port" value="4242" />
 		</Publisher>
-		<Mutator class="string.StringTokenMutator" /> 
 	</Test>
 
 <Run name="DefaultRun">

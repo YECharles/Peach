@@ -19,7 +19,7 @@
 	-->
 	
 	<!-- Location of Peach -->
-	<PythonPath path="c:/projects/peach" />
+	<PythonPath path="/home/dd/peach" />
 	<PythonPath path="c:/peach" />
 	
 	<!-- The usual imports for Peach modules -->
