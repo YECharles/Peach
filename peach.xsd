@@ -362,6 +362,11 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
+			<xs:attribute name="analyzer" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>[Optional] The class of an analyzer to further decompose data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attribute name="lengthType">
 				<xs:annotation>
 					<xs:documentation>An optional attribute that specifies the value of length.  Default is string.</xs:documentation>
@@ -2252,24 +2257,6 @@
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:attribute>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="Choice" minOccurs="0">
-								<xs:complexType>
-									<xs:choice maxOccurs="unbounded">
-										<xs:element name="Action" minOccurs="1" maxOccurs="unbounded">
-											<xs:complexType>
-												<xs:attribute name="ref" type="xs:string" use="required"/>
-												<xs:attribute name="type" use="required">
-													<xs:simpleType>
-														<xs:restriction base="xs:string">
-															<xs:enumeration value="changeState"/>
-														</xs:restriction>
-													</xs:simpleType>
-												</xs:attribute>
-											</xs:complexType>
-										</xs:element>
-									</xs:choice>
 								</xs:complexType>
 							</xs:element>
 						</xs:choice>
