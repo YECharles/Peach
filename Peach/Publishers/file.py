@@ -704,6 +704,8 @@ try:
 			self._windowName = windowname
 			self.waitTime = float(waitTime)
 			self.debugger = False
+			self.count = 0
+			self._fd_sequencial = None
 			if debugger.lower() == "true":
 				self.debugger = True
 				
@@ -743,18 +745,7 @@ try:
 			# First lets rename the old file if there is one
 			
 			try:
-				try:
-					os.unlink(self._filename + ".old.old")
-				except:
-					pass
-				
-				try:
-					os.rename(self._filename + ".old", self._filename + ".old.old")
-				except:
-					pass
-				
-				os.rename(self._filename, self._filename + ".old")
-				
+				os.unlink(self._filename)
 			except:
 				pass
 			
@@ -762,13 +753,22 @@ try:
 			# still be open.  Lets retry a few times.
 			for i in range(10):
 				try:
+					
 					self._fd = open(self._filename, "w+b")
 					break
+				
 				except:
+					try:
+						os.unlink(self._filename)
+					except:
+						pass
+					
 					if i == 9:
 						raise
 				
 				time.sleep(1)
+			
+			#self._fd_sequencial = open("%s_%d" % (self._filename, self.count), "w+b")
 			
 			self._state = 1
 		
@@ -792,10 +792,14 @@ try:
 				os.mkdir(path)
 			except:
 				pass
-			
+		
 		def close(self):
 			if self._state == 0:
 				return
+			
+			if self._fd_sequencial != None:
+				self._fd_sequencial.close()
+				self.count += 1
 			
 			self._fd.close()
 			self._fd = None
@@ -803,6 +807,9 @@ try:
 		
 		def send(self, data):
 			self._fd.write(data)
+			
+			if self._fd_sequencial != None:
+				self._fd_sequencial.write(data)
 		
 		def receive(self, size = None):
 			if size != None:
@@ -843,7 +850,7 @@ try:
 			time.sleep(self.waitTime)
 			
 			self.closeApp(proc, self._windowName)
-	
+		
 		def enumCallback(hwnd, args):
 			'''
 			Will get called by win32gui.EnumWindows, once for each
@@ -854,7 +861,7 @@ try:
 			windowName = args[1]
 			
 			try:
-			
+				
 				# Get window title
 				title = win32gui.GetWindowText(hwnd)
 				
@@ -866,6 +873,7 @@ try:
 				# Send WM_CLOSE message
 				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
 				win32gui.PostQuitMessage(hwnd)
+				
 			except:
 				pass
 		
@@ -881,7 +889,7 @@ try:
 			windowName = args[1]
 			
 			try:
-			
+				
 				# Get window title
 				title = win32gui.GetWindowText(hwnd)
 				
