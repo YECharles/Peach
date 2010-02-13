@@ -34,7 +34,7 @@ object that contians things like templates, namespaces, etc.
 
 # $Id$
 
-import sys, re, types
+import sys, re, types, os, glob
 import traceback
 from uuid import uuid1
 
@@ -773,11 +773,9 @@ class ParseTemplate:
 		# name
 		
 		if node.hasAttributeNS(None, 'name'):
-			templateName = self._getAttribute(node, 'name')
-			template.name = templateName
+			template.name = self._getAttribute(node, 'name')
 		
 		template.elementType = 'template'
-		#template.node = node
 		
 		# pointer
 		
@@ -808,10 +806,10 @@ class ParseTemplate:
 			oldName = self._getAttribute(node, 'ref')
 			for relation in template._genRelationsInDataModelFromHere():
 				if relation.of == oldName:
-					relation.of = self._getAttribute(node, 'name')
+					relation.of = template.name
 				
 				elif relation.From == oldName:
-					relation.From = self._getAttribute(node, 'name')
+					relation.From = template.name
 
 
 		#template.printDomMap()
@@ -2085,6 +2083,32 @@ class ParseTemplate:
 		
 		if node.hasAttributeNS(None, 'fileName'):
 			data.fileName = self._getAttribute(node, 'fileName')
+			
+			if data.fileName.find('*') != -1:
+				data.fileGlob = data.fileName
+				
+				for f in glob.glob(data.fileGlob):
+					if not os.path.isdir(f):
+						data.fileName = f
+				
+				data.multipleFiles = True
+			
+			elif os.path.isdir(data.fileName):
+				data.folderName = data.fileName
+				
+				for f in os.listdir(data.folderName):
+					f = os.path.join(data.folderName, f)
+					if not os.path.isdir(f):
+						data.fileName = f
+						
+				data.multipleFiles = True
+		
+		# switchCount
+
+		if node.hasAttributeNS(None, 'switchCount'):
+			data.switchCount = int(self._getAttribute(node, 'switchCount'))
+		else:
+			data.switchCount = 200
 		
 		# expression
 		

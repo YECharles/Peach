@@ -110,6 +110,7 @@ class Filesystem(Logger):
 		self.elementType = 'logger'
 		self.params = params
 		self.heartBeat = 512
+		self.file = None
 	
 	def _writeMsg(self, line):
 		self.file.write(asctime() + ": " + line + "\n")
@@ -133,6 +134,9 @@ class Filesystem(Logger):
 			os.mkdir(self.path)
 		except:
 			pass
+		
+		if self.file != None:
+			self.file.close()
 		
 		self.file = open(os.path.join(self.path,"status.txt"), "w")
 		

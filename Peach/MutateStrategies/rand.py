@@ -52,6 +52,15 @@ class RandomMutationStrategy(MutationStrategy):
 	def __init__(self, args):
 		MutationStrategy.__init__(self, args)
 		
+		#: Number of iterations befor we switch files
+		self.switchCount = 100
+		
+		#: Number of iterations
+		self.iterationCount = 0
+		
+		#: Are we using multiple data sets?
+		self.multipleFiles = False
+		
 		#: Will this mutation strategy ever end?
 		self.isFinite = False
 		
@@ -110,6 +119,8 @@ class RandomMutationStrategy(MutationStrategy):
 		@param	stateEngine: StateEngine instance in use
 		'''
 		
+		self.iterationCount += 1
+		
 		if not self._isFirstTestCase:
 			## Select the data model to change
 			self._dataModelToChange = self._random.choice(self._dataModels.keys())
@@ -131,6 +142,140 @@ class RandomMutationStrategy(MutationStrategy):
 		self._dataModelToChange = None
 		
 	
+	def GetRef(self, str, parent = None, childAttr = 'templates'):
+		'''
+		Get the object indicated by ref.  Currently the object must have
+		been defined prior to this point in the XML
+		'''
+		
+		#print "GetRef(%s) -- Starting" % str
+		
+		origStr = str
+		baseObj = self.context
+		hasNamespace = False
+		isTopName = True
+		found = False
+		
+		# Parse out a namespace
+		
+		if str.find(":") > -1:
+			ns, tmp = str.split(':')
+			str = tmp
+			
+			#print "GetRef(%s): Found namepsace: %s" % (str, ns)
+			
+			# Check for namespace
+			if hasattr(self.context.namespaces, ns):
+				baseObj = getattr(self.context.namespaces, ns)
+			else:
+				#print self
+				raise PeachException("Unable to locate namespace: " + origStr)
+			
+			hasNamespace = True
+		
+		for name in str.split('.'):
+			
+			#print "GetRef(%s): Looking for part %s" % (str, name)
+			
+			found = False
+			
+			if not hasNamespace and isTopName and parent != None:
+				# check parent, walk up from current parent to top
+				# level parent checking at each level.
+				
+				while parent != None and not found:
+					
+					#print "GetRef(%s): Parent.name: %s" % (name, parent.name)
+					
+					if hasattr(parent, 'name') and parent.name == name:
+						baseObj = parent
+						found = True
+						
+					elif hasattr(parent, name):
+						baseObj = getattr(parent, name)
+						found = True
+					
+					elif hasattr(parent.children, name):
+						baseObj = getattr(parent.children, name)
+						found = True
+					
+					elif hasattr(parent, childAttr) and hasattr( getattr(parent, childAttr), name):
+						baseObj = getattr( getattr(parent, childAttr), name)
+						found = True
+						
+					else:
+						parent = parent.parent
+			
+			# check base obj
+			elif hasattr(baseObj, name):
+				baseObj = getattr(baseObj, name)
+				found = True
+				
+			# check childAttr
+			elif hasattr(baseObj, childAttr):
+				obj = getattr(baseObj, childAttr)
+				if hasattr(obj, name):
+					baseObj = getattr(obj, name)
+					found = True
+			
+			else:
+				raise PeachException("Could not resolve ref %s" % origStr)
+			
+			# check childAttr
+			if found == False and hasattr(baseObj, childAttr):
+				obj = getattr(baseObj, childAttr)
+				if hasattr(obj, name):
+					baseObj = getattr(obj, name)
+					found = True
+			
+			# check across namespaces if we can't find it in ours
+			if isTopName and found == False:
+				for child in baseObj:
+					if child.elementType != 'namespace':
+						continue
+					
+					#print "GetRef(%s): CHecking namepsace: %s" % (str, child.name)
+					ret = self._SearchNamespaces(child, name, childAttr)
+					if ret:
+						#print "GetRef(%s) Found part %s in namespace" % (str, name)
+						baseObj = ret
+						found = True
+			
+			isTopName = False
+		
+		if found == False:
+			raise PeachException("Unable to resolve reference: %s" % origStr)
+		
+		return baseObj
+	
+	def _SearchNamespaces(self, obj, name, attr):
+		'''
+		Used by GetRef to search across namespaces
+		'''
+		
+		#print "_SearchNamespaces(%s, %s)" % (obj.name, name)
+		#print "dir(obj): ", dir(obj)
+		
+		# Namespaces are stuffed under this variable
+		# if we have it we should be it :)
+		if hasattr(obj, 'ns'):
+			obj = obj.ns
+
+		if hasattr(obj, name):
+			return getattr(obj, name)
+		
+		elif hasattr(obj, attr) and hasattr(getattr(obj, attr), name):
+			return getattr(getattr(obj, attr), name)
+		
+		for child in obj:
+			if child.elementType != 'namespace':
+				continue
+			
+			ret = self._SearchNamespaces(child, name, attr)
+			if ret != None:
+				return ret
+		
+		return None
 	
 	def onDataModelGetValue(self, action, dataModel):
 		'''
@@ -141,6 +286,49 @@ class RandomMutationStrategy(MutationStrategy):
 		@type	dataModel: Template
 		@param	dataModel: Data model we are using
 		'''
+		
+		if action.data != None and action.data.multipleFiles:
+			self.switchCount = action.data.switchCount
+		
+		if action.data != None and action.data.multipleFiles and \
+					self.iterationCount % self.switchCount == 0:
+			
+			self.context = action.getRoot()
+			
+			# Time to switch to another file!
+			action.data.gotoRandomFile()
+			
+			# Locate fresh copy of template with no data
+			obj = self.GetRef(action.template.ref)
+			template = obj.copy(action)
+			template.ref = action.template.ref
+			template.parent = action
+			template.name = action.template.name
+			
+			# Switch any references to old name
+			oldName = template.ref
+			for relation in template._genRelationsInDataModelFromHere():
+				if relation.of == oldName:
+					relation.of = template.name
+				
+				elif relation.From == oldName:
+					relation.From = template.name
+			
+			# Crack file
+			template.setDefaults(action.data)
+			
+			# Cache default values
+			action.template = template
+			template.getValue()
+			template.getValue()
+			
+			# Remove state engine copy
+			if hasattr(action, "origionalTemplate"):
+				delattr(action, "origionalTemplate")
+			
+			# Regenerate mutator state
+			self._isFirstTestCase = True
+		
 		
 		if self._isFirstTestCase:
 			fullName = dataModel.getFullname()

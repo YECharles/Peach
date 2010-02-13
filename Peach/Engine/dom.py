@@ -54,6 +54,7 @@ if PROFILE:
 	import profile
 
 import sys, re, types, new, base64, time, ctypes, traceback, os, cPickle
+import random, glob
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
@@ -4976,6 +4977,10 @@ class Relation(Element):
 class Data(ElementWithChildren):
 	'''
 	Default data container.  Children are Field objects.
+	
+	When used in multi-file mode, fileName will always
+	contain an actual real file.  It's upto the mutator
+	strategy to use the other files.
 	'''
 	def __init__(self, name):
 		ElementWithChildren.__init__(self, name, None)
@@ -4985,6 +4990,34 @@ class Data(ElementWithChildren):
 		self.fileName = None
 		#: Expression that returns data to load
 		self.expression = None
+		#: Does this data element point to multiple files
+		self.multipleFiles = False
+		#: A unix style glob path
+		self.fileGlob = None
+		#: Folder of files to use
+		self.folderName = None
+	
+	def gotoRandomFile(self):
+		'''
+		Goto random file.
+		'''
+		
+		if not self.multipleFiles:
+			raise PeachException("Error, Data.gotoRandomFile called with self.multipleFiels == False!")
+		
+		if self.folderName != None:
+			self.fileName = self.folderName
+			files = os.listdir(self.folderName)
+			
+			while os.path.isdir(self.fileName):
+				self.fileName = random.choice(files)
+				self.fileName = os.path.join(self.folderName, self.fileName)
+		
+		elif self.fileGlob != None:
+			files = glob.glob(self.fileGlob)
+			self.fileName = random.choice(files)
+			while os.path.isdir(self.fileName):
+				self.fileName = random.choice(files)
 
 
 class Field(ElementWithChildren):

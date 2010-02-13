@@ -785,6 +785,13 @@
 						based on the data model.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name="switchCount" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>If specifying multiple data files this attribute will control how often they are
+						switched.  Default is 100.  For files that take a long cracking time set to 1024 or larger.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attribute name="expression" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>A python expression that should return the data blob used to populate the data mode.
