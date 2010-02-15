@@ -328,6 +328,8 @@ class RandomMutationStrategy(MutationStrategy):
 			
 			# Regenerate mutator state
 			self._isFirstTestCase = True
+			self._dataModels = {}
+			self._fieldMutators = {}
 		
 		
 		if self._isFirstTestCase:
