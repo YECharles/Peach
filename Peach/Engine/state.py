@@ -633,7 +633,11 @@ class StateEngine:
 					raise SoftException("StateEngine._runAction(xpath): valueXpath did not return a node")
 				
 				valueNode = valueNodes[0]
-				valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
+				try:
+					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
+					
+				except AttributeError, e:
+					print "Warning: Slurp AttributeError: ", str(valueNode.getAttributeNS(None, "fullName"))
 				
 			for node in setNodes:
 				
