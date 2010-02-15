@@ -369,26 +369,45 @@ class RandomMutationStrategy(MutationStrategy):
 			# Select nodes we will modify
 			if len(nodes) <= self._n:
 				fields = nodes
+				
+				for i in range(self._n):
+					# Now perform mutations on fields
+					for node in fields:
+						try:
+							mutator = self._random.choice(self._fieldMutators[node.getFullname()])
+							
+							print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
+							
+							# Note: Since we are applying multiple mutations
+							#       sometimes a mutation will fail.  We should
+							#       ignore those failures.
+							try:
+								mutator.randomMutation(node)
+							except:
+								pass
+						
+						except:
+							pass
 			else:
 				fields = self._random.sample(nodes, self._n)
-			
-			# Now perform mutations on fields
-			for node in fields:
-				try:
-					mutator = self._random.choice(self._fieldMutators[node.getFullname()])
-					
-					#print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
-					
-					# Note: Since we are applying multiple mutations
-					#       sometimes a mutation will fail.  We should
-					#       ignore those failures.
+				
+				# Now perform mutations on fields
+				for node in fields:
 					try:
-						mutator.randomMutation(node)
+						mutator = self._random.choice(self._fieldMutators[node.getFullname()])
+						
+						print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
+						
+						# Note: Since we are applying multiple mutations
+						#       sometimes a mutation will fail.  We should
+						#       ignore those failures.
+						try:
+							mutator.randomMutation(node)
+						except:
+							pass
+					
 					except:
 						pass
-				
-				except:
-					pass
 			
 		# all done!
 
