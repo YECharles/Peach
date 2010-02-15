@@ -191,16 +191,22 @@ class BitFlipperMutator(Mutator):
 		if len(data) == 0:
 			return data
 		
-		if position >= length:
-			position = length - 1
+		# How many bytes to change
+		size = self._random.choice([1, 2, 4, 8])
+		
+		if (position+size) >= length:
+			position = length - size
 		if position < 0:
 			position = 0
+		if size > length:
+			size = length
 		
-		byte = struct.unpack('B', data[position])[0]
-		byte ^= self._random.randint(0, 255)
-		
-		packedup = struct.pack("B", byte)
-		data = data[:position] + packedup + data[position+1:]
+		for i in range(position, position+size):
+			byte = struct.unpack('B', data[i])[0]
+			byte ^= self._random.randint(0, 255)
+			
+			packedup = struct.pack("B", byte)
+			data = data[:i] + packedup + data[i+1:]
 		
 		return data
 

@@ -65,7 +65,7 @@ class RandomMutationStrategy(MutationStrategy):
 		self.isFinite = False
 		
 		#: Number of fields to change
-		self._n = 5
+		self._n = 7
 		
 		#: Data models (fullname as key, value is node count)
 		self._dataModels = {}
