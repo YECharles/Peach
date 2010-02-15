@@ -510,7 +510,7 @@ try:
 				self.ProcessName = None
 			
 			if args.has_key('ProcessID'):
-				self.ProcessID = int(args['ProcessID']).replace("'''", "")
+				self.ProcessID = int(args['ProcessID'].replace("'''", ""))
 			else:
 				self.ProcessID = None
 			
