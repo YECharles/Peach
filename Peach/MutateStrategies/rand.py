@@ -331,6 +331,7 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		
 		if self._isFirstTestCase:
+			
 			fullName = dataModel.getFullname()
 			
 			if fullName not in self._dataModels:
