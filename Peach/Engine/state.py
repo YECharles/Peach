@@ -636,8 +636,8 @@ class StateEngine:
 				try:
 					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
 					
-				except AttributeError, e:
-					print "Warning: Slurp AttributeError: ", str(valueNode.getAttributeNS(None, "fullName"))
+				except:
+					raise PeachException("Slurp AttributeError: ", str(valueNode.getAttributeNS(None, "fullName")))
 				
 			for node in setNodes:
 				
