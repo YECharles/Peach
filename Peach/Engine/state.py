@@ -637,7 +637,11 @@ class StateEngine:
 					valueElement = action.getRoot().getByName(str(valueNode.getAttributeNS(None, "fullName")))
 					
 				except:
-					raise PeachException("Slurp AttributeError: ", str(valueNode.getAttributeNS(None, "fullName")))
+					print "valueNode:", valueNode
+					print "valueNode.nodeName:", valueNode.nodeName
+					print "valueXpath:", action.valueXpath
+					print "results:", len(valueNodes)
+					raise PeachException("Slurp AttributeError: [%s]" % str(valueNode.getAttributeNS(None, "fullName")))
 				
 			for node in setNodes:
 				
