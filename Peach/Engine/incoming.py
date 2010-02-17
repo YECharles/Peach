@@ -35,7 +35,7 @@ it is capable of using well defined templates to crack data.
 
 # $Id$
 
-import sys, os, time, struct, types, operator
+import sys, os, time, struct, types, operator, traceback
 from Peach.Engine.common import *
 from Peach.Engine.dom import *
 import Peach
@@ -916,6 +916,9 @@ class DataCracker:
 			Debug(1, "_lookAhead(): pos > len(data), no lookahead")
 			return 4
 		
+		#print "_lookAhead"
+		#traceback.print_stack()
+		
 		## Setup a few variables
 		
 		DataCracker._tabLevel += 1
@@ -1018,16 +1021,31 @@ class DataCracker:
 		sizes.  If they do we can determin our size.
 		'''
 		
+		Debug(1, "_isLastUnsizedNode(%s)" % node.name)
+		
 		length = 0
 		n = node
-		while self._nextNode(n) != None:
-			n = self._nextNode(n)
+		b = False
+		
+		while True:
+			(n, b) = self._nextNodeOrSizedParent(n)
+			
+			if b:
+				Debug(1, "_isLastUnsizedNode: Found sized parent!")
+				break
+			
+			if n == None:
+				Debug(1, "_isLastUnsizedNode: Next node returned None")
+				break
+			
 			s = self._hasSize(n)
 			if s == None:
+				Debug(1, "_isLastUnsizedNode: returning None due to [%s]" % n.name)
 				return None
 			
 			length += s
 		
+		Debug(1, "_isLastUnsizedNode: length: %d" % length)
 		return length
 	
 	def _hasSize(self, node):
@@ -1052,6 +1070,12 @@ class DataCracker:
 			return int(node.size) / 8
 		
 		elif isinstance(node, Block):
+			# Check for relation
+			relation = node.getRelationOfThisElement('size')
+			if relation != None:
+				Debug(1, "_hasSize(%s): Found relation" % node.name)
+				return int(relation.getValue(True))
+			
 			# Check each child
 			size = 0
 			for child in node:
@@ -1067,10 +1091,22 @@ class DataCracker:
 			return int(node.length) / 8
 	
 		elif isinstance(node, Choice):
+			# Check for relation
+			relation = node.getRelationOfThisElement('size')
+			if relation != None:
+				Debug(1, "_hasSize(%s): Found relation" % node.name)
+				return int(relation.getValue(True))
+			
 			# Until choice is run we
 			# will not know which element
 			# was selected.
 			return None
+		
+		# Check for relation
+		relation = node.getRelationOfThisElement('size')
+		if relation != None:
+			Debug(1, "_hasSize(%s): Found relation" % node.name)
+			return int(relation.getValue(True))
 		
 		return None
 	
@@ -1111,7 +1147,60 @@ class DataCracker:
 			node = self._nextNode(node)
 		
 		return node
+	
+	def _nextNodeOrSizedParent(self, node):
+		'''
+		Find the next node, or sized parent.
 		
+		Returns tubple of (Node, Boolean)
+		Node - Found node
+		Boolean - Is sized parent?
+		'''
+		
+		if node == None:
+			return (None, False)
+		
+		try:
+			Debug(1, "_nextNodeOrSizedParent(%s)" % node.name)
+		
+		except:
+			Debug(1, "_nextNodeOrSizedParent: %s" % repr(node))
+			raise
+		
+		if not isinstance(node, Peach.Engine.dom.DataElement) or \
+			node.elementType == 'template':
+			
+			Debug(1, "_nextNodeOrSizedParent: not data element or is template, failing")
+			return (None, False)
+		
+		# Try and escape Choice blocks.
+		while node.parent != None and node.parent.elementType == 'choice':
+			if node.parent.maxOccurs > 1:
+				Debug(1, "_nextNodeOrSizedParent: Returning node.parent due to maxOccurs > 1")
+				return (node.parent, False)
+			
+			if self._hasSize(node.parent):
+				Debug(1, "_nextNodeOrSizedParent: Found sized choice parent, this is the last element")
+				return (node.parent, True)
+			
+			node = node.parent
+		
+		nextNode = node.nextSibling()
+		while nextNode != None and not isinstance(nextNode, Peach.Engine.dom.DataElement):
+			nextNode = nextNode.nextSibling()
+		
+		if nextNode != None and isinstance(nextNode, Peach.Engine.dom.DataElement):	
+			Debug(1, "_nextNodeOrSizedParent: Found: %s" % nextNode.name)
+			return (nextNode, False)
+		
+		if node.parent != None and self._hasSize(node.parent):
+			Debug(1, "_nextNodeOrSizedParent: Found sized parent, this is the last element")
+			return (node.parent, True)
+		
+		Debug(1, "_nextNodeOrSizedParent: Calling _nextNodeOrSizedParent on parent!")
+		return self._nextNodeOrSizedParent(node.parent)
+	
+	
 	def _nextNode(self, node):
 		'''
 		Locate the next node.
@@ -1120,7 +1209,7 @@ class DataCracker:
 		2. Does are parent have .nextSibling?
 		...
 		
-		Need to also support escaping Choice blocks!		
+		Need to also support escaping Choice blocks!
 		'''
 		
 		if node == None:
@@ -1136,13 +1225,14 @@ class DataCracker:
 		if not isinstance(node, Peach.Engine.dom.DataElement) or \
 			node.elementType == 'template':
 			
-			Debug(1, "_nextNode(%s): not data element or is template")
+			Debug(1, "_nextNode: not data element or is template")
 			
 			return None
 		
 		# Try and escape Choice blocks.
 		while node.parent != None and node.parent.elementType == 'choice':
 			if node.parent.maxOccurs > 1:
+				Debug(1, "_nextNode: Returning node.parent due to maxOccurs > 1.")
 				return node.parent
 			
 			node = node.parent
@@ -2237,6 +2327,9 @@ class DataCracker:
 						rating = 2
 				
 				else:
+					
+					# Lets try and remove all _lookAhead calls.
+					raise PeachException("Error, unable to determine size of blob [%s] while cracking." % node.getFullname())
 					
 					while lookRating > 2 and newpos < len(buff.data):
 						#Debug(1, ".")
