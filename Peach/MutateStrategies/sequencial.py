@@ -104,6 +104,9 @@ class SequencialMutationStrategy(MutationStrategy):
 	def next(self):
 		# Goto next test case
 		
+		if len(self._dataModels) == 0:
+			raise PeachException("Error: Peach couldn't find any DataModels with elements to fuzz!")
+		
 		dataModelName = self._dataModels[self._dataModelIndex]
 		
 		while self._fieldIndex >= len(self._dataModelFields[dataModelName]):
@@ -180,11 +183,15 @@ class SequencialMutationStrategy(MutationStrategy):
 		@param	dataModel: Data model we are using
 		'''
 		
+		print "onDataModelGetValue(%s, %s)" % (action.name, dataModel.name)
+		
 		# On first test case lets just figure out which
 		# data models and fields we will be mutating
 		if self._isFirstTestCase:
 			fullName = dataModel.getFullname()
+			print "DataModel fullName: ", fullName
 			if fullName not in self._dataModels:
+				print "Found new DataModel"
 				self._dataModels.append(fullName)
 				self._dataModelFields[fullName] = []
 				
@@ -202,7 +209,10 @@ class SequencialMutationStrategy(MutationStrategy):
 								# Need to create new instance from class
 								mutators.append( m(Engine.context,node) )
 			
+			print "onDataModelGetValue done"
 			return
+		
+		print "Not first iteration..."
 		
 		# Is this data model we are changing?
 		if dataModel.getFullname() != self._dataModels[self._dataModelIndex]:
