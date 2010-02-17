@@ -31,6 +31,7 @@ A few standard fixups.
 #
 # $Id$
 
+import operator
 import zlib, hashlib, struct, binascii, array
 from Peach.fixup import Fixup
 from Peach.Engine.common import *
@@ -156,6 +157,23 @@ class Crc32Fixup(Fixup):
 		
 		return crc
 
+class LRCFixup(Fixup):
+	
+	def __init__(self, ref):
+		Fixup.__init__(self)
+		self.ref = ref
+		
+	def fixup(self):
+		self.context.defaultValue = "0"
+		stuff = self._findDataElementByName(self.ref).getValue()
+		
+		if stuff == None:
+			raise Exception("Error: LRCFixup was unable to locate [%s]" % self.ref)
+		
+		lrc = 0
+		for b in stuff:
+			lrc ^= ord(b)
+		return chr(lrc)
 
 class Crc32DualFixup(Fixup):
 	'''
