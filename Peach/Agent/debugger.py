@@ -536,7 +536,7 @@ try:
 				
 			else:
 				self.StartOnCall = False
-				
+			
 			if args.has_key("IgnoreFirstChanceGardPage"):
 				self.IgnoreFirstChanceGardPage = True
 			else:
@@ -823,6 +823,21 @@ try:
 			
 			else:
 				raise Exception("Unable to create UnixGdb!  Error in params!")
+			
+			if args.has_key("StartOnCall"):
+				self.StartOnCall = True
+				self.OnCallMethod = str(args['StartOnCall']).replace("'''", "").lower()
+				
+			else:
+				self.StartOnCall = False
+		
+		def PublisherCall(self, method):
+			
+			if not self.StartOnCall:
+				return
+			
+			if self.OnCallMethod == method.lower():
+				self._StartDebugger()
 		
 		def _StartDebugger(self):
 			UnixDebugger.quit.clear()
@@ -857,9 +872,18 @@ try:
 			'''
 			Called right before start of test.
 			'''
-			if not self._IsDebuggerAlive():
+			if not self.StartOnCall and not self._IsDebuggerAlive():
 				self._StartDebugger()
+			
+			elif self.StartOnCall:
+				self._StopDebugger()
 		
+		def OnTestFinished(self):
+			if not self.StartOnCall or not self._IsDebuggerAlive():
+				return
+			
+			self._StopDebugger()
+			
 		def GetMonitorData(self):
 			'''
 			Get any monitored data.
