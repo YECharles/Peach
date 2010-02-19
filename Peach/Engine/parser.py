@@ -55,6 +55,7 @@ from Peach.Engine import dom
 import Peach.Engine
 from Peach.Mutators import *
 from Peach.Engine.common import *
+from Peach.Engine.incoming import DataCracker
 
 def PeachStr(s):
 	'''
@@ -844,7 +845,7 @@ class ParseTemplate:
 				self.HandleHint(child, elem)
 			
 			else:
-				raise str("found unexpected child node: %s" % child.nodeName)
+				raise PeachException("Found unexpected child node '%s' in element '%s'." % (child.nodeName, elem.name))
 	
 	def HandleTransformer(self, node, parent):
 		'''
@@ -1850,6 +1851,18 @@ class ParseTemplate:
 			else:
 				raise PeachException("Flags attribute rightToLeft must be 'true' or 'false'.")
 		
+		# padding
+		
+		if node.hasAttributeNS(None, 'padding'):
+			if self._getAttribute(node, 'padding').lower() == "true":
+				flags.padding = True
+			
+			elif self._getAttribute(node, 'padding').lower() == "false":
+				flags.padding = False
+			
+			else:
+				raise PeachException("Flags attribute padding must be 'true' or 'false'.")
+		
 		# constraint
 		flags.constraint = self._getAttribute(node, "constraint")
 
@@ -2389,6 +2402,8 @@ class ParseTemplate:
 				
 				actions = [child for child in state if child.elementType=='action']
 				for action in actions:
+					cracker = DataCracker(action.getRoot())
+					cracker.optmizeModelForCracking(action.template)
 					action.template.setDefaults(data, self.dontCrack)
 				
 			elif child.nodeName not in ['Mutator']:
@@ -2831,7 +2846,9 @@ class ParseTemplate:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
 		
 		if action.template != None and action.data != None:
-			action.template.setDefaults(action.data, self.dontCrack)
+			cracker = DataCracker(action.getRoot())
+			cracker.optmizeModelForCracking(action.template)
+			action.template.setDefaults(action.data, self.dontCrack, True)
 		
 		# Verify action has a DataModel if needed
 		if action.type in ['input', 'output']:
@@ -2885,7 +2902,9 @@ class ParseTemplate:
 				raise PeachException("Parser: ActionParam has unknown child [%s]" % PeachStr(child.nodeName))
 		
 		if param.template != None and param.data != None:
-			param.template.setDefaults(param.data, self.dontCrack)
+			cracker = DataCracker(param.template.getRoot())
+			cracker.optmizeModelForCracking(param.template)
+			param.template.setDefaults(param.data, self.dontCrack, True)
 		
 		# Verify param has data model
 		if param.template == None:

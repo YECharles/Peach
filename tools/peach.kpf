@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="ab4b7f35-e386-4c14-9e8b-926c99b5839f" kpf_version="4" name="peach.kpf">
+<file id="081d2ab7-f52b-4f6b-86c9-96a430cf7d3d" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="test.py" url="file:///c:/test.py">
+</file>
 <file id="a78ea52a-154c-4697-9fd8-04547d0ca93b" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="testsql2.py" url="file:///c:/audits/gd/testsql2.py">
 </file>
 <preference-set idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f">

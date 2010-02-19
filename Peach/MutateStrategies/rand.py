@@ -35,6 +35,7 @@ Mutation Strategies
 import sys, os, time, random
 from Peach.Engine.engine import Engine
 from Peach.mutatestrategies import *
+from Peach.Engine.incoming import DataCracker
 
 class _RandomMutator(object):
 	name = "Random"
@@ -295,36 +296,55 @@ class RandomMutationStrategy(MutationStrategy):
 			
 			self.context = action.getRoot()
 			
-			# Time to switch to another file!
-			action.data.gotoRandomFile()
-			
-			# Locate fresh copy of template with no data
-			obj = self.GetRef(action.template.ref)
-			template = obj.copy(action)
-			template.ref = action.template.ref
-			template.parent = action
-			template.name = action.template.name
-			
-			# Switch any references to old name
-			oldName = template.ref
-			for relation in template._genRelationsInDataModelFromHere():
-				if relation.of == oldName:
-					relation.of = template.name
+			# If a file fails to parse, don't exit the
+			# run, instead re-crack until we find a working
+			# file.
+			while True:
+				# Time to switch to another file!
+				action.data.gotoRandomFile()
 				
-				elif relation.From == oldName:
-					relation.From = template.name
-			
-			# Crack file
-			template.setDefaults(action.data)
+				# Locate fresh copy of template with no data
+				obj = self.GetRef(action.template.ref)
+				cracker = DataCracker(obj.getRoot())
+				cracker.optmizeModelForCracking(obj)
+				
+				template = obj.copy(action)
+				template.ref = action.template.ref
+				template.parent = action
+				template.name = action.template.name
+				
+				# Switch any references to old name
+				oldName = template.ref
+				for relation in template._genRelationsInDataModelFromHere():
+					if relation.of == oldName:
+						relation.of = template.name
+					
+					elif relation.From == oldName:
+						relation.From = template.name
+				
+				# Crack file
+				try:
+					template.setDefaults(action.data, False, True)
+					print ""
+					break
+				
+				except:
+					pass
 			
 			# Cache default values
 			action.template = template
 			template.getValue()
-			template.getValue()
 			
-			# Remove state engine copy
+			# Re-create state engine copy.  We do this to
+			# avoid have optmizeModelForCracking called over
+			# and over...
 			if hasattr(action, "origionalTemplate"):
-				delattr(action, "origionalTemplate")
+				#delattr(action, "origionalTemplate")
+				action.origionalTemplate = action.template
+				action.origionalTemplate.BuildRelationCache()
+				action.origionalTemplate.resetDataModel()
+				action.origionalTemplate.getValue()
+				action.template = action.template.copy(action)
 			
 			# Regenerate mutator state
 			self._isFirstTestCase = True
@@ -368,6 +388,7 @@ class RandomMutationStrategy(MutationStrategy):
 				if not node.isMutable:
 					nodes.remove(node)
 			
+			print "The following elements are mutating: "
 			# Select nodes we will modify
 			if len(nodes) <= self._n:
 				fields = nodes
@@ -378,7 +399,9 @@ class RandomMutationStrategy(MutationStrategy):
 						try:
 							mutator = self._random.choice(self._fieldMutators[node.getFullname()])
 							
-							print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
+							fullName = node.getFullnameInDataModel()[len(dataModel.name)+1:]
+							print " %s" % (fullName)
+							print "   %s" % (mutator.name)
 							
 							# Note: Since we are applying multiple mutations
 							#       sometimes a mutation will fail.  We should
@@ -398,7 +421,10 @@ class RandomMutationStrategy(MutationStrategy):
 					try:
 						mutator = self._random.choice(self._fieldMutators[node.getFullname()])
 						
-						print "> %s: %s" % (node.getFullnameInDataModel(), mutator.name)
+						#print "   > %s: %s" % (node.getFullnameInDataModel(), mutator.name)
+						fullName = node.getFullnameInDataModel()[len(dataModel.name)+1:]
+						print " %s" % (fullName)
+						print "   %s" % (mutator.name)
 						
 						# Note: Since we are applying multiple mutations
 						#       sometimes a mutation will fail.  We should
@@ -410,6 +436,8 @@ class RandomMutationStrategy(MutationStrategy):
 					
 					except:
 						pass
+			
+			print ""
 			
 		# all done!
 

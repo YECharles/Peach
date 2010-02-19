@@ -97,6 +97,53 @@ class DataCracker:
 		Debug(1, "Done cracking stuff")
 		return (rating, pos)
 	
+	def optmizeModelForCracking(self, datamodel, silent = False):
+		'''
+		This method will pre-compute some values that will
+		enable optimzing how we crack data into said model.
+		'''
+		
+		if not silent:
+			print "[*] Optmizing DataModel for cracking: '%s'" % datamodel.name
+		
+		# Setup choice fastcheck		
+		for node in datamodel.getAllChildDataElements():
+			if node.elementType == 'choice':
+				for child in node:
+					
+					# If _isTokenNext on our choice child is true we can cache
+					# cache that value and use it to super speed up choice checks
+					fastCheck = False
+					fastCheckValue = None
+					fastCheckOffset = 0
+					
+					if child.isStatic:
+						fastCheck = True
+						fastCheckValue = child.getValue()
+						fastCheckOffset = 0
+						
+						Debug(1, "optmizeModelForCracking: FastCheck: Child is token for '%s'" % child.name)
+					else:
+						values = self._isTokenNext(child, True)
+						Debug(1, "optmizeModelForCracking: FastCheck: back from _isTokenNext")
+						if values != None:
+							fastCheck = True
+							fastCheckValue = values[0].getValue()
+							fastCheckOffset = values[1]
+							
+							# Sanity check
+							if len(fastCheckValue) < 1:
+								raise PeachException("optmizeModelForCracking: Warning, fastCheckValue is < 1 in length")
+							
+							Debug(1, "optmizeModelForCracking: FastCheck: Found next token for '%s'" % child.name)
+							
+						else:
+							Debug(1, "optmizeModelForCracking: Found no token for '%s'" % child.name)
+							#raise PeachException("_handleChoice(): Found no token for '%s'" % child.name)
+					
+					child.choiceCache = (fastCheck, fastCheckOffset, fastCheckValue)
+
+		
 	def crackData(self, template, buff, method = 'setValue'):
 		'''
 		Crack data based on template.  Set values into data tree.
@@ -112,14 +159,21 @@ class DataCracker:
 		# Reset all values in tree
 		# NOTE: Do not change setValue to method.  We NEEVER want
 		#       to run this with setDefaultValue or else DEATH AND DOOM TO U!
-		self._resetDataElementValues(template, 'setValue')
+		#
+		# Do we really need todo this?
+		#
+		#self._resetDataElementValues(template, 'setValue')
 		
 		#self.method = 'setValue'
+		self.crackPassed = True
 		self.method = method
 		(rating, pos) = self._handleNode(template, buff, 0, None) #, self.dom)
 		Debug(1, "RATING: %d - POS: %d - LEN(DATA): %d" % (rating, self.parentPos+pos, len(buff.data)))
 		if pos < len(buff.data)-1:
+			self.crackPassed = False
 			Debug(1, "WARNING: Did not consume all data!!!")
+		if rating > 2:
+			self.crackPassed = False
 		
 		# Find all our placements and shift elements around.
 		placements = []
@@ -987,24 +1041,89 @@ class DataCracker:
 		else:
 			return rating
 	
-	def _isTokenNext(self, node):
+	def _isTokenNext(self, node, fastChoice = False):
 		'''
 		Determine if a token node follows.  Other sized
 		nodes can be between them.
 		'''
 		
+		#print "_isTokenNext(%s)" % node.name
+		
 		staticNode = None
 		length = 0
 		n = node
-		while self._nextNode(n) != None:
-			n = self._nextNode(n)
+		while True:
+			
+			if fastChoice and n.elementType == 'block' and len(n) > 0:
+				n = n[0]
+			
+			else:
+				n = self._nextNode(n)
+			
+			if n == None:
+				break
 			
 			if n.isStatic:
 				staticNode = n
 				break
 			
+			# If we are a choice we fail
+			if n.elementType == 'choice':
+				#print "_isTokenNext: Found choice, exiting"
+				return None
+			
+			# If a child flag is token we don't support that
+			if n.elementType == 'Flags':
+				for child in n:
+					if isinstance(child, 'Flag') and child.isStatic:
+						if fastChoice:
+							return None
+						else:
+							staticNode = n
+							break
+				
+			# If we are a block, we need to
+			# head into the block.
+			if n.elementType == 'block':
+				
+				# If no children then size == 0
+				if len(n) == 0:
+					continue
+				
+				child = n[0]
+				if child.isStatic:
+					staticNode = child
+					break
+				
+				# If a child flag is token we don't support that
+				if n.elementType == 'Flags':
+					for child in n:
+						if isinstance(child, 'Flag') and child.isStatic:
+							if fastChoice:
+								return None
+							else:
+								staticNode = n
+								break
+				
+				s = self._hasSize(child)
+				if s == None:
+					#print "_isTokenNext: Child has no size, exiting [%s.%s]" % (n.name, child.name)
+					return None
+				
+				length += s
+				
+				ret = self._isTokenNext(child, fastChoice)
+				if ret == None:
+					#print "_isTokenNext: Child has no next token, exiting"
+					return None
+				
+				length += ret[1]
+				staticNode = ret[0]
+				break
+			
 			s = self._hasSize(n)
 			if s == None:
+				#print "_isTokenNext: N has no size, exiting [%s]" % n.name
 				return None
 			
 			length += s
@@ -1013,6 +1132,7 @@ class DataCracker:
 		if staticNode == None:
 			return None
 		
+		#print "_isTokenNext: Returning node & length"
 		return (staticNode, length)
 		
 	def _isLastUnsizedNode(self, node):
@@ -1264,6 +1384,7 @@ class DataCracker:
 		# Default is failure
 		rating = 4
 		curpos = pos
+		newpos = pos
 		node.currentElement = None
 		
 		# Our list can shrink/expand as we go
@@ -1285,6 +1406,11 @@ class DataCracker:
 			# Try this child
 			
 			Debug(1, "_handleChoice(): Tring child [%s]" % child.name)
+			
+			fastCheck, fastCheckOffset, fastCheckValue = child.choiceCache
+			if fastCheck and buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)] != fastCheckValue:
+				Debug(1, "_handleChoice(): FastCheck: Child fastCheck failed, NEXT!")
+				Debug(1, "_handleChoice(): FastCheck: [%s] != [%s]" % (buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)],fastCheckValue))
 			
 			(childRating, newpos) = self._handleNode(child, buff, curpos)
 			if child.currentValue != None and len(child.currentValue) > 30:
@@ -1992,36 +2118,53 @@ class DataCracker:
 		value = buff.data[pos:pos+length]
 		newpos = pos + length
 		
-		# Now, unpack the integer
-		
-		fmt2 = '>'
-		if node.endian == 'little':
-			fmt = '<'
+		if node.padding:
+			# Now, unpack the integer
+			
+			fmt2 = '>'
+			if node.endian == 'little' and not node.rightToLeft:
+				fmt = '<'
+			elif node.endian == 'little' and node.rightToLeft:
+				fmt = '>'
+			
+			elif node.endian == 'big' and node.rightToLeft:
+				fmt = '<'
+			elif node.endian == 'big' and not node.rightToLeft:
+				fmt = '>'
+			
+			else:
+				raise Exception("Error, unable to determine endian for unpack")
+			
+			if node.length == 8:
+				fmt += 'B'
+				fmt2 += 'B'
+			elif node.length == 16:
+				fmt += 'H'
+				fmt2 += 'H'
+			elif node.length == 32:
+				fmt += 'I'
+				fmt2 += 'I'
+			elif node.length == 64:
+				fmt += 'Q'
+				fmt2 += 'Q'
+			
+			value = int(struct.unpack(fmt, value)[0])
+			value = struct.pack(fmt2, value)
+			
+			if node.endian == 'little' and not node.rightToLeft:
+				bits = BitBuffer(value, True)
+			elif node.endian == 'little' and node.rightToLeft:
+				bits = BitBuffer(value, False)
+			
+			elif node.endian == 'big' and node.rightToLeft:
+				bits = BitBuffer(value, False)
+			elif node.endian == 'big' and not node.rightToLeft:
+				bits = BitBuffer(value, True)
+			
 		else:
-			fmt = '>'
-		
-		if node.length == 8:
-			fmt += 'B'
-			fmt2 += 'B'
-		elif node.length == 16:
-			fmt += 'H'
-			fmt2 += 'H'
-		elif node.length == 32:
-			fmt += 'I'
-			fmt2 += 'I'
-		elif node.length == 64:
-			fmt += 'Q'
-			fmt2 += 'Q'
-		
-		value = int(struct.unpack(fmt, value)[0])
-		# Repack with correct byte order for BitBuffer
-		value = struct.pack(fmt2, value)
-		
-		# Now, do the Flag portions
-	
+			bits = BitBuffer(value, node.endian == 'big')
+			
 		rating = 2
-		
-		bits = BitBuffer(value, node.rightToLeft)
 		
 		for child in node._children:
 			if child.elementType != 'flag':

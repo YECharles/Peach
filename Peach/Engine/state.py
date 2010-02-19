@@ -88,7 +88,7 @@ class StateEngine:
 		self.cachedXml = None
 		
 		#: Background dom copier
-		self.domCopier = DomBackgroundCopier()
+		#self.domCopier = DomBackgroundCopier()
 	
 	def getXml(self):
 		'''
@@ -194,6 +194,7 @@ class StateEngine:
 		# First up we need to copy all the action's templates
 		# otherwise values can leak all over the place!
 		
+		cracker = DataCracker(self.engine.peach)
 		for action in state:
 			if not isinstance(action, Action):
 				continue
@@ -203,19 +204,21 @@ class StateEngine:
 					if c.elementType == 'actionparam' or c.elementType == 'actionresult':
 						# Copy template from origional first
 						if not hasattr(c, 'origionalTemplate'):
+							if c.elementType == 'actionresult':
+								cracker.optmizeModelForCracking(c.template, True)
 							c.origionalTemplate = c.template
 							c.origionalTemplate.BuildRelationCache()
 							c.origionalTemplate.resetDataModel()
 							c.origionalTemplate.getValue()
-							self.domCopier.addDom(c.origionalTemplate)
+							#self.domCopier.addDom(c.origionalTemplate)
 						
 						# Make a fresh copy of the template
 						del c[c.template.name]
 						c.template = None
-						while c.template == None:
-							c.template = self.domCopier.getCopy(c.origionalTemplate)
-						#if c.template == None:
-						#	c.template = c.origionalTemplate.copy(c)
+						##while c.template == None:
+						##	c.template = self.domCopier.getCopy(c.origionalTemplate)
+						if c.template == None:
+							c.template = c.origionalTemplate.copy(c)
 						#c.template = c.origionalTemplate.clone()
 						c.append(c.template)
 				
@@ -223,21 +226,24 @@ class StateEngine:
 			
 			# Copy template from origional first
 			if not hasattr(action, 'origionalTemplate'):
+				if action.type == 'input':
+					cracker.optmizeModelForCracking(action.template, True)
+				
 				action.origionalTemplate = action.template
 				action.origionalTemplate.BuildRelationCache()
 				action.origionalTemplate.resetDataModel()
 				action.origionalTemplate.getValue()
-				self.domCopier.addDom(action.origionalTemplate)
+				#self.domCopier.addDom(action.origionalTemplate)
 			
 			# Make a fresh copy of the template
 			del action[action.template.name]
 			action.template = None
-			while action.template == None:
-				action.template = self.domCopier.getCopy(action.origionalTemplate)
-			#action.template = action.origionalTemplate.copy(action)
+			##while action.template == None:
+			##	print "0"
+			##	action.template = self.domCopier.getCopy(action.origionalTemplate)
+			action.template = action.origionalTemplate.copy(action)
 			#action.template = action.origionalTemplate.clone()
 			action.append(action.template)
-		
 		
 		# Next setup a few things
 		self.actionValues.append( [ state.name, 'state' ] )

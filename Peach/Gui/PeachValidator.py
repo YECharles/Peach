@@ -283,7 +283,7 @@ class PeachValidatorGui(gui.PeachValidation):
 			cracker = incoming.DataCracker(self.peach)
 			cracker.haveAllData = True
 			self.template = self.template.copy(None)
-			(rating, pos) = cracker.crackData(self.template, PublisherBuffer(None,data), "setDefaultValue")
+			(rating, pos) = cracker.crackData(self.template, PublisherBuffer(None,data))
 			if pos < len(data)-1:
 				# not everything was parsed!
 				self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)

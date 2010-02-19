@@ -563,7 +563,7 @@ class BitBuffer:
 	Class seems to work fairly well :)
 	'''
 	
-	def __init__(self, buf='', readRightLeft = False):
+	def __init__(self, buf='', bigEndian = False):
 		self.buf=[ord(x) for x in buf]
 		
 		self.pos=0
@@ -572,7 +572,7 @@ class BitBuffer:
 		self.closed = False
 		self.softspace = 0
 		
-		self.readRightLeft = readRightLeft
+		self.bigEndian = bigEndian
 
 	def close(self):
 		"""Let me think... Closes and flushes the toilet!"""
@@ -628,24 +628,25 @@ class BitBuffer:
 		
 		if self.closed:
 			raise ValueError, "I/O operation on closed file"
-
-		if not self.readRightLeft:
-			n &= (1L << bitlen)-1
-	
-			newpos = self.pos + bitlen
-	
-			startBPos=self.pos%8
-			startBlock=self.pos//8
-	
-			endBPos=newpos%8
-			endBlock=newpos//8+(endBPos != 0)
-	
-			#print startBlock, startBPos, endBlock, endBPos
-	
-			while len(self.buf) < endBlock: self.buf += [0]
-	
-			pos=startBPos
-	
+		
+		n &= (1L << bitlen)-1
+		
+		newpos = self.pos + bitlen
+		
+		startBPos=self.pos%8
+		startBlock=self.pos//8
+		
+		endBPos=newpos%8
+		endBlock=newpos//8+(endBPos != 0)
+		
+		#print startBlock, startBPos, endBlock, endBPos
+		
+		while len(self.buf) < endBlock: self.buf += [0]
+		
+		pos = startBPos
+		
+		if not self.bigEndian:
+			
 			while bitlen > 0:
 				bitsLeft=8-(pos%8)
 				if bitsLeft > bitlen: bitsLeft=bitlen
@@ -654,31 +655,18 @@ class BitBuffer:
 				
 				self.buf[startBlock+(pos//8)] ^= self.buf[startBlock+(pos//8)]&(mask<<(pos%8))
 				self.buf[startBlock+(pos//8)] |= int(n&mask)<<(pos%8)
-			
+				
 				n >>= bitsLeft
 				bitlen -= bitsLeft
 				
 				pos+=bitsLeft
-	
+			
 			self.pos = newpos
 			if self.pos > self.len:
 				self.len=self.pos
 		
 		else:
-			n &= (1L << bitlen)-1
-	
-			newpos = self.pos + bitlen
-	
-			startBPos=self.pos%8
-			startBlock=self.pos//8
-	
-			endBPos=newpos%8
-			endBlock=newpos//8+(endBPos != 0)
-	
-			while len(self.buf) < endBlock: self.buf += [0]
-	
-			pos = startBPos
-	
+			
 			while bitlen > 0:
 				bitsLeft=8-(pos%8)
 				if bitsLeft > bitlen: bitsLeft=bitlen
@@ -692,7 +680,7 @@ class BitBuffer:
 				
 				bitlen -= bitsLeft
 				pos+=bitsLeft
-	
+			
 			self.pos = newpos
 			if self.pos > self.len:
 				self.len=self.pos
@@ -712,79 +700,67 @@ class BitBuffer:
 		return len(s) - s.find('1')
 	
 	def readbits(self, bitlen):
-		"""Reads bits"""
+		"""
+		Reads bits based on endianness
+		"""
 		
 		if self.closed:
 			raise ValueError, "I/O operation on closed file"
-
+		
 		newpos = self.pos + bitlen
 		orig_bitlen = bitlen
 		
-		if self.readRightLeft:
-
-			startBPos=self.pos%8
-			startBlock=self.pos//8
-			
-			endBPos=newpos%8
-			endBlock=newpos//8+(endBPos != 0)
-			
-			ret=0	
-			pos=startBPos
-			
-			while bitlen > 0:
-				bitsLeft = 8 - (pos % 8)
-				bitsToLeft = pos - (pos/8*8)
-				if bitsLeft > bitlen: bitsLeft=bitlen
-				
-				mask=(1<<bitsLeft)-1
-					
-				byte = self.buf[startBlock+(pos//8)]
-				byte= byte >> (8 - bitsLeft) - bitsToLeft
-				
-				shift = self.bitlen(self.binaryFormatter(mask, 8))
-				ret = ret << shift
-				ret |= byte & mask
-				
-				shift += bitsLeft
-				bitlen -= bitsLeft
-				pos+=bitsLeft
-			
-			self.pos = newpos
-			return ret
+		startBPos=self.pos%8
+		startBlock=self.pos//8
 		
-		else:
+		endBPos=newpos%8
+		endBlock=newpos//8+(endBPos != 0)
+		
+		ret=0
+		
+		pos=startBPos
+		
+		while bitlen > 0:
+			bitsLeft = 8 - (pos % 8)
+			bitsToLeft = pos - (pos/8*8)
+			if bitsLeft > bitlen: bitsLeft=bitlen
 			
-			startBPos=self.pos%8
-			startBlock=self.pos//8
+			mask=(1<<bitsLeft)-1
 			
-			endBPos=newpos%8
-			endBlock=newpos//8+(endBPos != 0)
+			byte = self.buf[startBlock+(pos//8)]
 			
-			ret=0
+			if not self.bigEndian:
+				# Reverse all bits
+				newByte = 0
+				for i in range(8):
+					bit = byte & 0x01
+					byte = byte >> 1
+					newByte = newByte << 1
+					newByte |= bit
+				byte = newByte
 			
-			pos=startBPos
-			shift=0
+			byte= byte >> (8 - bitsLeft) - bitsToLeft
 			
-			while bitlen > 0:
-				bitsLeft = 8-(pos%8)
-				if bitsLeft > bitlen: bitsLeft=bitlen
-				bitsToLeft = pos - (pos/8*8)
-				
-				mask=(1<<bitsLeft)-1
-				
-				byte = self.buf[startBlock+(pos//8)]
-				byte = byte >> (8 - bitsLeft) - bitsToLeft
-				
-				ret |= long(byte & mask) << shift
-				
-				shift += bitsLeft
-				
-				bitlen -= bitsLeft
-				pos+=bitsLeft
+			shift = self.bitlen(self.binaryFormatter(mask, 8))
+			ret = ret << shift
+			ret |= byte & mask
 			
-			self.pos = newpos
-			return ret
-	
+			shift  += bitsLeft
+			bitlen -= bitsLeft
+			pos    += bitsLeft
+		
+		# Reverse requested bits
+		if not self.bigEndian:
+			newByte = 0
+			for i in range(orig_bitlen):
+				bit = ret & 0x01
+				ret = ret >> 1
+				newByte = newByte << 1
+				newByte |= bit
+			ret = newByte
+		
+		self.pos = newpos
+		return ret	
 
 	def getvalue(self):
 		"""Get the buffer"""

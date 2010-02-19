@@ -54,7 +54,7 @@ if PROFILE:
 	import profile
 
 import sys, re, types, new, base64, time, ctypes, traceback, os, cPickle
-import random, glob
+import random, glob, struct
 from Peach.Transformers.encode import WideChar
 from Peach import Transformers
 from Peach.Engine.common import *
@@ -1197,7 +1197,7 @@ class DataElement(Mutatable):
 				if isinstance(c, Element):
 					self._pickleRemoveInstanceMethods(c)
 	
-	def setDefaults(self, data, dontCrack = False):
+	def setDefaults(self, data, dontCrack = False, mustPass = False):
 		'''
 		Set data elements defaultValue based on a Data object.
 		'''
@@ -1258,6 +1258,8 @@ class DataElement(Mutatable):
 								   globals(), {"cracker":cracker, "self":self, "stuff":stuff, "buff":buff})
 				else:
 					cracker.crackData(self, buff, "setDefaultValue")
+					if mustPass and not cracker.crackPassed:
+						raise PeachException("Error, file did not properly parse.")
 				
 				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
 				print "[*] Building relation cache"
@@ -1274,7 +1276,7 @@ class DataElement(Mutatable):
 				##	except:
 				##		pass
 			
-			return
+			return cracker.crackPassed
 		
 		if data.expression != None:
 			
@@ -3007,7 +3009,10 @@ class Choice(DataElement):
 		self.currentElement = None
 		self.length = None
 		self.lengthType = None
-	
+		
+		#: Used by cracker to optimize choice cracking
+		self.choiceCache = (False, 0, None)
+
 	def clone(self, obj = None):
 		
 		if obj == None:
@@ -4163,6 +4168,7 @@ class Flags(DataElement):
 		self.length = None	# called size
 		self.endian = Flags.defaultEndian
 		self.rightToLeft = False
+		self.padding = False
 
 	def clone(self, obj = None):
 		
@@ -4271,7 +4277,7 @@ class Flags(DataElement):
 		value comes before any modifications such as packing,
 		padding, truncating, etc.
 		
-		For Numbers this is the python int value.
+		For Flags we are always a binary string.
 		'''
 		# 1. Init our value
 		
@@ -4284,19 +4290,42 @@ class Flags(DataElement):
 			if n.elementType == 'flag':
 				flags.append(n)
 		
-		#print "rightToLeft:", self.rightToLeft
-		bits = BitBuffer("\0" * (self.length/8), self.rightToLeft)
+		if self.padding:
+			print self.endian, self.rightToLeft, self.padding
+			bits = BitBuffer("\0" * (self.length/8), not self.rightToLeft)
+				
+		else:
+			bits = BitBuffer("\0" * (self.length/8), self.endian == 'big')
 		
 		for flag in flags:
 			#print "%s: %d:, %d, %d" % (flag.name, flag.position, int(flag.getInternalValue()), flag.length)
 			bits.seek(flag.position)
 			bits.writebits(int(flag.getInternalValue()), flag.length)
 		
-		bits.seek(0)
-		ret = bits.readbits(self.length)
+		if self.padding and ( (self.endian == 'little' and not self.rightToLeft) or \
+			(self.endian == 'big' and self.rightToLeft) ):
+			
+			fmt = '>'
+			fmt2 = '<'
+			
+			if self.length == 8:
+				fmt += 'B'
+				fmt2 += 'B'
+			elif self.length == 16:
+				fmt += 'H'
+				fmt2 += 'H'
+			elif self.length == 32:
+				fmt += 'I'
+				fmt2 += 'I'
+			elif self.length == 64:
+				fmt += 'Q'
+				fmt2 += 'Q'
+			
+			ret = struct.unpack(fmt, bits.getvalue())[0]
+			ret = struct.pack(fmt2, ret)
 		
-		if self.endian == "little":
-			ret = self.flipBitsByByte(ret, self.length)
+		else:
+			ret = bits.getvalue()
 			
 		# 4. do we fixup?
 		
@@ -4320,32 +4349,8 @@ class Flags(DataElement):
 		
 	def getRawValue(self, sout = None):
 		
-		## 2. Get our transformer
-		isSigned = 0
-		isLittleEndian = 0
-		
-		if self.length == 8:
-			trans = Transformers.type.AsInt8(isSigned, isLittleEndian)
-		elif self.length == 16:
-			trans = Transformers.type.AsInt16(isSigned, isLittleEndian)
-		elif self.length == 24:
-			trans = Transformers.type.AsInt24(isSigned, isLittleEndian)
-		elif self.length == 32:
-			trans = Transformers.type.AsInt32(isSigned, isLittleEndian)
-		elif self.length == 64:
-			trans = Transformers.type.AsInt64(isSigned, isLittleEndian)
-		
-		# 6. Apply numerical transformer
-		
 		ret = self.getInternalValue()
 		
-		if ret != '' and ret != None:
-			ret = trans.encode(ret)
-		#else:
-		#	print "DID NOT TRASNFORM RET", ret
-		
-		#print "AFTERPACK:", repr(ret), type(ret)
-			
 		# 7. Return value
 		
 		if sout != None:

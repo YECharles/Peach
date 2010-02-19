@@ -594,6 +594,10 @@
 			</xs:choice>
 			<xs:attributeGroup ref="peachCommonAttributes" />
 			<xs:attribute name="endian">
+				<xs:annotation>
+					<xs:documentation>Select byte order of little, network, or big.
+						Default is little.</xs:documentation>
+				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
 						<xs:enumeration value="little" />
@@ -605,8 +609,22 @@
 			<xs:attribute name="rightToLeft">
 				<xs:annotation>
 					<xs:documentation>After reading bits interpret them from right to left
-					instead of left to right.  The default for this attribute is false.  Note:
-					this should not be confused for setting endian byte order.</xs:documentation>
+						instead of left to right.  This flag only applies when padding is
+						enabled.  The default for this attribute is false.  Note:
+						this should not be confused for setting endian byte order.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true" />
+						<xs:enumeration value="false" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="padding">
+				<xs:annotation>
+					<xs:documentation>When padding is enabled, bytes/bits are read as if a
+						reading a structure.  See the 010 Editor documentation for "bitfields" for
+						a good discussion of how this affects reading of bits.</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -618,7 +636,7 @@
 			<xs:attribute name="size" type="xs:unsignedShort" use="required">
 				<xs:annotation>
 					<xs:documentation>Length in bits of this flag set. Valid values are 8, 16, 32, and
-					64.</xs:documentation>
+						64.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attributeGroup ref="commonTemplateAttributes" />
