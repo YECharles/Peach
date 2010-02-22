@@ -693,7 +693,7 @@ try:
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
 			pass
-		
+			
 		def notify(self, event, trace):
 			print "Got event: %d from pid %d, signal: %d" % (event, trace.getPid(), trace.getMeta("PendingSignal"))
 			
@@ -858,12 +858,15 @@ try:
 		
 		def _StopDebugger(self):
 			
-			if self.thread != None and self.thread.isAlive():
-				UnixDebugger.quit.set()
-				UnixDebugger.started.clear()
-				self.thread.trace.kill()
-				self.thread.join()
-				time.sleep(0.25)	# Take a breath
+			if self.thread != None:
+				if self.thread.isAlive():
+					UnixDebugger.quit.set()
+					UnixDebugger.started.clear()
+					self.thread.trace.kill()
+					self.thread.join()
+					time.sleep(0.25)	# Take a breath
+				
+				self.thread.trace.release() # FIX
 		
 		def _IsDebuggerAlive(self):
 			return self.thread != None and self.thread.isAlive()

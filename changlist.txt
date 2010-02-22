@@ -30,6 +30,8 @@ v2.3.5
  - Bug: Fixed checksum fixup to alwasy return positive crc32
  - Bug: Fixed bug were sequencial mutator strategy would throw an exception
  - Bug: Cracker updated to better handle Choices inside of Choices
+ - Bug: Fixed bug in UnixDebugger & vtrace where threads are not 
+        being released.
 
 v2.3.4
 ------
