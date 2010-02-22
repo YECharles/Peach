@@ -283,6 +283,7 @@ class PeachValidatorGui(gui.PeachValidation):
 			cracker = incoming.DataCracker(self.peach)
 			cracker.haveAllData = True
 			self.template = self.template.copy(None)
+			cracker.optmizeModelForCracking(self.template, True)
 			(rating, pos) = cracker.crackData(self.template, PublisherBuffer(None,data))
 			if pos < len(data)-1:
 				# not everything was parsed!
