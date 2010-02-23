@@ -867,7 +867,7 @@ try:
 					time.sleep(0.25)	# Take a breath
 				
 				self.thread.trace.release() # FIX
-				self.thread.trace.platformDetach() # FIX fd
+				self.thread.trace.releaseMemory() # FIX fd
 		
 		def _IsDebuggerAlive(self):
 			return self.thread != None and self.thread.isAlive()
