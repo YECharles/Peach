@@ -1258,8 +1258,8 @@ class DataElement(Mutatable):
 								   globals(), {"cracker":cracker, "self":self, "stuff":stuff, "buff":buff})
 				else:
 					cracker.crackData(self, buff, "setDefaultValue")
-					if mustPass and not cracker.crackPassed:
-						raise PeachException("Error, file did not properly parse.")
+					#if mustPass and not cracker.crackPassed:
+					#	raise PeachException("Error, file did not properly parse.")
 				
 				print "[*] Total time to crack data: %.2f" % (time.time() - startTime)
 				print "[*] Building relation cache"
@@ -1937,13 +1937,16 @@ class DataElement(Mutatable):
 								if rel.type == type and rel.of.endswith(r.parent.name):
 									return rel
 							
-							print "obj", obj
-							print "obj.fullname", obj.getFullname()
-							print "self.fullname", self.getFullname()
-							print "r.From", r.From
+							print "r.parent.name:", r.parent.name
+							print "rel.of:"
+							print "of-object:", obj
+							print "of-obj.fullname:", obj.getFullname()
+							print "self.fullname:", self.getFullname()
+							print "r.From:", r.From
 							print "len(obj.relations)", len(obj.relations)
 							for rel in obj.relations:
 								print "rel:", rel.type, rel.of
+							
 							raise Exception("Mismatched relations???")
 						
 						for rel in obj.relations:
@@ -2016,7 +2019,7 @@ class DataElement(Mutatable):
 					raise Exception("Mismatched relations1??? [%s]" % r.From)
 				
 				for rel in obj.relations:
-					if rel.type == 'when' or not rel.of.endswith(self.name):
+					if rel.type == 'when' or rel.of == None or not rel.of.endswith(self.name):
 						continue
 					
 					#print rel.of
@@ -4291,7 +4294,7 @@ class Flags(DataElement):
 				flags.append(n)
 		
 		if self.padding:
-			print self.endian, self.rightToLeft, self.padding
+			#print self.endian, self.rightToLeft, self.padding
 			bits = BitBuffer("\0" * (self.length/8), not self.rightToLeft)
 				
 		else:
@@ -4859,7 +4862,12 @@ class Relation(Element):
 					
 				else:
 					obj = self.parent.find(self.relativeTo)
-					value = value + obj.possiblePos
+					try:
+						value = value + obj.possiblePos
+					except:
+						print "obj:", obj
+						print "obj.fullname:", obj.getFullname()
+						raise
 			
 			environment = {
 				'self' : self.parent,

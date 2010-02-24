@@ -32,6 +32,9 @@ v2.3.5
  - Bug: Cracker updated to better handle Choices inside of Choices
  - Bug: Fixed bug in UnixDebugger & vtrace where threads are not 
         being released.
+ - Bug: Fixed bug in UnixDebugger were vtrace file handles were not
+        being released.
+ - Bug: Fixed bug with relations and complex Choice blocks
 
 v2.3.4
 ------

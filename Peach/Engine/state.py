@@ -242,7 +242,6 @@ class StateEngine:
 			##	print "0"
 			##	action.template = self.domCopier.getCopy(action.origionalTemplate)
 			action.template = action.origionalTemplate.copy(action)
-			#action.template = action.origionalTemplate.clone()
 			action.append(action.template)
 		
 		# Next setup a few things
@@ -354,10 +353,6 @@ class StateEngine:
 				'sleep' : time.sleep
 				}
 			
-			#print action.parent.parent
-			#for k in action.parent.parent._childrenHash.keys():
-			#	print "Key: ", k
-			
 			if not evalEvent(action.when, environment, self.engine.peach):
 				Debug(1, "Action when failed: " + action.when)
 				return
@@ -406,8 +401,6 @@ class StateEngine:
 			if rating > 2:
 				raise SoftException("Was unble to crack incoming data into %s data model." % action.template.name)
 			
-			#print "Have %d bytes left" % (len(self.publisher.buff) - self.publisher.pos)
-			
 			action.value = action.template.getValue()
 			
 		elif action.type == 'output':
@@ -426,6 +419,7 @@ class StateEngine:
 			if action.template.modelHasOffsetRelation:
 				stringBuffer = StreamBuffer()
 				action.template.getValue(stringBuffer)
+				
 				stringBuffer.setValue("")
 				stringBuffer.seekFromStart(0)
 				action.template.getValue(stringBuffer)
@@ -518,12 +512,8 @@ class StateEngine:
 					if c.template.isPointer:
 						print "Found ctypes pointer...trying to cast..."
 						retCtype = c.template.asCTypeType()
-						#print type(retCtype)
 						retCast = ctypes.cast(ret, retCtype)
-						#print type(retCast)
-						#print retCast
-						#print dir(retCast)
-						#print retCast.contents
+						
 						for i in range(len(retCast.contents._fields_)):
 							(key, value) = retCast.contents._fields_[i]
 							value = eval("retCast.contents.%s" % key)

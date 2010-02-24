@@ -122,10 +122,10 @@ class DataCracker:
 						fastCheckValue = child.getValue()
 						fastCheckOffset = 0
 						
-						Debug(1, "optmizeModelForCracking: FastCheck: Child is token for '%s'" % child.name)
+						#Debug(1, "optmizeModelForCracking: FastCheck: Child is token for '%s'" % child.name)
 					else:
 						values = self._isTokenNext(child, True)
-						Debug(1, "optmizeModelForCracking: FastCheck: back from _isTokenNext")
+						#Debug(1, "optmizeModelForCracking: FastCheck: back from _isTokenNext")
 						if values != None:
 							fastCheck = True
 							fastCheckValue = values[0].getValue()
@@ -135,11 +135,12 @@ class DataCracker:
 							if len(fastCheckValue) < 1:
 								raise PeachException("optmizeModelForCracking: Warning, fastCheckValue is < 1 in length")
 							
-							Debug(1, "optmizeModelForCracking: FastCheck: Found next token for '%s'" % child.name)
+							#Debug(1, "optmizeModelForCracking: FastCheck: Found next token for '%s'" % child.name)
 							
 						else:
-							Debug(1, "optmizeModelForCracking: Found no token for '%s'" % child.name)
+							#Debug(1, "optmizeModelForCracking: Found no token for '%s'" % child.name)
 							#raise PeachException("_handleChoice(): Found no token for '%s'" % child.name)
+							pass
 					
 					child.choiceCache = (fastCheck, fastCheckOffset, fastCheckValue)
 
@@ -209,12 +210,18 @@ class DataCracker:
 			
 			for relation in placement.parent._getAllRelationsInDataModel(placement.parent):
 				if relation not in relationsHold and relation.type != 'when':
-					obj = relation.getOfElement()
-					if obj == None:
-						print "relation:", relation.getFullname()
-						print "of: ", relation.of
+					try:
+						obj = relation.getOfElement()
+						if obj == None:
+							print "relation:", relation.getFullname()
+							print "of: ", relation.of
 						
-						raise Exception("obj is null")
+							raise Exception("obj is null")
+					except:
+						print "relation:", relation.getFullname()
+						print "of:", relation.of
+						raise
+						
 					#print "Found:",relation.getFullname()
 					relations.append([relation, obj])
 					relationsHold.append(relation)
@@ -426,12 +433,21 @@ class DataCracker:
 				
 				# Remove relation (else we get errors)
 				for relation in node.getRelationsOfThisElement():
-					Debug(1, "@ Found and removing relation...")
+					Debug(1, "@ Found and removing relation: %s" % relation.getFullname())
 					if relation in relation.parent.relations:
+						Debug(1, "@ Removing type: %s, parent.name: %s" % (relation.type, relation.parent.name))
 						relation.parent.relations.remove(relation)
 					
 					if relation.parent.has_key(relation.name):
+						Debug(1, "@ Also removeing from collection")
 						del relation.parent[relation.name]
+					
+					for rfrom in node.relations:
+						if rfrom.From != None and rfrom.From.endswith(relation.parent.name):
+							Debug(1, "@ Also removing FROM side")
+							node.relations.remove(rfrom)
+							if node.parent.has_key(rfrom.name):
+								del node.parent[rfrom.name]
 				
 				# Remove element
 				del node.parent[node.name]
@@ -1409,14 +1425,31 @@ class DataCracker:
 			
 			fastCheck, fastCheckOffset, fastCheckValue = child.choiceCache
 			if fastCheck and buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)] != fastCheckValue:
-				Debug(1, "_handleChoice(): FastCheck: Child fastCheck failed, NEXT!")
-				Debug(1, "_handleChoice(): FastCheck: [%s] != [%s]" % (buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)],fastCheckValue))
+				Debug(1, "_handleChoice(): FastCheck: [%s] != [%s] NEXT!" % (buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)],fastCheckValue))
+				continue
+			
+			# Before we actually do this we need to emulate this as the only child.
+			node.choice__children = node._children
+			node.choice__childrenHash = node._childrenHash
+			node.choice_children = node.children
+			node._children = []
+			node._childrenHash = {}
+			node.children = Empty()
+			node.append(child)
 			
 			(childRating, newpos) = self._handleNode(child, buff, curpos)
 			if child.currentValue != None and len(child.currentValue) > 30:
 				Debug(1, "_handleChoice(): Rating: (%d) [%s]: %s = [%s]" % (childRating, repr(child.defaultValue), child.name, child.currentValue[:30]))
 			else:
 				Debug(1, "_handleChoice(): Rating: (%d) [%s]: %s = [%s]" % (childRating, repr(child.defaultValue), child.name, child.currentValue))
+			
+			# Now lets move it all back
+			node._children = node.choice__children
+			node._childrenHash = node.choice__childrenHash
+			node.children = node.choice_children
+			node.choice__children = None
+			node.choice__childrenHash = None
+			node.choice_children = None
 			
 			# Check if we are keeping this child or not
 			if childRating > 2:
