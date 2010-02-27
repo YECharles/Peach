@@ -115,6 +115,107 @@ class DWORDSliderMutator(Mutator):
 		
 		node.currentValue = data[:position] + inject + data[position + len(inject):]
 
+class BitFlipperMutator(Mutator):
+	'''
+	Flip a % of total bits in blob.  Default % is 20.
+	'''
+	
+	def __init__(self, peach, node):
+		Mutator.__init__(self)
+		#: Weight to be chosen randomly
+		BitFlipperMutator.weight = 3
+		
+		self.isFinite = True
+		self.name = "BitFlipperMutator"
+		self._peach = peach
+		self._n = self._getN(node, None)
+		self._current = 0
+		self._len = len(node.getInternalValue())
+		
+		if self._n != None:
+			self._count = self._n
+		
+		else:
+			self._count = long((len(node.getInternalValue())*8) * 0.2)
+	
+	def _getN(self, node, n):
+		for c in node.hints:
+			if c.name == 'BitFlipperMutator-N':
+				try:
+					n = int(c.value)
+				except:
+					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
+		
+		return n
+	
+	def next(self):
+		self._current += 1
+		if self._current > self._count:
+			raise MutatorCompleted()
+
+	def getCount(self):
+		return self._count
+
+	def supportedDataElement(e):
+		if isinstance(e, Blob) and e.isMutable:
+			return True
+		
+		return False
+	supportedDataElement = staticmethod(supportedDataElement)
+	
+	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
+		data = node.getInternalValue()
+		
+		for i in range(self._random.randint(0, 10)):
+			if self._len - 1 <= 0:
+				count = 0
+			else:
+				count = self._random.randint(0, self._len-1)
+				
+			data = self._performMutation(data, count)
+			
+		node.currentValue = data
+	
+	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
+		data = node.getInternalValue()
+		
+		for i in range(self._random.randint(0, 10)):
+			if self._len -1 <= 0:
+				count = 0
+			else:
+				count = self._random.randint(0, self._len-1)
+			
+			data = self._performMutation(data, count)
+		
+		node.currentValue = data
+	
+	def _performMutation(self, data, position):
+		length = len(data)
+		
+		if len(data) == 0:
+			return data
+		
+		# How many bytes to change
+		size = self._random.choice([1, 2, 4, 8])
+		
+		if (position+size) >= length:
+			position = length - size
+		if position < 0:
+			position = 0
+		if size > length:
+			size = length
+		
+		for i in range(position, position+size):
+			byte = struct.unpack('B', data[i])[0]
+			byte ^= self._random.randint(0, 255)
+			
+			packedup = struct.pack("B", byte)
+			data = data[:i] + packedup + data[i+1:]
+		
+		return data
+
 
 class BlobMutator(BitFlipperMutator):
 	'''
@@ -122,6 +223,11 @@ class BlobMutator(BitFlipperMutator):
 	than BitFlipperMutator currently can perform.  We
 	will grow the Blob, shrink the blob, etc.
 	'''
+	
+	def __init__(self, peach, node):
+		BitFlipperMutator.__init__(self, peach, node)
+		
+		self.name = "BlobMutator"
 	
 	def sequencialMutation(self, node):
 		self.changedName = node.getFullnameInDataModel()
@@ -153,8 +259,8 @@ class BlobMutator(BitFlipperMutator):
 			self.changeReduceBuffer,
 			self.changeChangeRange,
 			self.changeChangeRangeSpecial,
-			changeNullRange,
-			changeUnNullRange,
+			self.changeNullRange,
+			self.changeUnNullRange,
 			])
 		
 		return func(data)
@@ -274,99 +380,5 @@ class BlobMutator(BitFlipperMutator):
 			buff += chr(self._random.randint(0, 255))
 		
 		return buff
-
-class BitFlipperMutator(Mutator):
-	'''
-	Flip a % of total bits in blob.  Default % is 20.
-	'''
-	
-	def __init__(self, peach, node):
-		Mutator.__init__(self)
-		#: Weight to be chosen randomly
-		BitFlipperMutator.weight = 3
-		
-		self.isFinite = True
-		self.name = "BitFlipperMutator"
-		self._peach = peach
-		self._n = self._getN(node, None)
-		self._current = 0
-		self._len = len(node.getInternalValue())
-		
-		if self._n != None:
-			self._count = self._n
-		
-		else:
-			self._count = long((len(node.getInternalValue())*8) * 0.2)
-	
-	def _getN(self, node, n):
-		for c in node.hints:
-			if c.name == 'BitFlipperMutator-N':
-				try:
-					n = int(c.value)
-				except:
-					raise PeachException("Expected numerical value for Hint named [%s]" % c.name)
-		
-		return n
-	
-	def next(self):
-		self._current += 1
-		if self._current > self._count:
-			raise MutatorCompleted()
-
-	def getCount(self):
-		return self._count
-
-	def supportedDataElement(e):
-		if isinstance(e, Blob) and e.isMutable:
-			return True
-		
-		return False
-	supportedDataElement = staticmethod(supportedDataElement)
-	
-	def sequencialMutation(self, node):
-		self.changedName = node.getFullnameInDataModel()
-		for i in range(self._random.randint(0, 10)):
-			if self._len - 1 <= 0:
-				count = 0
-			else:
-				count = self._random.randint(0, self._len-1)
-				
-			node.currentValue = self._performMutation(node, count)
-	
-	def randomMutation(self, node):
-		self.changedName = node.getFullnameInDataModel()
-		for i in range(self._random.randint(0, 10)):
-			if self._len -1 <= 0:
-				count = 0
-			else:
-				count = self._random.randint(0, self._len-1)
-			
-			node.currentValue = self._performMutation(node, count)
-	
-	def _performMutation(self, node, position):
-		data = node.getInternalValue()
-		length = len(data)
-		
-		if len(data) == 0:
-			return data
-		
-		# How many bytes to change
-		size = self._random.choice([1, 2, 4, 8])
-		
-		if (position+size) >= length:
-			position = length - size
-		if position < 0:
-			position = 0
-		if size > length:
-			size = length
-		
-		for i in range(position, position+size):
-			byte = struct.unpack('B', data[i])[0]
-			byte ^= self._random.randint(0, 255)
-			
-			packedup = struct.pack("B", byte)
-			data = data[:i] + packedup + data[i+1:]
-		
-		return data
 
 # end

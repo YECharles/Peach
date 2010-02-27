@@ -688,7 +688,7 @@ except:
 try:
 	
 	import vtrace, envi
-	from threading import Thread, Event, Lock
+	import threading
 	
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
@@ -776,9 +776,9 @@ try:
 		
 			return "Who knows?!?!!?"
 
-	class _TraceThread(Thread):
+	class _TraceThread(threading.Thread):
 		def __init__(self):
-			Thread.__init__(self)
+			threading.Thread.__init__(self)
 
 		def run(self):
 			
@@ -802,11 +802,11 @@ try:
 		
 		def __init__(self, args):
 			
-			UnixDebugger.quit = Event()
-			UnixDebugger.started = Event()
-			UnixDebugger.handlingFault = Event()
-			UnixDebugger.handledFault = Event()
-			UnixDebugger.lock = Lock()
+			UnixDebugger.quit = threading.Event()
+			UnixDebugger.started = threading.Event()
+			UnixDebugger.handlingFault = threading.Event()
+			UnixDebugger.handledFault = threading.Event()
+			UnixDebugger.lock = threading.Lock()
 			UnixDebugger.crashInfo = None
 			UnixDebugger.fault = False
 			self.thread = None

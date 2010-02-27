@@ -271,7 +271,7 @@ Debug Peach XML File
 			except:
 				print ""
 				print "Error using mutation strategy '%s'.\n" % strategy
-				#raise
+				raise
 				sys.exit(0)
 		
 		elif optlist[i][0] == '--debug':
