@@ -7,6 +7,7 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: New more agressive Blob mutator
  - New: Data fileName attribute can now specify multiple files.
         This will only work with the random mutation strategy.
         Files will be switched every 100 iterations by default,
@@ -36,6 +37,7 @@ v2.3.5
         being released.
  - Bug: Fixed bug with relations and complex Choice blocks
 
+
 v2.3.4
 ------
 
@@ -44,6 +46,7 @@ v2.3.4
  - Changed: Listening for ExitProcess event in Debugger
  - Changed: Improved random mutation weighting system
  - Changed: Improved paired token support in StringTokenizer
+
 
 v2.3.3
 ------
@@ -58,6 +61,7 @@ v2.3.2
 
  - Change: Windows debugger runs in seprate process
  - Change: Patch for Linux Ping Monitor support
+
 
 v2.3.1
 ------
@@ -77,6 +81,7 @@ v2.3.1
  - Bug: Unicode bug fixes
  - Bug: self.find('element') failed when inside of two sized Blocks.
  - Bug: Fixed off-by-one error on --skipto
+
 
 v2.3
 ----
@@ -101,6 +106,7 @@ v2.3
  - Internally all strings are unicode
  
  - Bug fixes.  More bug fixes than you can shake a stick at.
+
 
 v2.2
 ----

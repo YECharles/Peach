@@ -3663,12 +3663,6 @@ class Number(DataElement):
 		if value == '':
 			return ''
 		
-		#if long(value) < -182229420:
-		#	print "Value: ", value
-		#	print "Name: ", self.name
-		#	print "Parent Name: ", self.parent.name
-		#	raise Exception("Fucked")
-		
 		ret = self.pack(value)
 		
 		if sout != None:

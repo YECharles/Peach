@@ -116,6 +116,165 @@ class DWORDSliderMutator(Mutator):
 		node.currentValue = data[:position] + inject + data[position + len(inject):]
 
 
+class BlobMutator(BitFlipperMutator):
+	'''
+	This mutator will do more types of changes
+	than BitFlipperMutator currently can perform.  We
+	will grow the Blob, shrink the blob, etc.
+	'''
+	
+	def sequencialMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
+		node.currentValue = self._performMutation(node)
+	
+	def randomMutation(self, node):
+		self.changedName = node.getFullnameInDataModel()
+		node.currentValue = self._performMutation(node)
+
+	def getRange(self, size):
+		start = self._random.randint(0, size)
+		end = self._random.randint(0, size)
+		
+		if start > end:
+			return (end, start)
+		
+		return (start, end)
+
+	def getPosition(self, size, len = 0):
+		pos = self._random.randint(0, size - len)
+		return pos
+
+	def _performMutation(self, node):
+		
+		data = node.getInternalValue()
+		
+		func = self._random.choice([
+			self.changeExpandBuffer,
+			self.changeReduceBuffer,
+			self.changeChangeRange,
+			self.changeChangeRangeSpecial,
+			changeNullRange,
+			changeUnNullRange,
+			])
+		
+		return func(data)
+	
+	def changeExpandBuffer(self, data):
+		'''
+		Expand the size of our buffer
+		'''
+		
+		size = self._random.randint(0, 255)
+		pos = self.getPosition()
+		
+		return data[:pos] + self.generateNewBytes(size) + data[pos:]
+	
+	def changeReduceBuffer(self, data):
+		'''
+		Reduce the size of our buffer
+		'''
+		(start, end) = self.getRange(len(data))
+		
+		return data[:start] + data[end:]
+	
+	def changeChangeRange(self, data):
+		'''
+		Change a sequence of bytes in our buffer
+		'''
+		(start, end) = self.getRange(len(data))
+		for i in range(start, end):
+			data[i] = chr(self._random.randint(0, 255))
+		
+		return data
+	
+	def changeChangeRangeSpecial(self, data):
+		'''
+		Change a sequence of bytes in our buffer
+		to some special chars.
+		'''
+		special = ["\x00", "\x01", "\xfe", "\xff"]
+		(start, end) = self.getRange(len(data))
+		for i in range(start, end):
+			data[i] = self._random.choice(special)
+		return data
+
+	def changeNullRange(self, data):
+		'''
+		Change a range of bytes to null.
+		'''
+		(start, end) = self.getRange(len(data))
+		for i in range(start, end):
+			data[i] = chr(0)
+		
+		return data
+	
+	def changeUnNullRange(self, data):
+		'''
+		Change all zero's in a range to something else.
+		'''
+		(start, end) = self.getRange(len(data))
+		for i in range(start, end):
+			if ord(data[i]) == 0:
+				data[i] = self._random.randint(1, 255)
+		
+		return data
+
+	# ######################################
+	
+	def generateNewBytes(self, size):
+		'''
+		Generate new bytes to inject into Blob.
+		'''
+		
+		func = self._random.choice([
+			self.GenerateNewBytesSingleRandom,
+			self.GenerateNewBytesIncrementing,
+			self.GenerateNewBytesZero,
+			self.GenerateNewBytesAllRandom,
+			])
+		
+		return func(size)
+	
+	def GenerateNewBytesSingleRandom(self, size):
+		'''
+		Generate a buffer of size bytes, each
+		byte is the same random number.
+		'''
+		
+		return chr(self._random.randint(0,255)) * size
+	
+	def GenerateNewBytesIncrementing(self, size):
+		'''
+		Generate a buffer of size bytes, each
+		byte is incrementing from a random start.
+		'''
+		
+		buff = ""
+		x = self._random.randint(0, 255-size)
+		for i in range(0, size):
+			buff += chr(i+x)
+		
+		return buff
+	
+	def GenerateNewBytesZero(self, size):
+		'''
+		Generate a buffer of size bytes, each
+		byte is zero (NULL).
+		'''
+		return "\0" * size
+	
+	def GenerateNewBytesAllRandom(self, size):
+		'''
+		Generate a buffer of size bytes, each
+		byte is randomly generated.
+		'''
+		buff = ""
+		
+		for i in range(size):
+			buff += chr(self._random.randint(0, 255))
+		
+		return buff
+
 class BitFlipperMutator(Mutator):
 	'''
 	Flip a % of total bits in blob.  Default % is 20.

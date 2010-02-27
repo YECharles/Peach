@@ -48,6 +48,7 @@
 		<Mutator class="number.NumericalVarianceMutator" />
 		<Mutator class="number.FiniteRandomNumbersMutator" />
 		
+		<Mutator class="blob.BlobMutator" />
 		<Mutator class="blob.BitFlipperMutator" />
 		<Mutator class="blob.DWORDSliderMutator" />
 		
