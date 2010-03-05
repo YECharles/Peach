@@ -379,6 +379,21 @@ Debug Peach XML File
 			
 			sys.exit(0)
 			
+		#elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
+		#	
+		#	# Start peach builder UI
+		#	
+		#	from Peach.Engine import *
+		#	from Peach.Engine.common import *
+		#
+		#	import os
+		#	from Peach.Gui import PeachGui
+		#
+		#	os.chdir( sys.path[0] + "/peach/gui" )
+		#
+		#	PeachGui.RunPeachEditor()
+		#	sys.exit(0)
+		
 		elif optlist[i][0] == '-w' or optlist[i][0] == '--web':
 			
 			# enable web watcher

@@ -52,6 +52,7 @@ class NumericalVarianceMutator(Mutator):
 		
 		#: Is mutator finite?
 		self.isFinite = True
+		self._count = None
 		
 		self._dataElementName = node.getFullname()
 		self._random = random.Random()
@@ -82,6 +83,17 @@ class NumericalVarianceMutator(Mutator):
 		if self._currentCount >= len(self._values):
 			raise MutatorCompleted()
 	
+	#def getCount(self):
+	#	if self._count == None:
+	#		cnt = 0
+	#		for i in self._values:
+	#			if i >= self._minValue and i <= self._maxValue:
+	#				cnt += 1
+	#		
+	#		self._count = cnt
+	#	
+	#	return self._count
+
 	def getCount(self):
 		return len(self._values)
 	
@@ -160,6 +172,7 @@ class NumericalEdgeCaseMutator(Mutator):
 		self.isFinite = True
 		self.name = "NumericalEdgeCaseMutator"
 		self._peach = peach
+		self._count = None
 		
 		self._n = self._getN(node, 50)
 		
@@ -254,7 +267,18 @@ class NumericalEdgeCaseMutator(Mutator):
 			raise MutatorCompleted()
 	
 	def getCount(self):
-		return len(self._values[self._size])
+		
+		if self._count == None:
+			cnt = 0
+			for i in self._values[self._size]:
+				if i < self._minValue or i > self._maxValue:
+					continue
+				
+				cnt += 1
+			
+			self._count = cnt
+		
+		return self._count
 
 	def supportedDataElement(e):
 		

@@ -259,6 +259,8 @@ class RandomDeterministicMutationStrategy(MutationStrategy):
 		#: Is initial test case?
 		self._isFirstTestCase = True
 		
+		#self._counts = {}
+		
 	def getCount(self):
 		'''
 		Return the number of test cases
@@ -272,13 +274,13 @@ class RandomDeterministicMutationStrategy(MutationStrategy):
 			for mutators in self._fieldMutators.values():
 				for m in mutators:
 					c = m.getCount()
+					#self._counts[m] = c
 					if c == None:
 						raise Exception("Count was null from %s" % repr(m))
 					
 					cnt += c
 			
 			self._count = cnt
-			return self._count
 		
 		return self._count
 
@@ -293,6 +295,7 @@ class RandomDeterministicMutationStrategy(MutationStrategy):
 		
 		if self.mutator != None:
 			try:
+				#self._counts[self.mutator] -= 1
 				self.mutator.next()
 			except MutatorCompleted:
 				self._fieldMutators[self.fieldName].remove(self.mutator)
@@ -307,7 +310,10 @@ class RandomDeterministicMutationStrategy(MutationStrategy):
 			self.mutator = self._random.choice(self._fieldMutators[self.fieldName])
 			return
 		
-		raise MutatorCompeted("All Done!")
+		#for m in self._counts.keys():
+		#	print "%s has %d counts left" % (m.name, self._counts[m])
+		
+		raise MutatorCompleted()
 		
 	
 	def currentMutator(self):

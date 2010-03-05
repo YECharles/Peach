@@ -7,6 +7,7 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: New default strategy is deterministic and random
  - New: New more agressive Blob mutator
  - New: Data fileName attribute can now specify multiple files.
         This will only work with the random mutation strategy.
@@ -25,6 +26,7 @@ v2.3.5
  - Changed: Binary analyzer changes how it locates strings as needed
  - Changed: Random mutation strategy more agressive
  - Changed: Data loaded by <Data fileName=""/> failes we will exit
+ - Changed: Improved accuracy of count vs. actual rounds
  - Bug: Fixed a couple odd bugs in Flags/Flag
  - Bug: Fixed bug in Memory agent
  - Bug: Fixed bug in Network Pcap agent

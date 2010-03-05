@@ -1063,7 +1063,7 @@ class DataCracker:
 		nodes can be between them.
 		'''
 		
-		Debug(1, "_isTokenNext(%s)" % node.name)
+		#print "_isTokenNext(%s)" % node.name
 		
 		staticNode = None
 		length = 0
@@ -1077,17 +1077,15 @@ class DataCracker:
 				n = self._nextNode(n)
 			
 			if n == None:
-				Debug(1, "isTokenNext: _nextNode returned None, exiting")
 				break
 			
 			if n.isStatic:
-				Debug(1, "_isTokenNext: Found static node!")
 				staticNode = n
 				break
 			
 			# If we are a choice we fail
 			if n.elementType == 'choice':
-				Debug(1, "_isTokenNext: Found choice, exiting")
+				#print "_isTokenNext: Found choice, exiting"
 				return None
 			
 			# If a child flag is token we don't support that
@@ -1125,14 +1123,14 @@ class DataCracker:
 				
 				s = self._hasSize(child)
 				if s == None:
-					Debug(1, "_isTokenNext: Child has no size, exiting [%s.%s]" % (n.name, child.name))
+					#print "_isTokenNext: Child has no size, exiting [%s.%s]" % (n.name, child.name)
 					return None
 				
 				length += s
 				
 				ret = self._isTokenNext(child, fastChoice)
 				if ret == None:
-					Debug(1, "_isTokenNext: Child has no next token, exiting")
+					#print "_isTokenNext: Child has no next token, exiting"
 					return None
 				
 				length += ret[1]
@@ -1141,7 +1139,7 @@ class DataCracker:
 			
 			s = self._hasSize(n)
 			if s == None:
-				Debug(1, "_isTokenNext: N has no size, exiting [%s]" % n.name)
+				#print "_isTokenNext: N has no size, exiting [%s]" % n.name
 				return None
 			
 			length += s
@@ -1150,7 +1148,7 @@ class DataCracker:
 		if staticNode == None:
 			return None
 		
-		Debug(1, "_isTokenNext: Returning node & length")
+		#print "_isTokenNext: Returning node & length"
 		return (staticNode, length)
 		
 	def _isLastUnsizedNode(self, node):
@@ -1176,9 +1174,6 @@ class DataCracker:
 				Debug(1, "_isLastUnsizedNode: Next node returned None")
 				break
 			
-			if n.maxOccurs > 1 or n.minOccurs < 1:
-				return None
-			
 			s = self._hasSize(n)
 			if s == None:
 				Debug(1, "_isLastUnsizedNode: returning None due to [%s]" % n.name)
@@ -1202,11 +1197,9 @@ class DataCracker:
 		
 		if isinstance(node, String) or isinstance(node, Blob):
 			if node.length != None:
-				Debug(1, "_hasSize(%s): Found length on string or blob, returning length: %d" % (node.name, node.length))
 				return node.length
 			
 			if node.isStatic:
-				Debug(1, "_hasSize(%s): Found token, returning length: %d" % (node.name, len(node.defaultValue)))
 				return len(node.defaultValue)
 		
 		elif isinstance(node, Number):
