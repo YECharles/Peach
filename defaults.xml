@@ -74,6 +74,7 @@
 		<Mutator class="string.UnicodeStringsMutator" />
 		<Mutator class="string.UnicodeBadUtf8Mutator" />
 		<Mutator class="string.UnicodeUtf8ThreeCharMutator" />
+		<Mutator class="string.ValidValuesMutator" />
 	</Mutators>
 	
 	<!--

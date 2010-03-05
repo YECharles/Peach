@@ -20,6 +20,7 @@ v2.3.5
  - New: !exploitable windbg module included in distribution
  - New: Flags now supported enabling padding to behave like structs
  - New: Cracking optimizations for Choice blocks added
+ - Changed: Enabled mutator ValidValuesMutator by default
  - Changed: UnixDebugger updated to support new file fuzzing model
  - Changed: Cracker will throw exception if it cannot size a Blob
  - Changed: Optmized test cases for small Numbers
