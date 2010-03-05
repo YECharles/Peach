@@ -220,8 +220,151 @@ class SequencialMutationStrategy(MutationStrategy):
 		
 		# all done!
 
+import random
+
+class RandomDeterministicMutationStrategy(MutationStrategy):
+	'''
+	Randomly select an element to fuzz until every element has
+	been completed.
+	
+	Note: This strategy does not affect the state model
+	Note: First test case will not be modified
+	'''
+	
+	def __init__(self, args):
+		MutationStrategy.__init__(self, args)
+		
+		self._random = random.Random()
+		self._random.seed("fnord")
+		
+		#: Is this a finite strategy?
+		self.isFinite = True
+		
+		#: Number of fields to change
+		self._count = None
+		
+		#: Data models (by fullname)
+		self._dataModels = []
+		
+		#: Key is field fullname, value is array of mutators, position 0 is current
+		#: when mutators are completed they will be removed.  Same with fields.
+		self._fieldMutators = {}
+		
+		#: Current mutator
+		self.mutator = None
+		
+		#: Current field name
+		self.fieldName = None
+		
+		#: Is initial test case?
+		self._isFirstTestCase = True
+		
+	def getCount(self):
+		'''
+		Return the number of test cases
+		'''
+		
+		if self._isFirstTestCase:
+			return None
+		
+		if self._count == None:
+			cnt = 0
+			for mutators in self._fieldMutators.values():
+				for m in mutators:
+					c = m.getCount()
+					if c == None:
+						raise Exception("Count was null from %s" % repr(m))
+					
+					cnt += c
+			
+			self._count = cnt
+			return self._count
+		
+		return self._count
+
+	def next(self):
+		# Goto next test case
+		
+		if len(self._fieldMutators.keys()) == 0:
+			raise PeachException("Error: Peach couldn't find any DataModels with elements to fuzz!")
+		
+		if self._isFirstTestCase:
+			self._isFirstTestCase = False
+		
+		if self.mutator != None:
+			try:
+				self.mutator.next()
+			except MutatorCompleted:
+				self._fieldMutators[self.fieldName].remove(self.mutator)
+				self.mutator = None
+		
+		while len(self._fieldMutators) > 0:
+			self.fieldName = self._random.choice(self._fieldMutators.keys())
+			if len(self._fieldMutators[self.fieldName]) == 0:
+				del self._fieldMutators[self.fieldName]
+				continue
+			
+			self.mutator = self._random.choice(self._fieldMutators[self.fieldName])
+			return
+		
+		raise MutatorCompeted("All Done!")
+		
+	
+	def currentMutator(self):
+		'''
+		Return the current Mutator in use
+		'''
+		if self._isFirstTestCase:
+			return _Unknown()
+			
+		return self.mutator
+	
+	## Events
+	
+	def onDataModelGetValue(self, action, dataModel):
+		'''
+		Called before getting a value from a data model
+		
+		@type	action: Action
+		@param	action: Action we are starting
+		@type	dataModel: Template
+		@param	dataModel: Data model we are using
+		'''
+		
+		# On first test case lets just figure out which
+		# data models and fields we will be mutating
+		if self._isFirstTestCase:
+			fullName = dataModel.getFullname()
+			if fullName not in self._dataModels:
+				self._dataModels.append(fullName)
+				
+				nodes = dataModel.getAllChildDataElements()
+				nodes.append(dataModel)
+				
+				for node in nodes:
+					if node.isMutable:
+						mutators = self._fieldMutators[node.getFullname()] = []
+						
+						# We should also populate the mutators here
+						for m in Engine.context.mutators:
+							if m.supportedDataElement(node):
+								# Need to create new instance from class
+								mutators.append( m(Engine.context,node) )
+			
+			return
+		
+		# Is this data model we are changing?
+		if not self.fieldName.startswith(dataModel.getFullname()):
+			return
+		
+		node = dataModel.getRoot().getByName(self.fieldName)
+		self.mutator.sequencialMutation(node)
+		
+		# all done!
+
 
 # Set default strategy!
-MutationStrategy.DefaultStrategy = SequencialMutationStrategy
+#MutationStrategy.DefaultStrategy = SequencialMutationStrategy
+MutationStrategy.DefaultStrategy = RandomDeterministicMutationStrategy
 
 # end
