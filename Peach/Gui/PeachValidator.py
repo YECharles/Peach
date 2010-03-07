@@ -6,7 +6,7 @@ PeachValidator GUI
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -316,7 +316,7 @@ class PeachValidatorGui(gui.PeachValidation):
 				analyzer.asDataElement(child, {}, child.defaultValue)
 			
 		except:
-			raise
+			#raise
 			self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)
 		
 		# Build tree
@@ -437,7 +437,8 @@ class PeachValidatorGui(gui.PeachValidation):
 				nodeInternal = str(node.getInternalValue())
 		
 		except:
-			raise
+			#raise
+			pass
 		
 		if nodeInternal != None:
 			if len(nodeInternal) > 100:

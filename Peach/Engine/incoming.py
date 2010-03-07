@@ -423,7 +423,11 @@ class DataCracker:
 			hasCountRelation = True
 			
 			## Check for count relation, verify > 0
-			if maxOccurs == 0:
+			if maxOccurs < 0:
+				Debug(1, "_handleArray: Found negative count relation: %d" % maxOccurs)
+				return (4, pos)
+			
+			elif maxOccurs == 0:
 				
 				#for child in node.getElementsByType(DataElement):
 				#	# Remove relation (else we get errors)
@@ -554,6 +558,11 @@ class DataCracker:
 				if occurs == 0 and newRating >= 3 and node.minOccurs == 0:
 					# This code is duplicated higher up
 					
+					if hasCountRelation and maxOccurs > 0:
+						Debug(1, "Error: We think count == 0, relation says %d" % maxOccurs)
+						Debug(1, "Returning a rating of suck (4)")
+						return (4, pos)
+					
 					# Remove node and increase rating.
 					Debug(1, "Firt element rating was poor and minOccurs == 0, remoing element and upping rating.")
 					
@@ -565,8 +574,9 @@ class DataCracker:
 					
 					# Remove relation (else we get errors)
 					for relation in node.getRelationsOfThisElement():
+						
 						relation.parent.relations.remove(relation)
-						relation.parent.__delitem__(relation.name)
+						del relation.parent[relation.name]
 					
 					# Delete our copy
 					if nodeCopy.name != node.name:
@@ -611,7 +621,50 @@ class DataCracker:
 						
 						# Update relation to have new name
 						if relation != None and relation.of != None:
+							
+							# We need to support out count being outside
+							# a double loop, so lets check and see if
+							# our relation is closer to root than us
+							# and if so check the parents in between
+							
+							relationParents = []
+							obj = relation.parent
+							while obj != None and obj.parent != None:
+								if isinstance(obj, DataElement):
+									relationParents.append(obj)
+								obj = obj.parent
+							
+							currentParents = []
+							obj = node.parent
+							while obj != None and obj.parent != None:
+								if isinstance(obj, DataElement):
+									currentParents.append(obj)
+								obj = obj.parent
+							
+							boolInsideArray = False
+							if len(currentParents) > len(relationParents):
+								minParents = len(relationParents)
+							else:
+								minParents = len(currentParents)
+							
+							for i in range(minParents):
+								if relationParents[i] != currentParents[i]:
+									break
+							
+							for x in range(i, len(currentParents)):
+								if currentParents[x].maxOccurs > 1:
+									boolInsideArray = True
+									break
+							
+							if boolInsideArray:
+								newRel = relation.copy(relation.parent)
+								relation.parent.append(newRel)
+								relation.parent.relations.append(newRel)
+							
+							# Now update curretn realtion
+							
 							relation.of = node.name
+							
 					
 					else:
 						# Next fix up our copied node
@@ -624,7 +677,7 @@ class DataCracker:
 					
 				else:
 					Debug(1, "*** Didn't work out!")
-					node.parent.__delitem__(nodeCopy.name)
+					del node.parent[nodeCopy.name]
 					break
 				
 				occurs += 1
@@ -648,7 +701,7 @@ class DataCracker:
 		#print "------"
 		
 		if curpos != None:
-			Debug(1, "@@@ Returning a curpos=%d, pos=%d, newCurPos=%d, occuurs=%d" %(self.parentPos+curpos, self.parentPos+pos, self.parentPos+newCurPos, occurs))
+			Debug(1, "@@@ Returning a rating=%d, curpos=%d, pos=%d, newCurPos=%d, occuurs=%d" %(rating, self.parentPos+curpos, self.parentPos+pos, self.parentPos+newCurPos, occurs))
 			node.relationOf = None
 			return (rating, curpos)
 		
@@ -663,10 +716,11 @@ class DataCracker:
 		## Sanity checking
 		
 		if pos > len(buff.data):
-			raise Exception("Running past data!, pos: %d, len.data: %d" % (pos, len(buff.data)))
+			Debug(1, "_handleNode: Running past data!, pos: %d, len.data: %d" % (pos, len(buff.data)))
+			return (4, pos)
 		
 		if node == None:
-			raise Exception("Node is None, bailing!")
+			raise Exception("_handleNode: Node is None, bailing!")
 		
 		## Save off origional position
 		
@@ -731,14 +785,16 @@ class DataCracker:
 			if relation != None and relation.type == 'offset':
 				# We need to move this show!
 				try:
-					Debug(1, "Found offset relation")
-					Debug(1, "Origional position saved as %d" % (self.parentPos+pos))
+					Debug(1, "_handleNode: Found offset relation")
+					Debug(1, "_handleNode: Origional position saved as %d" % (self.parentPos+pos))
 					popPosition = pos
 					pos = int(relation.getValue(True))
-					Debug(1, "Changed position to %d" % (self.parentPos+pos))
+					Debug(1, "_handleNode: Changed position to %d" % (self.parentPos+pos))
 					
 				except:
 					raise
+			else:
+				Debug(1, "_handleNode: Did not find offset relation")
 		
 		## Would be nice to have our current pos in scripting :)
 		node.possiblePos = pos
@@ -759,11 +815,11 @@ class DataCracker:
 			# Do we have a transformer, if so decode the data
 			if node.transformer != None:
 				try:
-					Debug(1, "String: Found transformer, decoding...")
+					Debug(1, "_handleNode: String: Found transformer, decoding...")
 					node.defaultValue = node.transformer.transformer.decode(node.defaultValue)
 				
 				except:
-					Debug(1, "String: Transformer threw exception!")
+					Debug(1, "_handleNode: String: Transformer threw exception!")
 					pass
 		
 		elif node.elementType == 'number':
@@ -1424,7 +1480,7 @@ class DataCracker:
 			Debug(1, "_handleChoice(): Tring child [%s]" % child.name)
 			
 			fastCheck, fastCheckOffset, fastCheckValue = child.choiceCache
-			if fastCheck and buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)] != fastCheckValue:
+			if fastCheck and buff.data[pos+fastCheckOffset:pos+fastCheckOffset+len(fastCheckValue)] != fastCheckValue:
 				Debug(1, "_handleChoice(): FastCheck: [%s] != [%s] NEXT!" % (buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)],fastCheckValue))
 				continue
 			
