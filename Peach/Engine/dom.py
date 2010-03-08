@@ -1696,6 +1696,11 @@ class DataElement(Mutatable):
 			parent = self.find(parentName)
 			if parent == None:
 				print self
+				print self.getFullname()
+				
+				for r in self.relations:
+					print "r.of:", r.of
+				
 				raise Exception("Unable to locate [%s]" % parentName)
 			
 			obj = self._findArrayByName(parent, arrayName)

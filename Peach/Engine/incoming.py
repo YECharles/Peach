@@ -628,7 +628,7 @@ class DataCracker:
 							# and if so check the parents in between
 							
 							relationParents = []
-							obj = relation.parent
+							obj = relation.parent.parent
 							while obj != None and obj.parent != None:
 								if isinstance(obj, DataElement):
 									relationParents.append(obj)
@@ -649,20 +649,39 @@ class DataCracker:
 							
 							for i in range(minParents):
 								if relationParents[i] != currentParents[i]:
+									#Debug(1, "_handleArray: Miss-match parents: %s, %s" % (relationParents[i].name, currentParents[i].name))
 									break
 							
+							#Debug(1, "_handleArray: i == %d" % i)
 							for x in range(i, len(currentParents)):
 								if currentParents[x].maxOccurs > 1:
+									#Debug(1, "_handleArray: Outside array found: %s" % currentParents[x].name)
 									boolInsideArray = True
 									break
 							
 							if boolInsideArray:
+								Debug(1, "_handleArray: Our count relation is outside of a double array.")
+								Debug(1, "_handleArray: Keeping a copy around for next iteration.")
+								
 								newRel = relation.copy(relation.parent)
 								relation.parent.append(newRel)
 								relation.parent.relations.append(newRel)
+							else:
+								Debug(1, "_handleArray: No double array relation issue")
+								
+								# Should we remove From?
+								for r in origionalNode.relations:
+									if r.From == relation.parent.name:
+										Debug(1, "_handleArray: Removing r.From origionalNode")
+										
+										origionalNode.relations.remove(r)
+										
+										try:
+											del origionalNode[r.name]
+										except:
+											pass
 							
 							# Now update curretn realtion
-							
 							relation.of = node.name
 							
 					
