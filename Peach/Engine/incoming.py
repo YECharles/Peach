@@ -247,7 +247,7 @@ class DataCracker:
 				
 				# Remove from old place
 				placement.parent.origName = placement.parent.name
-				placement.parent.parent.__delitem__(placement.parent.origName)
+				del placement.parent.parent[placement.parent.origName]
 				
 				# Do we need to rename our Element?
 				if after.parent.has_key(placement.parent.name):
@@ -279,7 +279,7 @@ class DataCracker:
 				
 				# Remove from old place
 				placement.parent.origName = placement.parent.name
-				placement.parent.parent.__delitem__(placement.parent.origName)
+				del placement.parent.parent[placement.parent.origName]
 				
 				# Do we need to rename our Element?
 				if before.parent.has_key(placement.parent.name):
@@ -309,6 +309,12 @@ class DataCracker:
 			Debug(1, "Update relations")
 			for relation, of in relations:
 				relation.of = of.getFullnameInDataModel()
+				
+				# Handle FROM side too
+				for r in of.relations:
+					if r.From != None and r.From.endswith(relation.parent.name):
+						r.From = relation.parent.getFullnameInDataModel()
+					
 				#print "Updating %s to %s" % (relation.getFullname(), relation.of)
 			
 			Debug(1, "Update relations")
