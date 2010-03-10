@@ -271,7 +271,7 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		
 		size = self._random.randint(0, 255)
-		pos = self.getPosition()
+		pos = self.getPosition(size)
 		
 		return data[:pos] + self.generateNewBytes(size) + data[pos:]
 	
