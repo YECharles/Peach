@@ -5009,6 +5009,26 @@ class Data(ElementWithChildren):
 		#: Folder of files to use
 		self.folderName = None
 	
+	def gotoFirstFile(self):
+		if not self.multipleFiles:
+			raise PeachException("Error, Data.gotoRandomFile called with self.multipleFiels == False!")
+		
+		if self.folderName != None:
+			self.fileName = self.folderName
+			self.files = os.listdir(self.folderName)
+			for i in range(len(self.files)):
+				self.files[i] = os.path.join(self.folderName, self.files[i])
+			
+		elif self.fileGlob != None:
+			self.files = glob.glob(self.fileGlob)
+		
+		self.fileName = self.files[1]
+		self.files = self.files[1:]
+	
+	def gotoNextFile(self):
+		self.fileName = self.files[1]
+		self.files = self.files[1:]
+		
 	def gotoRandomFile(self):
 		'''
 		Goto random file.
