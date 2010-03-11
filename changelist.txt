@@ -7,6 +7,7 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: New reproduction strategy for running pre-fuzzed files.
  - New: New default strategy is deterministic and random
  - New: New more agressive Blob mutator
  - New: Data fileName attribute can now specify multiple files.

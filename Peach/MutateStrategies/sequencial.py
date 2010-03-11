@@ -376,7 +376,7 @@ MutationStrategy.DefaultStrategy = RandomDeterministicMutationStrategy
 from Peach.Engine.incoming import DataCracker
 
 class _RandomMutator(object):
-	name = "Random"
+	name = "N/A"
 	changedName = "N/A"
 
 class ReproStrategy(MutationStrategy):
@@ -420,10 +420,22 @@ class ReproStrategy(MutationStrategy):
 	
 		self._mutator = _RandomMutator()
 		
+		self.action = None
+		
 		self.completed = False
 		self.firstFile = True
 		
 	def next(self):
+		if self.action.data != None and self.action.data.multipleFiles:
+			if self.firstFile:
+				self.action.data.gotoFirstFile()
+				self.firstFile = False
+			else:
+				try:
+					self.action.data.gotoNextFile()
+				except:
+					self.completed = True
+
 		if self.completed:
 			raise MutatorCompleted()
 	
@@ -627,7 +639,7 @@ class ReproStrategy(MutationStrategy):
 		'''
 		
 		if action.data != None and action.data.multipleFiles:
-			
+			self.action = action
 			self.context = action.getRoot()
 			
 			# If a file fails to parse, don't exit the
@@ -638,11 +650,6 @@ class ReproStrategy(MutationStrategy):
 				if self.firstFile:
 					action.data.gotoFirstFile()
 					self.firstFile = False
-
-				try:
-					action.data.gotoNextFile()
-				except:
-					self.completed = True
 				
 				# Locate fresh copy of template with no data
 				obj = self.GetRef(action.template.ref)
