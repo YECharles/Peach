@@ -125,6 +125,9 @@ try:
 				ExceptionInformation11, ExceptionInformation12, ExceptionInformation13,
 				ExceptionInformation14, FirstChance):
 			
+			if self.IgnoreSecondChanceGardPage and ExceptionCode == 0x80000001:
+				return DbgEng.DEBUG_STATUS_NO_CHANGE
+			
 			# Only capture dangerouse first chance exceptions
 			if FirstChance:
 				if self.IgnoreFirstChanceGardPage and ExceptionCode == 0x80000001:
@@ -209,20 +212,20 @@ try:
 				self.buff += "\n\n"
 				
 				# 4. Write dump file
-				print "Exception: 4. Write dump file"
-				
-				dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
-				minidump = None
-				
-				try:
-					f = open('dumpfile.core', 'rb+')
-					minidump = f.read()
-					f.close()
-					
-					os.unlink('dumpfile.core')
-					
-				except:
-					pass
+				#print "Exception: 4. Write dump file"
+				#
+				#dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
+				#minidump = None
+				#
+				#try:
+				#	f = open('dumpfile.core', 'rb+')
+				#	minidump = f.read()
+				#	f.close()
+				#	
+				#	os.unlink('dumpfile.core')
+				#	
+				#except:
+				#	pass
 				
 				
 				# 5. !analyze -v
@@ -338,6 +341,7 @@ try:
 		KernelConnectionString = kwargs.get('KernelConnectionString', None)
 		SymbolsPath = kwargs.get('SymbolsPath', None)
 		IgnoreFirstChanceGardPage = kwargs.get('IgnoreFirstChanceGardPage', None)
+		IgnoreSecondChanceGardPage = kwargs.get('IgnoreSecondChanceGardPage', None)
 		quit = kwargs['Quit']
 		dbg = None
 		
@@ -351,6 +355,7 @@ try:
 			_eventHandler.handlingFault = handlingFault
 			_eventHandler.handledFault = handledFault
 			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
+			_eventHandler.IgnoreSecondChanceGardPage = IgnoreSecondChanceGardPage
 			_eventHandler.quit = quit
 			
 			if KernelConnectionString:
@@ -542,6 +547,11 @@ try:
 			else:
 				self.IgnoreFirstChanceGardPage = False
 			
+			if args.has_key("IgnoreSecondChanceGardPage"):
+				self.IgnoreSecondChanceGardPage = True
+			else:
+				self.IgnoreSecondChanceGardPage = False
+			
 			if self.Service == None and self.CommandLine == None and self.ProcessName == None \
 					and self.KernelConnectionString == None and self.ProcessID == None:
 				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or ProcessID, or KernelConnectionString parameter.")
@@ -568,6 +578,7 @@ try:
 				'KernelConnectionString':self.KernelConnectionString,
 				'SymbolsPath':self.SymbolsPath,
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
+				'IgnoreSecondChanceGardPage':self.IgnoreSecondChanceGardPage,
 				'Quit':self.quit
 				})
 			
