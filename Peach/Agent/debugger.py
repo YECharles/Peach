@@ -215,7 +215,7 @@ try:
 				#print "Exception: 4. Write dump file"
 				#
 				#dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
-				#minidump = None
+				minidump = None
 				#
 				#try:
 				#	f = open('dumpfile.core', 'rb+')

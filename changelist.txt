@@ -22,6 +22,7 @@ v2.3.5
  - New: !exploitable windbg module included in distribution
  - New: Flags now supported enabling padding to behave like structs
  - New: Cracking optimizations for Choice blocks added
+ - Changed: Xml Analyzer, default string type now utf8
  - Changed: Windows Debugger no longer takes mini-dump
  - Changed: Enabled mutator ValidValuesMutator by default
  - Changed: UnixDebugger updated to support new file fuzzing model

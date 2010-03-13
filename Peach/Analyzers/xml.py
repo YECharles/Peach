@@ -6,7 +6,7 @@ XML Analyzers
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -289,6 +289,7 @@ class _Xml2Peach(object):
 					# This is node's value!
 					string = doc.createElementNS(None, "String")
 					string.setAttributeNS(None, "value", child.nodeValue)
+					string.setAttributeNS(None, "type", "utf8")
 					element.appendChild(string)
 				
 			elif child.nodeName == "#comment":
@@ -320,6 +321,7 @@ class _Xml2Peach(object):
 		
 		string = doc.createElementNS(None, "String")
 		string.setAttributeNS(None, "value", attribObj.value)
+		string.setAttributeNS(None, "type", "utf8")
 		element.appendChild(string)
 		
 		return element
