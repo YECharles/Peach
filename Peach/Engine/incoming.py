@@ -2406,7 +2406,7 @@ class DataCracker:
 				Debug(1, "_handleNumber: Constraint passed")
 			
 		if rating < 3:
-			node.pos = newpos
+			node.pos = pos
 			node.rating = rating
 		
 		Debug(1, "<--- %s (%d)" % (node.name, self.parentPos+newpos))

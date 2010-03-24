@@ -6,8 +6,16 @@
 	<Include ns="default" src="file:defaults.xml" />
 	
 	<!-- TODO: Create data model -->
-	<DataModel name="TheDataModel">
-	</DataModel>
+<DataModel name="TheDataModel">
+<Choice>
+  <Block>
+    <String length="4" constraint="value.find('Foo') > -1" />
+  </Block>
+  <Block>
+    <String length="4" constraint="value.find('Bar') > -1" />
+  </Block>
+</Choice>
+</DataModel>
 	
 	<!-- TODO: Create state model -->
 	<StateModel name="TheState" initialState="Initial">

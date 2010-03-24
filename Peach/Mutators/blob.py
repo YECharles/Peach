@@ -301,7 +301,7 @@ class BlobMutator(BitFlipperMutator):
 		special = ["\x00", "\x01", "\xfe", "\xff"]
 		(start, end) = self.getRange(len(data))
 		for i in range(start, end):
-			data[i] = self._random.choice(special)
+			data = data[:i-1] + self._random.choice(special) + data[i:]
 		return data
 
 	def changeNullRange(self, data):
@@ -310,7 +310,7 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		(start, end) = self.getRange(len(data))
 		for i in range(start, end):
-			data[i] = chr(0)
+			data = data[:i-1] + chr(0) + data[i:]
 		
 		return data
 	
@@ -321,7 +321,7 @@ class BlobMutator(BitFlipperMutator):
 		(start, end) = self.getRange(len(data))
 		for i in range(start, end):
 			if ord(data[i]) == 0:
-				data[i] = self._random.randint(1, 255)
+				data = data[:i-1] + self._random.randint(1, 255) + data[i:]
 		
 		return data
 
