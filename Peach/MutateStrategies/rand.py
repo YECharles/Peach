@@ -392,10 +392,13 @@ class RandomMutationStrategy(MutationStrategy):
 			# Select nodes we will modify
 			if len(nodes) <= self._n:
 				fields = nodes
+				maxN = self._n - len(fields)
+				if maxN <= 0:
+					maxN = self._n/2
 				
-				for i in range(self._n):
+				for i in range(self._random.randint(1, maxN)):
 					# Now perform mutations on fields
-					for node in fields:
+					for node in self._random.sample(fields, self._random.randint(1, len(fields))):
 						try:
 							mutator = self._random.choice(self._fieldMutators[node.getFullname()])
 							
@@ -414,7 +417,7 @@ class RandomMutationStrategy(MutationStrategy):
 						except:
 							pass
 			else:
-				fields = self._random.sample(nodes, self._n)
+				fields = self._random.sample(nodes, self._random.randint(1, self._n))
 				
 				# Now perform mutations on fields
 				for node in fields:

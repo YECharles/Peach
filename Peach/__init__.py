@@ -37,14 +37,14 @@ information.
 
 # $Id$
 
-import generator, group, publisher, transformer
-import Generators, Publishers, Transformers
+import publisher, transformer
+import Publishers, Transformers
 import Engine, Gui, agent, mutator
 import Mutators, mutatestrategies, MutateStrategies
 import logger, Fixups, fixup
 
-__all__ = ["generator", "group", "publisher", "transformer",
-		   "Generators", "Publishers", "Transformers", "Engine",
+__all__ = ["publisher", "transformer",
+		   "Publishers", "Transformers", "Engine",
 		   "Gui", "agent", "mutator", "Mutators", "fixup", "Fixups",
 		   "mutatestrategies", "MutateStrategies"]
 

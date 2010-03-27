@@ -39,7 +39,8 @@ import struct, sys, time
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re, pickle
-import gc
+import gc, tempfile
+from multiprocessing import *
 
 try:
 	
@@ -54,7 +55,6 @@ try:
 	import win32serviceutil
 	import win32service
 	import win32api, win32con, win32process
-	from multiprocessing import *
 	
 
 	# ###############################################################################################
@@ -212,32 +212,7 @@ try:
 				self.buff += "\n\n"
 				
 				# 4. Write dump file
-				#print "Exception: 4. Write dump file"
-				#
-				#dbg.idebug_client.WriteDumpFile(c_char_p("dumpfile.core"), DbgEng.DEBUG_DUMP_SMALL)
 				minidump = None
-				#
-				#try:
-				#	f = open('dumpfile.core', 'rb+')
-				#	minidump = f.read()
-				#	f.close()
-				#	
-				#	os.unlink('dumpfile.core')
-				#	
-				#except:
-				#	pass
-				
-				
-				# 5. !analyze -v
-				#print "Exception: 5. !analyze -v"
-				#
-				#handle = None
-				#try:
-				#	dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!analyze -v"), DbgEng.DEBUG_EXECUTE_ECHO)
-				#	pass
-				#except:
-				#	raise
-				
 				
 				## 6. Bang-Exploitable
 				print "Exception: 6. Bang-Expoitable"
@@ -258,7 +233,6 @@ try:
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".load %s\\msec.dll" % p), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p("!msec.exploitable -m"), DbgEng.DEBUG_EXECUTE_ECHO)
-					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, c_char_p(".unload msec.dll"), DbgEng.DEBUG_EXECUTE_ECHO)
 					
 				except:
 					raise
@@ -321,7 +295,7 @@ try:
 			self.fault = True
 			
 			print "Exception: Writing to file"
-			fd = open(".peach_crashInfo.bin", "wb+")
+			fd = open(self.Tempfile, "wb+")
 			fd.write(pickle.dumps(self.crashInfo))
 			fd.close()
 			
@@ -343,6 +317,7 @@ try:
 		IgnoreFirstChanceGardPage = kwargs.get('IgnoreFirstChanceGardPage', None)
 		IgnoreSecondChanceGardPage = kwargs.get('IgnoreSecondChanceGardPage', None)
 		quit = kwargs['Quit']
+		Tempfile = kwargs['Tempfile']
 		dbg = None
 		
 		print "run()"
@@ -357,6 +332,7 @@ try:
 			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
 			_eventHandler.IgnoreSecondChanceGardPage = IgnoreSecondChanceGardPage
 			_eventHandler.quit = quit
+			_eventHandler.Tempfile = Tempfile
 			
 			if KernelConnectionString:
 				dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
@@ -504,6 +480,7 @@ try:
 			self.crashInfo = None
 			self.fault = False
 			self.thread = None
+			self.tempfile = None
 			
 			if args.has_key('CommandLine'):
 				self.CommandLine = str(args['CommandLine']).replace("'''", "")
@@ -567,10 +544,18 @@ try:
 			self.crashInfo = None
 			self.fault = False
 			
+			(fd, self.tempfile) = tempfile.mkstemp()
+			os.close(fd)
+			
+			try:
+				os.unlink(self.tempfile)
+			except:
+				pass
+			
 			self.thread = Process(group = None, target = WindowsDebugEngineProcess_run, kwargs = {
 				'Started':self.started,
-				'HandlingFault' : self.handlingFault,
-				'HandledFault' : self.handledFault,
+				'HandlingFault':self.handlingFault,
+				'HandledFault':self.handledFault,
 				'CommandLine':self.CommandLine,
 				'Service':self.Service,
 				'ProcessName':self.ProcessName,
@@ -579,7 +564,8 @@ try:
 				'SymbolsPath':self.SymbolsPath,
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
 				'IgnoreSecondChanceGardPage':self.IgnoreSecondChanceGardPage,
-				'Quit':self.quit
+				'Quit':self.quit,
+				'Tempfile':self.tempfile
 				})
 			
 			# Kick off our thread:
@@ -642,12 +628,12 @@ try:
 			'''
 			
 			print "GetMonitorData(): Loading from file"
-			fd = open(".peach_crashInfo.bin", "rb+")
+			fd = open(self.tempfile, "rb+")
 			self.crashInfo = pickle.loads(fd.read())
 			fd.close()
 			
 			try:
-				os.unlink(".peach_crashInfo.bin")
+				os.unlink(self.tempfile)
 			except:
 				pass
 			
@@ -699,7 +685,6 @@ except:
 try:
 	
 	import vtrace, envi
-	import threading
 	
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
@@ -708,9 +693,14 @@ try:
 		def notify(self, event, trace):
 			print "Got event: %d from pid %d, signal: %d" % (event, trace.getPid(), trace.getMeta("PendingSignal"))
 			
-			UnixDebugger.handlingFault.set()
-			buff = ""
+			# Don't allow recursion in handling
+			if self.handlingFault.is_set() or self.handledFault.is_set():
+				return
 			
+			self.crasshInfo = {}
+			self.handlingFault.set()
+			
+			buff = ""
 			addr = None
 			
 			# Stacktrace
@@ -759,11 +749,14 @@ try:
 			
 			print buff
 			
-			UnixDebugger.lock.acquire()
-			UnixDebugger.crashInfo = { 'DebuggerOutput.txt' : buff, 'Bucket' : "AV_at_%d" % addr }
-			UnixDebugger.fault = True
-			UnixDebugger.lock.release()
-			UnixDebugger.handledFault.set()
+			self.crashInfo = { 'DebuggerOutput.txt' : buff, 'Bucket' : "AV_at_%d" % addr }
+			
+			print "Exception: Writing to file"
+			fd = open(self.Tempfile, "wb+")
+			fd.write(pickle.dumps(self.crashInfo))
+			fd.close()
+			
+			self.handledFault.set()
 			
 		
 		def bestName(self, trace, address):
@@ -787,22 +780,36 @@ try:
 		
 			return "Who knows?!?!!?"
 
-	class _TraceThread(threading.Thread):
-		def __init__(self):
-			threading.Thread.__init__(self)
+	class _TraceThread(Process):
+		def __init__(self, kwargs):
+			Process.__init__(self, group = None, target = self.run, **kwargs)
+			self.started = kwargs['Started']
+			self.handlingFault = kwargs['HandlingFault']
+			self.handledFault = kwargs['HandledFault']
+			self._command = kwargs['Command']
+			self._params = kwargs['Parameters']
+			self._pid = kwargs['ProcessID']
+			self.quit = kwargs['Quit']
+			self.Tempfile = kwargs['Tempfile']
 
 		def run(self):
 			
+			notifier = PeachNotifier()
+			notifier.handlingFault = self.handlingFault
+			notifier.handledFault = self.handledFault
+			notifier.quit = self.quit
+			notifier.Tempfile = self.Tempfile
+			
 			self.trace = vtrace.getTrace()
-			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, PeachNotifier())
+			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, notifier)
 			self.trace.execute(self._command + " " + self._params)
-			UnixDebugger.started.set()
+			self.started.set()
 			self.trace.run()
 			
 	
 	class UnixDebugger(Monitor):
 		'''
-		Unix GDB monitor.  This debugger monitor uses the gdb
+		Unix vtrace monitor.  This debugger monitor uses the gdb
 		debugger via pygdb wrapper.  Tested under Linux and OS X.
 		
 			* Collect core files
@@ -813,13 +820,12 @@ try:
 		
 		def __init__(self, args):
 			
-			UnixDebugger.quit = threading.Event()
-			UnixDebugger.started = threading.Event()
-			UnixDebugger.handlingFault = threading.Event()
-			UnixDebugger.handledFault = threading.Event()
-			UnixDebugger.lock = threading.Lock()
-			UnixDebugger.crashInfo = None
-			UnixDebugger.fault = False
+			self.quit = Event()
+			self.started = Event()
+			self.handlingFault = Event()
+			self.handledFault = Event()
+			self.crashInfo = None
+			self.fault = False
 			self.thread = None
 			
 			if args.has_key('Command'):
@@ -851,28 +857,42 @@ try:
 				self._StartDebugger()
 		
 		def _StartDebugger(self):
-			UnixDebugger.quit.clear()
-			UnixDebugger.started.clear()
-			UnixDebugger.handlingFault.clear()
-			UnixDebugger.handledFault.clear()
-			UnixDebugger.fault = False
-			UnixDebugger.crashInfo = None
+			self.started = Event()
+			self.quit = Event()
+			self.handlingFault = Event()
+			self.handledFault = Event()
+			self.crashInfo = None
+			self.fault = False
 			
-			self.thread = _TraceThread()
-			self.thread._command = self._command
-			self.thread._params = self._params
-			self.thread._pid = self._pid
+			(fd, self.tempfile) = tempfile.mkstemp()
+			fd.close()
+			
+			try:
+				os.unlink(self.tempfile)
+			except:
+				pass
+			
+			self.thread = _TraceThread(kwargs = {
+				'Started':self.started,
+				'HandlingFault':self.handlingFault,
+				'HandledFault':self.handledFault,
+				'Command':self._command,
+				'Parameters':self._params,
+				'ProcessID':self._pid,
+				'Quit':self.quit,
+				'Tempfile':self.tempfile
+				})
 			
 			self.thread.start()
-			UnixDebugger.started.wait()
+			self.started.wait()
 			time.sleep(2)	# Let things spin up!
 		
 		def _StopDebugger(self):
 			
 			if self.thread != None:
 				if self.thread.isAlive():
-					UnixDebugger.quit.set()
-					UnixDebugger.started.clear()
+					self.quit.set()
+					self.started.clear()
 					self.thread.trace.kill()
 					self.thread.join()
 					time.sleep(0.25)	# Take a breath
@@ -903,16 +923,23 @@ try:
 			'''
 			Get any monitored data.
 			'''
-			UnixDebugger.lock.acquire()
-			if UnixDebugger.crashInfo != None:
-				ret = UnixDebugger.crashInfo
-				UnixDebugger.crashInfo = None
-				UnixDebugger.lock.release()
-				print "Returning crash data!"
+			
+			print "GetMonitorData(): Loading from file"
+			fd = open(self.tempfile, "rb+")
+			self.crashInfo = pickle.loads(fd.read())
+			fd.close()
+			
+			try:
+				os.unlink(self.tempfile)
+			except:
+				pass
+			
+			print "GetMonitorData(): Got it!"
+			if self.crashInfo != None:
+				ret = self.crashInfo
+				self.crashInfo = None
 				return ret
 			
-			UnixDebugger.lock.release()
-			print "Not returning any crash data!"
 			return None
 		
 		def DetectedFault(self):
@@ -920,22 +947,16 @@ try:
 			Check if a fault was detected.
 			'''
 			
-			time.sleep(0.25)
-
-			if not UnixDebugger.handlingFault.is_set():
+			if self.thread and self.thread.is_alive():
+				time.sleep(0.25)
+			
+			if not self.handlingFault.is_set():
 				return False
 			
-			UnixDebugger.handledFault.wait()
-			UnixDebugger.lock.acquire()
+			self.handledFault.wait()
 			
-			if UnixDebugger.fault or not self.thread.isAlive():
-				print ">>>>>> RETURNING FAULT <<<<<<<<<"
-				UnixDebugger.fault = False
-				UnixDebugger.lock.release()
-				return True
-			
-			UnixDebugger.lock.release()
-			return False
+			print ">>>>>> RETURNING FAULT <<<<<<<<<"
+			return True
 		
 		def OnFault(self):
 			'''
@@ -950,7 +971,7 @@ try:
 			self._StopDebugger()
 
 except:
-	# Only complain on Windows platforms.
+	# Only complain on non-Windows platforms.
 	if sys.platform != 'win32':
 		print "Warning: Unix debugger failed to load: ", sys.exc_info()
 

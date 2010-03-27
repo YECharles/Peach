@@ -2928,7 +2928,7 @@ class Template(DataElement):
 						#if type(cv) == type(5):
 						#	print "getInternalValue(%s): int value for" % self.name, c
 					
-						value += c.cv
+						value += cv
 					else:
 						cv = c.getValue(sout)
 						

@@ -34,8 +34,8 @@ Mutators that operate on blob types.
 # $Id$
 
 import sys, os, time, struct, traceback
+sys.path.append("c:/peach")
 from Peach.mutator import *
-from Peach.group import *
 from Peach.Engine.common import *
 
 class DWORDSliderMutator(Mutator):
@@ -70,7 +70,7 @@ class DWORDSliderMutator(Mutator):
 		return self._len
 
 	def supportedDataElement(e):
-		if isinstance(e, Blob) and e.isMutable:
+		if (isinstance(e, Blob) or isinstance(e, Template)) and e.isMutable:
 			for child in e.hints:
 				if child.name == 'DWORDSliderMutator' and child.value == 'off':
 					return False
@@ -157,7 +157,7 @@ class BitFlipperMutator(Mutator):
 		return self._count
 
 	def supportedDataElement(e):
-		if isinstance(e, Blob) and e.isMutable:
+		if (isinstance(e, Blob) or isinstance(e, Template)) and e.isMutable:
 			return True
 		
 		return False
@@ -289,7 +289,7 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		(start, end) = self.getRange(len(data))
 		for i in range(start, end):
-			data[i] = chr(self._random.randint(0, 255))
+			data = data[:i] + chr(self._random.randint(0, 255)) + data[i+1:]
 		
 		return data
 	
@@ -380,5 +380,15 @@ class BlobMutator(BitFlipperMutator):
 			buff += chr(self._random.randint(0, 255))
 		
 		return buff
+
+if __name__ == '__main__':
+	data = "skaldjalskjdlaskjdlaskjdlaksjdlaksjdlkajsdlkajsdljaslkdjalskdjalskdjalskjdlaksjdlakjsd"
+	b = BlobMutator(None, None)
+	b.changeExpandBuffer(data)
+	b.changeReduceBuffer(data)
+	b.changeChangeRange(data)
+	b.changeChangeRangeSpecial(data)
+	b.changeNullRange(data)
+	b.changeUnNullRange(data)
 
 # end
