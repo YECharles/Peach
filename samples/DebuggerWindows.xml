@@ -56,6 +56,9 @@
 		<Monitor class="debugger.WindowsDebugEngine">
 			<Param name="CommandLine" value="C:\Peach\samples\CrashableServer\release\CrashableServer.exe 127.0.0.1 4244" />
 		</Monitor>
+ 		<Monitor class="process.PageHeap">
+			<Param name="Executable" value="CrashableServer.exe"/>
+		</Monitor>
 	</Agent>
 
 	<Test name="TheTest">
