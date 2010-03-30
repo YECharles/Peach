@@ -783,28 +783,29 @@ try:
 	class _TraceThread(Process):
 		def __init__(self, kwargs):
 			Process.__init__(self, group = None, target = self.run, **kwargs)
-			self.started = kwargs['Started']
-			self.handlingFault = kwargs['HandlingFault']
-			self.handledFault = kwargs['HandledFault']
-			self._command = kwargs['Command']
-			self._params = kwargs['Parameters']
-			self._pid = kwargs['ProcessID']
-			self.quit = kwargs['Quit']
-			self.Tempfile = kwargs['Tempfile']
 
-		def run(self):
+	def TraceThread_run(*args, **kwargs):
+		
+			started = kwargs['Started']
+			handlingFault = kwargs['HandlingFault']
+			handledFault = kwargs['HandledFault']
+			_command = kwargs['Command']
+			_params = kwargs['Parameters']
+			_pid = kwargs['ProcessID']
+			quit = kwargs['Quit']
+			Tempfile = kwargs['Tempfile']
 			
 			notifier = PeachNotifier()
-			notifier.handlingFault = self.handlingFault
-			notifier.handledFault = self.handledFault
-			notifier.quit = self.quit
-			notifier.Tempfile = self.Tempfile
+			notifier.handlingFault = handlingFault
+			notifier.handledFault = handledFault
+			notifier.quit = quit
+			notifier.Tempfile = Tempfile
 			
-			self.trace = vtrace.getTrace()
-			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, notifier)
-			self.trace.execute(self._command + " " + self._params)
-			self.started.set()
-			self.trace.run()
+			trace = vtrace.getTrace()
+			trace.registerNotifier(vtrace.NOTIFY_SIGNAL, notifier)
+			trace.execute(_command + " " + _params)
+			started.set()
+			trace.run()
 			
 	
 	class UnixDebugger(Monitor):
@@ -865,14 +866,14 @@ try:
 			self.fault = False
 			
 			(fd, self.tempfile) = tempfile.mkstemp()
-			fd.close()
+			os.close(fd)
 			
 			try:
 				os.unlink(self.tempfile)
 			except:
 				pass
 			
-			self.thread = _TraceThread(kwargs = {
+			self.thread = Process(group = None, target = TraceThread_run, kwargs = {
 				'Started':self.started,
 				'HandlingFault':self.handlingFault,
 				'HandledFault':self.handledFault,
@@ -890,7 +891,7 @@ try:
 		def _StopDebugger(self):
 			
 			if self.thread != None:
-				if self.thread.isAlive():
+				if self.thread.is_alive():
 					self.quit.set()
 					self.started.clear()
 					self.thread.trace.kill()
@@ -901,7 +902,7 @@ try:
 				self.thread.trace.releaseMemory() # FIX fd
 		
 		def _IsDebuggerAlive(self):
-			return self.thread != None and self.thread.isAlive()
+			return self.thread != None and self.thread.is_alive()
 		
 		def OnTestStarting(self):
 			'''
