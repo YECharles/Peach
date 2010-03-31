@@ -321,7 +321,7 @@ class BlobMutator(BitFlipperMutator):
 		(start, end) = self.getRange(len(data))
 		for i in range(start, end):
 			if ord(data[i]) == 0:
-				data = data[:i-1] + self._random.randint(1, 255) + data[i:]
+				data = data[:i-1] + chr(self._random.randint(1, 255)) + data[i:]
 		
 		return data
 
