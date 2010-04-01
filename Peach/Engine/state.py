@@ -36,7 +36,7 @@ Will try and run a state machine.
 # $Id$
 
 import sys, re, types, time, struct, ctypes
-import traceback
+import traceback, random
 ##import cProfile as profile
 
 import Ft.Xml.Domlette
@@ -350,7 +350,9 @@ class StateEngine:
 				'StateModel' : action.parent.parent,
 				'Mutator' : mutator,
 				'peachPrint' : self.f,
-				'sleep' : time.sleep
+				'sleep' : time.sleep,
+				'getXml' : self.getXml,
+				'random' : random
 				}
 			
 			if not evalEvent(action.when, environment, self.engine.peach):
@@ -502,11 +504,11 @@ class StateEngine:
 					print "RET:",ret,type(ret)
 					
 					data = None
-					if type(ret) == 'int':
+					if type(ret) == int:
 						data = struct.pack("i", ret)
-					elif type(ret) == 'long':
+					elif type(ret) == long:
 						data = struct.pack("q", ret)
-					elif type(ret) == 'str':
+					elif type(ret) == str:
 						data = ret
 					
 					if c.template.isPointer:
