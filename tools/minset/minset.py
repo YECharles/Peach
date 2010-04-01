@@ -129,6 +129,7 @@ os.system("BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbT
 fd = open("bblocks.txt", "rb+")
 strOffsets = fd.read().split("\n")
 offsets = []
+fd.close()
 
 try:
 	os.unlink("bblocks.txt")
@@ -176,6 +177,7 @@ for sampleFile in sampleFiles:
 		output_callbacks_sink = _eventHandler)
 	
 	dbg.event_loop_with_quit_event(DuhEvent())
+	_eventHandler.peachBlocks = None
 	
 	print "[-] %s hit %d blocks" % (sampleFile, len(bblocks[sampleFile]))
 	
@@ -183,13 +185,13 @@ for sampleFile in sampleFiles:
 # Figure out who covered the most blocks
 for sampleFile in sampleFiles:
 	cnt = len(bblocks[sampleFile])
-	print sampleFile, cnt
 	if cnt > sampleFileMostCoverageCount:
 		sampleFileMostCoverage = sampleFile
 		sampleFileMostCoverageCount = cnt
 
 minset.append(sampleFileMostCoverage)
 
+print ""
 print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
 
 def delta(list1, list2):
