@@ -124,7 +124,30 @@ commandLine = sys.argv[3]
 commandArgs = sys.argv[4]
 
 print "[*] Finding all basic blocks in [%s]" % bbTarget
-os.system("BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget)
+
+# Locate the base path of this executable/script
+p = None
+if not (hasattr(sys,"frozen") and sys.frozen == "console_exe"):
+	p = __file__[:-9]
+
+else:
+	p = os.path.dirname(os.path.abspath(sys.executable))
+
+if len(p) == 0:
+	p = "."
+
+# Locate and run basicblock finding program
+if os.path.exists(os.path.join(p,"BasicBlocks")):
+	os.system(os.path.join(p,"BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget))
+elif os.path.exists(os.path.join(p,"bin\\basicblocks.exe")):
+	os.system(os.path.join(p,"bin\\basicblocks.exe /in %s" % bbTarget))
+elif os.path.exists(os.path.join(p,"basicblocks.exe")):
+	os.system(os.path.join(p,"basicblocks.exe /in %s" % bbTarget))
+elif os.path.exists(os.path.join(p,"tools")):
+	os.system(os.path.join(p,"tools\\minset\\BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget))
+else:
+	print "ERROR: Unable to locate basicblocks.exe"
+	sys.exit(0)
 
 fd = open("bblocks.txt", "rb+")
 strOffsets = fd.read().split("\n")

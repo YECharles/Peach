@@ -7,6 +7,10 @@ but I'm going to try and start :)
 v2.3.5
 ------
 
+ - New: minset promoted to first tier tool, now compiled
+ - New: Action when attribute has a new method available, 'getXml()'
+        to allow for using xpaths in when expressions.
+ - New: Action when attribute has access to the 'random' module
  - New: Windows Debugger now has IgnoreSecondChanceGardPage option
  - New: New reproduction strategy for running pre-fuzzed files.
  - New: New default strategy is deterministic and random
@@ -22,6 +26,7 @@ v2.3.5
  - New: !exploitable windbg module included in distribution
  - New: Flags now supported enabling padding to behave like structs
  - New: Cracking optimizations for Choice blocks added
+ - Changed: Updated minset.py to use pydbgeng
  - Changed: Use random filename to move data between debugger threads
  - Changed: Xml Analyzer, default string type now utf8
  - Changed: Windows Debugger no longer takes mini-dump
@@ -33,6 +38,7 @@ v2.3.5
  - Changed: Random mutation strategy more agressive
  - Changed: Data loaded by <Data fileName=""/> failes we will exit
  - Changed: Improved accuracy of count vs. actual rounds
+ - Changed: Unix Debugger now uses multiprocessing module
  - Bug: Fixed a couple odd bugs in Flags/Flag
  - Bug: Fixed bug in Memory agent
  - Bug: Fixed bug in Network Pcap agent

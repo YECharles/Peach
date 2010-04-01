@@ -13,10 +13,13 @@ rmdir /s/q bin
 rmdir /s/q build
 rmdir /s/q dist
 
+copy tools\minset\minset.py
+
 rem -O0 will cause optmized byte code to
 rem be generated
 python -OO setup.py py2exe
 
+del /q minset.py
 ren dist bin
 rmdir /s/q build
 del /q setup.py
@@ -35,6 +38,7 @@ copy c:\windows\system32\MFC71.DLL bin
 copy c:\windows\SysWOW64\mfc71.dll bin
 del /q bin\iphlpapi.dll
 copy tools\bangexploitable\x86\msec.dll bin
+copy tools\minset\BasicBlocks\BasicBlocks\bin\release\*.* bin
 
 xcopy /s/q c:\peach\Peach\Generators\xmltests c:\peach\bin\xmltests\
 
