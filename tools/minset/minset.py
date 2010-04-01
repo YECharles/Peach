@@ -14,7 +14,7 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 '''
 
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,57 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 
 # $Id$
 
-import sys, os, threading, glob, pydbg
+import sys, os, threading, glob, re
+import PyDbgEng
+from comtypes.gen import DbgEng
+
+class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
+	
+	bps = False
+	mainOffset = 0
+	
+	def Output(self, this, Mask, Text):
+		if self.mainOffset == 0 and Text.find("ModLoad") > -1:
+			m = re.search("ModLoad:\s*([^ ]*) ", Text)
+			self.mainOffset = int(m.group(1), 16)
+	
+	def LoadModule(self, this, ImageFileHandle, BaseOffset, ModuleSize, ModuleName,
+				   ImageName, CheckSum, TimeDateStamp):
+		
+		if self.bps == False:
+			self.bps = True
+			
+			try:
+				for offset in self.peachOffsets:
+					bp_params = this.idebug_control.AddBreakpoint(Type = DbgEng.DEBUG_BREAKPOINT_CODE, DesiredId = DbgEng.DEBUG_ANY_ID)
+					flags = DbgEng.DEBUG_BREAKPOINT_ENABLED | DbgEng.DEBUG_BREAKPOINT_ONE_SHOT
+					bp_params.AddFlags(flags)
+					bp_params.SetOffset(self.mainOffset + offset)
+			except:
+				print sys.exc_info()
+		
+		return DbgEng.DEBUG_STATUS_NO_CHANGE
+	
+	def GetInterestMask(self):
+		#print "GetInterestMask"
+		return DbgEng.DEBUG_EVENT_BREAKPOINT | \
+			DbgEng.DEBUG_EVENT_LOAD_MODULE | DbgEng.DEBUG_ENGOPT_INITIAL_BREAK |\
+			DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT
+	
+	def ExitProcess(self, dbg, ExitCode):
+		#print "ExitProcess"
+		return DbgEng.DEBUG_STATUS_NO_CHANGE
+	
+	def Breakpoint(self, this, Offset, Id, BreakType, ProcType, Flags, DataSize,
+				   DataAccessType, PassCount, CurrentPassCount, MatchThread,
+				   CommandSize, OffsetExpressionSize):
+		
+		#print "Breakpoint", Offset - self.mainOffset
+		self.peachBlocks.append(Offset - self.mainOffset)
+		return DbgEng.DEBUG_STATUS_NO_CHANGE
 
 print ""
-print "] Peach Minset Finder v0.3"
+print "] Peach Minset Finder v0.5"
 print "] Copyright (c) Michael Eddington\n"
 
 if len(sys.argv) < 4:
@@ -74,7 +121,7 @@ commandLine = sys.argv[3]
 commandArgs = sys.argv[4]
 
 print "[*] Finding all basic blocks in [%s]" % bbTarget
-os.system("BasicBlocks\\BasicBlocks\\bin\\debug\\basicblocks.exe /in %s" % bbTarget)
+os.system("BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget)
 
 fd = open("bblocks.txt", "rb+")
 strOffsets = fd.read().split("\n")
@@ -99,28 +146,6 @@ for f in glob.glob(samples):
 
 print "[*] Found %d basic blocks and %d sample files" % (len(offsets),len(sampleFiles))
 
-def handleAccessViolation(dbg):
-	if dbg.first_breakpoint:
-		
-		# Locate base offset
-		baseoffset = None
-		for module in dbg.enumerate_modules():
-			if module[0] == 'tracerpt.exe':
-				baseoffset = module[1]
-		print "Using %d as base offset" % baseoffset
-		
-		# Set breakpoints
-		for offset in dbg.peachOffsets:
-			dbg.bp_set(baseoffset + offset)
-		
-		return pydbg.defines.DBG_CONTINUE
-	
-	addr = dbg.dbg.u.Exception.ExceptionRecord.ExceptionAddress
-	if addr in dbg.peachOffsets and addr not in dbg.peachBlocks:
-		dbg.peachBlocks.append(addr)
-	
-	return pydbg.defines.DBG_CONTINUE
-
 #: Dictionary of lists, key is sampleFile
 bblocks = {}
 #: Most coverage
@@ -129,19 +154,25 @@ sampleFileMostCoverageCount = -1
 #: Min set
 minset = []
 
+class DuhEvent:
+	def is_set(self):
+		return False
+
 for sampleFile in sampleFiles:
 	print "[*] Determining coverage with [%s]...." % sampleFile
 	
 	bblocks[sampleFile] = []
 	
-	dbg = pydbg.pydbg()
-	dbg.set_callback(pydbg.EXCEPTION_BREAKPOINT, handleAccessViolation)
-	dbg.load(commandLine, commandArgs % sampleFile)
+	_eventHandler = _DbgEventHandler()
+	_eventHandler.peachOffsets = offsets
+	_eventHandler.peachBlocks = bblocks[sampleFile]
 	
-	dbg.peachOffsets = offsets
-	dbg.peachBlocks = bblocks[sampleFile]
+	dbg = PyDbgEng.ProcessCreator(command_line = "%s %s" % (commandLine, commandArgs % sampleFile),
+		follow_forks = True,
+		event_callbacks_sink = _eventHandler,
+		output_callbacks_sink = _eventHandler)
 	
-	dbg.debug_event_loop()
+	dbg.event_loop_with_quit_event(DuhEvent())
 	
 	print "[-] %s hit %d blocks" % (sampleFile, len(bblocks[sampleFile]))
 	

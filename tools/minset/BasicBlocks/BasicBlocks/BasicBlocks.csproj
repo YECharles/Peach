@@ -34,6 +34,7 @@
     <DefineConstants>TRACE;PHX_DEBUG_SUPPORT;PHX_DEBUG_DUMPS</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <IncrementalBuild>false</IncrementalBuild>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,10 +63,12 @@
     <Compile Include="PhoenixTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="architecture-msild, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
-    <Reference Include="architecture-x86d, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
-    <Reference Include="phxd, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
-    <Reference Include="runtime-vccrt-win-msild, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
-    <Reference Include="runtime-vccrt-win32-x86d, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="architecture-amd64, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="architecture-msil, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="architecture-x86, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="phx, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="runtime-vccrt-win-msil, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="runtime-vccrt-win32-x86, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="runtime-vccrt-win64-amd64, Version=0.64.30627.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
   </ItemGroup>
 </Project>
