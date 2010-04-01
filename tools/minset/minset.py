@@ -86,7 +86,10 @@ class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventC
 				   CommandSize, OffsetExpressionSize):
 		
 		#print "Breakpoint", Offset - self.mainOffset
-		self.peachBlocks.append(Offset - self.mainOffset)
+		addr = Offset - self.mainOffset
+		if not (addr in self.peachBlocks):
+			self.peachBlocks.append(addr)
+		
 		return DbgEng.DEBUG_STATUS_NO_CHANGE
 
 print ""
@@ -180,6 +183,7 @@ for sampleFile in sampleFiles:
 # Figure out who covered the most blocks
 for sampleFile in sampleFiles:
 	cnt = len(bblocks[sampleFile])
+	print sampleFile, cnt
 	if cnt > sampleFileMostCoverageCount:
 		sampleFileMostCoverage = sampleFile
 		sampleFileMostCoverageCount = cnt
