@@ -31,10 +31,10 @@
 
 # $Id$
 
-import network, debugger, vm, process, test, memory, power, gui, socketmon
+import network, debugger, vm, process, test, memory, power, gui, socketmon, osx
 
 __all__ = [ "network", "debugger", "vm", "process", "test",
-		   "memory", "power", "socketmon", "gui" ]
+		   "memory", "power", "socketmon", "gui", "osx" ]
 
 
 # end

@@ -116,7 +116,7 @@ class PageHeap(Monitor):
 		os.spawnv(os.P_WAIT, self._path, self._offParams )
 
 
-class Process(Monitor):
+class WindowsProcess(Monitor):
 	'''
 	Process control agent.  This agent is able to start, stop, and monitor
 	if a process is running.  If the process exits early a fault will be
@@ -242,7 +242,7 @@ class Process(Monitor):
 		Get any monitored data.
 		'''
 		if self.strangeExit:
-			return "Process exited early"
+			return { "WindowsProcess.txt" : "Process exited early" }
 		
 		return None
 	
@@ -256,6 +256,149 @@ class Process(Monitor):
 		
 		else:
 			return False
+	
+	def OnFault(self):
+		'''
+		Called when a fault was detected.
+		'''
+		self._StopProcess()
+	
+	def OnShutdown(self):
+		'''
+		Called when Agent is shutting down.
+		'''
+		self._StopProcess()
+
+from subprocess import *
+
+class Process(Monitor):
+	'''
+	Process control agent.  This agent is able to start, stop, and monitor
+	if a process is running.  If the process exits early a fault will be
+	issued to the fuzzer.
+	'''
+	
+	def __init__(self, args):
+		self.restartOnTest = False
+		if args.has_key('RestartOnEachTest'):
+			if args['RestartOnEachTest'].replace("'''", "").lower() == 'true':
+				self.restartOnTest = True
+		
+		self.faultOnEarlyExit = True
+		if args.has_key('FaultOnEarlyExit'):
+			if args['FaultOnEarlyExit'].replace("'''", "").lower() != 'true':
+				self.faultOnEarlyExit = False
+		
+		self.startOnCall = False
+		if args.has_key('StartOnCall'):
+			self.startOnCall = True
+			self.startOnCallMethod = args['StartOnCall'].replace("'''", "").lower()
+		
+		self.waitForExitOnCall = False
+		if args.has_key('WaitForExitOnCall'):
+			self.waitForExitOnCall = True
+			self.waitForExitOnCallMethod = args['WaitForExitOnCall'].replace("'''", "").lower()
+		
+		if not args.has_key('Command'):
+			raise PeachException("Error, monitor Process requires a parameter named 'Command'")
+		
+		self.strangeExit = False
+		self.command = args["Command"].replace("'''", "")
+		self.args = self.command.split()
+		self.pid = None
+		self.process = None
+	
+	def PublisherCall(self, method):
+		
+		method = method.lower()
+		if self.startOnCall and self.startOnCallMethod == method:
+			print "Process: startOnCall, starting process!"
+			
+			self._StopProcess()
+			self._StartProcess()
+		
+		elif self.waitForExitOnCall and self.waitForExitOnCallMethod == method:
+			print "Process: waitForExitOnCall, waiting on process exit"
+			
+			while True:
+				if not self._IsProcessRunning():
+					print "Process: Process exitted"
+					return
+				time.sleep(0.25)
+	
+	def _StopProcess(self):
+		
+		if not self.process:
+			return
+		
+		if self._IsProcessRunning():
+			self.process.send_signal(SIGTERM)
+			self.process.send_signal(SIGKILL)
+			self.process.wait()
+		
+		self.process = None
+	
+	def _StartProcess(self):
+		if self.process:
+			self._StopProcess()
+		
+		self.process = Popen(self.args)
+	
+	def _IsProcessRunning(self):
+		if not self.process:
+			return False
+		
+		if self.process.poll() == None:
+			return False
+		
+		return True
+	
+	def OnTestStarting(self):
+		'''
+		Called right before start of test.
+		'''
+		self.strangeExit = False
+		if not self.startOnCall and (self.restartOnTest or not self._IsProcessRunning()):
+			self._StopProcess()
+			self._StartProcess()
+		elif self.startOnCall:
+			self._StopProcess()
+		
+		print "Exiting OnTestStarting..."
+	
+	def OnTestFinished(self):
+		'''
+		Called right after a test.
+		'''
+		if not self._IsProcessRunning():
+			self.strangeExit = True
+			
+		if self.restartOnTest:
+			self._StopProcess()
+	
+		elif self.startOnCall:
+			self._StopProcess()
+	
+	def GetMonitorData(self):
+		'''
+		Get any monitored data.
+		'''
+		if self.strangeExit:
+			return {"Process.txt" : "Process exited early"}
+		
+		return None
+	
+	def DetectedFault(self):
+		'''
+		Check if a fault was detected.  If the process exits
+		with out our help we will report it as a fault.
+		'''
+		#if self.faultOnEarlyExit:
+		#	return not self._IsProcessRunning()
+		#
+		#else:
+		#	return False
+		return False
 	
 	def OnFault(self):
 		'''
@@ -356,7 +499,7 @@ class WindowsService(Monitor):
 		Get any monitored data.
 		'''
 		if self.strangeExit:
-			return "Process exited early"
+			return {"WindowsService.txt" : "Process exited early"}
 		
 		return None
 	
@@ -365,11 +508,12 @@ class WindowsService(Monitor):
 		Check if a fault was detected.  If the process exits
 		with out our help we will report it as a fault.
 		'''
-		if self.faultOnEarlyExit:
-			return not self._IsProcessRunning()
-		
-		else:
-			return False
+		#if self.faultOnEarlyExit:
+		#	return not self._IsProcessRunning()
+		#
+		#else:
+		#	return False
+		return False
 	
 	def OnFault(self):
 		'''

@@ -973,7 +973,7 @@ try:
 
 except:
 	# Only complain on non-Windows platforms.
-	if sys.platform != 'win32':
+	if not sys.platform in ['win32', 'darwin']:
 		print "Warning: Unix debugger failed to load: ", sys.exc_info()
 
 #class AppleCrashReporter(Monitor):

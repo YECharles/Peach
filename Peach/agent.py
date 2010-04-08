@@ -46,6 +46,9 @@ from xmlrpclib import ServerProxy, Error
 from Peach.Publishers import *
 from Peach.Engine.common import *
 
+def Debug(msg):
+	print msg
+
 def PeachStr(s):
 	'''
 	Our implementation of str() which does not
@@ -776,6 +779,8 @@ class AgentClient:
 		
 	def StartMonitor(self, name, classStr, params, restarting = False):
 		
+		Debug("> StartMonitor")
+		
 		msg = _Msg(self._id, _MsgType.StartMonitor)
 		msg.monitorName = name
 		msg.monitorClass = classStr
@@ -788,8 +793,12 @@ class AgentClient:
 		
 		if not restarting:
 			self._monitors.append([name, classStr, params])
+			
+		Debug("< StartMonitor")
 	
 	def StopMonitor(self, name):
+		Debug("> StopMonitor")
+		
 		msg = _Msg(self._id, _MsgType.StopMonitor)
 		msg.monitorName = name
 		
@@ -801,11 +810,16 @@ class AgentClient:
 		for m in self._monitors:
 			if m[0] == name:
 				self._monitors.remove(m)
+		
+		Debug("< StopMonitor")
 	
 	def OnTestStarting(self):
 		'''
 		Called right before start of test.
 		'''
+		
+		Debug("> OnTestStarting")
+		
 		msg = _Msg(self._id, _MsgType.OnTestStarting)
 		
 		try:
@@ -817,8 +831,12 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during OnTestStarting call." % self._name)
+		
+		Debug("< OnTestStarting")
 	
 	def OnPublisherCall(self, method):
+		Debug("> OnPublisherCall")
+		
 		msg = _Msg(self._id, _MsgType.PublisherCall)
 		msg.method = method
 		
@@ -831,11 +849,16 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during OnPublisherCall call." % self._name)
+		
+		Debug("< OnPublisherCall")
 	
 	def OnTestFinished(self):
 		'''
 		Called right after a test.
 		'''
+		
+		Debug("> OnTestFinished")
+		
 		msg = _Msg(self._id, _MsgType.OnTestFinished)
 		
 		try:
@@ -847,11 +870,16 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during OnTestFinished call." % self._name)
-	
+		
+		Debug("< OnTestFinished")
+
 	def GetMonitorData(self):
 		'''
 		Get any monitored data.
 		'''
+		
+		Debug("> GetMonitorData")
+		
 		msg = _Msg(self._id, _MsgType.GetMonitorData)
 		
 		try:
@@ -864,12 +892,17 @@ class AgentClient:
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during GetMonitorData call." % self._name)
 		
+		Debug("< GetMonitorData")
+		
 		return msg.results
 	
 	def DetectedFault(self):
 		'''
 		Check if a fault was detected.
 		'''
+		
+		Debug("> DetectedFault")
+		
 		try:
 			msg = _Msg(self._id, _MsgType.DetectFault)
 			msg = pickle.loads(self._agent.detectFault(pickle.dumps(msg)))
@@ -881,12 +914,17 @@ class AgentClient:
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during GetMonitorData call." % self._name)
 		
+		Debug("< DetectedFault")
+		
 		return msg.results
 	
 	def OnFault(self):
 		'''
 		Called when a fault was detected.
 		'''
+		
+		Debug("> OnFault")
+		
 		try:
 			msg = _Msg(self._id, _MsgType.OnFault)
 			msg = pickle.loads(self._agent.onFault(pickle.dumps(msg)))
@@ -897,13 +935,20 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during GetMonitorData call." % self._name)
+		
+		Debug("< OnFault")
 	
 	def OnShutdown(self):
 		'''
 		Called when Agent is shutting down.
 		'''
+		
+		Debug("> OnShutdown")
+		
 		msg = _Msg(self._id, _MsgType.OnShutdown)
 		self._agent.onShutdown(pickle.dumps(msg))
+		
+		Debug("< OnShutdown")
 	
 	def StopRun(self):
 		'''
@@ -911,6 +956,9 @@ class AgentClient:
 		should return True if an unrecoverable error
 		occurs.
 		'''
+		
+		Debug("> StopRun")
+		
 		try:
 			msg = _Msg(self._id, _MsgType.StopRun)
 			msg = pickle.loads(self._agent.stopRun(pickle.dumps(msg)))
@@ -921,6 +969,8 @@ class AgentClient:
 		
 		if msg.type != _MsgType.Ack:
 			raise PeachException("Lost connection to Agent %s during GetMonitorData call." % self._name)
+		
+		Debug("< StopRun")
 		
 		return msg.results
 	
