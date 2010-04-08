@@ -270,6 +270,7 @@ class WindowsProcess(Monitor):
 		self._StopProcess()
 
 from subprocess import *
+import signal, os
 
 class Process(Monitor):
 	'''
@@ -332,8 +333,11 @@ class Process(Monitor):
 			return
 		
 		if self._IsProcessRunning():
-			self.process.send_signal(SIGTERM)
-			self.process.send_signal(SIGKILL)
+			try:
+				os.kill(self.process.pid, signal.SIGTERM)
+				os.kill(self.process.pid, signal.SIGKILL)
+			except:
+				pass
 			self.process.wait()
 		
 		self.process = None
