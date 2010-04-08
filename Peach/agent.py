@@ -47,7 +47,8 @@ from Peach.Publishers import *
 from Peach.Engine.common import *
 
 def Debug(msg):
-	print msg
+	#print msg
+	pass
 
 def PeachStr(s):
 	'''

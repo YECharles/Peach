@@ -62,8 +62,8 @@ import re, pickle
 from Peach.publisher import PublisherBuffer
 from Peach.Engine import parser, engine, incoming, dom
 from Peach.Engine.dom import *
+from Peach.Analyzers import *
 import Peach
-#import Peach.Gui
 
 class PeachValidatorGui(gui.PeachValidation):
 	
@@ -237,7 +237,8 @@ class PeachValidatorGui(gui.PeachValidation):
 		# Display default model
 		self.OnComboDataModel(None)
 	
-	def OnComboDataModel(self, event): # wxGlade: PeachValidation.<event_handler>
+	def OnComboDataModel(self, event):
+		# wxGlade: PeachValidation.<event_handler>
 		#print "Event handler `OnComboDataModel' not implemented!"
 		#event.Skip()
 		
@@ -304,8 +305,6 @@ class PeachValidatorGui(gui.PeachValidation):
 			for child in self.template.getElementsByType(String):
 				if child.analyzer != None and child.defaultValue != None and child not in objs:
 					objs.append(child)
-			
-			from Peach.Analyzers import *
 			
 			for child in objs:
 				try:
