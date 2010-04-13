@@ -1248,21 +1248,21 @@ class DataCracker:
 			(n, b) = self._nextNodeOrSizedParent(n)
 			
 			if b:
-				Debug(1, "_isLastUnsizedNode: Found sized parent!")
+				#Debug(1, "_isLastUnsizedNode: Found sized parent!")
 				break
 			
 			if n == None:
-				Debug(1, "_isLastUnsizedNode: Next node returned None")
+				#Debug(1, "_isLastUnsizedNode: Next node returned None")
 				break
 			
 			s = self._hasSize(n)
 			if s == None:
-				Debug(1, "_isLastUnsizedNode: returning None due to [%s]" % n.name)
+				#Debug(1, "_isLastUnsizedNode: returning None due to [%s]" % n.name)
 				return None
 			
 			length += s
 		
-		Debug(1, "_isLastUnsizedNode: length: %d" % length)
+		#Debug(1, "_isLastUnsizedNode: length: %d" % length)
 		return length
 	
 	def _hasSize(self, node):
@@ -1290,7 +1290,7 @@ class DataCracker:
 			# Check for relation
 			relation = node.getRelationOfThisElement('size')
 			if relation != None:
-				Debug(1, "_hasSize(%s): Found relation" % node.name)
+				#Debug(1, "_hasSize(%s): Found relation" % node.name)
 				return int(relation.getValue(True))
 			
 			# Check each child
@@ -1311,7 +1311,7 @@ class DataCracker:
 			# Check for relation
 			relation = node.getRelationOfThisElement('size')
 			if relation != None:
-				Debug(1, "_hasSize(%s): Found relation" % node.name)
+				#Debug(1, "_hasSize(%s): Found relation" % node.name)
 				return int(relation.getValue(True))
 			
 			# Until choice is run we
@@ -1322,7 +1322,7 @@ class DataCracker:
 		# Check for relation
 		relation = node.getRelationOfThisElement('size')
 		if relation != None:
-			Debug(1, "_hasSize(%s): Found relation" % node.name)
+			#Debug(1, "_hasSize(%s): Found relation" % node.name)
 			return int(relation.getValue(True))
 		
 		return None
@@ -1377,27 +1377,27 @@ class DataCracker:
 		if node == None:
 			return (None, False)
 		
-		try:
-			Debug(1, "_nextNodeOrSizedParent(%s)" % node.name)
-		
-		except:
-			Debug(1, "_nextNodeOrSizedParent: %s" % repr(node))
-			raise
+		#try:
+		#	Debug(1, "_nextNodeOrSizedParent(%s)" % node.name)
+		#
+		#except:
+		#	Debug(1, "_nextNodeOrSizedParent: %s" % repr(node))
+		#	raise
 		
 		if not isinstance(node, Peach.Engine.dom.DataElement) or \
 			node.elementType == 'template':
 			
-			Debug(1, "_nextNodeOrSizedParent: not data element or is template, failing")
+			#Debug(1, "_nextNodeOrSizedParent: not data element or is template, failing")
 			return (None, False)
 		
 		# Try and escape Choice blocks.
 		while node.parent != None and node.parent.elementType == 'choice':
 			if node.parent.maxOccurs > 1:
-				Debug(1, "_nextNodeOrSizedParent: Returning node.parent due to maxOccurs > 1")
+				#Debug(1, "_nextNodeOrSizedParent: Returning node.parent due to maxOccurs > 1")
 				return (node.parent, False)
 			
 			if self._hasSize(node.parent):
-				Debug(1, "_nextNodeOrSizedParent: Found sized choice parent, this is the last element")
+				#Debug(1, "_nextNodeOrSizedParent: Found sized choice parent, this is the last element")
 				return (node.parent, True)
 			
 			node = node.parent
@@ -1407,14 +1407,14 @@ class DataCracker:
 			nextNode = nextNode.nextSibling()
 		
 		if nextNode != None and isinstance(nextNode, Peach.Engine.dom.DataElement):	
-			Debug(1, "_nextNodeOrSizedParent: Found: %s" % nextNode.name)
+			#Debug(1, "_nextNodeOrSizedParent: Found: %s" % nextNode.name)
 			return (nextNode, False)
 		
 		if node.parent != None and self._hasSize(node.parent):
-			Debug(1, "_nextNodeOrSizedParent: Found sized parent, this is the last element")
+			#Debug(1, "_nextNodeOrSizedParent: Found sized parent, this is the last element")
 			return (node.parent, True)
 		
-		Debug(1, "_nextNodeOrSizedParent: Calling _nextNodeOrSizedParent on parent!")
+		#Debug(1, "_nextNodeOrSizedParent: Calling _nextNodeOrSizedParent on parent!")
 		return self._nextNodeOrSizedParent(node.parent)
 	
 	
@@ -1432,24 +1432,24 @@ class DataCracker:
 		if node == None:
 			return None
 		
-		try:
-			Debug(1, "_nextNode(%s)" % node.name)
-		
-		except:
-			Debug(1, "_nextNode: %s" % repr(node))
-			raise
+		#try:
+		#	Debug(1, "_nextNode(%s)" % node.name)
+		#
+		#except:
+		#	Debug(1, "_nextNode: %s" % repr(node))
+		#	raise
 		
 		if not isinstance(node, Peach.Engine.dom.DataElement) or \
 			node.elementType == 'template':
 			
-			Debug(1, "_nextNode: not data element or is template")
+			#Debug(1, "_nextNode: not data element or is template")
 			
 			return None
 		
 		# Try and escape Choice blocks.
 		while node.parent != None and node.parent.elementType == 'choice':
 			if node.parent.maxOccurs > 1:
-				Debug(1, "_nextNode: Returning node.parent due to maxOccurs > 1.")
+				#Debug(1, "_nextNode: Returning node.parent due to maxOccurs > 1.")
 				return node.parent
 			
 			node = node.parent
@@ -1459,10 +1459,10 @@ class DataCracker:
 			nextNode = nextNode.nextSibling()
 		
 		if nextNode != None and isinstance(nextNode, Peach.Engine.dom.DataElement):	
-			Debug(1, "_nextNode(): Found: %s" % nextNode.name)
+			#Debug(1, "_nextNode(): Found: %s" % nextNode.name)
 			return nextNode
 		
-		Debug(1, "_nextNode(): Calling _nextNode on parent!")
+		#Debug(1, "_nextNode(): Calling _nextNode on parent!")
 		return self._nextNode(node.parent)
 
 	def _adjustRating(self, rating, lookAheadRating):
@@ -1907,19 +1907,6 @@ class DataCracker:
 					newpos = len(buff.data)
 					rating = 1
 				
-				elif self._isLastUnsizedNode(node) != None:
-					# Are all other nodes of deterministic size?
-					
-					Debug(1, "_handleString: self._isLastUnsizedNode(node)")
-					
-					if not buff.haveAllData:
-						buff.readAll()
-					
-					length = self._isLastUnsizedNode(node)
-					newpos = len(buff.data) - length
-					value = buff.data[pos:newpos]
-					rating = 1
-				
 				elif self._isTokenNext(node) != None:
 					# Is there an isStatic ahead?
 					
@@ -1962,7 +1949,22 @@ class DataCracker:
 					
 					Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
 				
+				elif self._isLastUnsizedNode(node) != None:
+					# Are all other nodes of deterministic size?
+					
+					Debug(1, "_handleString: self._isLastUnsizedNode(node)")
+					
+					if not buff.haveAllData:
+						buff.readAll()
+					
+					length = self._isLastUnsizedNode(node)
+					newpos = len(buff.data) - length
+					value = buff.data[pos:newpos]
+					rating = 1
+				
 				else:
+					
+					Debug(1, "_handleString: No size for our string.")
 					
 					# Will will suckup bytes one by one check the
 					# look ahead each time to see if we should keep

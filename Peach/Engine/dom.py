@@ -5022,11 +5022,11 @@ class Data(ElementWithChildren):
 		elif self.fileGlob != None:
 			self.files = glob.glob(self.fileGlob)
 		
-		self.fileName = self.files[1]
+		self.fileName = self.files[0]
 		self.files = self.files[1:]
 	
 	def gotoNextFile(self):
-		self.fileName = self.files[1]
+		self.fileName = self.files[0]
 		self.files = self.files[1:]
 		
 	def gotoRandomFile(self):
