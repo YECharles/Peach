@@ -173,13 +173,16 @@ try:
 				# 1. Calculate no. of frames
 				print "Exception: 1. Calculate no, of frames"
 				
-				frames_filled = 0
-				stack_frames = dbg.get_stack_trace(100)
-				for i in range(100):
-					eip = stack_frames[i].InstructionOffset
-					if (eip == 0):
-						break
-					frames_filled += 1
+				try:
+					frames_filled = 0
+					stack_frames = dbg.get_stack_trace(100)
+					for i in range(100):
+						eip = stack_frames[i].InstructionOffset
+						if (eip == 0):
+							break
+						frames_filled += 1
+				except:
+					pass
 				
 				# 2. Output registers
 				print "Exception: 2. Output registers"
