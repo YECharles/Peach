@@ -36,8 +36,8 @@
 ;General
 
   ;Name and file
-  Name "Peach 2.3.5 x86"
-  OutFile "Peach-2.3.5-x86.exe"
+  Name "Peach 2.3.6 DEV x86"
+  OutFile "Peach-2.3.6-DEV-x86.exe"
 
   ;Default installation folder
   InstallDir "c:\peach"
