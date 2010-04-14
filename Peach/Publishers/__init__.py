@@ -7,8 +7,7 @@ Collection of default included Publishers
 '''
 
 #
-# Copyright (c) 2005-2008 Michael Eddington
-# Copyright (c) 2004-2005 IOActive Inc.
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal

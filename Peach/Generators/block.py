@@ -7,8 +7,7 @@ Contains implementation of a Block generator and BlockSize generator.
 '''
 
 #
-# Copyright (c) 2005-2007 Michael Eddington
-# Copyright (c) 2004-2005 IOActive Inc.
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
