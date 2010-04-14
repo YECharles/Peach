@@ -80,6 +80,7 @@ Section "Dummy Section" SecDummy
     /x *.nsi /x PeachSimple.gadget \
     /x setup.py /x peach.kpf \
     /x compilepeach.py /x deb-ubuntu \
+    /x tools\minset \
     c:\peach\*.*
   
   ; Remove old links

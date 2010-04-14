@@ -4050,6 +4050,12 @@ class String(DataElement):
 		
 		# 0. Override value?
 		if self.currentValue != None:
+			
+			# Make sure we null terminate if needed
+			if self.nullTerminated:
+				if self.currentValue[-1] != 0:
+					self.currentValue = self.currentValue + "\0"
+			
 			if sout != None:
 				sout.write(self.currentValue, self.getFullDataName())
 			
