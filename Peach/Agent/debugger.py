@@ -170,55 +170,33 @@ try:
 				self.crashInfo = {}
 				self.handlingFault.set()
 				
-				# 1. Calculate no. of frames
-				print "Exception: 1. Calculate no, of frames"
+				## 1. Output registers
+				print "Exception: 1. Output registers"
 				
-				try:
-					frames_filled = 0
-					stack_frames = dbg.get_stack_trace(100)
-					for i in range(100):
-						eip = stack_frames[i].InstructionOffset
-						if (eip == 0):
-							break
-						frames_filled += 1
-				except:
-					pass
-				
-				# 2. Output registers
-				print "Exception: 2. Output registers"
-				
-				dbg.idebug_registers.OutputRegisters(DbgEng.DEBUG_OUTCTL_THIS_CLIENT, DbgEng.DEBUG_REGISTERS_ALL)
+				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+										   c_char_p("r"),
+										   DbgEng.DEBUG_EXECUTE_ECHO)
+				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+										   c_char_p("rF"),
+										   DbgEng.DEBUG_EXECUTE_ECHO)
+				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+										   c_char_p("rX"),
+										   DbgEng.DEBUG_EXECUTE_ECHO)
 				self.buff += "\n\n"
 				
+				## 2. Ouput stack trace
+				print "Exception: 2. Output stack trace"
 				
-				# 3. Ouput stack trace
-				print "Exception: 3. Output stack trace"
-				
-				frames_count = 100
-				frames_buffer = create_string_buffer( frames_count * sizeof(DbgEng._DEBUG_STACK_FRAME) )
-				frames_buffer_ptr = cast(frames_buffer, POINTER(DbgEng._DEBUG_STACK_FRAME))
-				
-				dbg.idebug_control.GetStackTrace(0, 0, 0, frames_buffer_ptr, frames_count)
-				dbg.idebug_control.OutputStackTrace(
-					DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
-					frames_buffer_ptr,
-					frames_filled,
-					
-					DbgEng.DEBUG_STACK_ARGUMENTS |
-					DbgEng.DEBUG_STACK_FUNCTION_INFO |
-					DbgEng.DEBUG_STACK_SOURCE_LINE |
-					DbgEng.DEBUG_STACK_FRAME_ADDRESSES |
-					DbgEng.DEBUG_STACK_COLUMN_NAMES |
-					DbgEng.DEBUG_STACK_FRAME_NUMBERS |
-					DbgEng.DEBUG_STACK_PARAMETERS )
-				
+				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+										   c_char_p("kb 100"),
+										   DbgEng.DEBUG_EXECUTE_ECHO)
 				self.buff += "\n\n"
 				
-				# 4. Write dump file
+				## 3. Write dump file
 				minidump = None
 				
-				## 6. Bang-Exploitable
-				print "Exception: 6. Bang-Expoitable"
+				## 4. Bang-Exploitable
+				print "Exception: 3. Bang-Expoitable"
 				
 				handle = None
 				try:

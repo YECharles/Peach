@@ -7,6 +7,7 @@ but I'm going to try and start :)
 v2.3.6
 ------
 
+ - Bug: Random freeze while calculating frames in stack trace
  - Bug: Strings loose NULL termination when being mutated
 
 v2.3.5
