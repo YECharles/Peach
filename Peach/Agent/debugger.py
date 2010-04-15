@@ -222,9 +222,9 @@ try:
 				print "Exception: Building crashInfo"
 				
 				if minidump:
-					self.crashInfo = { 'StackTrace.txt' : self.buff, 'Dump.dmp' : minidump }
+					self.crashInfo = { 'StackTrace.txt' : self.buff.replace(chr(0x0a), "\r\n"), 'Dump.dmp' : minidump }
 				else:
-					self.crashInfo = { 'StackTrace.txt' : self.buff }
+					self.crashInfo = { 'StackTrace.txt' : self.buff.replace(chr(0x0a), "\r\n") }
 				
 				# Build bucket string
 				try:
