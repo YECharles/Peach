@@ -2298,8 +2298,12 @@ class ParseTemplate:
 		for child in node.childNodes:
 						
 			if child.nodeName == 'Publisher':
-				test.publisher = self.HandlePublisher(child, test)
-				test.append(test.publisher.domPublisher)
+				if not test.publishers:
+					test.publishers = []
+			
+				pub = self.HandlePublisher(child, test)
+				test.publishers.append(pub)
+				test.append(pub.domPublisher)
 			
 			elif child.nodeName == 'Agent':
 				if child.hasAttributeNS(None, 'ref'):
@@ -2369,7 +2373,7 @@ class ParseTemplate:
 		if test.template == None and test.stateMachine == None:
 			raise PeachException(PeachStr("Test %s does not have a Template or StateMachine defined" % name))
 		
-		if test.publisher == None:
+		if len(test.publishers) == 0:
 			raise PeachException(PeachStr("Test %s does not have a publisher defined!" % name))
 		
 		if test.template != None and test.stateMachine != None:
@@ -2579,6 +2583,9 @@ class ParseTemplate:
 		
 		publisher.classStr = publisherClass = self._getAttribute(node, "class")
 		
+		if node.hasAttributeNS(None, "name"):
+			publisher.name = self._getAttribute(node, "name")
+		
 		# children
 		
 		for child in node.childNodes:
@@ -2778,6 +2785,7 @@ class ParseTemplate:
 		action.valueLiteral = self._getAttribute(node, 'value')
 		action.method = self._getAttribute(node, 'method')
 		action.property = self._getAttribute(node, 'property')
+		action.publisher = self._getAttribute(node, 'publisher')
 		
 		# Quick hack to get open support.  open and connect are same.
 		if action.type == 'open':

@@ -63,11 +63,11 @@ class StateEngine:
 	Runs a StateMachine instance.
 	'''
 	
-	def __init__(self, engine, stateMachine, publisher):
+	def __init__(self, engine, stateMachine, publishers):
 		'''
 		engine - Engine
 		stateMachien - StateMachine to use
-		publisher - Publisher to use
+		publishers - Available Publishers
 		'''
 		
 		#: Engine reference
@@ -76,8 +76,8 @@ class StateEngine:
 		#: State model we are using
 		self.stateMachine = stateMachine
 		
-		#: Publisher we are using
-		self.publisher = publisher
+		# publishers - Available Publishers
+		self.publishers = publishers
 		
 		self.f = peachPrint
 		
@@ -120,8 +120,9 @@ class StateEngine:
 		
 		Debug(1, "StateEngine.run: %s" % self.stateMachine.name)
 
-		self.publisher.hasBeenConnected = False
-		self.publisher.hasBeenStarted = False
+		for pub in self.publishers:
+			pub.hasBeenConnected = False
+			pub.hasBeenStarted = False
 		
 		self.actionValues = []
 		
@@ -155,19 +156,31 @@ class StateEngine:
 		
 		finally:
 		
-			# At end of state machine make sure publisher is closed
-			if self.publisher.hasBeenConnected:
-				self.publisher.close()
-				self.publisher.hasBeenConnected = False
-				
-			# At end of state machine make sure publisher is stopped
-			if self.publisher.hasBeenStarted:
-				self.publisher.stop()
-				self.publisher.hasBeenStarted = False
+			for pub in self.publishers:
+				# At end of state machine make sure publisher is closed
+				if pub.hasBeenConnected:
+						pub.close()
+						pub.hasBeenConnected = False
+
+				# At end of state machine make sure publisher is stopped
+				if pub.hasBeenStarted:
+					pub.stop()
+					pub.hasBeenStarted = False
 			
 		mutator.onStateMachineFinished(self)
 		
 		return self.actionValues
+		
+	def _getPublisherByName(self, publisherName):
+		'''
+		Locate a Publisher object by name
+		'''
+		
+		for child in self.publishers:
+			if child.domPublisher.elementType == 'publisher' and child.domPublisher.name == publisherName:
+				return child
+		
+		return None
 
 	def _getStateByName(self, stateName):
 		'''
@@ -341,6 +354,15 @@ class StateEngine:
 				
 		mutator.onActionStarting(action.parent, action)
 		
+		# If publisher property has been given, use referenced Publisher; otherwise the first one
+		if action.publisher != None:
+			pub = self._getPublisherByName(action.publisher)
+			
+			if pub == None:
+				raise PeachException("Publisher '%s' not found!" % action.publisher)
+		else:
+			pub = self.publishers[0]
+		
 		# EVENT: when
 		if action.when != None:
 			environment = {
@@ -380,12 +402,12 @@ class StateEngine:
 		if action.type == 'input':
 			action.value = None
 			
-			if self.publisher.hasBeenStarted == False:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
-			if not self.publisher.hasBeenConnected:
-				self.publisher.connect()
-				self.publisher.hasBeenConnected = True
+			if pub.hasBeenStarted == False:
+				pub.start()
+				pub.hasBeenStarted = True
+			if not pub.hasBeenConnected:
+				pub.connect()
+				pub.hasBeenConnected = True
 			
 			# Make a fresh copy of the template
 			action.__delitem__(action.template.name)
@@ -393,7 +415,7 @@ class StateEngine:
 			action.append(action.template)
 			
 			# Create buffer
-			buff = PublisherBuffer(self.publisher)
+			buff = PublisherBuffer(pub)
 			self.dirtyXmlCache()
 			
 			# Crack data
@@ -407,12 +429,12 @@ class StateEngine:
 			
 		elif action.type == 'output':
 			
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
-			if not self.publisher.hasBeenConnected:
-				self.publisher.connect()
-				self.publisher.hasBeenConnected = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
+			if not pub.hasBeenConnected:
+				pub.connect()
+				pub.hasBeenConnected = True
 			
 			# Run mutator
 			mutator.onDataModelGetValue(action, action.template)
@@ -433,10 +455,10 @@ class StateEngine:
 			
 			Debug(1, "Actiong output sending %d bytes" % len(action.value))
 			
-			if not self.publisher.withNode:
-				self.publisher.send(action.value)
+			if not pub.withNode:
+				pub.send(action.value)
 			else:
-				self.publisher.sendWithNode(action.value, action.template)
+				pub.sendWithNode(action.value, action.template)
 			
 			self.actionValues.append( [ action.name, 'output', action.value ] )
 			
@@ -450,9 +472,9 @@ class StateEngine:
 			
 			actionParams = []
 			
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
 			
 			# build up our call
 			method = action.method
@@ -491,10 +513,10 @@ class StateEngine:
 				
 				actionParams.append([p.name, 'param', p.value])
 			
-			if not self.publisher.withNode:
-				ret = self.publisher.call(method, argValues)
+			if not pub.withNode:
+				ret = pub.call(method, argValues)
 			else:
-				ret = self.publisher.callWithNode(method, argValues, argNodes)
+				ret = pub.callWithNode(method, argValues, argNodes)
 			
 			# look for and set return
 			for c in action:
@@ -534,16 +556,16 @@ class StateEngine:
 		elif action.type == 'getprop':
 			action.value = None
 			
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
 			
 			# build up our call
 			property = action.property
 			if property == None:
 				raise Exception("StateEngine._runAction(): getprop type does not have property name!")
 			
-			data = self.publisher.property(property)
+			data = pub.property(property)
 			
 			self.actionValues.append( [ action.name, 'getprop', property, data ] )
 			
@@ -567,9 +589,9 @@ class StateEngine:
 		elif action.type == 'setprop':
 			action.value = None
 			
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
 				
 			# build up our call
 			property = action.property
@@ -599,10 +621,10 @@ class StateEngine:
 					valueNode = c.template
 					break
 			
-			if not self.publisher.withNode:
-				self.publisher.property(property, value)
+			if not pub.withNode:
+				pub.property(property, value)
 			else:
-				self.publisher.propertyWithNode(property, value, valueNode)
+				pub.propertyWithNode(property, value, valueNode)
 			
 			self.actionValues.append( [ action.name, 'setprop', property, value ] )
 		
@@ -679,38 +701,38 @@ class StateEngine:
 			#print " - Total time to slurp data: %.2f" % (time.time() - startTime)
 		
 		elif action.type == 'connect':
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
 				
-			self.publisher.connect()
-			self.publisher.hasBeenConnected = True
+			pub.connect()
+			pub.hasBeenConnected = True
 		
 		elif action.type == 'accept':
-			if not self.publisher.hasBeenStarted:
-				self.publisher.start()
-				self.publisher.hasBeenStarted = True
+			if not pub.hasBeenStarted:
+				pub.start()
+				pub.hasBeenStarted = True
 			
-			self.publisher.accept()
-			self.publisher.hasBeenConnected = True
+			pub.accept()
+			pub.hasBeenConnected = True
 		
 		elif action.type == 'close':
-			if not self.publisher.hasBeenConnected:
+			if not pub.hasBeenConnected:
 				# If we haven't been opened lets ignore
 				# this close.
 				return
 				
-			self.publisher.close()
-			self.publisher.hasBeenConnected = False
+			pub.close()
+			pub.hasBeenConnected = False
 		
 		elif action.type == 'start':
-			self.publisher.start()
-			self.publisher.hasBeenStarted = True
+			pub.start()
+			pub.hasBeenStarted = True
 		
 		elif action.type == 'stop':
-			if self.publisher.hasBeenStarted:
-				self.publisher.stop()
-				self.publisher.hasBeenStarted = False
+			if pub.hasBeenStarted:
+				pub.stop()
+				pub.hasBeenStarted = False
 		
 		elif action.type == 'wait':
 			time.sleep(float(action.valueLiteral))

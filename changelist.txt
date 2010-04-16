@@ -7,10 +7,15 @@ but I'm going to try and start :)
 v2.3.6
 ------
 
+ - New: Multiple Publishers are now supported by adding a "name" attribute
+        to the <Publisher> element and a "publisher" attribute to <Action>.
+ - Bug: StringMutator changed to set currentValue instead of finalValue.
+        fixes bugs related to NULL termination or Unicode encodings.
  - Bug: Windows Debugger module didn't have CRLF line feeds causing
         notepad to display stacktrace wrong.
  - Bug: Random freeze while calculating frames in stack trace
  - Bug: Strings loose NULL termination when being mutated
+
 
 v2.3.5
 ------

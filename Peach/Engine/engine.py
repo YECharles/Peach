@@ -555,9 +555,9 @@ class Engine(object):
 		'''
 		
 		stateMachine = test.stateMachine
-		stateEngine = StateEngine(self, stateMachine, test.publisher)
+		stateEngine = StateEngine(self, stateMachine, test.publishers)
 		
-		pub = test.publisher
+		pub = test.publishers
 		
 		totalTests = "?"
 		testCount = 0
@@ -771,13 +771,14 @@ class Engine(object):
 				print "-- Shutting down publisher(s)"
 				
 				try:
-					if hasattr(pub, "hasBeenConnected") and pub.hasBeenConnected:
-						pub.close()
-						pub.hasBeenConnected = False
+					for pub in test.publishers:
+						if hasattr(pub, "hasBeenConnected") and pub.hasBeenConnected:
+							pub.close()
+							pub.hasBeenConnected = False
 					
-					if hasattr(pub, "hasBeenStarted") and pub.hasBeenStarted:
-						pub.stop()
-						pub.hasBeenStarted = False
+						if hasattr(pub, "hasBeenStarted") and pub.hasBeenStarted:
+							pub.stop()
+							pub.hasBeenStarted = False
 					
 				except:
 					pass
@@ -804,7 +805,7 @@ class Engine(object):
 		print ("[*] Running path validation test[%s]\n" % test.name)
 		try:
 			
-			stateEngine = StateEngine(self, stateMachine, test.publisher)
+			stateEngine = StateEngine(self, stateMachine, test.publishers)
 			
 			# Create a path validator to check basic validation rules
 			mutator = PathValidationMutator()

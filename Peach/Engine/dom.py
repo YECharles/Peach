@@ -2605,7 +2605,7 @@ class Test(ElementWithChildren):
 		self.description = None
 		self.template = None
 		self.data = None
-		self.publisher = None
+		self.publishers = None
 		self.stateMachine = None
 		self.ref = None
 		self.mutators = None
@@ -5184,6 +5184,7 @@ class Action(Mutatable):
 		self.value = None
 		self.method = None
 		self.property = None
+		self.publisher = None;
 
 class ActionParam(ElementWithChildren):
 	def __init__(self, name, parent):

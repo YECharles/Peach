@@ -1250,7 +1250,7 @@
 					</xs:complexType>
 				</xs:element>
 
-				<xs:element name="Publisher" minOccurs="1">
+				<xs:element name="Publisher" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>Define the publisher to use for this test. A publisher sends and
 							receives data. This can take the form of a network protocol (TCP, UDP, HTTP) or
@@ -1261,6 +1261,7 @@
 						<xs:sequence minOccurs="0" maxOccurs="unbounded">
 							<xs:element ref="Param" />
 						</xs:sequence>
+						<xs:attributeGroup ref="peachCommonAttributes" />
 						<xs:attribute name="class" use="required">
 							<xs:annotation>
 								<xs:documentation>Specify the python class name of a Peach publisher class. You can
@@ -2195,6 +2196,11 @@
 										<xs:annotation>
 											<xs:documentation>Python expression that will be evauluated before this Action is performed.  If the 
 												expression evaulates to true the action will be performed otherwise it will be skipped.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="publisher" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Name of publisher to use. If not specified it defaults to first declared publisher.</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
 									<xs:attribute name="onStart" type="xs:string">
