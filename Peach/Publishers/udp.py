@@ -33,7 +33,7 @@ Default UDP publishers.
 
 # $Id$
 
-import socket, time
+import socket, time,sys
 from Peach.publisher import *
 import Peach
 
@@ -175,7 +175,7 @@ class Udp6(Publisher):
 			
 			if hasattr(self, "publisherBuffer"):
 				self.publisherBuffer.haveAllData = True
-		
+			
 			return data
 		except:
 			if data == None or len(data) < size:
@@ -204,8 +204,6 @@ class UdpListener(Publisher):
 			self._timeout = 2
 			
 		self._socket = None
-		self.buff = ""
-		self.pos = 0
 			
 	def stop(self):
 		'''Close connection if open'''
@@ -215,8 +213,6 @@ class UdpListener(Publisher):
 		if self._socket != None:
 			self._socket.close()
 			self._socket = None
-		self.buff = ""
-		self.pos = 0
 			
 	def connect(self):
 		if self._socket != None:
@@ -224,8 +220,6 @@ class UdpListener(Publisher):
 			self._socket.close()
 		self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self._socket.bind((self._host,int(self._port)))
-		self.buff = ""
-		self.pos = 0
 		
 	def send(self, data):
 		'''
@@ -241,11 +235,11 @@ class UdpListener(Publisher):
 			pass
 	
 	def receive(self, size = None):
-		data,addr = self._socket.recvfrom(65565)
+		data,self.addr = self._socket.recvfrom(65565)
 		
 		if hasattr(self, "publisherBuffer"):
-			publisherBuffer.haveAllData = True
+			self.publisherBuffer.haveAllData = True
 			
 		return data
-		
+
 # end
