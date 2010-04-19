@@ -547,7 +547,7 @@ class StateEngine:
 					else:
 						cracker = DataCracker(self.engine.peach)
 						cracker.haveAllData = True
-						(rating, pos) = cracker.crackData(c.template, PublisherBuffer(None,data))
+						(rating, pos) = cracker.crackData(c.template, PublisherBuffer(None, data, True))
 						if rating > 2:
 							raise SoftException("Was unble to crack result data into %s data model." % c.template.name)
 			

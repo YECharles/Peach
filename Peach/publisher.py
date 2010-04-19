@@ -65,7 +65,7 @@ class PublisherBuffer:
 	An IO buffer.
 	'''
 	
-	def __init__(self, publisher, data = None):
+	def __init__(self, publisher, data = None, haveAllData = False):
 		
 		#: Publisher associated with buffer
 		self.publisher = publisher
@@ -77,7 +77,7 @@ class PublisherBuffer:
 		self.data = ""
 		
 		#: Do we have all the data?
-		self.haveAllData = False
+		self.haveAllData = haveAllData
 		
 		if data != None:
 			self.data = data
