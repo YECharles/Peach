@@ -89,6 +89,8 @@ class PageHeap(Monitor):
 				os.environ["SystemDrive"]+"\\",
 				os.environ["ProgramFiles"],
 				]
+			if "ProgramW6432" in os.environ:
+				pgPaths.append(os.environ["ProgramW6432"])
 			if "ProgramFiles(x86)" in os.environ:
 				pgPaths.append(os.environ["ProgramFiles(x86)"])
 			
