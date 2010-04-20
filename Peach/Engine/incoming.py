@@ -1505,6 +1505,21 @@ class DataCracker:
 			Debug(1, "_handleChoice(): Tring child [%s]" % child.name)
 			
 			fastCheck, fastCheckOffset, fastCheckValue = child.choiceCache
+			
+			# Check and see if we need to read more data for check
+			if fastCheck and len(fastCheckValue) > (len(buff.data) - (pos+fastCheckOffset)):
+				# Need to read some data in if posssible
+				if buff.haveAllData:
+					Debug(1, "_handleChoice(): FastCheck: Not enough data to match, NEXT!")
+					continue
+				
+				else:
+					size = len(fastCheckValue) - (len(buff.data) - (pos+fastCheckOffset))
+					buff.read(size)
+					if len(fastCheckValue) > (len(buff.data) - (pos+fastCheckOffset)):
+						Debug(1, "_handleChoice(): FastCheck: Not enough data to match, NEXT!")
+						continue
+				
 			if fastCheck and buff.data[pos+fastCheckOffset:pos+fastCheckOffset+len(fastCheckValue)] != fastCheckValue:
 				Debug(1, "_handleChoice(): FastCheck: [%s] != [%s] NEXT!" % (buff.data[pos+fastCheckOffset:pos+len(fastCheckValue)],fastCheckValue))
 				continue
