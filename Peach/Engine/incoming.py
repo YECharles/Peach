@@ -2070,13 +2070,23 @@ class DataCracker:
 		# Are we last?
 		if self._nextNode(node) == None:
 			
+			# Are we in an array
+			obj = node
+			inArray = False
+			while obj.parent != None and isinstance(obj.parent, DataElement):
+				if obj.maxOccurs > 1:
+					inArray = True
+					break
+				
+				obj = obj.parent
+			
 			# Note: If doingMinMax then we can't
 			# assume we should eat all data even
 			# if we are the last node!
 			#
 			# Note2: maxOccurs can lie if we are doingMinMax!
 			#
-			if newpos < len(buff.data) and node.maxOccurs == 1 and (node.parent == None or node.parent.maxOccurs == 1) and not doingMinMax:
+			if newpos < len(buff.data) and not inArray and not doingMinMax:
 				# We didn't use it all up, sad for us!
 				Debug(1, "--- Didn't use all data, rating == 4")
 				rating = 4
