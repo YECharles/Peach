@@ -297,13 +297,15 @@ class PeachValidatorGui(gui.PeachValidation):
 			# Simce analyzers can modify the DOM we need to make our list
 			# of objects we will look at first!
 			
+			print "Looking for analyzers to run"
+			
 			objs = []
 			
 			for child in self.template.getElementsByType(Blob):
-				if child.analyzer != None and child.defaultValue != None and child not in objs:
+				if child.analyzer != None and child not in objs:
 					objs.append(child)
 			for child in self.template.getElementsByType(String):
-				if child.analyzer != None and child.defaultValue != None and child not in objs:
+				if child.analyzer != None and child not in objs:
 					objs.append(child)
 			
 			for child in objs:
@@ -312,10 +314,10 @@ class PeachValidatorGui(gui.PeachValidation):
 				except:
 					analyzer = eval("PeachXml_"+"%s()" % child.analyzer)
 				
-				analyzer.asDataElement(child, {}, child.defaultValue)
+				analyzer.asDataElement(child, {}, child.getInternalValue())
 			
 		except:
-			#raise
+			raise
 			self.treeDataTree.SetItemImage(self.root, self.treeImages.NodeError)
 		
 		# Build tree

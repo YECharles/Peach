@@ -1,14 +1,15 @@
 Peach Changlist
 ===============
 
-I've never been good about keeping change lists,
-but I'm going to try and start :)
 
 v2.3.6
 ------
 
  - New: Multiple Publishers are now supported by adding a "name" attribute
         to the <Publisher> element and a "publisher" attribute to <Action>.
+ - Bug: Fixed issue were Peach Validator would not always run analyzers
+ - Bug: Updated WireShark Analyzer to use <DataModel> instead of <Template>
+ - Bug: Fixed bug with ASCII strings containing char values over 127
  - Bug: Fixed bug in <Choice> fast checking.
  - Bug: Fixed minor issue with <Result> cracking (marked data as haveAll).
  - Bug: Fixed two bugs in UdpListener

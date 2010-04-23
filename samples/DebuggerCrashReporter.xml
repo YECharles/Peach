@@ -5,22 +5,15 @@
 
 	<!--
 		
-		Example of the WindowsDebugger monitor.  This example will launch a 
-		program with an attached debugger and log stack traces on faults.  The
-		included example program will fault on test 47.
+		Example of the OS X Crash Reporter monitor.  This example will use the OS X
+		Crash Repoter functionality to detect faults.  This feature is still in BETA.
 		
 		Syntax:
 		
 		  python peach.py -a
 		  
-		  python peach.py samples\Debugger.xml
-		
-		Output:
-		
-		  You will see the tests scroll along.  Once test 47 has occured you can check
-		  the c:\peach\logfiles folder for a log of this test that will include a Debugger.txt
-		  faul output.
-		
+		  python peach.py samples\DebuggerCrashReporter.xml
+				
 		Authors:
 		
 		  Michael Eddington (mike@phed.org)

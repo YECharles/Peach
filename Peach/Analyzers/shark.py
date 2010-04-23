@@ -410,7 +410,7 @@ class PeachShark:
 			
 			if tabCount == 1:
 				if len(showName) > 1: ret += tabs + '<!-- %s -->\n' % showName
-				ret += tabs + '<Template name="%s">\n' % self._genName
+				ret += tabs + '<DataModel name="%s">\n' % self._genName
 			else:
 				ret += tabs + '<Block %s>\n' % nodeName
 			
@@ -473,7 +473,7 @@ class PeachShark:
 			# Dunno if we need this anymore
 			if tabCount == 1:
 				name = self._genName[3:]
-				ret += tabs + '</Template>\n'
+				ret += tabs + '</DataModel>\n'
 			else:
 				ret += tabs + '</Block>\n'
 			
