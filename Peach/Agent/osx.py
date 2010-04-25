@@ -28,69 +28,8 @@
 
 import struct, sys, time
 from Peach.agent import Monitor
-
 import os, re, pickle
-import tempfile
-from subprocess import *
-from threading import *
-import popen2
 
-def _MonitorSyslog(*args, **kargs):
-	'''
-	Watch syslog for Crash Reports
-	'''
-	
-	try:
-		
-		#print "> _MonitorSyslog"
-		
-		eventStarted = kargs["EventStarted"]
-		eventFormulating = kargs["EventFormulating"]
-		eventCrashReport = kargs["EventCrashReport"]
-		eventQuit = kargs["EventQuit"]
-		crashReporter = kargs["Context"]
-		
-		reFormulating = r"Formulating crash report for process [^\\[]*\\\[(\d+)\\\]"
-		reCrashReport = r"Saved crashreport to (.*) using"
-		
-		p = popen2.Popen4(
-			"/usr/bin/syslog -w 1 -k Facility eq \"Crash Reporter\"")
-		
-		crashReporter.monitorPid = None
-		crashReporter.monitorCrashReport = None
-		
-		if p.poll() != -1:
-			raise Exception("Failed to run syslog")
-		
-		eventStarted.set()
-		
-		while (not eventQuit.isSet()) and p.poll() == -1:
-			line = p.fromchild.readline()
-			
-			m = re.search(reFormulating, line)
-			if m:
-				print "CrashReporter: !!! FOUND FAULT !!!"
-				crashReporter.monitorPid = int(m.group(1))
-				eventFormulating.set()
-				
-				line = p.fromchild.readline()
-				m = re.search(reCrashReport, line)
-				if m:
-					crashReporter.monitorCrashReport = m.group(1)
-					eventCrashReport.set()
-		
-		if p.poll() == None:
-			print "_MonitorSyslog: syslog exited!"
-		
-	except:
-		print "_MonitorSyslog: Exception:", sys.exc_info()
-		raise
-	
-	finally:
-		eventStarted.clear()
-	
-	#print "< _MonitorSyslog"
-	
 
 class CrashReporter(Monitor):
 	'''
@@ -110,46 +49,25 @@ class CrashReporter(Monitor):
 		else:
 			self.ProcessName = None
 		
+		if args.has_key('LogFolder'):
+			self.logFolder = str(args['LogFolder']).replace("'''", "")
+		else:
+			self.logFolder = os.path.join(os.environ['HOME'], "Library/Logs/CrashReporter")
+		
 		# Our name for this monitor
 		self._name = "CrashReporter"
 		
-		self.eventCrashReport = Event()
-		self.eventFormulating = Event()
-		self.eventQuit = Event()
-		self.eventStarted = Event()
-		
-		self.monitorPid = None
-		self.monitorCrashReport = None
-		
-		self.thread = None
+		self.data = None
+		self.startingFiles = None
+	
 	
 	def OnTestStarting(self):
 		'''
 		Called right before start of test case or variation
 		'''
 		
-		if not self.thread or not self.thread.isAlive():
-			if self.thread:
-				self.thread.join()
-			
-			self.eventCrashReport.clear()
-			self.eventFormulating.clear()
-			self.eventQuit.clear()
-			self.eventStarted.clear()
-			
-			self.thread = None
-			self.thread = Thread(target=_MonitorSyslog, kwargs = {
-				"EventStarted": self.eventStarted,
-				"EventFormulating": self.eventFormulating,
-				"EventCrashReport": self.eventCrashReport,
-				"EventQuit" : self.eventQuit,
-				"Context": self
-				})
-			self.thread.start()
-			
-			print "Waiting for eventStarted"
-			self.eventStarted.wait()
-			print "Done waiting..."
+		# Monitor folder
+		self.startingFiles = os.listdir(self.logFolder)
 	
 	def OnTestFinished(self):
 		'''
@@ -162,34 +80,39 @@ class CrashReporter(Monitor):
 		Get any monitored data from a test case.
 		'''
 		
-		if not self.eventFormulating.isSet():
+		if self.data == None:
 			return None
 		
-		self.eventCrashReport.wait()
-		
-		fileName = self.monitorCrashReport
-		
-		self.monitorCrashReport = None
-		self.monitorPid = None
-		
-		fd = open(fileName, "rb")
-		data = fd.read()
-		fd.close()
-		
-		self.eventFormulating.clear()
-		self.eventCrashReport.clear()
-		
-		return {"CrashReport.txt": data}
+		return {"CrashReport.txt":self.data}
 	
 	def DetectedFault(self):
 		'''
 		Check if a fault was detected.
 		'''
 		
-		# Give crash reporter time to find the crash
-		time.sleep(2)
+		try:
+			# Give crash reporter time to find the crash
+			time.sleep(0.25)
+			time.sleep(0.25)
+			
+			#return self.eventFormulating.isSet()
+			
+			self.data = None
+			for f in os.listdir(self.logFolder):
+				if not f in self.startingFiles:
+					fd = open(os.path.join(self.logFolder, f), "rb")
+					self.data = fd.read()
+					fd.close()
+					
+					return True
+				
+			
+			return False
 		
-		return self.eventFormulating.isSet()
+		except:
+			print sys.exc_info()
+		
+		return False
 	
 	def OnFault(self):
 		'''
@@ -202,8 +125,7 @@ class CrashReporter(Monitor):
 		Called when Agent is shutting down, typically at end
 		of a test run or when a Stop-Run occurs
 		'''
-		self.eventQuit.set()
-		self.thread.join()
+		pass
 	
 	def StopRun(self):
 		'''
