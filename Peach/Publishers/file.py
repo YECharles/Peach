@@ -576,7 +576,15 @@ class FileWriterLauncher(Publisher):
 			# Launch via agent
 			
 			Engine.context.agent.OnPublisherCall(method)
-			time.sleep(self.waitTime)
+			
+			methodRunning = method + "_isrunning"
+			for i in range(long(self.waitTime/0.25)):
+				ret = Engine.context.agent.OnPublisherCall(methodRunning)
+				if ret == False:
+					# Process exited already
+					break
+				
+				time.sleep(0.25)
 		
 		else:
 			# Launch via spawn
@@ -620,7 +628,15 @@ class FileWriterLauncher(Publisher):
 			# Launch via agent
 			
 			Engine.context.agent.OnPublisherCall(method)
-			time.sleep(self.waitTime)
+			
+			methodRunning = method + "_isrunning"
+			for i in range(long(self.waitTime/0.25)):
+				ret = Engine.context.agent.OnPublisherCall(methodRunning)
+				if ret == False:
+					# Process exited already
+					break
+				
+				time.sleep(0.25)
 		
 		else:
 			# Launch via spawn
@@ -768,8 +784,6 @@ try:
 				
 				time.sleep(1)
 			
-			#self._fd_sequencial = open("%s_%d" % (self._filename, self.count), "w+b")
-			
 			self._state = 1
 		
 		def stop(self):
@@ -832,6 +846,15 @@ try:
 				# Launch via agent
 				
 				Engine.context.agent.OnPublisherCall(method)
+				
+				methodRunning = method + "_isrunning"
+				for i in range(long(self.waitTime/0.25)):
+					ret = Engine.context.agent.OnPublisherCall(methodRunning)
+					if ret == False:
+						# Process exited already
+						break
+					
+					time.sleep(0.15)
 			
 			else:
 				realArgs = [method]
@@ -846,8 +869,8 @@ try:
 					print "Error: Exception thrown creating process"
 					raise
 			
-			# Wait 5 seconds
-			time.sleep(self.waitTime)
+				# Wait 5 seconds
+				time.sleep(self.waitTime)
 			
 			self.closeApp(proc, self._windowName)
 		
@@ -861,7 +884,6 @@ try:
 			windowName = args[1]
 			
 			try:
-				
 				# Get window title
 				title = win32gui.GetWindowText(hwnd)
 				
@@ -872,8 +894,6 @@ try:
 				
 				# Send WM_CLOSE message
 				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
-				win32gui.PostQuitMessage(hwnd)
-				
 			except:
 				pass
 		
@@ -899,9 +919,10 @@ try:
 				
 				# Send WM_CLOSE message
 				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
-				win32gui.PostQuitMessage(hwnd)
+				
 			except:
 				pass
+				#print sys.exc_info()
 		
 		enumChildCallback = staticmethod(enumChildCallback)
 		
@@ -941,7 +962,7 @@ try:
 			try:
 				win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, [proc, title])
 				
-				if proc:
+				if proc != None and not self.debugger:
 					win32event.WaitForSingleObject(int(proc._handle), 5*1000)
 					
 					for pid in self.genChildProcesses(proc):
@@ -951,9 +972,11 @@ try:
 							win32api.CloseHandle(handle)
 						except:
 							pass
+				
 			except:
 				pass
 			
+	
 	###class FileRegressionGui(Publisher):
 	###	'''
 	###	Writes a file to disk and then launches a program.  After

@@ -444,10 +444,13 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 		
 		print "Agent: onPublisherCall()"
 		
+		outRet = None
 		for m in self._monitors:
-			m.PublisherCall(msg.method)
+			ret = m.PublisherCall(msg.method)
+			if ret != None:
+				outRet = ret
 		
-		return pickle.dumps(_Msg(None, _MsgType.Ack))
+		return pickle.dumps(_Msg(None, _MsgType.Ack, outRet))
 
 	def _stopAllMonitors(self):
 		'''
@@ -852,6 +855,7 @@ class AgentClient:
 			raise PeachException("Lost connection to Agent %s during OnPublisherCall call." % self._name)
 		
 		Debug("< OnPublisherCall")
+		return msg.results
 	
 	def OnTestFinished(self):
 		'''
@@ -1065,8 +1069,13 @@ class AgentPlexer:
 			self._agents[name].OnTestStarting()
 	
 	def OnPublisherCall(self, method):
+		ourRet = None
 		for name in self._agents.keys():
-			self._agents[name].OnPublisherCall(method)
+			ret = self._agents[name].OnPublisherCall(method)
+			if ret != None:
+				ourRet = ret
+		
+		return ourRet
 			
 	def OnTestFinished(self):
 		'''

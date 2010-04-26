@@ -594,10 +594,16 @@ try:
 		def PublisherCall(self, method):
 			
 			if not self.StartOnCall:
-				return
+				return None
 			
 			if self.OnCallMethod == method.lower():
 				self._StartDebugger()
+				return True
+			
+			if self.OnCallMethod+"_isrunning" == method.lower():
+				return not self.quit.is_set()
+			
+			return None
 		
 		def OnTestFinished(self):
 			if not self.StartOnCall or not self._IsDebuggerAlive():

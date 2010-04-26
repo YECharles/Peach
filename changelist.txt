@@ -7,6 +7,7 @@ v2.3.6
 
  - New: Multiple Publishers are now supported by adding a "name" attribute
         to the <Publisher> element and a "publisher" attribute to <Action>.
+ - Changed: Improved Agent to Publisher communication, increasing fuzzing speed
  - Changed: Improved osx.CrashReporter monitor.  More reliable now.
  - Bug: Fixed issue were Peach Validator would not always run analyzers
  - Bug: Updated WireShark Analyzer to use <DataModel> instead of <Template>
