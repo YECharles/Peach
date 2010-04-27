@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.7
 ------
 
+ - Bug: Fixed couple bugs in XmlAnalyzer when attached to a String
 
 v2.3.6
 ------

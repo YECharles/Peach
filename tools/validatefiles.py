@@ -31,16 +31,29 @@ Syntax: validatefiles <Peach PIT> <Data Model> <Input Files>
 from Peach.Engine import *
 from Peach.Engine.incoming import DataCracker
 from Peach.publisher import *
+from Peach.analyzer import Analyzer
+from Peach.Analyzers import *
 
 inputFiles = []
-inputFilesPath = sys.argv[2]
-dataModelName = sys.argv[1]
-xmlFile = sys.argv[0]
+inputFilesPath = sys.argv[3]
+dataModelName = sys.argv[2]
+xmlFile = sys.argv[1]
 
-inputFiles = glob.glob(inputFilesPath)
+if os.path.isdir(inputFilesPath):
+	for file in os.listdir(inputFilesPath):
+		inputFiles.append(os.path.join(inputFilesPath, file))
+
+else:
+	inputFiles = glob.glob(inputFilesPath)
+
+print " - Found %d files\n" % len(inputFiles)
+
+peach = Analyzer.DefaultParser().asParser("file:"+xmlFile)
+dataModel = peach.templates[dataModelName]
 
 for file in inputFiles:
-	self.peach = Analyzer.DefaultParser().asParser("file:"+file)
+	#peach = Analyzer.DefaultParser().asParser("file:"+xmlFile)
+	dataModel = peach.templates[dataModelName].copy(peach)
 	
 	fd = open(file, "rb")
 	data = fd.read()
@@ -48,8 +61,8 @@ for file in inputFiles:
 	
 	buff = PublisherBuffer(None, data, True)
 	
-	cracker = DataCracker(self.peach)
-	cracker.optmizeModelForCracking(self.peach, True)
+	cracker = DataCracker(peach)
+	cracker.optmizeModelForCracking(dataModel, True)
 	cracker.crackData(dataModel, buff)
 	
 	if dataModel.getValue() == data:

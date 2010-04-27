@@ -76,6 +76,9 @@ class XmlAnalyzer(Analyzer):
 		Should return a DataElement such as Block, Number or String.
 		'''
 		
+		if len(dataBuffer) == 0:
+			return
+		
 		dom = _Xml2Dom().xml2Dom(dataBuffer)
 		
 		# Replace parent with new dom
@@ -261,6 +264,9 @@ class _Xml2Peach(object):
 		Returns an XmlElement object.
 		'''
 		
+		if parent == None:
+			return None
+		
 		doc = parent.ownerDocument
 		if doc == None:
 			doc = parent
@@ -343,10 +349,8 @@ class _Xml2Dom(object):
 		Returns an XmlElement object.
 		'''
 		
-		doc = parent.ownerDocument
-		if doc == None:
-			doc = parent
-
+		doc = node.rootNode
+		
 		## Element
 		
 		element = XmlElement(None, parent)
