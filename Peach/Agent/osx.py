@@ -54,6 +54,11 @@ class CrashReporter(Monitor):
 		else:
 			self.logFolder = os.path.join(os.environ['HOME'], "Library/Logs/CrashReporter")
 		
+		if args.has_key('CrashWrangler') and str(args['CrashWrangler']).replace("'''", "").lower() == "false":
+			self.crashWrangler = False
+		else:
+			self.crashWrangler = True
+		
 		# Our name for this monitor
 		self._name = "CrashReporter"
 		
