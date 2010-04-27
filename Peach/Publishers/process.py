@@ -35,7 +35,7 @@ Start a process with data as parameter.
 
 
 from Peach.publisher import Publisher
-import os
+import os, sys, time
 
 class Command(Publisher):
 	'''
@@ -100,8 +100,8 @@ class Launcher(Publisher):
 		pid = os.spawnv(os.P_NOWAIT, self.command, realArgs)
 		
 		for i in range(0, long(self.waitTime/0.15)):
-			(pid, ret) = os.waitpid(pid, os.WNOHANG)
-			if not (pid == 0 and ret == 0):
+			(pid1, ret) = os.waitpid(pid, os.WNOHANG)
+			if not (pid1 == 0 and ret == 0):
 				break
 			
 			time.sleep(0.15)
@@ -109,10 +109,14 @@ class Launcher(Publisher):
 		try:
 			import signal
 			os.kill(pid, signal.SIGTERM)
-			time.sleep(0.15)
+			time.sleep(0.25)
+			(pid1, ret) = os.waitpid(pid, os.WNOHANG)
+			if not (pid1 == 0 and ret == 0):
+				return
+			
 			os.kill(pid, signal.SIGKILL)
 		except:
-			pass
+			print sys.exc_info()
 	
 	def callWindows(self):
 		'''
