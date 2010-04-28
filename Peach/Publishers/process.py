@@ -34,6 +34,7 @@ Start a process with data as parameter.
 # $Id$
 
 
+from Peach.Engine.engine import Engine
 from Peach.publisher import Publisher
 import os, sys, time
 
@@ -211,6 +212,10 @@ class DebuggerLauncher(Publisher):
 	Launch a program via Debugger
 	'''
 	
+	def __init__(self, waitTime = 3):
+		Publisher.__init__(self)
+		self.waitTime = float(waitTime)
+		
 	def call(self, method, args):
 			
 		Engine.context.agent.OnPublisherCall(method)
