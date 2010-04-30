@@ -398,9 +398,10 @@ try:
 		stream publisher.  Close, than call a program (or two).
 		'''
 		
-		def __init__(self, waitTime = 3):
+		def __init__(self, windowname, waitTime = 3):
 			Publisher.__init__(self)
 			self.waitTime = float(waitTime)
+			self._windowName = windowname
 			
 			if sys.platform != 'win32':
 				raise PeachException("Error, publisher DebuggerLauncherGui not supported on non-Windows platforms.")
