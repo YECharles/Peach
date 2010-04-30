@@ -387,6 +387,136 @@ try:
 			except:
 				pass
 
+
+	class DebuggerLauncherGui(Publisher):
+		'''
+		Writes a file to disk and then launches a program.  After
+		some defined amount of time we will try and close the GUI
+		application by sending WM_CLOSE than kill it.
+		
+		To use, first use this publisher like the FileWriter
+		stream publisher.  Close, than call a program (or two).
+		'''
+		
+		def __init__(self, waitTime = 3):
+			Publisher.__init__(self)
+			self.waitTime = float(waitTime)
+			
+			if sys.platform != 'win32':
+				raise PeachException("Error, publisher DebuggerLauncherGui not supported on non-Windows platforms.")
+		
+		def call(self, method, args):
+			
+			Engine.context.agent.OnPublisherCall(method)
+			
+			methodRunning = method + "_isrunning"
+			for i in range(long(self.waitTime/0.25)):
+				ret = Engine.context.agent.OnPublisherCall(methodRunning)
+				if ret == False:
+					# Process exited already
+					break
+				
+				time.sleep(0.25)
+			
+			self.closeApp(None, self._windowName)
+		
+		def enumCallback(hwnd, windowName):
+			'''
+			Will get called by win32gui.EnumWindows, once for each
+			top level application window.
+			'''
+			
+			try:
+				# Get window title
+				title = win32gui.GetWindowText(hwnd)
+				
+				# Is this our guy?
+				if title.find(windowName) == -1:
+					win32gui.EnumChildWindows(hwnd, FileWriterLauncherGui.enumChildCallback, windowName)
+					return
+				
+				# Send WM_CLOSE message
+				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+			except:
+				pass
+		
+		enumCallback = staticmethod(enumCallback)
+		
+		def enumChildCallback(hwnd, windowName):
+			'''
+			Will get called by win32gui.EnumWindows, once for each
+			top level application window.
+			'''
+			
+			try:
+				
+				# Get window title
+				title = win32gui.GetWindowText(hwnd)
+				
+				# Is this our guy?
+				if title.find(windowName) == -1:
+					return
+				
+				# Send WM_CLOSE message
+				win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+				
+			except:
+				pass
+				#print sys.exc_info()
+		
+		enumChildCallback = staticmethod(enumChildCallback)
+		
+		def genChildProcesses(self, proc):
+			parentPid = proc.pid
+			
+			for p in self.genProcesses():
+				if p.th32ParentProcessID == parentPid:
+					yield p.th32ProcessID
+		
+		def genProcesses(self):
+			
+			CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
+			Process32First = ctypes.windll.kernel32.Process32First
+			Process32Next = ctypes.windll.kernel32.Process32Next
+			CloseHandle = ctypes.windll.kernel32.CloseHandle
+			
+			hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+			pe32 = PROCESSENTRY32()
+			pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
+			if Process32First(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+				print >> sys.stderr, "Failed getting first process."
+				return
+			
+			while True:
+				yield pe32
+				if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+					break
+			
+			CloseHandle(hProcessSnap)
+		
+		def closeApp(self, hProcess, title):
+			'''
+			Close Application by window title
+			'''
+			
+			try:
+				win32gui.EnumWindows(FileWriterLauncherGui.enumCallback, title)
+				
+				if hProcess != None:
+					win32event.WaitForSingleObject(hProcess, 5*1000)
+					win32api.CloseHandle(hProcess)
+					
+					for pid in self.genChildProcesses(proc):
+						try:
+							handle = win32api.OpenProcess(1, False, pid)
+							win32process.TerminateProcess(handle, -1)
+							win32api.CloseHandle(handle)
+						except:
+							pass
+				
+			except:
+				pass
+
 except:
 	pass
 
