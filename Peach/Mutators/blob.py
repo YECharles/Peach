@@ -115,6 +115,7 @@ class DWORDSliderMutator(Mutator):
 		
 		node.currentValue = data[:position] + inject + data[position + len(inject):]
 
+
 class BitFlipperMutator(Mutator):
 	'''
 	Flip a % of total bits in blob.  Default % is 20.
@@ -152,10 +153,10 @@ class BitFlipperMutator(Mutator):
 		self._current += 1
 		if self._current > self._count:
 			raise MutatorCompleted()
-
+	
 	def getCount(self):
 		return self._count
-
+	
 	def supportedDataElement(e):
 		if (isinstance(e, Blob) or isinstance(e, Template)) and e.isMutable:
 			return True
