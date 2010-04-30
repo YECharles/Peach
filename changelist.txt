@@ -4,6 +4,8 @@ Peach Changlist
 v2.3.7
 ------
 
+ - Bug: Fixed a couple bugs related to opening and closing processes
+        on OS X using the FileWriterLauncher.
  - Bug: Fixed couple bugs in XmlAnalyzer when attached to a String
 
 v2.3.6

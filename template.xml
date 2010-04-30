@@ -7,32 +7,33 @@
 
 	<!-- TODO: Create data model -->
 	<DataModel name="TheDataModel">
-		
+		<Blob lengthType="calc" length="" />
 	</DataModel>
 
 	<!-- TODO: Create state model -->
 	<StateModel name="TheState" initialState="Initial">
 
 		<State name="Initial">
-			<Action type="output">
+			<Action type="output" publisher="File">
 				<DataModel ref="TheDataModel"/>
+				<Data fileName="sample.png" />
 			</Action>
+			<Action type="close" publisher="File" />
+			<Action type="call" method="asdasd" publisher="DoLaunch" />
 		</State>
 
 	</StateModel>
 
-	<!-- TODO: Configure agent/monitors
-	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
-		<Monitor class="test.TestStopOnFirst" />
-	</Agent>
-	-->
-
 	<Test name="TheTest">
-		<!-- <Agent ref="LocalAgent"/> -->
 		<StateModel ref="TheState"/>
 
-		<!-- TODO: Complete publisher -->
-		<Publisher/>
+		<Publisher name="File" class="file.FileWriter">
+			<Param name="filename" value="fuzzed.png"/>
+		</Publisher>
+		<Publisher name="DoLaunch" class="process.Launcher">
+			<Param name="Command" value="bin\pngcheck.exe"/>
+			<Param name="Args" value="fuzzed.png"/>
+		</Publisher>
 	</Test>
 
 	<!-- Configure a single run -->
