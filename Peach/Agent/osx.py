@@ -328,7 +328,30 @@ class CrashWrangler(Monitor):
 				self._StartProcess()
 			
 			elif self.StartOnCall+"_isrunning" == method:
-				return self._IsRunning()
+				if self._IsRunning():
+					
+					cpu = None
+					try:
+						os.system("ps -o pcpu %d > .cpu" % self.pid2)
+						fd = open(".cpu", "rb")
+						data = fd.read()
+						fd.close()
+						os.unlink(".cpu")
+						
+						cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
+						if cpu.startswith("0."):
+							print "CrashWrangler: PCPU is low (%s), stopping process" % cpu
+							self._StopProcess()
+							return False
+					
+					except:
+						print sys.exc_info()
+					
+					return True
+				else:
+					return False
+					
+
 		
 		return None
 		
