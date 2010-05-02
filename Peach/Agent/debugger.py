@@ -258,7 +258,7 @@ try:
 					
 					if majorHash != None and minorHash != None:
 						
-						bucket = os.path.join(classification,
+						bucket = "%s_%s_%s_%s" % (classification,
 							shortDescription,
 							majorHash,
 							minorHash)

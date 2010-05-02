@@ -4,6 +4,8 @@ Peach Changlist
 v2.3.7
 ------
 
+ - New: Added monitor for OS X that uses Crash Wrangler to detect faults
+        and perform bucketing (osx.CrashWrangler).
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
