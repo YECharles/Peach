@@ -228,6 +228,8 @@ class Filesystem(Logger):
 				
 				# Output filename from data set if we have it.
 				if len(actionValues[i]) > 3 and actionValues[i][1] == 'output':
+					self._writeMsg("Origional file name: "+actionValues[i][3])
+					
 					fileName = os.path.join(path, "data_%d_%s_%s_fileName.txt" % (i, actionValues[i][1], actionValues[i][0]))
 					fout = open(fileName, "w+b")
 					fout.write(actionValues[i][3])

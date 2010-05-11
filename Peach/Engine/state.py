@@ -461,7 +461,7 @@ class StateEngine:
 				pub.sendWithNode(action.value, action.template)
 			
 			# Save the data filename used for later matching
-			if action.data and action.data.fileName:
+			if action.data != None and action.data.fileName != None:
 				self.actionValues.append( [ action.name, 'output', action.value, action.data.fileName ] )
 			
 			else:
