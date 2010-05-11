@@ -362,10 +362,24 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="analyzer" type="xs:string">
+			<xs:attribute name="analyzer">
 				<xs:annotation>
 					<xs:documentation>[Optional] The class of an analyzer to further decompose data.</xs:documentation>
 				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="stringtoken.StringTokenAnalyzer">
+							<xs:annotation>
+								<xs:documentation>Break up the string by tokens.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="xml.XmlAnalyzer">
+							<xs:annotation>
+								<xs:documentation>Convert string into XmlElements/XmlAttributes.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:attribute>
 			<xs:attribute name="lengthType">
 				<xs:annotation>
@@ -1308,6 +1322,29 @@
 												<xs:annotation>
 													<xs:documentation>Run a command and pass generated data as first parameter.  Requires a 
 														parameter named &quot;command&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="process.Launcher">
+												<xs:annotation>
+													<xs:documentation>Launch a program when Call action occured in state model.  Requires a 
+														parameter named 'command' and 'args'.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="process.LauncherGui">
+												<xs:annotation>
+													<xs:documentation>Launch a program when Call action occured in state model.  Requires a 
+														parameter named 'command', 'args', and 'windowName'.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="process.DebuggerLauncher">
+												<xs:annotation>
+													<xs:documentation>Route call to debugger to launch a program.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="process.DebuggerLauncherGui">
+												<xs:annotation>
+													<xs:documentation>Route call to debugger to launch a program, send WM_CLOSE to app.  
+														Requires a parameter named 'windowName'..</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
 											<xs:enumeration value="stdout.Stdout">

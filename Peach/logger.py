@@ -221,10 +221,17 @@ class Filesystem(Logger):
 				fout = open(fileName, "w+b")
 				fout.write(actionValues[i][2])
 				
-				if len(actionValues[i]) > 3:
+				if len(actionValues[i]) > 3 and actionValues[i][1] != 'output':
 					fout.write(repr(actionValues[i][3]))
 				
 				fout.close()
+				
+				# Output filename from data set if we have it.
+				if len(actionValues[i]) > 3 and actionValues[i][1] == 'output':
+					fileName = os.path.join(path, "data_%d_%s_%s_fileName.txt" % (i, actionValues[i][1], actionValues[i][0]))
+					fout = open(fileName, "w+b")
+					fout.write(actionValues[i][3])
+					fout.close()
 		
 		for key in monitorData.keys():
 			if key.find("_Bucket") == -1:

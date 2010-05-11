@@ -460,7 +460,12 @@ class StateEngine:
 			else:
 				pub.sendWithNode(action.value, action.template)
 			
-			self.actionValues.append( [ action.name, 'output', action.value ] )
+			# Save the data filename used for later matching
+			if action.data and action.data.fileName:
+				self.actionValues.append( [ action.name, 'output', action.value, action.data.fileName ] )
+			
+			else:
+				self.actionValues.append( [ action.name, 'output', action.value ] )
 			
 			obj = Element(action.name, None)
 			obj.elementType = 'dom'
