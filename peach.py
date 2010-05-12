@@ -266,7 +266,13 @@ Debug Peach XML File
 				from Peach.mutatestrategies import *
 				from Peach.MutateStrategies import *
 				
-				exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+				try:
+					exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+					
+				except:
+					parts = strategy.split(".")
+					exec("import %s" % parts[0])
+					exec("MutationStrategy.DefaultStrategy = %s" % strategy)
 			
 			except:
 				print ""

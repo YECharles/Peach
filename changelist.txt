@@ -4,11 +4,15 @@ Peach Changlist
 v2.3.7
 ------
 
+ - New: Peach now logs the file name of the origional file if one was used
+        as the data source.  This makes matching up files easier when using
+        a large sample set.
  - New: Added monitor for OS X that uses Crash Wrangler to detect faults
         and perform bucketing (osx.CrashWrangler).
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Bug: Will now try to import the module prefix of a custom strategy.
  - Bug: Fixed a couple bugs related to opening and closing processes
         on OS X using the FileWriterLauncher.
  - Bug: Fixed couple bugs in XmlAnalyzer when attached to a String
