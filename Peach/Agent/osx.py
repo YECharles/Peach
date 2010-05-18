@@ -404,9 +404,6 @@ class CrashWrangler(Monitor):
 		self.pid2 = int(fd.read())
 		fd.close()
 		
-		# Wait so process can start up
-		time.sleep(1)
-		
 		print "_StartProcess(): Pid2: ", self.pid2
 		
 		try:
