@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://phed.org/2008/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://phed.org/2008/Peach /peach/peach.xsd">
+
+    <!--  Change all occurences of "fuzzed.bin" to desired extension. -->
+
+	<Include ns="default" src="file:defaults.xml"/>
+
+	<DataModel name="TheDataModel">
+		<Blob />
+	</DataModel>
+	
+	<StateModel name="TheState" initialState="Initial">
+
+		<State name="Initial">
+			<Action type="output" publisher="file">
+				<DataModel ref="TheDataModel"/>
+				<Data fileName="samples" />
+			</Action>
+			
+			<Action type="close" publisher="file" />
+			
+			<Action type="call" method="ScoobySnacks" publisher="launch"/>			
+		</State>
+
+	</StateModel>
+
+	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
+		<Monitor class="osx.CrashWrangler">
+			<Param name="Command" value="/Applications/Safari.app/Contents/MacOS/Safari" />
+			<Param name="Arguments" value="fuzzed.bin" />
+			
+			<Param name="UseDebugMalloc" value="false" />
+			<Param name="ExploitableReads" value="true" />
+			<Param name="ExecHandler" value="./exc_handler" />
+			
+			<Param name="StartOnCall" value="ScoobySnacks" />
+		</Monitor>
+	</Agent>
+
+	<Test name="TheTest">
+		<Agent ref="LocalAgent"/>
+		<StateModel ref="TheState"/>
+
+		<Publisher name="file" class="file.FileWriterLauncher">
+			<Param name="filename" value="fuzzed.bin"/>
+		</Publisher>
+		
+		<Publisher name="launch" class="process.DebuggerLauncher"/>
+	</Test>
+
+	<Run name="DefaultRun">
+
+		<Logger class="logger.Filesystem">
+			<Param name="path" value="logs"/>
+		</Logger>
+
+		<Test ref="TheTest"/>
+
+	</Run>
+
+</Peach>
+<!-- end -->
