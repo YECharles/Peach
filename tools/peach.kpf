@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="ab4b7f35-e386-4c14-9e8b-926c99b5839f" kpf_version="4" name="peach.kpf">
-<file id="a9ea02e5-a7a8-4b54-86cc-14fcd5c31f33" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="test.py" url="file:///c:/test.py">
-</file>
-<file id="ef00c976-343f-497a-8266-06948c1ce40c" idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f" name="process.py" url="file:///C:/Users/dd/Desktop/process.py">
-</file>
 <preference-set idref="ab4b7f35-e386-4c14-9e8b-926c99b5839f">
   <string id="import_dirname">C:\peach</string>
   <string id="import_exclude_matches">*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;*%*;tmp*.html;.DS_Store</string>
