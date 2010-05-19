@@ -12,6 +12,7 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Bug: Small bug-fix added to struct2peach.pl script.
  - Bug: Will now try to import the module prefix of a custom strategy.
  - Bug: Fixed a couple bugs related to opening and closing processes
         on OS X using the FileWriterLauncher.

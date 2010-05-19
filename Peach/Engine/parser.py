@@ -778,6 +778,21 @@ class ParseTemplate:
 		
 		template.elementType = 'template'
 		
+		# mutable
+		
+		mutable = self._getAttribute(node, 'mutable')
+		if mutable == None or len(mutable) == 0:
+			template.isMutable = True
+		
+		elif mutable.lower() == 'true':
+			template.isMutable = True
+			
+		elif mutable.lower() == 'false':
+			template.isMutable = False
+		
+		else:
+			raise PeachException("Attribute 'mutable' has unexpected value [%s], only 'true' and 'false' are supported." % mutable)
+		
 		# pointer
 		
 		pointer = self._getAttribute(node, 'pointer')

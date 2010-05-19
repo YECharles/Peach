@@ -441,11 +441,14 @@ sub MakeSubs
 		
 		foreach my $k (keys %{$self->KnownDefines})
 		{
-			if($expr =~ /\b$k\b/)
+			#if($expr =~ /\b$k\b/)
+            # \Q quote (disable) pattern metacharacters till \E allows for metacharacters like ( or ) in $k
+            if($expr =~ /\Q\b$k\b\E/)
 			{
 				$madesub = 1;
 				$val = ${$self->KnownDefines}{"$k"};
-				$expr =~ s/\b$k\b/$val/;
+				#$expr =~ s/\b$k\b/$val/;
+                $expr =~ s/\Q\b$k\b\E/$val/;
 			}
 		}
 	}
