@@ -54,14 +54,14 @@ try:
 	from comtypes.gen import DbgEng
 	import win32serviceutil
 	import win32service
-	import win32api, win32con, win32process
+	import win32api, win32con, win32process, win32pdh
 	
-
+	
 	# ###############################################################################################
 	# ###############################################################################################
 	# ###############################################################################################
 	# ###############################################################################################
-
+	
 	class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
 		
 		buff = ''
@@ -72,7 +72,9 @@ try:
 			'''
 			
 			try:
+				
 				hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
+			
 			except:
 				
 				# Lets try a few common places before failing.
@@ -109,11 +111,26 @@ try:
 		
 		def Output(self, this, Mask, Text):
 			self.buff += Text
+			
+		def LoadModule(self, unknown, imageFileHandle, baseOffset, moduleSize, moduleName, imageName, checkSum, timeDateStamp = None):
+			if self.pid == None:
+				self.dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+										   c_char_p("|."),
+										   DbgEng.DEBUG_EXECUTE_ECHO)
+				
+				match = re.search(r"\.\s+\d+\s+id:\s+([0-9a-fA-F]+)\s+\w+\s+name:\s", self.buff)
+				if match != None:
+					self.pid = int(match.group(1), 16)
+					
+					# Write out PID for main peach process
+					fd = open(self.TempfilePid, "wb+")
+					fd.write(str(self.pid))
+					fd.close()
 		
 		def GetInterestMask(self):
 			return PyDbgEng.DbgEng.DEBUG_EVENT_EXCEPTION | PyDbgEng.DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT | \
-				PyDbgEng.DbgEng.DEBUG_EVENT_EXIT_PROCESS
-			
+				PyDbgEng.DbgEng.DEBUG_EVENT_EXIT_PROCESS | PyDbgEng.DbgEng.DEBUG_EVENT_LOAD_MODULE
+		
 		def ExitProcess(self, dbg, ExitCode):
 			print "_DbgEventHandler.ExitProcess: Target application has exitted"
 			self.quit.set()
@@ -301,21 +318,24 @@ try:
 		IgnoreSecondChanceGardPage = kwargs.get('IgnoreSecondChanceGardPage', None)
 		quit = kwargs['Quit']
 		Tempfile = kwargs['Tempfile']
+		TempfilePid = kwargs['TempfilePid']
 		dbg = None
 		
-		print "run()"
+		print "WindowsDebugEngineProcess_run"
 		
 		# Hack for comtypes early version
 		comtypes._ole32.CoInitializeEx(None, comtypes.COINIT_APARTMENTTHREADED)
 		
 		try:
 			_eventHandler = _DbgEventHandler()
+			_eventHandler.pid = None
 			_eventHandler.handlingFault = handlingFault
 			_eventHandler.handledFault = handledFault
 			_eventHandler.IgnoreFirstChanceGardPage = IgnoreFirstChanceGardPage
 			_eventHandler.IgnoreSecondChanceGardPage = IgnoreSecondChanceGardPage
 			_eventHandler.quit = quit
 			_eventHandler.Tempfile = Tempfile
+			_eventHandler.TempfilePid = TempfilePid
 			
 			if KernelConnectionString:
 				dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
@@ -392,6 +412,7 @@ try:
 			else:
 				raise Exception("Didn't find way to start debugger... bye bye!!")
 			
+			_eventHandler.dbg = dbg
 			started.set()
 			dbg.event_loop_with_quit_event(quit)
 			
@@ -526,8 +547,15 @@ try:
 			self.handledFault = Event()
 			self.crashInfo = None
 			self.fault = False
+			self.pid = None
+			self.cpu_process = None
+			self.cpu_path = None
+			self.cpu_hq = None
+			self.cpu_counter_handle = None
 			
 			(fd, self.tempfile) = tempfile.mkstemp()
+			os.close(fd)
+			(fd, self.tempfilepid) = tempfile.mkstemp()
 			os.close(fd)
 			
 			try:
@@ -548,7 +576,8 @@ try:
 				'IgnoreFirstChanceGardPage':self.IgnoreFirstChanceGardPage,
 				'IgnoreSecondChanceGardPage':self.IgnoreSecondChanceGardPage,
 				'Quit':self.quit,
-				'Tempfile':self.tempfile
+				'Tempfile':self.tempfile,
+				'TempfilePid':self.tempfilepid
 				})
 			
 			# Kick off our thread:
@@ -559,6 +588,13 @@ try:
 		
 		def _StopDebugger(self):
 			print "_StopDebugger()"
+			
+			try:
+				if self.cpu_hq != None:
+					win32pdh.RemoveCounter(self.cpu_counter_handle)
+					win32pdh.CloseQuery(self.cpu_hq)
+			except:
+				pass
 			
 			if self.thread != None and self.thread.is_alive():
 				self.quit.set()
@@ -601,10 +637,105 @@ try:
 				return True
 			
 			if self.OnCallMethod+"_isrunning" == method.lower():
+				if not self.quit.is_set():
+					if self.pid == None:
+						fd = open(self.tempfilepid, "rb+")
+						pid = fd.read()
+						fd.close()
+						
+						if len(pid) != 0:
+							self.pid = int(pid)
+							
+							try:
+								os.unlink(self.tempfilepid)
+							except:
+								pass
+					
+					if self.pid != None:
+						# Check and see if the CPU utalization is low
+						if self.cpu_process == None:
+							self.cpu_process = self.getProcessInstance(self.pid)
+						
+						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
+						if cpu < 1.0:
+							cpu = self.getProcessCpuTimeWindows(self.getProcessInstance(self.pid))
+							if cpu < 1.0:
+								print "PublisherCall: Stopping debugger, CPU:", cpu
+								self._StopDebugger()
+								return False
+				
 				return not self.quit.is_set()
 			
 			return None
+			
+		def getProcessCpuTimeWindows(self, process):
+			'''
+			Get the current CPU processor time as a double based on a process
+			instance (chrome#10).
+			'''
+			
+			if self.cpu_path == None:
+				self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
+				self.cpu_hq = win32pdh.OpenQuery()
+				self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
+				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+				time.sleep(0.25)
+			
+			try:
+				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+				(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
+				return cpu
+			
+			except win32pdh.error, e:
+				print e
+				pass
 		
+			return None
+		
+		def getProcessInstance(self, pid):
+			'''
+			Get the process instance name using pid.
+			'''
+			
+			win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
+			junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
+		
+			proc_dict = {}
+			for instance in instances:
+				if proc_dict.has_key(instance):
+					proc_dict[instance] = proc_dict[instance] + 1
+				else:
+					proc_dict[instance]=0
+			
+			proc_ids = []
+			for instance, max_instances in proc_dict.items():
+				for inum in xrange(max_instances+1):
+					hq = win32pdh.OpenQuery() # initializes the query handle 
+					try:
+						path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
+						counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
+						try:
+							win32pdh.CollectQueryData(hq) #collects data for the counter 
+							type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
+							proc_ids.append((instance, val))
+							
+							if val == pid:
+								return "%s#%d" % (instance, inum)
+							
+						except win32pdh.error, e:
+							#print e
+							pass
+		
+						win32pdh.RemoveCounter(counter_handle)
+		
+					except win32pdh.error, e:
+						#print e
+						pass
+					win32pdh.CloseQuery(hq) 
+			
+			# SHouldn't get here...we hope!
+			return None
+	
 		def OnTestFinished(self):
 			if not self.StartOnCall or not self._IsDebuggerAlive():
 				return
