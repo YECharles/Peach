@@ -7,19 +7,18 @@
 
 	<!-- TODO: Create data model -->
 	<DataModel name="TheDataModel">
-		<Blob lengthType="calc" length="" />
+
 	</DataModel>
 
 	<!-- TODO: Create state model -->
 	<StateModel name="TheState" initialState="Initial">
 
 		<State name="Initial">
-			<Action type="output" publisher="File">
+			<Action type="output">
 				<DataModel ref="TheDataModel"/>
-				<Data fileName="sample.png" />
+				<!-- <Data fileName="sample.png" /> -->
 			</Action>
-			<Action type="close" publisher="File" />
-			<Action type="call" method="asdasd" publisher="DoLaunch" />
+
 		</State>
 
 	</StateModel>
@@ -27,13 +26,8 @@
 	<Test name="TheTest">
 		<StateModel ref="TheState"/>
 
-		<Publisher name="File" class="file.FileWriter">
-			<Param name="filename" value="fuzzed.png"/>
-		</Publisher>
-		<Publisher name="DoLaunch" class="process.Launcher">
-			<Param name="Command" value="bin\pngcheck.exe"/>
-			<Param name="Args" value="fuzzed.png"/>
-		</Publisher>
+		<!-- TODO: Configure a publisher -->
+		<Publisher class="" />
 	</Test>
 
 	<!-- Configure a single run -->
