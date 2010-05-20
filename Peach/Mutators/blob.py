@@ -253,8 +253,10 @@ class BlobMutator(BitFlipperMutator):
 
 	def _performMutation(self, node):
 		
+		print "a"
 		data = node.getInternalValue()
 		
+		print "b"
 		func = self._random.choice([
 			self.changeExpandBuffer,
 			self.changeReduceBuffer,
@@ -264,6 +266,7 @@ class BlobMutator(BitFlipperMutator):
 			self.changeUnNullRange,
 			])
 		
+		print "c", func
 		return func(data)
 	
 	def changeExpandBuffer(self, data):
