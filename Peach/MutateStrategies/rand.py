@@ -416,6 +416,7 @@ class RandomMutationStrategy(MutationStrategy):
 							try:
 								print "3", mutator
 								mutator.randomMutation(node)
+								print "3.1"
 							except:
 								pass
 						
