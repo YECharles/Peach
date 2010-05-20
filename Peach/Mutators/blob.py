@@ -292,7 +292,10 @@ class BlobMutator(BitFlipperMutator):
 		Change a sequence of bytes in our buffer
 		'''
 		(start, end) = self.getRange(len(data))
-		print start, end
+		
+		if end > (start+100):
+			end = start+100
+		
 		for i in range(start, end):
 			data = data[:i] + chr(self._random.randint(0, 255)) + data[i+1:]
 		
@@ -305,6 +308,10 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		special = ["\x00", "\x01", "\xfe", "\xff"]
 		(start, end) = self.getRange(len(data))
+		
+		if end > (start+100):
+			end = start+100
+		
 		for i in range(start, end):
 			data = data[:i-1] + self._random.choice(special) + data[i:]
 		return data
