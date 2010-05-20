@@ -391,12 +391,16 @@ class RandomMutationStrategy(MutationStrategy):
 			print "The following elements are mutating: "
 			# Select nodes we will modify
 			if len(nodes) <= self._n:
+				
+				print "1"
+				
 				fields = nodes
 				maxN = self._n - len(fields)
 				if maxN <= 0:
 					maxN = self._n/2
 				
 				for i in range(self._random.randint(1, maxN)):
+					print "2"
 					# Now perform mutations on fields
 					for node in self._random.sample(fields, self._random.randint(1, len(fields))):
 						try:
@@ -410,6 +414,7 @@ class RandomMutationStrategy(MutationStrategy):
 							#       sometimes a mutation will fail.  We should
 							#       ignore those failures.
 							try:
+								print "3", mutator
 								mutator.randomMutation(node)
 							except:
 								pass
@@ -417,11 +422,15 @@ class RandomMutationStrategy(MutationStrategy):
 						except:
 							pass
 			else:
+				
+				print "4"
+				
 				fields = self._random.sample(nodes, self._random.randint(1, self._n))
 				
 				# Now perform mutations on fields
 				for node in fields:
 					try:
+						print "5"
 						mutator = self._random.choice(self._fieldMutators[node.getFullname()])
 						
 						#print "   > %s: %s" % (node.getFullnameInDataModel(), mutator.name)
@@ -433,6 +442,7 @@ class RandomMutationStrategy(MutationStrategy):
 						#       sometimes a mutation will fail.  We should
 						#       ignore those failures.
 						try:
+							print "6"
 							mutator.randomMutation(node)
 						except:
 							pass
@@ -441,6 +451,7 @@ class RandomMutationStrategy(MutationStrategy):
 						pass
 			
 			print ""
+			print "onDataModelGetValue - exiting"
 			
 		# all done!
 
