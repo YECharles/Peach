@@ -321,6 +321,10 @@ class BlobMutator(BitFlipperMutator):
 		Change a range of bytes to null.
 		'''
 		(start, end) = self.getRange(len(data))
+		
+		if end > (start+100):
+			end = start+100
+		
 		for i in range(start, end):
 			data = data[:i-1] + chr(0) + data[i:]
 		
@@ -331,6 +335,10 @@ class BlobMutator(BitFlipperMutator):
 		Change all zero's in a range to something else.
 		'''
 		(start, end) = self.getRange(len(data))
+		
+		if end > (start+100):
+			end = start+100
+		
 		for i in range(start, end):
 			if ord(data[i]) == 0:
 				data = data[:i-1] + chr(self._random.randint(1, 255)) + data[i:]
