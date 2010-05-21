@@ -657,9 +657,9 @@ try:
 							self.cpu_process = self.getProcessInstance(self.pid)
 						
 						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
-						if cpu < 1.0:
+						if cpu != None and cpu < 1.0:
 							cpu = self.getProcessCpuTimeWindows(self.getProcessInstance(self.pid))
-							if cpu < 1.0:
+							if cpu != None and cpu < 1.0:
 								print "PublisherCall: Stopping debugger, CPU:", cpu
 								self._StopDebugger()
 								return False
@@ -674,22 +674,25 @@ try:
 			instance (chrome#10).
 			'''
 			
-			if self.cpu_path == None:
-				self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
-				self.cpu_hq = win32pdh.OpenQuery()
-				self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
-				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-				time.sleep(0.25)
-			
 			try:
-				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-				(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
-				return cpu
+				if process == None:
+					return None
+				
+				if self.cpu_path == None:
+					self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
+					self.cpu_hq = win32pdh.OpenQuery()
+					self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
+					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+					time.sleep(0.25)
+					
+					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+					(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
+					return cpu
 			
-			except win32pdh.error, e:
-				print e
-				pass
-		
+			except:
+				print "getProcessCpuTimeWindows threw exception!"
+				print sys.exc_info()
+			
 			return None
 		
 		def getProcessInstance(self, pid):
@@ -697,41 +700,46 @@ try:
 			Get the process instance name using pid.
 			'''
 			
-			win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
-			junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
-		
-			proc_dict = {}
-			for instance in instances:
-				if proc_dict.has_key(instance):
-					proc_dict[instance] = proc_dict[instance] + 1
-				else:
-					proc_dict[instance]=0
+			try:
+				
+				win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
+				junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
 			
-			proc_ids = []
-			for instance, max_instances in proc_dict.items():
-				for inum in xrange(max_instances+1):
-					hq = win32pdh.OpenQuery() # initializes the query handle 
-					try:
-						path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
-						counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
+				proc_dict = {}
+				for instance in instances:
+					if proc_dict.has_key(instance):
+						proc_dict[instance] = proc_dict[instance] + 1
+					else:
+						proc_dict[instance]=0
+				
+				proc_ids = []
+				for instance, max_instances in proc_dict.items():
+					for inum in xrange(max_instances+1):
+						hq = win32pdh.OpenQuery() # initializes the query handle 
 						try:
-							win32pdh.CollectQueryData(hq) #collects data for the counter 
-							type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
-							proc_ids.append((instance, val))
+							path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
+							counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
+							try:
+								win32pdh.CollectQueryData(hq) #collects data for the counter 
+								type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
+								proc_ids.append((instance, val))
+								
+								if val == pid:
+									return "%s#%d" % (instance, inum)
+								
+							except win32pdh.error, e:
+								#print e
+								pass
 							
-							if val == pid:
-								return "%s#%d" % (instance, inum)
-							
+							win32pdh.RemoveCounter(counter_handle)
+						
 						except win32pdh.error, e:
 							#print e
 							pass
-		
-						win32pdh.RemoveCounter(counter_handle)
-		
-					except win32pdh.error, e:
-						#print e
-						pass
-					win32pdh.CloseQuery(hq) 
+						win32pdh.CloseQuery(hq) 
+			except:
+				print "getProcessInstance thew exception"
+				print sys.exc_info()
 			
 			# SHouldn't get here...we hope!
 			return None
