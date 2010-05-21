@@ -659,7 +659,7 @@ try:
 						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
 						if cpu != None and cpu < 1.0:
 							cpu = self.getProcessCpuTimeWindows(self.getProcessInstance(self.pid))
-							if cpu != None and cpu < 1.0:
+							if cpu != None and cpu < 1.0 and self.quit.is_set():
 								print "PublisherCall: Stopping debugger, CPU:", cpu
 								self._StopDebugger()
 								return False
@@ -676,6 +676,7 @@ try:
 			
 			try:
 				if process == None:
+					print "getProcessCpuTimeWindows: process is null"
 					return None
 				
 				if self.cpu_path == None:
@@ -685,9 +686,9 @@ try:
 					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
 					time.sleep(0.25)
 					
-					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-					(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
-					return cpu
+				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+				(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
+				return cpu
 			
 			except:
 				print "getProcessCpuTimeWindows threw exception!"
