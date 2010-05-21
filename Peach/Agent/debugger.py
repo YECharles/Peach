@@ -657,10 +657,9 @@ try:
 							self.cpu_process = self.getProcessInstance(self.pid)
 						
 						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
-						print "PublisherCall: cpu:",cpu
 						if cpu != None and cpu < 1.0:
 							cpu = self.getProcessCpuTimeWindows(self.getProcessInstance(self.pid))
-							if cpu != None and cpu < 1.0 and self.quit.is_set():
+							if cpu != None and cpu < 1.0 and not self.quit.is_set():
 								print "PublisherCall: Stopping debugger, CPU:", cpu
 								self._StopDebugger()
 								return False
