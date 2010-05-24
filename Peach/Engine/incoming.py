@@ -237,7 +237,8 @@ class DataCracker:
 			# ----
 			
 			if placement.after != None:
-				after = template.findDataElementByName(placement.after)
+				#after = template.findDataElementByName(placement.after)
+				after = placement.find(placement.after)
 				if after == None:
 					raise Exception("Error: Unable to locate element [%s] for placement" % placement.after)
 				
@@ -269,7 +270,8 @@ class DataCracker:
 				placement.parent.placement = None
 				
 			elif placement.before != None:
-				before = template.findDataElementByName(placement.before)
+				#before = template.findDataElementByName(placement.before)
+				before = placement.find(placement.before)
 				if before == None:
 					raise Exception("Error: Unable to locate element [%s] for placement" % placement.before)
 				
