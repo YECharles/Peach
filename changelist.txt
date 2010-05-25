@@ -14,6 +14,8 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Bug: Placement after/before reference found via data model, not placement
+        causing placements to be at the wrong element sometimes.
  - Bug: Fixed some slow mutations in BlobMutator
  - Bug: Small bug-fix added to struct2peach.pl script.
  - Bug: Will now try to import the module prefix of a custom strategy.

@@ -264,6 +264,7 @@ class BlobMutator(BitFlipperMutator):
 			self.changeUnNullRange,
 			])
 		
+		print "BlobMutator:", func
 		return func(data)
 	
 	def changeExpandBuffer(self, data):
@@ -373,7 +374,7 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		
 		buff = ""
-		x = self._random.randint(0, 255-size)
+		x = self._random.randint(0, size)
 		for i in range(0, size):
 			buff += chr(i+x)
 		
