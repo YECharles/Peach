@@ -694,11 +694,15 @@ try:
 				
 				if self.cpu_path == None:
 					self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
+				
+				if self.cpu_hq == None:
 					self.cpu_hq = win32pdh.OpenQuery()
+				
+				if self.cpu_counter_handle == None:
 					self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
 					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
 					time.sleep(0.25)
-					
+				
 				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
 				(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
 				return cpu
@@ -706,6 +710,7 @@ try:
 			except:
 				print "getProcessCpuTimeWindows threw exception!"
 				print sys.exc_info()
+			
 			finally:
 				print "<< getProcessCpuTimeWindows"
 			
@@ -717,6 +722,9 @@ try:
 			'''
 			
 			print ">> getProcessInstance"
+			
+			hq = None
+			counter_handle = None
 			
 			try:
 				
@@ -750,15 +758,29 @@ try:
 								pass
 							
 							win32pdh.RemoveCounter(counter_handle)
+							counter_handle = None
 						
 						except win32pdh.error, e:
 							#print e
 							pass
-						win32pdh.CloseQuery(hq) 
+						win32pdh.CloseQuery(hq)
+						hq = None
 			except:
 				print "getProcessInstance thew exception"
 				print sys.exc_info()
+			
 			finally:
+				
+				try:
+					if counter_handle != None:
+						win32pdh.RemoveCounter(counter_handle)
+						counter_handle = None
+					if hq != None:
+						win32pdh.CloseQuery(hq)
+						hq = None
+				except:
+					pass
+				
 				print "<< getProcessInstance"
 			
 			# SHouldn't get here...we hope!
