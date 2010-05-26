@@ -540,6 +540,15 @@ try:
 		
 		def _StartDebugger(self):
 			
+			try:
+				if self.cpu_hq != None:
+					win32pdh.RemoveCounter(self.cpu_counter_handle)
+					win32pdh.CloseQuery(self.cpu_hq)
+					self.cpu_hq = None
+					self.cpu_counter_handle = None
+			except:
+				pass
+			
 			# Clear all our event handlers
 			self.started = Event()
 			self.quit = Event()
@@ -593,6 +602,8 @@ try:
 				if self.cpu_hq != None:
 					win32pdh.RemoveCounter(self.cpu_counter_handle)
 					win32pdh.CloseQuery(self.cpu_hq)
+					self.cpu_hq = None
+					self.cpu_counter_handle = None
 			except:
 				pass
 			
@@ -658,7 +669,7 @@ try:
 						
 						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
 						if cpu != None and cpu < 1.0:
-							cpu = self.getProcessCpuTimeWindows(self.getProcessInstance(self.pid))
+							cpu = self.getProcessCpuTimeWindows(self.cpu_process)
 							if cpu != None and cpu < 1.0 and not self.quit.is_set():
 								print "PublisherCall: Stopping debugger, CPU:", cpu
 								self._StopDebugger()
