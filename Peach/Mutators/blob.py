@@ -376,6 +376,10 @@ class BlobMutator(BitFlipperMutator):
 		buff = ""
 		x = self._random.randint(0, size)
 		for i in range(0, size):
+			
+			if i+x > 255:
+				return buff
+			
 			buff += chr(i+x)
 		
 		return buff

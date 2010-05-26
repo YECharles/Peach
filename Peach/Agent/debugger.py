@@ -674,6 +674,8 @@ try:
 			instance (chrome#10).
 			'''
 			
+			print ">> getProcessCpuTimeWindows"
+			
 			try:
 				if process == None:
 					print "getProcessCpuTimeWindows: process is null"
@@ -693,6 +695,8 @@ try:
 			except:
 				print "getProcessCpuTimeWindows threw exception!"
 				print sys.exc_info()
+			finally:
+				print "<< getProcessCpuTimeWindows"
 			
 			return None
 		
@@ -700,6 +704,8 @@ try:
 			'''
 			Get the process instance name using pid.
 			'''
+			
+			print ">> getProcessInstance"
 			
 			try:
 				
@@ -741,6 +747,8 @@ try:
 			except:
 				print "getProcessInstance thew exception"
 				print sys.exc_info()
+			finally:
+				print "<< getProcessInstance"
 			
 			# SHouldn't get here...we hope!
 			return None

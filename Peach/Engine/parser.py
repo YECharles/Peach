@@ -1439,6 +1439,8 @@ class ParseTemplate:
 			self.HandleSeek(child, parent)
 		elif child.nodeName == 'Custom':
 			self.HandleCustom(child, parent)
+		elif child.nodeName == 'Asn1':
+			self.HandleAsn1(child, parent)
 		elif child.nodeName == 'XmlElement':
 			# special XmlElement reference
 		
@@ -1546,6 +1548,60 @@ class ParseTemplate:
 				block.length = int(length)
 			else:
 				block.length = None
+		
+		# common attributes
+		
+		self.HandleCommonDataElementAttributes(node, block)
+		
+		# children
+		self.HandleDataContainerChildren(node, block)
+		
+		parent.append(block)
+		return block
+	
+	def HandleAsn1(self, node, parent):
+		
+		# name
+		
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		else:
+			name = None
+		
+		# ref
+		
+		if node.hasAttributeNS(None, 'ref'):
+			
+			raise PeachException("Asn1 element does not yet support ref!")
+			#
+			#if name == None or len(name) == 0:
+			#	name = Element.getUniqueName()
+			#
+			## We have a base template
+			#obj = self.GetRef( self._getAttribute(node, 'ref'), parent )
+			#
+			##print "About to deep copy: ", obj, " for ref: ", self._getAttribute(node, 'ref')
+			#
+			#block = obj.copy(parent)
+			#block.name = name
+			#block.parent = parent
+			#block.ref = self._getAttribute(node, 'ref')
+			
+		else:
+			block = Asn1Type(name, parent)
+			block.ref = None
+			
+		# encode type
+		
+		if node.hasAttributeNS(None, "encode"):
+			block.encodeType = node.getAttributeNS(None, "encode")
+		
+		# asn1Type
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Error, all Asn1 elements must have 'type' attribute.")
+		
+		block.asn1Type = node.getAttributeNS(None, "type")
 		
 		# common attributes
 		
