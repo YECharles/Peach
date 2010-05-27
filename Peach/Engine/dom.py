@@ -3680,6 +3680,7 @@ try:
 	import pyasn1.codec.ber.encoder
 	import pyasn1.codec.cer.encoder
 	import pyasn1.codec.der.encoder
+	from pyasn1.type import tag
 	
 	class Asn1Type(DataElement):
 		'''
@@ -3722,6 +3723,24 @@ try:
 			"UTCTime":useful.UTCTime,
 			}
 		
+		ASN1_TAG_CLASS_MAP = {
+			"universal" : 0x00,
+			"application" : 0x40,
+			"context" : 0x80,
+			"private" : 0xc0,
+			}
+		
+		ASN1_TAG_TYPE_MAP = {
+			"simple" : 0x00,
+			"constructed" : 0x20,
+			}
+		
+		ASN1_TAG_CAT_MAP = {
+			"implicit":0x01,
+			"explicit":0x02,
+			"untagged":0x04,
+			}
+		
 		def __init__(self, name, parent):
 			DataElement.__init__(self, name, parent)
 			self.elementType = 'asn1type'
@@ -3730,7 +3749,11 @@ try:
 			self.insideRelation = False
 			self.asn1Type = ""
 			self.encodeType = "ber"
-			
+			self.tagClass = None
+			self.tagFormat = None
+			self.tagCategory = None
+			self.tagNumber = None
+		
 		def clone(self, obj = None):
 			
 			if obj == None:
@@ -3768,69 +3791,109 @@ try:
 			
 			For Numbers this is the python int value.
 			'''
+			try:
 			
-			if parent == None:
-				haveParent = False
-			elif isinstance(parent, Asn1Type):
-				haveParent = True
-			
-			asn1Obj = None
-			value = None
-			childAsn1Objs = []
-			for c in self:
-				if isinstance(c, Asn1Type):
-					childAsn1Objs.append(c.getInternalValue(None, self))
+				if parent == None:
+					haveParent = False
+				elif isinstance(parent, Asn1Type):
+					haveParent = True
 				
-				elif self.asn1Type == 'BitString' and c.isDataElement:
-					b = c.getValue()
-					b = self.blob2bin(b)
-					if b[:8] == '00000000':
-						b = b[8:]
+				asn1Obj = None
+				value = None
+				childAsn1Objs = []
+				for c in self:
+					if isinstance(c, Asn1Type):
+						childAsn1Objs.append(c.getInternalValue(None, self))
 					
-					value = "'%s'B" % b
+					elif self.asn1Type == 'BitString' and c.isDataElement:
+						b = c.getValue()
+						b = self.blob2bin(b)
+						if b[:8] == '00000000':
+							b = b[8:]
+						
+						value = "'%s'B" % b
+						
+					elif isinstance(c, Number):
+						value = long(c.getInternalValue())
 					
-				elif isinstance(c, Number):
-					value = c.getInternalValue()
+					elif c.isDataElement:
+						value = c.getValue()
 				
-				elif c.isDataElement:
-					value = c.getValue()
-			
-			if value != None:
-				if (self.objType == int or self.objType == long):
-					if type(value) not in [int, long]:
-						try:
-							value = long(value)
-						except:
-							value = long(0)
+				if value != None:
+					#if (self.objType == int or self.objType == long):
+					#	if type(value) not in [int, long]:
+					#		try:
+					#			value = long(value)
+					#		except:
+					#			value = long(0)
+					
+					try:
+						if self.tagNumber != None:
+							if self.tagCategory == "implicit":
+								tagSet=self.ASN1_MAP[self.asn1Type].tagSet.tagImplicitly(
+									tag.Tag(self.tagClass, self.tagFormat, self.tagNumber))
+							else:
+								tagSet=self.ASN1_MAP[self.asn1Type].tagSet.tagExplicitly(
+									tag.Tag(self.tagClass, self.tagFormat, self.tagNumber))
+							
+							asn1Obj = self.ASN1_MAP[self.asn1Type](value, tagSet = tagSet)
+							
+						else:
+							asn1Obj = self.ASN1_MAP[self.asn1Type](value)
+					except:
+						#raise SoftException("Error building asn.1 obj")
+						print sys.exc_info()
+						raise PeachException("Error building asn.1 obj")
 				
-				try:
-					asn1Obj = self.ASN1_MAP[self.asn1Type](value)
-				except:
-					raise SoftException("Error building asn.1 obj")
-			
-			else:
-				asn1Obj = self.ASN1_MAP[self.asn1Type](self.asnTagSet, self.asn1Spec)
-			
-			if len(childAsn1Objs) > 0:
-				for i in range(len(childAsn1Objs)):
-					asn1Obj.setComponentByPosition(i, childAsn1Objs[i])
-			
-			if not haveParent:
-				# Perform encoding ourselves
-				encoder = eval("pyasn1.codec.%s.encoder" % self.encodeType)
+				else:
+					try:
+						#asn1Obj = self.ASN1_MAP[self.asn1Type](self.asnTagSet, self.asn1Spec)
+						if self.tagNumber != None:
+							if self.tagCategory == "implicit":
+								tagSet=self.ASN1_MAP[self.asn1Type].tagSet.tagImplicitly(
+									tag.Tag(self.tagClass, self.tagFormat, self.tagNumber))
+							else:
+								tagSet=self.ASN1_MAP[self.asn1Type].tagSet.tagExplicitly(
+									tag.Tag(self.tagClass, self.tagFormat, self.tagNumber))
+							
+							asn1Obj = self.ASN1_MAP[self.asn1Type](tagSet = tagSet)
+						
+						else:
+							asn1Obj = self.ASN1_MAP[self.asn1Type]()
+						
+					except:
+						print sys.exc_info()
+						raise PeachException("Error building asn.1 obj")
 				
-				try:
+				if len(childAsn1Objs) > 0:
+					for i in range(len(childAsn1Objs)):
+						asn1Obj.setComponentByPosition(i, childAsn1Objs[i])
+				
+				if not haveParent:
+					# Perform encoding ourselves
+					encoder = eval("pyasn1.codec.%s.encoder" % self.encodeType)
+					
+					try:
+						#print asn1Obj
+						bin = encoder.encode(asn1Obj)
+					except:
+						print self.encodeType
+						print encoder
+						print asn1Obj
+						print sys.exc_info()
+						raise SoftException("Error encoding asn.1 obj")
+					
 					#print asn1Obj
-					bin = encoder.encode(asn1Obj)
-				except:
-					raise SoftException("Error encoding asn.1 obj")
-				
-				#print asn1Obj
-				
-				return bin
-				
-			# Otherwise allow parent to perform encoding
-			return asn1Obj
+					
+					return bin
+					
+				# Otherwise allow parent to perform encoding
+				return asn1Obj
+			except:
+				print sys.exc_info()
+				raise PeachException("ASN.1 FAILURE")
+			
+			return None
 		
 		def getRawValue(self, sout = None, parent = None):
 			return self.getInternalValue(sout, parent)

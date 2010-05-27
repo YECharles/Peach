@@ -58,7 +58,7 @@ class CrashReporter(Monitor):
 			self.crashWrangler = False
 		else:
 			self.crashWrangler = True
-		
+			
 		# Our name for this monitor
 		self._name = "CrashReporter"
 		
@@ -196,6 +196,11 @@ class CrashWrangler(Monitor):
 		else:
 			self.ExploitableReads = True
 		
+		if args.has_key("NoCpuKill"):
+			self.NoCpuKill = True
+		else:
+			self.NoCpuKill = False
+			
 		# Our name for this monitor
 		self._name = "CrashWrangler"
 		self.pid = None
@@ -330,22 +335,23 @@ class CrashWrangler(Monitor):
 			elif self.StartOnCall+"_isrunning" == method:
 				if self._IsRunning():
 					
-					cpu = None
-					try:
-						os.system("ps -o pcpu %d > .cpu" % self.pid2)
-						fd = open(".cpu", "rb")
-						data = fd.read()
-						fd.close()
-						os.unlink(".cpu")
+					if not self.NoCpuKill:
+						cpu = None
+						try:
+							os.system("ps -o pcpu %d > .cpu" % self.pid2)
+							fd = open(".cpu", "rb")
+							data = fd.read()
+							fd.close()
+							os.unlink(".cpu")
+							
+							cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
+							if cpu.startswith("0."):
+								print "CrashWrangler: PCPU is low (%s), stopping process" % cpu
+								self._StopProcess()
+								return False
 						
-						cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
-						if cpu.startswith("0."):
-							print "CrashWrangler: PCPU is low (%s), stopping process" % cpu
-							self._StopProcess()
-							return False
-					
-					except:
-						print sys.exc_info()
+						except:
+							print sys.exc_info()
 					
 					return True
 				else:

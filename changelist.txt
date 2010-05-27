@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.7
 ------
 
+ - New: Exposing new Asn1 data element that used to be internal only.
  - New: Windows debugger will use processor CPU time to close the process earlier
         for file fuzzing.
  - New: Peach now logs the file name of the origional file if one was used

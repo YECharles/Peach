@@ -533,6 +533,11 @@ try:
 			else:
 				self.IgnoreSecondChanceGardPage = False
 			
+			if args.has_key("NoCpuKill"):
+				self.NoCpuKill = True
+			else:
+				self.NoCpuKill = False
+			
 			if self.Service == None and self.CommandLine == None and self.ProcessName == None \
 					and self.KernelConnectionString == None and self.ProcessID == None:
 				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or ProcessID, or KernelConnectionString parameter.")
@@ -662,7 +667,7 @@ try:
 							except:
 								pass
 					
-					if self.pid != None:
+					if self.NoCpuKill == False and self.pid != None:
 						# Check and see if the CPU utalization is low
 						if self.cpu_process == None:
 							self.cpu_process = self.getProcessInstance(self.pid)

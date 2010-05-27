@@ -1603,6 +1603,17 @@ class ParseTemplate:
 		
 		block.asn1Type = node.getAttributeNS(None, "type")
 		
+		# Tag Stuff
+		
+		if node.hasAttributeNS(None, "tagNumber"):
+			try:
+				block.tagClass = Asn1Type.ASN1_TAG_CLASS_MAP[self._getAttribute(node, "tagClass").lower()]
+				block.tagFormat = Asn1Type.ASN1_TAG_TYPE_MAP[self._getAttribute(node, "tagFormat").lower()]
+				block.tagCategory = self._getAttribute(node, "tagCategory").lower()
+				block.tagNumber = int(self._getAttribute(node, "tagNumber"))
+			except:
+				raise PeachException("Error, When using tags you must specify 'tagClass', 'tagFormat', 'tagCategory', and 'tagNumber'.")
+		
 		# common attributes
 		
 		self.HandleCommonDataElementAttributes(node, block)
