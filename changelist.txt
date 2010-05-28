@@ -15,6 +15,7 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Bug: Fixed bug in process.Process causing the process to always be restarted
  - Bug: Placement after/before reference found via data model, not placement
         causing placements to be at the wrong element sometimes.
  - Bug: Fixed some slow mutations in BlobMutator

@@ -345,7 +345,15 @@ class CrashWrangler(Monitor):
 							os.unlink(".cpu")
 							
 							cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
-							if cpu.startswith("0."):
+							
+							if cpu.startswith("0.") and not os.path.exists("cw.lck"):
+								
+								time.sleep(0.25)
+								
+								# Check and see if crashwrangler is going
+								if os.path.exists("cw.lck"):
+									return True
+								
 								print "CrashWrangler: PCPU is low (%s), stopping process" % cpu
 								self._StopProcess()
 								return False
@@ -354,6 +362,7 @@ class CrashWrangler(Monitor):
 							print sys.exc_info()
 					
 					return True
+				
 				else:
 					return False
 					
@@ -441,15 +450,6 @@ class CrashWrangler(Monitor):
 			
 			except:
 				return
-
-			try:
-				# Kill process with signal
-				import signal
-				os.kill(self.pid, signal.SIGTERM)
-				time.sleep(0.25)
-				os.kill(self.pid, signal.SIGKILL)
-			except:
-				pass
 			
 			try:
 				# Kill process with signal
@@ -457,6 +457,15 @@ class CrashWrangler(Monitor):
 				os.kill(self.pid2, signal.SIGTERM)
 				time.sleep(0.25)
 				os.kill(self.pid2, signal.SIGKILL)
+			except:
+				pass
+			
+			try:
+				# Kill process with signal
+				import signal
+				os.kill(self.pid, signal.SIGTERM)
+				time.sleep(0.25)
+				os.kill(self.pid, signal.SIGKILL)
 			except:
 				pass
 			
