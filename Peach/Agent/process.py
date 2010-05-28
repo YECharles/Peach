@@ -357,12 +357,12 @@ class Process(Monitor):
 	
 	def _IsProcessRunning(self):
 		
-		if not self.process:
-			print "Process._IsProcessRunning: False"
+		if self.process == None:
+			print "Process._IsProcessRunning: False (self.process == None)"
 			return False
 		
 		if self.process.poll() == None:
-			print "Process._IsProcessRunning: False"
+			print "Process._IsProcessRunning: False (self.process.poll == None)"
 			return False
 		
 		print "Process._IsProcessRunning: True"
