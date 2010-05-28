@@ -331,6 +331,8 @@ class Process(Monitor):
 	
 	def _StopProcess(self):
 		
+		print "Process._StopProcess"
+		
 		if not self.process:
 			return
 		
@@ -345,18 +347,25 @@ class Process(Monitor):
 		self.process = None
 	
 	def _StartProcess(self):
+		
+		print "Process._StartProcess"
+		
 		if self.process:
 			self._StopProcess()
 		
 		self.process = Popen(self.args)
 	
 	def _IsProcessRunning(self):
+		
 		if not self.process:
+			print "Process._IsProcessRunning: False"
 			return False
 		
 		if self.process.poll() == None:
+			print "Process._IsProcessRunning: False"
 			return False
 		
+		print "Process._IsProcessRunning: True"
 		return True
 	
 	def OnTestStarting(self):
@@ -365,9 +374,12 @@ class Process(Monitor):
 		'''
 		self.strangeExit = False
 		if not self.startOnCall and (self.restartOnTest or not self._IsProcessRunning()):
+			print "Process.OnTestStarting: Stopping and starting process"
 			self._StopProcess()
 			self._StartProcess()
+			
 		elif self.startOnCall:
+			print "Process.OnTestStarting: Stopping process"
 			self._StopProcess()
 		
 		print "Exiting OnTestStarting..."
@@ -380,9 +392,11 @@ class Process(Monitor):
 			self.strangeExit = True
 			
 		if self.restartOnTest:
+			print "Process.OnTestFinished: Stopping process"
 			self._StopProcess()
 	
 		elif self.startOnCall:
+			print "Process.OnTestFinished: Stopping process"
 			self._StopProcess()
 	
 	def GetMonitorData(self):
@@ -399,12 +413,11 @@ class Process(Monitor):
 		Check if a fault was detected.  If the process exits
 		with out our help we will report it as a fault.
 		'''
-		#if self.faultOnEarlyExit:
-		#	return not self._IsProcessRunning()
-		#
-		#else:
-		#	return False
-		return False
+		if self.faultOnEarlyExit:
+			return self.strangeExit
+		
+		else:
+			return False
 	
 	def OnFault(self):
 		'''
