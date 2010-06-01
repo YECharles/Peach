@@ -348,7 +348,7 @@ class CrashWrangler(Monitor):
 							
 							if cpu.startswith("0.") and not os.path.exists("cw.lck"):
 								
-								time.sleep(0.25)
+								time.sleep(1.5)
 								
 								# Check and see if crashwrangler is going
 								if os.path.exists("cw.lck"):
