@@ -41,70 +41,46 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 # $Id$
 
 import sys, os, threading, glob, re
-import PyDbgEng
-from comtypes.gen import DbgEng
 
-class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
+def getCoverage(cmd):
+	'''
+	returns array of offsets
+	'''
 	
-	bps = False
-	mainOffset = 0
+	try:
+		os.unlink("bblocks.out")
+	except:
+		pass
 	
-	def Output(self, this, Mask, Text):
-		if self.mainOffset == 0 and Text.find("ModLoad") > -1:
-			m = re.search("ModLoad:\s*([^ ]*) ", Text)
-			self.mainOffset = int(m.group(1), 16)
+	os.system("pin-2.8\\ia32\\bin\\pin.exe -t bblocks.dll -- %s" % cmd)
 	
-	def LoadModule(self, this, ImageFileHandle, BaseOffset, ModuleSize, ModuleName,
-				   ImageName, CheckSum, TimeDateStamp):
-		
-		if self.bps == False:
-			self.bps = True
-			
-			try:
-				for offset in self.peachOffsets:
-					bp_params = this.idebug_control.AddBreakpoint(Type = DbgEng.DEBUG_BREAKPOINT_CODE, DesiredId = DbgEng.DEBUG_ANY_ID)
-					flags = DbgEng.DEBUG_BREAKPOINT_ENABLED | DbgEng.DEBUG_BREAKPOINT_ONE_SHOT
-					bp_params.AddFlags(flags)
-					bp_params.SetOffset(self.mainOffset + offset)
-			except:
-				print sys.exc_info()
-		
-		return DbgEng.DEBUG_STATUS_NO_CHANGE
+	fd = open("bblocks.out", "rb+")
+	strOffsets = fd.read().split("\n")
+	offsets = []
+	fd.close()
 	
-	def GetInterestMask(self):
-		#print "GetInterestMask"
-		return DbgEng.DEBUG_EVENT_BREAKPOINT | \
-			DbgEng.DEBUG_EVENT_LOAD_MODULE | DbgEng.DEBUG_ENGOPT_INITIAL_BREAK |\
-			DbgEng.DEBUG_FILTER_INITIAL_BREAKPOINT
+	try:
+		os.unlink("bblocks.out")
+	except:
+		pass
 	
-	def ExitProcess(self, dbg, ExitCode):
-		#print "ExitProcess"
-		return DbgEng.DEBUG_STATUS_NO_CHANGE
+	for s in strOffsets:
+		if len(s) < 2:
+			continue
+		offsets.append(int(s, 16))
 	
-	def Breakpoint(self, this, Offset, Id, BreakType, ProcType, Flags, DataSize,
-				   DataAccessType, PassCount, CurrentPassCount, MatchThread,
-				   CommandSize, OffsetExpressionSize):
-		
-		#print "Breakpoint", Offset - self.mainOffset
-		addr = Offset - self.mainOffset
-		if not (addr in self.peachBlocks):
-			self.peachBlocks.append(addr)
-		
-		return DbgEng.DEBUG_STATUS_NO_CHANGE
+	return offsets
 
 print ""
-print "] Peach Minset Finder v0.5"
+print "] Peach Minset Finder v0.7"
 print "] Copyright (c) Michael Eddington\n"
 
-if len(sys.argv) < 4:
-	print "Syntax: minset.py target.exe samples\\folder command.exe \"args %%s\""
+if len(sys.argv) < 3:
+	print "Syntax: minset.py samples\\folder \"command.exe args %%s\""
 	print ""
-	print "  target.exe   The target executable or ddl that"
-	print "               contains the core parser logic."
 	print "  samples      The folder containing the sample files"
 	print "               for which we will find the min."
 	print "  command      The command line of the program to run."
-	print "  args         The arguments for the command line, it "
 	print "               MUST contain a %%s which will be substututed"
 	print "               for the sample filename."
 	print ""
@@ -114,16 +90,14 @@ if len(sys.argv) < 4:
 # 1. Read in offsets
 
 try:
-	os.unlink("bblocks.txt")
+	os.unlink("bblocks.out")
 except:
 	pass
 
-bbTarget = sys.argv[1]
-samples = sys.argv[2]
-commandLine = sys.argv[3]
-commandArgs = sys.argv[4]
+samples = sys.argv[1]
+command = sys.argv[2]
 
-print "[*] Finding all basic blocks in [%s]" % bbTarget
+print "[*] Finding all basic blocks"
 
 # Locate the base path of this executable/script
 p = None
@@ -136,34 +110,6 @@ else:
 if len(p) == 0:
 	p = "."
 
-# Locate and run basicblock finding program
-if os.path.exists(os.path.join(p,"BasicBlocks")):
-	os.system(os.path.join(p,"BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget))
-elif os.path.exists(os.path.join(p,"bin\\basicblocks.exe")):
-	os.system(os.path.join(p,"bin\\basicblocks.exe /in %s" % bbTarget))
-elif os.path.exists(os.path.join(p,"basicblocks.exe")):
-	os.system(os.path.join(p,"basicblocks.exe /in %s" % bbTarget))
-elif os.path.exists(os.path.join(p,"tools")):
-	os.system(os.path.join(p,"tools\\minset\\BasicBlocks\\BasicBlocks\\bin\\release\\basicblocks.exe /in %s" % bbTarget))
-else:
-	print "ERROR: Unable to locate basicblocks.exe"
-	sys.exit(0)
-
-fd = open("bblocks.txt", "rb+")
-strOffsets = fd.read().split("\n")
-offsets = []
-fd.close()
-
-try:
-	os.unlink("bblocks.txt")
-except:
-	pass
-
-for s in strOffsets:
-	if len(s) < 2:
-		continue
-	offsets.append(int(s))
-
 sampleFiles = []
 for f in glob.glob(samples):
 	if os.path.isdir(f):
@@ -171,7 +117,7 @@ for f in glob.glob(samples):
 	
 	sampleFiles.append(f)
 
-print "[*] Found %d basic blocks and %d sample files" % (len(offsets),len(sampleFiles))
+print "[*] Found %d sample files" % len(sampleFiles)
 
 #: Dictionary of lists, key is sampleFile
 bblocks = {}
@@ -181,26 +127,11 @@ sampleFileMostCoverageCount = -1
 #: Min set
 minset = []
 
-class DuhEvent:
-	def is_set(self):
-		return False
-
 for sampleFile in sampleFiles:
 	print "[*] Determining coverage with [%s]...." % sampleFile
 	
-	bblocks[sampleFile] = []
-	
-	_eventHandler = _DbgEventHandler()
-	_eventHandler.peachOffsets = offsets
-	_eventHandler.peachBlocks = bblocks[sampleFile]
-	
-	dbg = PyDbgEng.ProcessCreator(command_line = "%s %s" % (commandLine, commandArgs % sampleFile),
-		follow_forks = True,
-		event_callbacks_sink = _eventHandler,
-		output_callbacks_sink = _eventHandler)
-	
-	dbg.event_loop_with_quit_event(DuhEvent())
-	_eventHandler.peachBlocks = None
+	cmd = command % sampleFile
+	bblocks[sampleFile] = sorted(set(getCoverage(cmd)))
 	
 	print "[-] %s hit %d blocks" % (sampleFile, len(bblocks[sampleFile]))
 	
