@@ -338,6 +338,7 @@ class Engine(object):
 		if runName == None:
 			runName = "DefaultRun"
 		
+		self.watcher = EngineWatchPlexer()
 		self.peach = Analyzer.DefaultParser().asParser(uri)
 		self.agent = AgentPlexer()
 		self._agents = {}
