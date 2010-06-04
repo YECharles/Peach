@@ -232,6 +232,21 @@ class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 		self._performMutation(node, count)
 
 
+def DomPrint(indent, node):
+	
+	tabs = '  ' * indent
+	
+	if hasattr(node, 'parent') and node.parent != None:
+		p = "parent"
+	else:
+		p = "!! no parent !!"
+	
+	print tabs + node.elementType + ": " + node.name + ": " + p
+	
+	if node.hasChildren:
+		for child in node._children:
+			DomPrint(indent+1, child)
+
 class ArrayReverseOrderMutator(ArrayVarianceMutator):
 	def __init__(self, peach, node):
 		ArrayVarianceMutator.__init__(self, peach, node, "ArrayReverseOrderMutator")
@@ -255,6 +270,10 @@ class ArrayReverseOrderMutator(ArrayVarianceMutator):
 		headIndex = arrayHead.parent.index(arrayHead)
 		items = []
 		
+		print "-- DOM PRE MUTATION --"
+		DomPrint(0, arrayHead.parent)
+		print "----------------------"
+		
 		for i in xrange(self._arrayCount):
 			obj = arrayHead.getArrayElementAt(i)
 			items.append(obj)
@@ -266,6 +285,10 @@ class ArrayReverseOrderMutator(ArrayVarianceMutator):
 			obj.parent.insert(headIndex + x, obj)
 			obj.arrayPosition = x
 			x+=1
+		
+		print "-- DOM POOST MUTATION --"
+		DomPrint(0, arrayHead.parent)
+		print "------------------------"
 		
 		assert(self._arrayCount == arrayHead.getArrayCount())
 
@@ -296,6 +319,10 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 		headIndex = arrayHead.parent.index(arrayHead)
 		items = []
 		
+		print "-- DOM PRE MUTATION --"
+		DomPrint(0, arrayHead.parent)
+		print "----------------------"
+		
 		for i in xrange(self._arrayCount):
 			obj = arrayHead.getArrayElementAt(i)
 			items.append(obj)
@@ -307,6 +334,10 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 			obj = items[i]
 			obj.parent.insert(headIndex + i, obj)
 			obj.arrayPosition = i
+		
+		print "-- DOM POOST MUTATION --"
+		DomPrint(0, arrayHead.parent)
+		print "------------------------"
 		
 		assert(self._arrayCount == arrayHead.getArrayCount())
 
