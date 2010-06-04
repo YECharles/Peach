@@ -204,6 +204,8 @@ class CrashWrangler(Monitor):
 		# Our name for this monitor
 		self._name = "CrashWrangler"
 		self.pid = None
+		self.currentCount = 0
+		self.restartFinger = 1000
 	
 	
 	def OnTestStarting(self):
@@ -377,7 +379,17 @@ class CrashWrangler(Monitor):
 		
 		if self._IsRunning():
 			return
-
+		
+		self.currentCount += 1
+		
+		# OS X can get very unstable during testing.  This will hopefully
+		# allow for longer fuzzing runs by killing off some processes
+		# that seem to get "stuck"
+		if self.currentCount % self.restartFinger == 0:
+			os.system('killall -KILL Finder')
+			os.system('killall -KILL Dock')
+			os.system('killall -KILL SystemUIServer')
+		
 		args = ["/usr/bin/env", "CW_LOG_PATH=cw.log", "CW_PID_FILE=cw.pid"]
 		
 		if self.UseDebugMalloc:

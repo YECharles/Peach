@@ -599,6 +599,12 @@ try:
 			
 			# Wait it...!
 			self.started.wait()
+			
+			if not self.NoCpuKill:
+				# Make sure we wait at least 1 second
+				# for program to startup.  Needed with new
+				# CPU killing k0de.
+				time.sleep(1)
 		
 		def _StopDebugger(self):
 			print "_StopDebugger()"
