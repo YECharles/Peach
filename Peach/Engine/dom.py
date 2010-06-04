@@ -3577,11 +3577,7 @@ class Number(DataElement):
 		
 		# 3. Relation?
 		
-		try:
-			value = self.getRelationValue(value)
-			
-		except:
-			print "Warning, caught exception calling getRelationalValue.", sys.exc_info()
+		value = self.getRelationValue(value)
 		
 		# 4. fixup?
 		if self.fixup != None:
