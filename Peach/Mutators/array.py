@@ -270,29 +270,26 @@ class ArrayReverseOrderMutator(ArrayVarianceMutator):
 		headIndex = arrayHead.parent.index(arrayHead)
 		items = []
 		
-		print "-- DOM PRE MUTATION --"
-		DomPrint(0, arrayHead.parent)
-		print "----------------------"
+		parent = arrayHead.parent
 		
 		try:
 			for i in xrange(self._arrayCount):
 				obj = arrayHead.getArrayElementAt(i)
-				items.append(obj)
-				del obj.parent[obj.name]
+				if obj != None:
+					items.append(obj)
+			
+			for obj in items:
+				del parent[obj.name]
 			
 			x = 0
-			for i in xrange(self._arrayCount-1, -1, -1):
+			for i in xrange(len(items)-1, -1, -1):
 				obj = items[i]
-				obj.parent.insert(headIndex + x, obj)
+				parent.insert(headIndex + x, obj)
 				obj.arrayPosition = x
 				x+=1
 		except:
 			print "Exception in ArrayReverseOrderMutator._performMutation"
 			print sys.exc_info()
-		
-		print "-- DOM POOST MUTATION --"
-		DomPrint(0, arrayHead.parent)
-		print "------------------------"
 		
 		assert(self._arrayCount == arrayHead.getArrayCount())
 
@@ -323,30 +320,27 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 		headIndex = arrayHead.parent.index(arrayHead)
 		items = []
 		
-		print "-- DOM PRE MUTATION --"
-		DomPrint(0, arrayHead.parent)
-		print "----------------------"
+		parent = arrayHead.parent
 		
 		try:
 			for i in xrange(self._arrayCount):
 				obj = arrayHead.getArrayElementAt(i)
-				items.append(obj)
-				del obj.parent[obj.name]
+				if obj != None:
+					items.append(obj)
+			
+			for obj in items:
+				del parent[obj.name]
 			
 			random.shuffle(items)
 			
-			for i in xrange(self._arrayCount):
+			for i in xrange(len(items)):
 				obj = items[i]
-				obj.parent.insert(headIndex + i, obj)
+				parent.insert(headIndex + i, obj)
 				obj.arrayPosition = i
 		
 		except:
 			print "Exception in ArrayRandomizeOrderMutator._performMutation"
 			print sys.exc_info()
-		
-		print "-- DOM POOST MUTATION --"
-		DomPrint(0, arrayHead.parent)
-		print "------------------------"
 		
 		assert(self._arrayCount == arrayHead.getArrayCount())
 
