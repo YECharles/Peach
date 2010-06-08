@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.7
 ------
 
+ - New: Tool mincrash.py will try to locate the min change for cash.
  - New: Exposing new Asn1 data element that used to be internal only.
  - New: Windows debugger will use processor CPU time to close the process earlier
         for file fuzzing.
@@ -15,6 +16,8 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Change: Added ProcessName to CrashReporter
+ - Change: OS X: Kill Finder, Dock, and SystemUIServer every 1,000 iterations
  - Bug: Fixed bug in process.Process causing the process to always be restarted
  - Bug: Placement after/before reference found via data model, not placement
         causing placements to be at the wrong element sometimes.

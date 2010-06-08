@@ -707,10 +707,18 @@ if __name__ == '__main__':
 	print "] mincrash v0.1 - Locate minimum crashing change"
 	print "] Copyright (c) Michael Eddington\n"
 	
-	fuzzedFile = sys.argv[1]
-	sampleFile = sys.argv[2]
-	testFile = sys.argv[3]
-	cmdLine = sys.argv[4]
+	try:
+		fuzzedFile = sys.argv[1]
+		sampleFile = sys.argv[2]
+		testFile = sys.argv[3]
+		cmdLine = sys.argv[4]
+	except:
+		print """Syntax:
+
+  mincrash.py fuzzed.bin origional.bin test.bin "target.exe test.bin"
+  
+"""
+		sys.exit()
 	
 	fd = open(fuzzedFile, "rb")
 	fuzzedData = fd.read()
@@ -755,6 +763,42 @@ if __name__ == '__main__':
 		else:
 			print "Rejecting (stopped crashing)"
 			testData = crashingData
+
+	#print " * Trying from the front..."
+	#
+	#while True:
+	#	diff = difflib.SequenceMatcher(None, testData, sampleData)
+	#	tag, i1, i2, j1, j2 = diff.get_opcodes()[0]
+	#		
+	#	if tag == 'equal':
+	#		tag, i1, i2, j1, j2 = diff.get_opcodes()[1]
+	#	
+	#	print ("%7s a[%d:%d] b[%d:%d]" %
+	#		(tag, i1, i2, j1, j2)),
+	#	
+	#	crashingData = testData
+	#	
+	#	if tag == 'replace':
+	#		testData = testData[:i1] + sampleData[j1:j2] + testData[i2:]
+	#	elif tag == 'delete':
+	#		testData = testData[:i1] + testData[i2:]
+	#	elif tag == 'insert':
+	#		testData = testData[:i1] + sampleData[j1:j2] + testData[i2:]
+	#	else:
+	#		continue
+	#
+	#	fd = open(testFile, "wb+")
+	#	fd.write(testData)
+	#	fd.close()
+	#
+	#	if StillCrashing():
+	#		print "Accepting (still crashes)"
+	#	
+	#	else:
+	#		print "Rejecting (stopped crashing)"
+	#		testData = crashingData
+	#		break
+
 
 	print "\n"
 	print " * Writing mincrash.bin"

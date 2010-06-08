@@ -104,7 +104,7 @@ class CrashReporter(Monitor):
 			
 			self.data = None
 			for f in os.listdir(self.logFolder):
-				if not f in self.startingFiles:
+				if not f in self.startingFiles and (self.ProcessName == None or f.find(self.ProcessName) > -1):
 					fd = open(os.path.join(self.logFolder, f), "rb")
 					self.data = fd.read()
 					fd.close()
