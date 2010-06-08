@@ -338,8 +338,7 @@ try:
 			_eventHandler.TempfilePid = TempfilePid
 			
 			if KernelConnectionString:
-				dbg = PyDbgEng.KernelAttacher(  connection_string = connection_string,
-					follow_forks = True,
+				dbg = PyDbgEng.KernelAttacher(  connection_string = KernelConnectionString,
 					event_callbacks_sink = _eventHandler,
 					output_callbacks_sink = _eventHandler,
 					symbols_path = SymbolsPath)
@@ -418,8 +417,12 @@ try:
 			
 		finally:
 			if dbg != None:
-				dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
-				dbg.idebug_client.Release()
+				if dbg.idebug_client != None:
+					dbg.idebug_client.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
+					dbg.idebug_client.Release()
+				elif dbg.idebug_control != None:
+					dbg.idebug_control.EndSession(DbgEng.DEBUG_END_ACTIVE_TERMINATE)
+					dbg.idebug_control.Release()
 			
 			dbg = None
 			

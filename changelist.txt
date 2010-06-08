@@ -18,6 +18,7 @@ v2.3.7
         support multi publisher capabilities in Peach.
  - Change: Added ProcessName to CrashReporter
  - Change: OS X: Kill Finder, Dock, and SystemUIServer every 1,000 iterations
+ - Bug: Fixed some bugs around Windows kernel debugging
  - Bug: Fixed bug in process.Process causing the process to always be restarted
  - Bug: Placement after/before reference found via data model, not placement
         causing placements to be at the wrong element sometimes.
