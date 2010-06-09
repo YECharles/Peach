@@ -169,7 +169,7 @@ class CrashWrangler(Monitor):
 		if args.has_key('Command'):
 			self.Command = str(args['Command']).replace("'''", "")
 		else:
-			raise PeachException("Error, CrashWrangler monitor requires 'Command' paramter.")
+			self.Command = None
 		
 		if args.has_key('Arguments'):
 			self.Arguments = str(args['Arguments']).replace("'''", "")
@@ -201,9 +201,25 @@ class CrashWrangler(Monitor):
 		else:
 			self.NoCpuKill = False
 			
+		if args.has_key('CwLogFile'):
+			self.CwLogFile = str(args['CwLogFile']).replace("'''", "")
+		else:
+			self.CwLogFile = "cw.log"
+		
+		if args.has_key('CwLockFile'):
+			self.CwLockFile = str(args['CwLockFile']).replace("'''", "")
+		else:
+			self.CwLockFile = "cw.lck"
+		
+		if args.has_key('CwPidFile'):
+			self.CwPidFile = str(args['CwPidFile']).replace("'''", "")
+		else:
+			self.CwPidFile = "cw.pid"
+		
 		# Our name for this monitor
 		self._name = "CrashWrangler"
 		self.pid = None
+		self.pid2 = None
 		self.currentCount = 0
 		self.restartFinger = 1000
 	
@@ -229,8 +245,8 @@ class CrashWrangler(Monitor):
 		Get any monitored data from a test case.
 		'''
 
-		if os.path.exists("cw.log"):
-			fd = open("cw.log", "rb")
+		if os.path.exists(self.CwLogFile):
+			fd = open(self.CwLogFile, "rb")
 			data = fd.read()
 			fd.close()
 			
@@ -273,8 +289,8 @@ class CrashWrangler(Monitor):
 				print sys.exc_info()
 				
 			try:
-				os.unlink("cw.log")
-				os.unlink("cw.lck")
+				os.unlink(self.CwLogFile)
+				os.unlink(self.CwLockFile)
 			except:
 				pass
 			
@@ -292,7 +308,7 @@ class CrashWrangler(Monitor):
 			time.sleep(0.25)
 			time.sleep(0.25)
 			
-			return os.path.exists("cw.log")
+			return os.path.exists(self.CwLogFile)
 		
 		except:
 			print sys.exc_info()
@@ -353,7 +369,7 @@ class CrashWrangler(Monitor):
 								time.sleep(1.5)
 								
 								# Check and see if crashwrangler is going
-								if os.path.exists("cw.lck"):
+								if os.path.exists(self.CwLockFile):
 									return True
 								
 								print "CrashWrangler: PCPU is low (%s), stopping process" % cpu
@@ -372,11 +388,14 @@ class CrashWrangler(Monitor):
 		
 		return None
 		
-		
+	def unlink(self, file):
+		try:
+			os.unlink(file)
+		except:
+			pass
+	
 	def _StartProcess(self):
 
-		print ">> _StartProcess"
-		
 		if self._IsRunning():
 			return
 		
@@ -389,6 +408,16 @@ class CrashWrangler(Monitor):
 			os.system('killall -KILL Finder')
 			os.system('killall -KILL Dock')
 			os.system('killall -KILL SystemUIServer')
+		
+		# Clean up any files
+		self.unlink(self.CwLockFile)
+		self.unlink(self.CwLogFile)
+		self.unlink(self.CwPidFile)
+		
+		# If no command is specified, assume we are running
+		# exc_handler some other way.
+		if self.Command == None:
+			return
 		
 		args = ["/usr/bin/env", "CW_LOG_PATH=cw.log", "CW_PID_FILE=cw.pid"]
 		
@@ -404,44 +433,23 @@ class CrashWrangler(Monitor):
 		
 		print "CrashWrangler._StartProcess():", args
 
-		# Remove any existing lock files
-		try:
-			os.unlink("cw.lck")
-		except:
-			pass
-		
-		# Remove any existing log files
-		try:
-			os.unlink("cw.lock")
-		except:
-			pass
-		
-		# Remove any existing pid files
-		try:
-			os.unlink("cw.pid")
-		except:
-			pass
-		
 		self.pid = os.spawnv(os.P_NOWAIT, "/usr/bin/env", args)
 		
-		while not os.path.exists("cw.pid"):
+		while not os.path.exists(self.CwPidFile):
 			time.sleep(0.15)
 		
-		fd = open("cw.pid", "rb")
+		fd = open(self.CwPidFile, "rb")
 		self.pid2 = int(fd.read())
 		fd.close()
+		self.unlink(self.CwPidFile)
 		
 		print "_StartProcess(): Pid2: ", self.pid2
 		
-		try:
-			os.unlink("cw.pid")
-		except:
-			pass
 		
 	
 	def _StopProcess(self):
-		print ">> _StopProcess"
-		if self.pid:
+		
+		if self.pid != None:
 
 			try:
 				# Verify if process is still running
@@ -449,7 +457,7 @@ class CrashWrangler(Monitor):
 				if not (pid1 == 0 and ret == 0):
 					self.pid = None
 					return
-
+				
 				# Check for cw.lck before killing
 				while os.path.exists("cw.lck"):
 					
