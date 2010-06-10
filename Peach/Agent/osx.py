@@ -166,6 +166,8 @@ class CrashWrangler(Monitor):
 		@param	args: Dictionary of parameters
 		'''
 		
+		Monitor.__init__(self, args)
+		
 		if args.has_key('Command'):
 			self.Command = str(args['Command']).replace("'''", "")
 		else:
@@ -419,7 +421,10 @@ class CrashWrangler(Monitor):
 		if self.Command == None:
 			return
 		
-		args = ["/usr/bin/env", "CW_LOG_PATH=cw.log", "CW_PID_FILE=cw.pid"]
+		args = ["/usr/bin/env", 
+		        "CW_LOG_PATH=" + self.CwLogFile, 
+		        "CW_PID_FILE=" + self.CwPidFile,
+		        "CW_LOCK_FILE=" + self.CwLockFile]
 		
 		if self.UseDebugMalloc:
 			args.append("CW_USE_GMAL=1")

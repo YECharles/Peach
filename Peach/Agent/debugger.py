@@ -1004,6 +1004,7 @@ try:
 		'''
 		
 		def __init__(self, args):
+			Monitor.__init__(self, args)
 			
 			self.quit = Event()
 			self.started = Event()
