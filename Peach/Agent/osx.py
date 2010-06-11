@@ -296,7 +296,10 @@ class CrashWrangler(Monitor):
 			except:
 				pass
 			
-			return {"CrashWrangler.txt":data, "Bucket":bucket}
+			if self.pid != None:
+				return {"CrashWrangler"+str(self.pid)+".txt":data, "Bucket":bucket}
+			else:
+				return {"CrashWrangler.txt":data, "Bucket":bucket}
 		
 		return None
 	
