@@ -436,8 +436,12 @@ class CrashWrangler(Monitor):
 		
 		args.append(self.ExecHandler)
 		args.append(self.Command)
-		for a in self.Arguments.split(" "):
-			args.append(a)
+		splitArgs = self.Arguments.split(" ")
+		for i in range(len(splitArgs)):
+			if i > 0 and splitArgs[i-1][-1] == '\\':
+				args[-1] = args[-1][:-1] + " " + splitArgs[i]
+			else:
+				args.append(splitArgs[i])
 		
 		print "CrashWrangler._StartProcess():", args
 
