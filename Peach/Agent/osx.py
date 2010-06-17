@@ -551,6 +551,11 @@ class Process(Monitor):
 		else:
 			self.StartOnCall = None
 		
+		if args.has_key("NoCpuKill"):
+			self.NoCpuKill = True
+		else:
+			self.NoCpuKill = False
+		
 		# Our name for this monitor
 		self._name = "OsxProcess"
 		self.pid = None
@@ -632,13 +637,13 @@ class Process(Monitor):
 							fd = open(".cpu", "rb")
 							data = fd.read()
 							fd.close()
-							os.unlink(".cpu")
+							self.unlink(".cpu")
 							
 							cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
 							
 							if cpu.startswith("0."):
 								
-								time.sleep(1.5)
+								time.sleep(1)
 								
 								print "osx.Process: PCPU is low (%s), stopping process" % cpu
 								self._StopProcess()
@@ -693,7 +698,9 @@ class Process(Monitor):
 		print "osx.Process._StartProcess():", args
 
 		self.pid = os.spawnv(os.P_NOWAIT, self.Command, args)
+		time.sleep(1.5)
 		
+		print "osx.Process: pid:", self.pid
 	
 	def _StopProcess(self):
 		
@@ -725,16 +732,17 @@ class Process(Monitor):
 	
 	
 	def _IsRunning(self):
-		if self.pid:
+		if self.pid != None:
 			try:
 				(pid1, ret) = os.waitpid(self.pid, os.WNOHANG)
 				if pid1 == 0 and ret == 0:
-					print "_IsRunning: True"
+					print "osx.Process._IsRunning: True"
 					return True
+				
 			except:
 				pass
 		
-		print "_IsRunning: False"
+		print "osx.Process._IsRunning: False"
 		return False
 	
 
