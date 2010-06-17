@@ -520,5 +520,222 @@ class CrashWrangler(Monitor):
 		print "_IsRunning: False"
 		return False
 	
+class Process(Monitor):
+	'''
+	Start a process and kill it based on CPU usage.
+	'''
+	
+	def __init__(self, args):
+		'''
+		Constructor.  Arguments are supplied via the Peach XML
+		file.
+		
+		@type	args: Dictionary
+		@param	args: Dictionary of parameters
+		'''
+		
+		Monitor.__init__(self, args)
+		
+		if args.has_key('Command'):
+			self.Command = str(args['Command']).replace("'''", "")
+		else:
+			self.Command = None
+		
+		if args.has_key('Arguments'):
+			self.Arguments = str(args['Arguments']).replace("'''", "")
+		else:
+			self.Arguments = ""
+		
+		if args.has_key('StartOnCall'):
+			self.StartOnCall = str(args['StartOnCall']).replace("'''", "")
+		else:
+			self.StartOnCall = None
+		
+		# Our name for this monitor
+		self._name = "OsxProcess"
+		self.pid = None
+		self.currentCount = 0
+		self.restartFinger = 1000	
+
+	def OnTestStarting(self):
+		'''
+		Called right before start of test case or variation
+		'''
+		
+		if not self.StartOnCall:
+			if not self._IsRunning():
+				self._StartProcess()
+	
+	def OnTestFinished(self):
+		'''
+		Called right after a test case or varation
+		'''
+		if self.StartOnCall and self._IsRunning():
+			self._StopProcess()
+	
+	def GetMonitorData(self):
+		'''
+		Get any monitored data from a test case.
+		'''
+
+		return None
+	
+	def DetectedFault(self):
+		'''
+		Check if a fault was detected.
+		'''
+		
+		return False
+	
+	def OnFault(self):
+		'''
+		Called when a fault was detected.
+		'''
+		pass
+	
+	def OnShutdown(self):
+		'''
+		Called when Agent is shutting down, typically at end
+		of a test run or when a Stop-Run occurs
+		'''
+		self._StopProcess()
+	
+	def StopRun(self):
+		'''
+		Return True to force test run to fail.  This
+		should return True if an unrecoverable error
+		occurs.
+		'''
+		return False
+	
+	def PublisherCall(self, method):
+		'''
+		Called when a call action is being performed.  Call
+		actions are used to launch programs, this gives the
+		monitor a chance to determin if it should be running
+		the program under a debugger instead.
+		
+		Note: This is a bit of a hack to get this working
+		'''
+		
+		if self.StartOnCall:
+			if self.StartOnCall == method:
+				self._StartProcess()
+			
+			elif self.StartOnCall+"_isrunning" == method:
+				if self._IsRunning():
+					
+					if not self.NoCpuKill:
+						cpu = None
+						try:
+							os.system("ps -o pcpu %d > .cpu" % self.pid)
+							fd = open(".cpu", "rb")
+							data = fd.read()
+							fd.close()
+							os.unlink(".cpu")
+							
+							cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
+							
+							if cpu.startswith("0."):
+								
+								time.sleep(1.5)
+								
+								print "osx.Process: PCPU is low (%s), stopping process" % cpu
+								self._StopProcess()
+								return False
+						
+						except:
+							print sys.exc_info()
+					
+					return True
+				
+				else:
+					return False
+		
+		return None
+		
+	def unlink(self, file):
+		try:
+			os.unlink(file)
+		except:
+			pass
+	
+	def _StartProcess(self):
+
+		if self._IsRunning():
+			return
+		
+		self.currentCount += 1
+		
+		# OS X can get very unstable during testing.  This will hopefully
+		# allow for longer fuzzing runs by killing off some processes
+		# that seem to get "stuck"
+		if self.currentCount % self.restartFinger == 0:
+			os.system('killall -KILL Finder')
+			os.system('killall -KILL Dock')
+			os.system('killall -KILL SystemUIServer')
+		
+		# If no command is specified, assume we are running
+		# exc_handler some other way.
+		if self.Command == None:
+			return
+		
+		args = []
+		
+		args.append(self.Command)
+		splitArgs = self.Arguments.split(" ")
+		for i in range(len(splitArgs)):
+			if i > 0 and splitArgs[i-1][-1] == '\\':
+				args[-1] = args[-1][:-1] + " " + splitArgs[i]
+			else:
+				args.append(splitArgs[i])
+		
+		print "osx.Process._StartProcess():", args
+
+		self.pid = os.spawnv(os.P_NOWAIT, self.Command, args)
+		
+	
+	def _StopProcess(self):
+		
+		if self.pid != None:
+
+			try:
+				# Verify if process is still running
+				(pid1, ret) = os.waitpid(self.pid, os.WNOHANG)
+				if not (pid1 == 0 and ret == 0):
+					self.pid = None
+					return
+				
+			except:
+				return
+			
+			try:
+				# Kill process with signal
+				import signal
+				os.kill(self.pid, signal.SIGTERM)
+				time.sleep(0.25)
+				os.kill(self.pid, signal.SIGKILL)
+			except:
+				pass
+			
+			# Prevent Zombies!
+			os.wait()
+			
+			self.pid = None
+	
+	
+	def _IsRunning(self):
+		if self.pid:
+			try:
+				(pid1, ret) = os.waitpid(self.pid, os.WNOHANG)
+				if pid1 == 0 and ret == 0:
+					print "_IsRunning: True"
+					return True
+			except:
+				pass
+		
+		print "_IsRunning: False"
+		return False
+	
 
 # end

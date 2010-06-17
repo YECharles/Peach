@@ -40,8 +40,107 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 
 # $Id$
 
-import sys, os, threading, glob, re
+import sys, os, threading, glob, re, time
+import win32api, win32con, win32process, win32pdh
 
+def getProcessCpuTimeWindows(process):
+	'''
+	Get the current CPU processor time as a double based on a process
+	instance (chrome#10).
+	'''
+	
+	try:
+		if process == None:
+			print "getProcessCpuTimeWindows: process is null"
+			return None
+		
+		if self.cpu_path == None:
+			self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
+		
+		if self.cpu_hq == None:
+			self.cpu_hq = win32pdh.OpenQuery()
+		
+		if self.cpu_counter_handle == None:
+			self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
+			win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+			time.sleep(0.25)
+		
+		win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
+		(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
+		return cpu
+	
+	except:
+		print "getProcessCpuTimeWindows threw exception!"
+		print sys.exc_info()
+	
+	return None
+
+def getProcessInstance(pid):
+	'''
+	Get the process instance name using pid.
+	'''
+	
+	hq = None
+	counter_handle = None
+	
+	try:
+		
+		win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
+		junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
+	
+		proc_dict = {}
+		for instance in instances:
+			if proc_dict.has_key(instance):
+				proc_dict[instance] = proc_dict[instance] + 1
+			else:
+				proc_dict[instance]=0
+		
+		proc_ids = []
+		for instance, max_instances in proc_dict.items():
+			for inum in xrange(max_instances+1):
+				hq = win32pdh.OpenQuery() # initializes the query handle 
+				try:
+					path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
+					counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
+					try:
+						win32pdh.CollectQueryData(hq) #collects data for the counter 
+						type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
+						proc_ids.append((instance, val))
+						
+						if val == pid:
+							return "%s#%d" % (instance, inum)
+						
+					except win32pdh.error, e:
+						#print e
+						pass
+					
+					win32pdh.RemoveCounter(counter_handle)
+					counter_handle = None
+				
+				except win32pdh.error, e:
+					#print e
+					pass
+				win32pdh.CloseQuery(hq)
+				hq = None
+	except:
+		print "getProcessInstance thew exception"
+		print sys.exc_info()
+	
+	finally:
+		
+		try:
+			if counter_handle != None:
+				win32pdh.RemoveCounter(counter_handle)
+				counter_handle = None
+			if hq != None:
+				win32pdh.CloseQuery(hq)
+				hq = None
+		except:
+			pass
+	
+	# SHouldn't get here...we hope!
+	return None
+		
 def getCoverage(cmd):
 	'''
 	returns array of offsets
@@ -52,7 +151,17 @@ def getCoverage(cmd):
 	except:
 		pass
 	
-	os.system("pin-2.8\\ia32\\bin\\pin.exe -t bblocks.dll -- %s" % cmd)
+	pid = os.spawnl(os.P_NOWAIT, "pin-2.8\\ia32\\bin\\pin.exe", "-t", "bblocks.dll", "--", cmd)
+	time.sleep(0.50)
+	hProc = getProcessInstance(pid)
+	while True:
+		(p, e) = os.waitpid(pid, os.WNOHANG)
+		if p != 0 and e != 0:
+			break
+		
+		cpu = getProcessCpuTimeWindows(hProc)
+		if cpu < 0.5:
+			break
 	
 	fd = open("bblocks.out", "rb+")
 	strOffsets = fd.read().split("\n")
