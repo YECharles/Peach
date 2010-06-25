@@ -77,6 +77,8 @@ class Wifi(Publisher):
 		self.beacon = None
 		self.beaconThread = None
 		self.beaconStopEvent = None
+		self.probe = None
+		self.association = None
 		
 		# Don't initalize here to avoid a deepcopy
 		# issue!
@@ -166,10 +168,27 @@ class Wifi(Publisher):
 			if not (dest_mac == '\xff\xff\xff\xff\xff\xff' or dest_mac == self.mac):
 				continue
 			
+			#print ">> Pkt type: %2x" % ord(data[0])
+
+			# Is probe request?
+			if ord(data[0]) == 0x40 and self.probe != None:
+				print ">> Sending probe %2x %2x %2x %2x" % (ord(self.probe[-4]), 
+				                                            ord(self.probe[-2]), 
+				                                            ord(self.probe[-3]), 
+				                                            ord(self.probe[-1]))
+				self.send(self.probe)
+				continue
+			
+			# Is Association request?
+			if ord(data[0]) == 0x00 and self.association != None:
+				print ">> Sending association"
+				self.send(self.association)
+				break
+			
 			if hasattr(self, "publisherBuffer"):
 				self.publisherBuffer.haveAllData = True
 			
-			return data
+			#return data
 	
 	def _sendBeacon(self):
 		while not self.beaconStopEvent.isSet():
@@ -190,6 +209,14 @@ class Wifi(Publisher):
 		if method == 'beacon':
 			self.beacon = args[0]
 			self._startBeacon()
+		elif method == 'probe':
+			print ">> Setting probe"
+			self.probe = args[0]
+			self.hexPrint(self.probe)
+		elif method == 'association':
+			print ">> Setting association"
+			self.association = args[0]
+			self.hexPrint(self.association)
 		
 	
 	def connect(self):
