@@ -193,7 +193,11 @@ class Crc32DualFixup(Fixup):
 			raise Exception("Error: Crc32DualFixup was unable to locate [%s] or [%s]" % (self.ref1, self.ref2))
 		
 		crc1 = zlib.crc32(stuff1)
-		return zlib.crc32(stuff2, crc1)
+		crc = zlib.crc32(stuff2, crc1)
+		if crc < 0:
+			crc = ~crc ^ 0xffffffff
+		
+		return crc
 
 
 class EthernetChecksumFixup(Fixup):
