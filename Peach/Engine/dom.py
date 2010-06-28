@@ -2382,7 +2382,7 @@ class DataElement(Mutatable):
 		if not self.isArray():
 			count = self.getCount()
 			if count > 1:
-				#print "getValue(%s): Item is array" % self.name
+				#print "getValue(%s): Item is array, %d" % (self.name, count)
 				origValue = value
 				value = value * count
 				
@@ -3262,33 +3262,6 @@ class Block(DataElement):
 				ret = ctypes.POINTER(ret)
 		
 		return ret
-	
-	def getSize(self):
-		'''
-		Return the length of this data element.  Try and
-		be fast about it!
-		'''
-		
-		if self.transformer != None and not self.transformer.changesSize():
-			return len(self.getValue())
-		
-		if self.fixup != None:
-			return len(self.getValue())
-		
-		if self.currentValue != None:
-			try:
-				return len(self.getValue())
-			except:
-				print "getSize(): self:", self
-				print "getSize(): self.getFullDataName:", self.getFullDataName()
-				print "getSize(): self.getValue:", self.getValue()
-		
-		size = 0
-		for c in self._children:
-			if c.isDataElement:
-				size += c.getSize()
-		
-		return size
 	
 	def hasLength(self):
 		if self.length != None:
