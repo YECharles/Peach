@@ -43,11 +43,41 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 import sys, os, threading, glob, re, time
 import win32api, win32con, win32process, win32pdh
 
-def getProcessCpuTimeWindows(process):
+def isWindows():
+	if sys.platform == 'win32':
+		return True
+	
+	return False
+
+def getProcessCpuTime(pid):
+	'''
+	Get current process time for PID.
+	'''
+	
+	if isWindows():
+		return getProcessCpuTimeWindows(pid)
+	
+	return getProcessCpuTimeUnix(pid)
+		
+
+def getProcessCpuTimeUnix(pid):
+	os.system("ps -o pcpu %d > .cpu" % self.pid)
+	fd = open(".cpu", "rb")
+	data = fd.read()
+	fd.close()
+	self.unlink(".cpu")
+	
+	cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
+	
+	return float(cpu)
+
+def getProcessCpuTimeWindows(pid):
 	'''
 	Get the current CPU processor time as a double based on a process
 	instance (chrome#10).
 	'''
+
+	process = getProcessInstance(pid)
 	
 	try:
 		if process == None:
@@ -151,32 +181,58 @@ def getCoverage(cmd):
 	except:
 		pass
 	
-	pid = os.spawnl(os.P_NOWAIT, "pin-2.8\\ia32\\bin\\pin.exe", "-t", "bblocks.dll", "--", cmd)
+	pid = os.spawnl(os.P_NOWAIT, 
+	                "pin-2.8\\ia32\\bin\\pin.exe", 
+	                "pin-2.8\\ia32\\bin\\pin.exe", 
+	                "-t", 
+	                "bblocks.dll", 
+	                "--", 
+	                cmd)
 	time.sleep(0.50)
-	hProc = getProcessInstance(pid)
 	while True:
-		(p, e) = os.waitpid(pid, os.WNOHANG)
-		if p != 0 and e != 0:
-			break
+		if isWindows():
+			if getProcessInstance(pid) == None:
+				break
+		else:
+			(p, e) = os.waitpid(pid, os.WNOHANG)
+			if p != 0 and e != 0:
+				break
 		
-		cpu = getProcessCpuTimeWindows(hProc)
+		cpu = getProcessCpuTime(hProc)
 		if cpu < 0.5:
+			print "Kill due to CPU time"
+			try:
+				# Kill process with signal
+				import signal
+				os.kill(pid, signal.SIGTERM)
+				time.sleep(0.25)
+				os.kill(pid, signal.SIGKILL)
+			except:
+				pass
+			
+			# Prevent Zombies!
+			os.wait()
+			
 			break
 	
 	fd = open("bblocks.out", "rb+")
-	strOffsets = fd.read().split("\n")
+	strOffsets = fd.read().replace("\r", "").split("\n")
 	offsets = []
 	fd.close()
+	
+	for s in strOffsets:
+		if len(s) < 2:
+			continue
+		
+		if len(s) > 8:
+			print "len(s)", len(s)
+			continue
+		offsets.append(int(s, 16))
 	
 	try:
 		os.unlink("bblocks.out")
 	except:
 		pass
-	
-	for s in strOffsets:
-		if len(s) < 2:
-			continue
-		offsets.append(int(s, 16))
 	
 	return offsets
 
