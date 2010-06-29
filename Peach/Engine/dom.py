@@ -1280,8 +1280,7 @@ class DataElement(Mutatable):
 		
 		if data.expression != None:
 			
-			stuff = peachEval(data.expression)
-			
+			stuff = evalEvent(data.expression, {})
 			buff = PublisherBuffer(None, stuff)
 			
 			parent = self.parent
