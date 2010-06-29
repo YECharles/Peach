@@ -9,4 +9,4 @@ msiexec /qn /i pyvmware-0.1.win32-py2.5.msi
 msiexec /qn /i pcap-peach.win32-py2.5.msi
 msiexec /qn /i zope.interface-3.3.0.win32-py2.5.msi
 msiexec /qn /i Twisted-8.0.1.win32-py2.5.msi
-msiexec /qn /i PyDbgEng-0.11.win32-py2.5.msi
+msiexec /qn /i PyDbgEng-0.14.win32-py2.5.msi
