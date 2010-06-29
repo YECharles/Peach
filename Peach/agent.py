@@ -468,7 +468,7 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 		if self._id == None or msg.id != self._id:
 			return pickle.dumps(_Msg(None, _MsgType.Nack))
 		
-		if msg.type != _MsgType.StopMonitor:
+		if msg.type != _MsgType.OnShutdown:
 			return pickle.dumps(_Msg(None, _MsgType.Nack))
 		
 		print "Agent: onShutdown()"
