@@ -181,39 +181,51 @@ def getCoverage(cmd):
 	except:
 		pass
 	
-	pid = os.spawnl(os.P_NOWAIT, 
+	if needsKilling:
+		pid = os.spawnl(os.P_NOWAIT, 
 	                "pin-2.8\\ia32\\bin\\pin.exe", 
 	                "pin-2.8\\ia32\\bin\\pin.exe", 
 	                "-t", 
 	                "bblocks.dll", 
 	                "--", 
 	                cmd)
-	time.sleep(0.50)
-	while True:
-		if isWindows():
-			if getProcessInstance(pid) == None:
-				break
-		else:
-			(p, e) = os.waitpid(pid, os.WNOHANG)
-			if p != 0 and e != 0:
-				break
-		
-		cpu = getProcessCpuTime(hProc)
-		if cpu < 0.5:
-			print "Kill due to CPU time"
-			try:
-				# Kill process with signal
-				import signal
-				os.kill(pid, signal.SIGTERM)
-				time.sleep(0.25)
-				os.kill(pid, signal.SIGKILL)
-			except:
-				pass
+
+		time.sleep(0.50)
+		while True:
+			if isWindows():
+				hProc = getProcessInstance(pid)
+				if hProc == None:
+					break
+			else:
+				(p, e) = os.waitpid(pid, os.WNOHANG)
+				if p != 0 and e != 0:
+					break
 			
-			# Prevent Zombies!
-			os.wait()
-			
-			break
+			cpu = getProcessCpuTime(hProc)
+			if cpu < 0.5:
+				print "Kill due to CPU time"
+				try:
+					# Kill process with signal
+					import signal
+					os.kill(pid, signal.SIGTERM)
+					time.sleep(0.25)
+					os.kill(pid, signal.SIGKILL)
+				except:
+					pass
+				
+				# Prevent Zombies!
+				os.wait()
+				
+				break
+	else:
+		pid = os.spawnl(os.P_WAIT, 
+	        "pin-2.8\\ia32\\bin\\pin.exe", 
+	        "pin-2.8\\ia32\\bin\\pin.exe", 
+	        "-t", 
+	        "bblocks.dll", 
+	        "--", 
+	        cmd)
+
 	
 	fd = open("bblocks.out", "rb+")
 	strOffsets = fd.read().replace("\r", "").split("\n")
@@ -241,8 +253,10 @@ print "] Peach Minset Finder v0.7"
 print "] Copyright (c) Michael Eddington\n"
 
 if len(sys.argv) < 3:
-	print "Syntax: minset.py samples\\folder \"command.exe args %%s\""
+	print "Syntax: minset.py [-gui] samples\\folder \"command.exe args %%s\""
 	print ""
+	print "  -gui         Optional parameter indicating program will"
+	print "               not close on it's own and needs killing"
 	print "  samples      The folder containing the sample files"
 	print "               for which we will find the min."
 	print "  command      The command line of the program to run."
@@ -259,8 +273,14 @@ try:
 except:
 	pass
 
-samples = sys.argv[1]
-command = sys.argv[2]
+needsKilling = False
+if sys.argv[1] == "-gui":
+	needsKilling = True
+	samples = sys.argv[2]
+	command = sys.argv[3]
+else:
+	samples = sys.argv[1]
+	command = sys.argv[2]
 
 print "[*] Finding all basic blocks"
 
