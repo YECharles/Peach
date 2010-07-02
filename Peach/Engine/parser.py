@@ -2938,6 +2938,10 @@ class ParseTemplate:
 		if action.template != None and action.data != None:
 			cracker = DataCracker(action.getRoot())
 			cracker.optmizeModelForCracking(action.template)
+			
+			# Somehow data not getting parent.  Force setting
+			action.data.parent = action
+			
 			action.template.setDefaults(action.data, self.dontCrack, True)
 		
 		# Verify action has a DataModel if needed

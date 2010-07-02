@@ -1280,7 +1280,7 @@ class DataElement(Mutatable):
 		
 		if data.expression != None:
 			
-			stuff = evalEvent(data.expression, {})
+			stuff = evalEvent(data.expression, {}, data)
 			buff = PublisherBuffer(None, stuff)
 			
 			parent = self.parent

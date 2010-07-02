@@ -109,7 +109,7 @@ def GetClassesInModule(module):
 def buildImports(node, g, l):
 
 	root = node.getRoot()
-
+	
 	for child in root:
 
 		if child.elementType == 'import':
