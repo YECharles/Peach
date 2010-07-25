@@ -590,7 +590,7 @@ class ParseTemplate:
 				baseObj = getattr(baseObj.data, name)
 			
 			else:
-				raise PeachException("Could not resolve ref", origStr)
+				raise PeachException("Could not resolve ref '%s'" % origStr)
 		
 		return baseObj
 	

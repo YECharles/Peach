@@ -380,7 +380,7 @@ class DataCracker:
 				baseObj = getattr(baseObj.templates, name)
 			
 			else:
-				raise Exception("Could not resolve ref", origStr)
+				raise Exception("Could not resolve ref '%s'" % origStr)
 		
 		return baseObj
 	
