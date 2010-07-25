@@ -19,6 +19,7 @@ v2.3.7
  - Change: New version of PyDbgEng used (v0.14).
  - Change: Added ProcessName to CrashReporter
  - Change: OS X: Kill Finder, Dock, and SystemUIServer every 1,000 iterations
+ - Bug: Fixed messages for unfound references to show unfound reference
  - Bug: Fixed Data expression handling to allow for external imports
  - Bug: Fixed odd bug with size relations and non-relation arrays.
  - Bug: Fixed bug in Dual CRC Fixup
