@@ -149,7 +149,7 @@ def peachPrint(msg):
 
 def changeDefaultEndian(endian):
 	if endian not in ['little', 'big']:
-		raise PeachException("Called ChangeEndian with invalid paramter [%s]", endian)
+		raise PeachException("Called ChangeEndian with invalid paramter [%s]" % endian)
 
 	from Peach.Engine.dom import Number
 	Number.defaultEndian = endian

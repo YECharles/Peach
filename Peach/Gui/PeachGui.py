@@ -297,7 +297,7 @@ try:
                 self.peachMainTree.SetItemImage(id, self.ImageLookup[node.nodeName])
                 
             except:
-                raise Exception("Unknown nodeName: ", node.nodeName)
+                raise Exception("Unknown nodeName: '%s'" % node.nodeName)
             
             for child in node.childNodes:
                 self.AddChildrenToTree(id, child)

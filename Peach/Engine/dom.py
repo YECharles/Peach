@@ -2939,22 +2939,23 @@ class Template(DataElement):
 						value += cv
 				
 				except:
-					print "value:", type(value)
+					print sys.exc_info()
+					#print "value:", type(value)
 					#print "value: [%s]" % repr(value)
-					print "c", c
-					print "c.name: %s" % c.name
-					print "c.type: %s" % c.elementType
-					if c.elementType == 'block':
-						try:
-							print "c[0]", c[0]
-							print "c.ref", c.ref
-							if c[0].elementType == 'choice':
-								print "c[0].currentElement", c[0].currentElement
-								print "c[0].currentElement.name", c[0].currentElement.name
-								print "c[0].currentElement.ref", c[0].currentElement.ref
-								#print "c[0].currentElement[0]", c[0].currentElement[0]
-						except:
-							pass
+					#print "c", c
+					#print "c.name: %s" % c.name
+					#print "c.type: %s" % c.elementType
+					#if c.elementType == 'block':
+					#	try:
+					#		print "c[0]", c[0]
+					#		print "c.ref", c.ref
+					#		if c[0].elementType == 'choice':
+					#			print "c[0].currentElement", c[0].currentElement
+					#			print "c[0].currentElement.name", c[0].currentElement.name
+					#			print "c[0].currentElement.ref", c[0].currentElement.ref
+					#			#print "c[0].currentElement[0]", c[0].currentElement[0]
+					#	except:
+					#		pass
 					
 					raise
 		

@@ -502,7 +502,7 @@ class PeachValidatorGui(gui.PeachValidation):
 			self.treeDataTree.SetItemImage(id, self.ImageLookup[node.elementType])
 			
 		except:
-			raise Exception("Unknown element type: ", node.elementType)
+			raise Exception("Unknown element type: '%s'" % node.elementType)
 		
 		try:
 			value = node.getValue()

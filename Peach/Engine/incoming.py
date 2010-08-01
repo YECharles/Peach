@@ -1234,6 +1234,100 @@ class DataCracker:
 		#print "_isTokenNext: Returning node & length"
 		return (staticNode, length)
 		
+	def _isContraintNext(self, node, fastChoice = False):
+		'''
+		Determine if a contraint node follows.  Other sized
+		nodes can be between them.
+		'''
+		
+		#print "_isContraintNext(%s)" % node.name
+		
+		staticNode = None
+		length = 0
+		n = node
+		while True:
+			
+			if fastChoice and n.elementType == 'block' and len(n) > 0:
+				n = n[0]
+			
+			else:
+				n = self._nextNode(n)
+			
+			if n == None:
+				break
+			
+			if n.contraint != None:
+				staticNode = n
+				break
+			
+			# If we are a choice we fail
+			if n.elementType == 'choice':
+				#print "_isTokenNext: Found choice, exiting"
+				return None
+			
+			# If a child flag is token we don't support that
+			if n.elementType == 'Flags':
+				for child in n:
+					if isinstance(child, 'Flag') and child.contraint != None:
+						if fastChoice:
+							return None
+						else:
+							staticNode = n
+							break
+				
+			# If we are a block, we need to
+			# head into the block.
+			if n.elementType == 'block':
+				
+				# If no children then size == 0
+				if len(n) == 0:
+					continue
+				
+				child = n[0]
+				if child.contraint != None:
+					staticNode = child
+					break
+				
+				# If a child flag is token we don't support that
+				if n.elementType == 'Flags':
+					for child in n:
+						if isinstance(child, 'Flag') and child.contraint:
+							if fastChoice:
+								return None
+							else:
+								staticNode = n
+								break
+				
+				s = self._hasSize(child)
+				if s == None:
+					#print "_isTokenNext: Child has no size, exiting [%s.%s]" % (n.name, child.name)
+					return None
+				
+				length += s
+				
+				ret = self._isConstraintNext(child, fastChoice)
+				if ret == None:
+					#print "_isTokenNext: Child has no next token, exiting"
+					return None
+				
+				length += ret[1]
+				staticNode = ret[0]
+				break
+			
+			s = self._hasSize(n)
+			if s == None:
+				#print "_isTokenNext: N has no size, exiting [%s]" % n.name
+				return None
+			
+			length += s
+		
+		# Shouldn't need this check
+		if staticNode == None:
+			return None
+		
+		#print "_isTokenNext: Returning node & length"
+		return (staticNode, length)
+		
 	def _isLastUnsizedNode(self, node):
 		'''
 		Determin if the following nodes all have known
@@ -1978,6 +2072,49 @@ class DataCracker:
 					newpos = len(buff.data) - length
 					value = buff.data[pos:newpos]
 					rating = 1
+				
+				elif self._isConstraintNext(node) != None:
+					# Is there an isStatic ahead?
+					
+					constraintNode, length = self._isConstraintNext(node)
+					
+					Debug(1, "_handleString: self._isConstraintNext(%s): %s" % (node.name, constraintNode.name))
+					#
+					## 1. Locate staticNode position
+					#val = constraintNode.getValue()
+					#Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
+					#valPos = buff.data[pos:].find(val)
+					#while valPos == -1:
+					#	if buff.haveAllData:
+					#		newpos = pos
+					#		value = ""
+					#		rating = 4
+					#		Debug(1, " :( Have all data")
+					#		break
+					#	
+					#	try:
+					#		buff.read(1)
+					#	except:
+					#		newpos = pos
+					#		value = ""
+					#		rating = 4
+					#		Debug(1, " :( Have all data")
+					#		break
+					#	
+					#	valPos = buff.data[pos:].find(val)
+					#
+					#if rating == 4:
+					#	break
+					#
+					## 2. Subtract length
+					#newpos = (pos+valPos) - length
+					#
+					## 3. Yuppie!
+					#value = buff.data[pos:newpos]
+					#rating = 1
+					#
+					#Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
+					
 				
 				else:
 					
