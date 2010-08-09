@@ -61,6 +61,6 @@ class SequenceRandomFixup(Fixup):
             
     def fixup(self):
         
-        return random.randint(0, (1 << 32) - 1)
+        return random.randint(0, (1 << self.context.size) - 1)
     
 # end
