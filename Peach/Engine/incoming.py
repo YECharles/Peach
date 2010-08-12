@@ -2074,7 +2074,7 @@ class DataCracker:
 					rating = 1
 				
 				elif self._isConstraintNext(node) != None:
-					# Is there an isStatic ahead?
+					# Is there a constraint ahead?
 					
 					constraintNode, length = self._isConstraintNext(node)
 					
