@@ -383,10 +383,19 @@ class RandomMutationStrategy(MutationStrategy):
 			nodes = dataModel.getAllChildDataElements()
 			nodes.append(dataModel)
 			
+			nodesToRemove = []
 			# Remove non-mutable fields
 			for node in nodes:
 				if not node.isMutable:
-					nodes.remove(node)
+					nodesToRemove.append(node)
+
+			for node in nodesToRemove:
+				nodes.remove(node)
+					
+			## Quick to check to see if we failed.
+			#for node in nodes:
+			#	if not self._fieldMutators.has_key(node.getFullname()) or len(self._fieldMutators[node.getFullname()]) == 0:
+			#		raise Exception("Found element with no mutations!")
 			
 			print "The following elements are mutating: "
 			# Select nodes we will modify
