@@ -351,7 +351,7 @@ Debug Peach XML File
 				parser = Analyzer.DefaultParser()
 				parser.asParser(args[0])
 				
-				print "File parsed with out errors.\n\n"
+				print "File parsed without errors.\n\n"
 	
 			except PeachException, pe:
 				print ""
