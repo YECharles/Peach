@@ -2073,47 +2073,47 @@ class DataCracker:
 					value = buff.data[pos:newpos]
 					rating = 1
 				
-				elif self._isConstraintNext(node) != None:
-					# Is there a constraint ahead?
+				#elif self._isConstraintNext(node) != None:
+					## Is there a constraint ahead?
 					
-					constraintNode, length = self._isConstraintNext(node)
+					#constraintNode, length = self._isConstraintNext(node)
 					
-					Debug(1, "_handleString: self._isConstraintNext(%s): %s" % (node.name, constraintNode.name))
-					#
-					## 1. Locate staticNode position
-					#val = constraintNode.getValue()
-					#Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
-					#valPos = buff.data[pos:].find(val)
-					#while valPos == -1:
-					#	if buff.haveAllData:
-					#		newpos = pos
-					#		value = ""
-					#		rating = 4
-					#		Debug(1, " :( Have all data")
-					#		break
-					#	
-					#	try:
-					#		buff.read(1)
-					#	except:
-					#		newpos = pos
-					#		value = ""
-					#		rating = 4
-					#		Debug(1, " :( Have all data")
-					#		break
-					#	
-					#	valPos = buff.data[pos:].find(val)
-					#
-					#if rating == 4:
-					#	break
-					#
-					## 2. Subtract length
-					#newpos = (pos+valPos) - length
-					#
-					## 3. Yuppie!
-					#value = buff.data[pos:newpos]
-					#rating = 1
-					#
-					#Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
+					#Debug(1, "_handleString: self._isConstraintNext(%s): %s" % (node.name, constraintNode.name))
+					##
+					### 1. Locate staticNode position
+					##val = constraintNode.getValue()
+					##Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
+					##valPos = buff.data[pos:].find(val)
+					##while valPos == -1:
+					##	if buff.haveAllData:
+					##		newpos = pos
+					##		value = ""
+					##		rating = 4
+					##		Debug(1, " :( Have all data")
+					##		break
+					##	
+					##	try:
+					##		buff.read(1)
+					##	except:
+					##		newpos = pos
+					##		value = ""
+					##		rating = 4
+					##		Debug(1, " :( Have all data")
+					##		break
+					##	
+					##	valPos = buff.data[pos:].find(val)
+					##
+					##if rating == 4:
+					##	break
+					##
+					### 2. Subtract length
+					##newpos = (pos+valPos) - length
+					##
+					### 3. Yuppie!
+					##value = buff.data[pos:newpos]
+					##rating = 1
+					##
+					##Debug(1, "Found: [%d][%d:%d][%s]" % (length, self.parentPos+pos, self.parentPos+newpos, value))
 					
 				
 				else:
