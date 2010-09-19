@@ -479,6 +479,8 @@ try:
 		def __init__(self, args):
 			Monitor.__init__(self, args)
 			
+			print "WindowsDebugEngine::__init__()"
+			
 			self.started = None
 			# Set at start of exception handling
 			self.handlingFault = None
@@ -835,6 +837,10 @@ try:
 			'''
 			
 			print "DetectedFault()"
+			
+			if self.handlingFault == None:
+				print "DetectedFault: Agent was re-set, returning false"
+				return False
 			
 			if self.thread and self.thread.is_alive():
 				time.sleep(0.15)
