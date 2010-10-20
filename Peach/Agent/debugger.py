@@ -207,7 +207,7 @@ try:
 				print "Exception: 2. Output stack trace"
 				
 				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
-										   c_char_p("kb 100"),
+										   c_char_p("kb"),
 										   DbgEng.DEBUG_EXECUTE_ECHO)
 				self.buff += "\n\n"
 				
@@ -319,6 +319,8 @@ try:
 		quit = kwargs['Quit']
 		Tempfile = kwargs['Tempfile']
 		TempfilePid = kwargs['TempfilePid']
+		FaultOnEarlyExit = kwargs['FaultOnEarlyExit']
+		
 		dbg = None
 		
 		print "WindowsDebugEngineProcess_run"
@@ -336,6 +338,7 @@ try:
 			_eventHandler.quit = quit
 			_eventHandler.Tempfile = Tempfile
 			_eventHandler.TempfilePid = TempfilePid
+			_eventHandler.FaultOnEarlyExit = FaultOnEarlyExit
 			
 			if KernelConnectionString:
 				dbg = PyDbgEng.KernelAttacher(  connection_string = KernelConnectionString,
@@ -543,11 +546,18 @@ try:
 			else:
 				self.NoCpuKill = False
 			
+			if args.has_key("FaultOnEarlyExit"):
+				self.FaultOnEarlyExit = True
+			else:
+				self.FaultOnEarlyExit = False
+			
 			if self.Service == None and self.CommandLine == None and self.ProcessName == None \
 					and self.KernelConnectionString == None and self.ProcessID == None:
 				raise PeachException("Unable to create WindowsDebugEngine, missing Service, or CommandLine, or ProcessName, or ProcessID, or KernelConnectionString parameter.")
 			
-		
+			self.handlingFault = None
+			self.handledFault = None
+			
 		def _StartDebugger(self):
 			
 			try:
@@ -596,7 +606,8 @@ try:
 				'IgnoreSecondChanceGardPage':self.IgnoreSecondChanceGardPage,
 				'Quit':self.quit,
 				'Tempfile':self.tempfile,
-				'TempfilePid':self.tempfilepid
+				'TempfilePid':self.tempfilepid,
+				'FaultOnEarlyExit':self.FaultOnEarlyExit
 				})
 			
 			# Kick off our thread:
@@ -612,6 +623,11 @@ try:
 				time.sleep(1)
 		
 		def _StopDebugger(self):
+			
+			if self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+				print "_StopDebugger(): Not killing process due to fault handling"
+				return
+			
 			print "_StopDebugger()"
 			
 			try:
@@ -656,6 +672,8 @@ try:
 		
 		def PublisherCall(self, method):
 			
+			print "PublisherCall"
+			
 			if not self.StartOnCall:
 				return None
 			
@@ -664,6 +682,11 @@ try:
 				return True
 			
 			if self.OnCallMethod+"_isrunning" == method.lower():
+				
+				# Program has stopped if we are handling a fault.
+				if self.handlingFault.is_set() or self.handledFault.is_set():
+					return False
+				
 				if not self.quit.is_set():
 					if self.pid == None:
 						fd = open(self.tempfilepid, "rb+")

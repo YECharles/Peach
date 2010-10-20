@@ -442,7 +442,7 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 		if msg.type != _MsgType.PublisherCall:
 			return pickle.dumps(_Msg(None, _MsgType.Nack))
 		
-		print "Agent: onPublisherCall()"
+		print "Agent: onPublisherCall():", msg.method
 		
 		outRet = None
 		for m in self._monitors:
