@@ -152,16 +152,11 @@ class Binary(Analyzer):
 			length = len(s.value)
 			try:
 				lengthL16 = struct.pack("H", length)
-			except:
-				pass
-			
-			lengthL32 = struct.pack("I", length)
-			
-			try:
 				lengthB16 = struct.pack("!H", length)
 			except:
 				pass
 			
+			lengthL32 = struct.pack("I", length)
 			lengthB32 = struct.pack("!I", length)
 			
 			first2 = data[s.startPos - 2:s.startPos]
