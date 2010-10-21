@@ -144,10 +144,24 @@ class Binary(Analyzer):
 		lengths = {}
 		
 		for s in strs:
+			lengthL16 = 0
+			lengthL32 = 0
+			lengthB16 = 0
+			lengthB32 = 0
+			
 			length = len(s.value)
-			lengthL16 = struct.pack("H", length)
+			try:
+				lengthL16 = struct.pack("H", length)
+			except:
+				pass
+			
 			lengthL32 = struct.pack("I", length)
-			lengthB16 = struct.pack("!H", length)
+			
+			try:
+				lengthB16 = struct.pack("!H", length)
+			except:
+				pass
+			
 			lengthB32 = struct.pack("!I", length)
 			
 			first2 = data[s.startPos - 2:s.startPos]
