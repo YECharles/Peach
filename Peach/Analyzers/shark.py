@@ -910,8 +910,22 @@ class PeachShark:
 				elif size == 8:
 					return 'uint64'
 			
-			#debug("bigBalue: [%s][%s]" % (valueHex, show))
-			bigValue = struct.unpack("!H", value)[0]
+			#debug("bigBalue: [%s][%s][%s]" % (valueHex, show, repr(value)))
+			
+			if len(value) == 2:
+				format = '!H'
+			elif len(value) == 4:
+				format = '!I'
+			else:
+				debug("There's an issue with bigValue: [%s][%s][%s]" % (valueHex, show, repr(value)))
+				if len(value) > 4:
+					value = value[:4]
+					format = '!I'
+				else:
+					value = value.ljust(4)
+					format = '!I'
+			
+			bigValue = struct.unpack(format, value)[0]
 			if int(bigValue) == int(showHex, 16):
 				if size == 1:
 					return 'n_uint8'

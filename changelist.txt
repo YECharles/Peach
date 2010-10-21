@@ -19,6 +19,7 @@ v2.3.7
  - Change: New version of PyDbgEng used (v0.14).
  - Change: Added ProcessName to CrashReporter
  - Change: OS X: Kill Finder, Dock, and SystemUIServer every 1,000 iterations
+ - Bug: Patch for bug in shark applied
  - Bug: Fixed small crash bug in binary analyzer related to shorts
  - Bug: Changed number of stack frames to display due to DOS issue.
  - Bug: Fixed crash in agent when mutator ran outo f memory
