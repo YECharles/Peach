@@ -388,7 +388,7 @@ class RandomMutationStrategy(MutationStrategy):
 			for node in nodes:
 				if not node.isMutable:
 					nodesToRemove.append(node)
-
+			
 			for node in nodesToRemove:
 				nodes.remove(node)
 					

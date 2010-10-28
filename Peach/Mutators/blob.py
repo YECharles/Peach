@@ -264,7 +264,7 @@ class BlobMutator(BitFlipperMutator):
 			self.changeUnNullRange,
 			])
 		
-		print "BlobMutator:", func
+		#print "BlobMutator:", func
 		return func(data)
 	
 	def changeExpandBuffer(self, data):

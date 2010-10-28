@@ -1449,14 +1449,6 @@
 														&quot;port&quot;.</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
-											<xs:enumeration value="tcp.TcpListenerLaunchGui">
-												<xs:annotation>
-													<xs:documentation>Accepts incoming connection on a TCP port. Requires
-														parameters named &quot;host&quot;, &quot;port&quot;, and
-														&quot;windowName&quot;. OPeration is similar to
-														FileWriterLauncherGui.</xs:documentation>
-												</xs:annotation>
-											</xs:enumeration>
 											<xs:enumeration value="udp.Udp">
 												<xs:annotation>
 													<xs:documentation>Send tests to UDP port. Requires parameters named
@@ -1530,22 +1522,6 @@
 														the test count #.</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
-											<xs:enumeration value="file.FileWriterLauncher">
-												<xs:annotation>
-													<xs:documentation>Writes a file and then allows launching an application
-														using the call action with method the program to launch. Requires a
-														single parameter, the name of the file to create.</xs:documentation>
-												</xs:annotation>
-											</xs:enumeration>
-											<xs:enumeration value="file.FileWriterLauncherGui">
-												<xs:annotation>
-													<xs:documentation>Writes a file and then allows launching an application
-														using the call action with method the program to launch. Two parameters
-														are required. First is the filename to create and the second is a
-														partial or full window title of the launched application. A WM_CLOSE
-														meesage will be sent to the app to try and close it.</xs:documentation>
-												</xs:annotation>
-											</xs:enumeration>
 											<xs:enumeration value="sql.Odbc">
 												<xs:annotation>
 													<xs:documentation>Will execute test cases as SQL queries. Requires
@@ -1561,13 +1537,6 @@
 														methodFormat parameter is in format:
 														FunctionName(&quot;%s&quot;) where %s will be replaced with the
 														test case.</xs:documentation>
-												</xs:annotation>
-											</xs:enumeration>
-											<xs:enumeration value="Publisher">
-												<xs:annotation>
-													<xs:documentation>A do nothing publisher. Used when XML will be consumed
-														by another program such as PeachTcpServer.py which does not make use of
-														a standard publisher.</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
 										</xs:restriction>

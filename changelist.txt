@@ -16,6 +16,9 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Change: Updated some of the samples to reflect multiple publishers
+ - Change: Depricated several Publishers such as FileWriterLauncher*.  Should
+           now make use of multiple publishers and use Launcher* and DebuggerLauncher*
  - Change: New version of PyDbgEng used (v0.14).
  - Change: Added ProcessName to CrashReporter
  - Change: OS X: Kill Finder, Dock, and SystemUIServer every 1,000 iterations
