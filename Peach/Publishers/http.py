@@ -140,7 +140,7 @@ class HttpDigestAuth(Publisher):
 		self._realm = realm
 		self._username = username
 		self._password = password
-		self._headers = headers
+		self._headers = eval(headers)
 		self._timeout = float(timeout)
 		self._fd = None
 	
@@ -157,7 +157,7 @@ class HttpDigestAuth(Publisher):
 		if self._fd:
 			self._fd.close()
 			self._fd = None
-		
+	
 	def send(self, data):
 		'''
 		Send data via sendall.
@@ -168,6 +168,64 @@ class HttpDigestAuth(Publisher):
 		
 		passmgr = urllib2.HTTPPasswordMgr()
 		passmgr.add_password(self._realm, self._url, self._username, self._password)
+		
+		auth_handler = urllib2.HTTPDigestAuthHandler(passmgr)
+		opener = urllib2.build_opener(auth_handler)
+		urllib2.install_opener(opener)
+		
+		req = urllib2.Request(self._url, data, self._headers)
+		
+		try:
+			self._fd = urllib2.urlopen(req)
+		except:
+			self._fd = None
+	
+	def receive(self, size = None):
+		'''
+		Receive upto 10000 bytes of data.
+		
+		@rtype: string
+		@return: received data.
+		'''
+		if self._fd:
+			if size != None:
+				return self._fd.read(size)
+			
+			return self._fd.read()
+		
+		else:
+			return ''
+
+class HttpDigestAuthDefaultRealm(Publisher):
+	'''
+	A simple HTTP publisher.
+	'''
+	
+	def __init__(self, url, authurl, username, password, headers = None, timeout = 0.1):
+		Publisher.__init__(self)
+		self._url = url
+		self._authurl = authurl
+		self._username = username
+		self._password = password
+		self._headers = eval(headers)
+		self._timeout = float(timeout)
+		self._fd = None
+	
+	def stop(self):
+		self.close()
+	
+	def connect(self):
+		pass
+	
+	def close(self):
+		if self._fd:
+			self._fd.close()
+			self._fd = None
+	
+	def send(self, data):
+		
+		passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm();
+		passmgr.add_password(None, self._authurl, self._username, self._password)
 		
 		auth_handler = urllib2.HTTPDigestAuthHandler(passmgr)
 		opener = urllib2.build_opener(auth_handler)
