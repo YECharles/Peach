@@ -39,8 +39,7 @@
 
 	<Agent name="LocalAgent" location="http://127.0.0.1:9000">
 		<Monitor class="process.Process">
-			<Param name="Command"
-		value="samples/UnixCrashServer/unixcrash" />
+			<Param name="Command" value="samples/UnixCrashServer/unixcrash" />
 		</Monitor>
 		<Monitor class="osx.CrashReporter" />
 	</Agent>
@@ -55,13 +54,13 @@
 		</Publisher>
 	</Test>
 
-<Run name="DefaultRun">
-	<Test ref="TheTest" />
-
-	<Logger class="logger.Filesystem">
-		<Param name="path" value="logs" />
-	</Logger>
-</Run>
+	<Run name="DefaultRun">
+		<Test ref="TheTest" />
+	
+		<Logger class="logger.Filesystem">
+			<Param name="path" value="logs" />
+		</Logger>
+	</Run>
 
 </Peach>
 <!-- end -->

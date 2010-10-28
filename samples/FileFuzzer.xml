@@ -11,19 +11,21 @@
 		
 		Syntax:
 		
-		python peach.py -a
+			peach -a
 		
-		python peach.py samples\Debugger.xml
+			peach samples\Debugger.xml
 		
 		Output:
 		
-		You will see the tests scroll along.  Once test 47 has occured you can check
-		the c:\peach\logfiles folder for a log of this test that will include a Debugger.txt
-		faul output.
+			You will see the tests scroll along.  Once test 47 has occured you can check
+			the c:\peach\logfiles folder for a log of this test that will include a Debugger.txt
+			faul output.
+			
+			NOTE: The crashing test can varry by version of Peach.
 		
 		Authors:
 		
-		Michael Eddington (mike@phed.org)
+			Michael Eddington (mike@phed.org)
 		
 		$Id: Debugger.xml 807 2008-03-25 08:34:38Z meddingt $
 		
@@ -38,19 +40,21 @@
 	</DataModel>
 	
 	<!-- Define a simple state machine that will write the file and 
-		then launch a program using the FileWriterLauncher publisher -->
+		then launch a program using the FileWriter and DebuggerLaucher publishers -->
 	<StateModel name="State" initialState="Initial">
 		<State name="Initial">
-			<!-- Write out contents of file -->
-			<Action name="WriteFile" type="output">
+			
+			<!-- Write out contents of file.  The publisher attribute matches 
+			the name we provide for the publisher in the Test section. -->
+			<Action name="WriteFile" type="output" publisher="file">
 				<DataModel ref="TestTemplate" />
 			</Action>
 			
 			<!-- Close file -->
-			<Action type="close" />
+			<Action type="close" publisher="file" />
 			
 			<!-- Launch the file consumer -->
-			<Action type="call" method="ScoobySnacks"/>
+			<Action type="call" method="ScoobySnacks" publisher="launch"/>
 			
 		</State>
 	</StateModel>
@@ -82,14 +86,16 @@
 	
 	<Test name="TheTest">
 		<Agent ref="LocalAgent" />
-		
 		<StateModel ref="State"/>
 		
 		<!-- Configure our publisher with correct filename to write too -->
-		<Publisher class="file.FileWriterLauncher">
+		<Publisher class="file.FileWriter" name="file">
 			<Param name="fileName" value="fuzzfile.bin" />
-			<Param name="debugger" value="true"/>
 		</Publisher>
+		
+		<!-- Configure publisher to launch our target process -->
+		<Publisher class="process.DebuggerLauncher" name="launch"/>
+		
 	</Test>
 	
 	<Run name="DefaultRun">

@@ -18,15 +18,15 @@
 			<Action type="open" />
 			
 			<!-- Write out contents of file -->
-			<Action name="WriteFile" type="output">
+			<Action name="WriteFile" type="output" publisher="file">
 				<DataModel ref="FileData" />
 			</Action>
 			
 			<!-- Close file -->
-			<Action type="close" />
+			<Action type="close" publisher="file" />
 			
 			<!-- Launch the file consumer -->
-			<Action type="call" method="notepad.exe"/>
+			<Action type="call" method="notepad.exe" publisher="launch"/>
 		</State>
 	</StateModel>
 	
@@ -57,10 +57,12 @@
 		<StateModel ref="State"/>
 		
 		<!-- Configure our publisher with correct filename to write too -->
-		<Publisher class="file.FileWriterLauncherGui">
+		<Publisher class="file.FileWriter" name="file">
 			<Param name="fileName" value="fuzzedfile.txt" />
+		</Publisher>
+		
+		<Publisher class="process.DebuggerLauncherGui" name="launch">
 			<Param name="windowName" value="Notepad" />
-			<Param name="debugger" value="true"/>
 		</Publisher>
 	</Test>
 	
