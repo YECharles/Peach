@@ -1,6 +1,0 @@
-break Parent
-break Child
-run simple
-cont
-cont
-quit

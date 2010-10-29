@@ -1,8 +1,0 @@
-break main
-run
-idb target command help
-idb target command help   
-idb target command     help
-idb target command foo
-kill
-quit
