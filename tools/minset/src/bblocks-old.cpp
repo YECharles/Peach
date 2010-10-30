@@ -3,18 +3,18 @@
 
 FILE* trace;
 
-VOID docount(VOID *ip, BOOL isBranch, AADRINT branchAddress)
+VOID docount(ADDRINT src, ADDRINT dst, INT32 taken)
 {
-    if(isBranch)
-        fprintf(trace, "%p\n", branchAddress);
+    if(taken)
+        fprintf(trace, "%p\n", dst);
 }
 
 // Pin calls this function every time a new instruction is encountered
-VOID Instruction(TRACE ins, VOID *v)
+VOID Instruction(INS ins, VOID *v)
 {
     if(INS_IsDirectBranchOrCall(ins))
     {
-        TRACE_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_INST_PTR, IARG_BRANCH_TAKEN, IARG_BRANCH_TARGET_ADDR, IARG_END);
+        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_INST_PTR, IARG_BRANCH_TARGET_ADDR, IARG_BRANCH_TAKEN, IARG_END);
     }
 }
 
@@ -52,11 +52,8 @@ int main(int argc, char * argv[])
     if (PIN_Init(argc, argv)) return Usage();
 
     // Register Instruction to be called to instrument instructions
-    TRACE_AddInstrumentFunction(Instruction, 0);
+    INS_AddInstrumentFunction(Instruction, 0);
 
-    // Register Fini to be called when the application exits
-    PIN_AddFiniFunction(Fini, 0);
-    
     // Start the program, never returns
     PIN_StartProgram();
     

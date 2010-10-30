@@ -1,25 +1,44 @@
+
+//
+// PIN Tool to find all basic blocks a program hits.
+//  This PIN Tool is intended for use with Peach.
+//
+//  Code based off example from PIN documentation.
+//
+// Author:
+//   Michael Eddington (mike@phed.org)
+//
+
+// TODO: Modify so we only hit each BB once.
+
+
 #include <stdio.h>
-#include "pin.H"
+#include <pin.H>
 
-FILE* trace;
+// The running count of instructions is kept here
+// make it static to help the compiler optimize docount
+static FILE* trace;
 
-VOID docount(ADDRINT src, ADDRINT dst, INT32 taken)
+// This function is called before every block
+// Use the fast linkage for calls
+VOID PIN_FAST_ANALYSIS_CALL docount(ADDRINT bbl)
 {
-    if(taken)
-        fprintf(trace, "%p\n", dst);
+    // TODO - Can we remove our call once it was hit??
+    
+    fprintf(trace, "%p\n", bbl);
 }
-
-// Pin calls this function every time a new instruction is encountered
-VOID Instruction(INS ins, VOID *v)
+    
+// Pin calls this function every time a new basic block is encountered
+// It inserts a call to docount
+VOID Trace(TRACE trace, VOID *v)
 {
-    if(INS_IsDirectBranchOrCall(ins))
+    // Visit every basic block  in the trace
+    for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl))
     {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_INST_PTR, IARG_BRANCH_TARGET_ADDR, IARG_BRANCH_TAKEN, IARG_END);
+        // Insert a call to docount for every bbl
+        BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)docount, IARG_UINT32, BBL_Address(bbl), IARG_END);
     }
 }
-
-KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool",
-    "o", "inscount.out", "specify output file name");
 
 // This function is called when the application exits
 VOID Fini(INT32 code, VOID *v)
@@ -27,35 +46,22 @@ VOID Fini(INT32 code, VOID *v)
     fclose(trace);
 }
 
-/* ===================================================================== */
-/* Print Help Message                                                    */
-/* ===================================================================== */
 
-INT32 Usage()
-{
-    PIN_ERROR("This tool counts the number of dynamic instructions executed\n" + 
-        KNOB_BASE::StringKnobSummary() + "\n");
-    return -1;
-}
-
-/* ===================================================================== */
-/* Main                                                                  */
-/* ===================================================================== */
-/*   argc, argv are the entire command line: pin -t <toolname> -- ...    */
-/* ===================================================================== */
-
+// argc, argv are the entire command line, including pin -t <toolname> -- ...
 int main(int argc, char * argv[])
 {
-    trace = fopen("bblocks.out", "w");
-    
     // Initialize pin
-    if (PIN_Init(argc, argv)) return Usage();
+    PIN_Init(argc, argv);
+    
+    trace = fopen("bblocks.out", "w");
 
     // Register Instruction to be called to instrument instructions
-    INS_AddInstrumentFunction(Instruction, 0);
+    TRACE_AddInstrumentFunction(Trace, 0);
 
     // Start the program, never returns
     PIN_StartProgram();
     
     return 0;
 }
+
+// end
