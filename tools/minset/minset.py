@@ -183,8 +183,8 @@ def getCoverage(cmd):
 	
 	if needsKilling:
 		pid = os.spawnl(os.P_NOWAIT, 
-	                "pin-2.8\\ia32\\bin\\pin.exe", 
-	                "pin-2.8\\ia32\\bin\\pin.exe", 
+	                "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+	                "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
 	                "-t", 
 	                "bblocks.dll", 
 	                "--", 
@@ -219,8 +219,8 @@ def getCoverage(cmd):
 				break
 	else:
 		pid = os.spawnl(os.P_WAIT, 
-	        "pin-2.8\\ia32\\bin\\pin.exe", 
-	        "pin-2.8\\ia32\\bin\\pin.exe", 
+	        "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+	        "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
 	        "-t", 
 	        "bblocks.dll", 
 	        "--", 
