@@ -241,11 +241,10 @@ def getCoverage(cmd):
 			continue
 		offsets.append(int(s, 16))
 	
-	#try:
-	#	os.unlink("bblocks.out")
-	#except:
-	#	pass
-	sys.exit(0)
+	try:
+		os.unlink("bblocks.out")
+	except:
+		pass
 	
 	return offsets
 
@@ -320,7 +319,6 @@ minset = []
 for sampleFile in sampleFiles:
 	print "[*] Determining coverage with [%s]...." % sampleFile
 	
-	print "cmd: ["+command+"]"
 	cmd = command % sampleFile
 	bblocks[sampleFile] = sorted(set(getCoverage(cmd)))
 	
