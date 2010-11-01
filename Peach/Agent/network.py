@@ -181,12 +181,12 @@ class UdpMonitor(Monitor):
 		
 	def GetMonitorData(self):
 		
-		data = None
+		data = ""
 		for d in self.thread.packets:
 			data += d
 		
 		self.thread.packets = []
-		self.thread.receivedPackets.clear()
+		self.thread.receivedPacket.clear()
 		
 		return { 'UdpMonitor.txt' : data }
 	
