@@ -1,1 +1,1 @@
-python minset.py samples\*.png "bin\pngcheck.exe %%s"
+python minset.py samples\*.png minset "bin\pngcheck.exe %%s"

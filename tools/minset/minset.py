@@ -40,7 +40,7 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 
 # $Id$
 
-import sys, os, threading, glob, re, time
+import sys, os, threading, glob, re, time, shutil
 import win32api, win32con, win32process, win32pdh
 
 def isWindows():
@@ -252,13 +252,14 @@ print ""
 print "] Peach Minset Finder v0.7"
 print "] Copyright (c) Michael Eddington\n"
 
-if len(sys.argv) < 3:
-	print "Syntax: minset.py [-gui] samples\\folder \"command.exe args %%s\""
+if len(sys.argv) < 4:
+	print "Syntax: minset.py [-gui] samples minset \"command.exe\" \"args %%s\""
 	print ""
 	print "  -gui         Optional parameter indicating program will"
 	print "               not close on it's own and needs killing"
 	print "  samples      The folder containing the sample files"
 	print "               for which we will find the min."
+	print "  minset       Folder to place the min set of required files."
 	print "  command      The command line of the program to run."
 	print "               MUST contain a %%s which will be substututed"
 	print "               for the sample filename."
@@ -277,13 +278,15 @@ needsKilling = False
 if sys.argv[1] == "-gui":
 	needsKilling = True
 	samples = sys.argv[2]
-	command = sys.argv[3]
-	if len(sys.argv) > 3:
+	minsetPath = sys.argv[3]
+	command = sys.argv[4]
+	if len(sys.argv) > 5:
 		command = '"' + command + '" ' + sys.argv[3]
 else:
 	samples = sys.argv[1]
-	command = sys.argv[2]
-	if len(sys.argv) > 3:
+	minsetPath = sys.argv[2]
+	command = sys.argv[3]
+	if len(sys.argv) > 4:
 		command = '"' + command + '" ' + sys.argv[3]
 
 print "[*] Finding all basic blocks"
@@ -350,6 +353,14 @@ def delta(list1, list2):
 	
 	return d
 
+def stripPath(fileName):
+	indx = fileName.rfind(os.path.sep)
+	
+	if indx == -1:
+		return fileName
+	
+	return fileName[indx+1:]
+
 coveredBlocks = []
 for b in bblocks[sampleFileMostCoverage]:
 	coveredBlocks.append(b)
@@ -365,8 +376,14 @@ for sampleFile in sampleFiles:
 print ""
 print "[*] Minimum set is %d of %d files:" % (len(minset), len(sampleFiles))
 
+try:
+	os.mkdir(minsetPath)
+except:
+	pass
+
 for sampleFile in minset:
 	print "[-]    %s" % sampleFile
+	shutil.copyfile(sampleFile, os.path.join(minsetPath, stripPath(sampleFile)))
 
 print "\n"
 
