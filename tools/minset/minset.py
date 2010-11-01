@@ -241,10 +241,11 @@ def getCoverage(cmd):
 			continue
 		offsets.append(int(s, 16))
 	
-	try:
-		os.unlink("bblocks.out")
-	except:
-		pass
+	#try:
+	#	os.unlink("bblocks.out")
+	#except:
+	#	pass
+	sys.exit(0)
 	
 	return offsets
 
@@ -278,9 +279,13 @@ if sys.argv[1] == "-gui":
 	needsKilling = True
 	samples = sys.argv[2]
 	command = sys.argv[3]
+	if len(sys.argv) > 3:
+		command = '"' + command + '" ' + sys.argv[3]
 else:
 	samples = sys.argv[1]
 	command = sys.argv[2]
+	if len(sys.argv) > 3:
+		command = '"' + command + '" ' + sys.argv[3]
 
 print "[*] Finding all basic blocks"
 
@@ -315,6 +320,7 @@ minset = []
 for sampleFile in sampleFiles:
 	print "[*] Determining coverage with [%s]...." % sampleFile
 	
+	print "cmd: ["+command+"]"
 	cmd = command % sampleFile
 	bblocks[sampleFile] = sorted(set(getCoverage(cmd)))
 	
