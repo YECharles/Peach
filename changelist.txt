@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.7
 ------
 
+ - New: UdpMonitor monitor will trigger fault when UDP packet received.
  - New: Tool mincrash.py will try to locate the min change for cash.
  - New: Exposing new Asn1 data element that used to be internal only.
  - New: Windows debugger will use processor CPU time to close the process earlier
@@ -16,6 +17,7 @@ v2.3.7
  - New: Added new publishers under process called Launcher, LauncherGui,
         DebuggerLauncher, and DebuggerLauncherGui.  Implemented to better
         support multi publisher capabilities in Peach.
+ - Change: Updated minset to work better
  - Change: Updated some of the samples to reflect multiple publishers
  - Change: Depricated several Publishers such as FileWriterLauncher*.  Should
            now make use of multiple publishers and use Launcher* and DebuggerLauncher*

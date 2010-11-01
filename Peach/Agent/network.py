@@ -39,7 +39,7 @@ Todo:
 # $Id$
 
 
-import sys, threading, os, time, thread, re
+import sys, threading, os, time, thread, re, socket
 from Peach.agent import Monitor
 
 try:
@@ -86,7 +86,7 @@ class PingMonitor(Monitor):
 		'''
 		
 		# Our name for this monitor
-		self.hostname = str(args['hostname'])
+		self.hostname = str(args['hostname']).replace("'''", "")
 		self._name = "PingMonitor"
 	
 	def DetectedFault(self):
@@ -101,7 +101,7 @@ class PingMonitor(Monitor):
 		elif sys.platform == "linux2":
 				ping_send_command = "ping -c 2 "
 				ping_send_command3 = "ping -c 3 "
-				ping_reply_regex = r"64 bytes from \d+\.\d+\.\d\.\d+:"
+				ping_reply_regex = r"64 bytes from \d+\.\d+\.\d+\.\d+:"
 		else:
 				raise Exception("PingAgent running on unsupported platform %s" % sys.platform)
 		
@@ -113,15 +113,103 @@ class PingMonitor(Monitor):
 			return False
 		
 		# If we didn't see a ping, lets try again with 3 pings just to make sure
-
+		
 		pipe = os.popen(ping_send_command3 + self.hostname)
 		buff = pipe.read()
 		pipe.close()
-
+		
 		if re.compile(ping_reply_regex, re.M).search(buff) != None:
 			return False
-
+		
 		return True
+
+
+class UdpThread(threading.Thread):
+	'''
+	Thread class for UdpMonitor
+	'''
+	
+	def __init__(self, parent, host, port):
+		threading.Thread.__init__(self)
+		threading.Thread.setDaemon(self, True)
+		
+		self._host = host
+		self._port = port
+		self.stopEvent = threading.Event()
+		self.stopEvent.clear()
+		self.receivedPacket = threading.Event()
+		self.receivedPacket.clear()
+		self.packets = []
+	
+	def run(self):
+		print "UdpThread(): Starting up UDP listener"
+		
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind((self._host,int(self._port)))
+		sock.setblocking(false)
+		
+		while not self.stopEvent.isSet():
+			try:
+				data = None
+				data,self.addr = self._socket.recvfrom(65565)
+				if data != None and len(data) > 0:
+					print "UdpThread: Received packet from ", self.addr
+					self.packets.append(data)
+					self.receivedPacket.set()
+					
+			except socket.error:
+				# Thrown if non-blocking and no packet
+				# available to receive.
+				pass
+		
+		print "UdpThread: Shutting down"
+		sock.close()
+
+class UdpMonitor(Monitor):
+	'''
+	Watches for incoming packets on a UDP port.  If packet
+	received will trigger fault saving data from packet.
+	'''
+	
+	def __init__(self, args):
+		Monitor.__init__(self)
+		
+		self.host = str(args['host']).replace("'''", "")
+		self.port = str(args['port']).replace("'''", "")
+		self._name = "UdpMonitor"
+		self.thread = None
+		
+	def OnTestStarting(self):
+		self.thread = PcapThread(self, self.host, self.port)
+		self.thread.start()
+	
+	def OnTestFinished(self):
+		if self.thread != None and self.thread.isAlive():
+			self.thread.stopEvent.set()
+			self.thread.join()
+			
+		self.thread = None
+	
+	def GetMonitorData(self):
+		
+		data = None
+		for d in self.thread.packets:
+			data += d
+		
+		self.thread.packets = []
+		self.thread.receivedPackets.clear()
+		
+		return { 'UdpMonitor.txt' : data }
+	
+	def OnShutdown(self):
+		if self.thread != None and self.thread.isAlive():
+			self.thread.stopEvent.set()
+			self.thread.join()
+		
+		self.thread = None
+	
+	def DetectedFault(self):
+		return self.thread.receivedPacket.isSet()
 
 
 class PcapThread(threading.Thread):
