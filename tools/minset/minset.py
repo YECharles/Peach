@@ -281,13 +281,13 @@ if sys.argv[1] == "-gui":
 	minsetPath = sys.argv[3]
 	command = sys.argv[4]
 	if len(sys.argv) > 5:
-		command = '"' + command + '" ' + sys.argv[3]
+		command = '"' + command + '" ' + sys.argv[5]
 else:
 	samples = sys.argv[1]
 	minsetPath = sys.argv[2]
 	command = sys.argv[3]
 	if len(sys.argv) > 4:
-		command = '"' + command + '" ' + sys.argv[3]
+		command = '"' + command + '" ' + sys.argv[4]
 
 print "[*] Finding all basic blocks"
 
