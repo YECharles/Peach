@@ -129,7 +129,7 @@ class UdpThread(threading.Thread):
 	Thread class for UdpMonitor
 	'''
 	
-	def __init__(self, parent, host, port):
+	def __init__(self, host, port):
 		threading.Thread.__init__(self)
 		threading.Thread.setDaemon(self, True)
 		
@@ -146,14 +146,14 @@ class UdpThread(threading.Thread):
 		
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		sock.bind((self._host,int(self._port)))
-		sock.setblocking(false)
+		sock.setblocking(False)
 		
 		while not self.stopEvent.isSet():
 			try:
 				data = None
-				data,self.addr = self._socket.recvfrom(65565)
+				data,addr = sock.recvfrom(65565)
 				if data != None and len(data) > 0:
-					print "UdpThread: Received packet from ", self.addr
+					print "UdpThread: Received packet from ", addr
 					self.packets.append(data)
 					self.receivedPacket.set()
 					
@@ -172,24 +172,13 @@ class UdpMonitor(Monitor):
 	'''
 	
 	def __init__(self, args):
-		Monitor.__init__(self)
-		
 		self.host = str(args['host']).replace("'''", "")
 		self.port = str(args['port']).replace("'''", "")
 		self._name = "UdpMonitor"
 		self.thread = None
-		
-	def OnTestStarting(self):
-		self.thread = PcapThread(self, self.host, self.port)
+		self.thread = UdpThread(self.host, self.port)
 		self.thread.start()
-	
-	def OnTestFinished(self):
-		if self.thread != None and self.thread.isAlive():
-			self.thread.stopEvent.set()
-			self.thread.join()
-			
-		self.thread = None
-	
+		
 	def GetMonitorData(self):
 		
 		data = None
