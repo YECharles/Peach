@@ -17,11 +17,18 @@
 
 using namespace std;
 
+static FILE* trace;
 static set<unsigned int> setKnownBlocks;
+static pair<set<unsigned int>::iterator,bool> ret;
 
 VOID PIN_FAST_ANALYSIS_CALL rememberBlock(ADDRINT bbl)
 {
-    setKnownBlocks.insert(bbl);
+    ret = setKnownBlocks.insert(bbl);
+    if(ret.second == true)
+    {
+        fprintf(trace, "%p\n", bbl);
+        fflush(trace);
+    }
 }
 
 VOID Trace(TRACE trace, VOID *v)
@@ -34,19 +41,21 @@ VOID Trace(TRACE trace, VOID *v)
 
 VOID Fini(INT32 code, VOID *v)
 {
-    FILE *trace = fopen("bblocks.out", "w");
-    
+    /*
     set<unsigned int>::iterator i;
     for(i = setKnownBlocks.begin(); i != setKnownBlocks.end(); ++i)
     {
         fprintf(trace, "%p\n", *i);
     }
+    */
     
     fclose(trace);
 }
 
 int main(int argc, char * argv[])
 {
+    trace = fopen("bblocks.out", "w");
+    
     PIN_Init(argc, argv);
     TRACE_AddInstrumentFunction(Trace, 0);
     PIN_AddFiniFunction(Fini, 0);

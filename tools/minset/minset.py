@@ -105,17 +105,8 @@ def process_list(parentId):
 		return
 	
 	while True:
-		#if pe32.szExeFile.lower().find("pin.exe") > -1:
-		#	print "pin.exe:", pe32.th32ProcessID
-		#if pe32.szExeFile.lower().find("winword.exe") > -1:
-		#	print "winword.exe", pe32.th32ProcessID, pe32.th32ParentProcessID
-		#	peParent = getProcessEntry(pe32.th32ParentProcessID)
-		#	print "  ", peParent.szExeFile, pe32.th32ProcessID, pe32.th32ParentProcessID
-			
 		if pe32.th32ParentProcessID == parentId:
 			yield pe32.th32ProcessID
-			#for p in process_list(pe32.th32ProcessID):
-			#	yield p
 		
 		if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
 			break
@@ -133,22 +124,19 @@ def getProcessCpuTime(pid):
 	Get current process time for PID.
 	'''
 	
-	if isWindows():
-		return getProcessCpuTimeWindows(pid)
-	
-	return getProcessCpuTimeUnix(pid)
+	return getProcessCpuTimeWindows(pid)
 		
 
-def getProcessCpuTimeUnix(pid):
-	os.system("ps -o pcpu %d > .cpu" % self.pid)
-	fd = open(".cpu", "rb")
-	data = fd.read()
-	fd.close()
-	self.unlink(".cpu")
-	
-	cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
-	
-	return float(cpu)
+#def getProcessCpuTimeUnix(pid):
+#	os.system("ps -o pcpu %d > .cpu" % self.pid)
+#	fd = open(".cpu", "rb")
+#	data = fd.read()
+#	fd.close()
+#	self.unlink(".cpu")
+#	
+#	cpu = re.search(r"\s*(\d+\.\d+)", data).group(1)
+#	
+#	return float(cpu)
 
 def getProcessCpuTimeWindows(pid):
 	'''
@@ -273,28 +261,30 @@ def getCoverage(cmd):
 			"--", 
 			cmd)
 		
-		time.sleep(0.5)
+		time.sleep(2)
 		
 		pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
 		for childPid in process_list(pid):
 			pass
 		
+		print "parentpid:", pid, "child pid:", childPid
+		
 		while True:
 			cpu = getProcessCpuTime(childPid)
-			print "cpu", cpu
+			if cpu == None:
+				print "CPU IS None!"
+				sys.exit(0)
+			
 			if cpu != None and cpu < 0.5:
 				print "Kill due to CPU time"
-				try:
-					win32api.TerminateProcess(hProcPin, 0)
-					hProcChild = win32api.OpenProcess(childPid)
-					win32api.TerminateProcess(hProcChild, 0)
-				except:
-					pass
+				
+				os.system("taskkill /pid %d" % (childPid))
+				os.system("taskkill /f /pid %d" % (childPid))
 				
 				# Prevent Zombies!
 				os.waitpid(hProcPin, 0)
-				
 				break
+			
 			time.sleep(0.50)
 	else:
 		pid = os.spawnl(os.P_WAIT, 
