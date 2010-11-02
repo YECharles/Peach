@@ -43,6 +43,85 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 import sys, os, threading, glob, re, time, shutil
 import win32api, win32con, win32process, win32pdh
 
+import ctypes
+import win32con
+
+TH32CS_SNAPPROCESS = 0x00000002
+class PROCESSENTRY32(ctypes.Structure):
+	_fields_ = [
+		("dwSize", ctypes.c_ulong),
+		("cntUsage", ctypes.c_ulong),
+		("th32ProcessID", ctypes.c_ulong),
+		("th32DefaultHeapID", ctypes.c_ulong),
+		("th32ModuleID", ctypes.c_ulong),
+		("cntThreads", ctypes.c_ulong),
+		("th32ParentProcessID", ctypes.c_ulong),
+		("pcPriClassBase", ctypes.c_ulong),
+		("dwFlags", ctypes.c_ulong),
+		("szExeFile", ctypes.c_char * 260)]
+
+def getProcessEntry(pid):
+	# See http://msdn2.microsoft.com/en-us/library/ms686701.aspx
+	CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
+	Process32First = ctypes.windll.kernel32.Process32First
+	Process32Next = ctypes.windll.kernel32.Process32Next
+	CloseHandle = ctypes.windll.kernel32.CloseHandle
+	
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+	
+	pe32 = PROCESSENTRY32()
+	pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
+	
+	if Process32First(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+		print >> sys.stderr, "Failed getting first process."
+		return
+	
+	while True:
+		if pe32.th32ProcessID == pid:
+			break
+		
+		if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+			pe32 = None
+			break
+	
+	CloseHandle(hProcessSnap)
+	
+	return pe32
+
+def process_list(parentId):
+	# See http://msdn2.microsoft.com/en-us/library/ms686701.aspx
+	CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
+	Process32First = ctypes.windll.kernel32.Process32First
+	Process32Next = ctypes.windll.kernel32.Process32Next
+	CloseHandle = ctypes.windll.kernel32.CloseHandle
+	
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+	
+	pe32 = PROCESSENTRY32()
+	pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
+	
+	if Process32First(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+		print >> sys.stderr, "Failed getting first process."
+		return
+	
+	while True:
+		#if pe32.szExeFile.lower().find("pin.exe") > -1:
+		#	print "pin.exe:", pe32.th32ProcessID
+		#if pe32.szExeFile.lower().find("winword.exe") > -1:
+		#	print "winword.exe", pe32.th32ProcessID, pe32.th32ParentProcessID
+		#	peParent = getProcessEntry(pe32.th32ParentProcessID)
+		#	print "  ", peParent.szExeFile, pe32.th32ProcessID, pe32.th32ParentProcessID
+			
+		if pe32.th32ParentProcessID == parentId:
+			yield pe32.th32ProcessID
+			#for p in process_list(pe32.th32ProcessID):
+			#	yield p
+		
+		if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+			break
+	
+	CloseHandle(hProcessSnap)
+
 def isWindows():
 	if sys.platform == 'win32':
 		return True
@@ -84,19 +163,19 @@ def getProcessCpuTimeWindows(pid):
 			print "getProcessCpuTimeWindows: process is null"
 			return None
 		
-		if self.cpu_path == None:
-			self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
+		#if cpu_path == None:
+		cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
 		
-		if self.cpu_hq == None:
-			self.cpu_hq = win32pdh.OpenQuery()
+		#if cpu_hq == None:
+		cpu_hq = win32pdh.OpenQuery()
 		
-		if self.cpu_counter_handle == None:
-			self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
-			win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-			time.sleep(0.25)
+		#if cpu_counter_handle == None:
+		cpu_counter_handle = win32pdh.AddCounter(cpu_hq, cpu_path) #convert counter path to counter handle
+		win32pdh.CollectQueryData(cpu_hq) #collects data for the counter
+		time.sleep(0.25)
 		
-		win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-		(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
+		win32pdh.CollectQueryData(cpu_hq) #collects data for the counter
+		(v,cpu) = win32pdh.GetFormattedCounterValue(cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
 		return cpu
 	
 	except:
@@ -182,49 +261,49 @@ def getCoverage(cmd):
 		pass
 	
 	if needsKilling:
-		pid = os.spawnl(os.P_NOWAIT, 
-	                "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
-	                "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
-	                "-t", 
-	                "bblocks.dll", 
-	                "--", 
-	                cmd)
-
-		time.sleep(0.50)
+		
+		if not isWindows():
+			raise Exception("-gui only on Windows for now")
+		
+		hProcPin = os.spawnl(os.P_NOWAIT, 
+			"pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+			"pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+			"-t", 
+			"bblocks.dll", 
+			"--", 
+			cmd)
+		
+		time.sleep(0.5)
+		
+		pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
+		for childPid in process_list(pid):
+			pass
+		
 		while True:
-			if isWindows():
-				hProc = getProcessInstance(pid)
-				if hProc == None:
-					break
-			else:
-				(p, e) = os.waitpid(pid, os.WNOHANG)
-				if p != 0 and e != 0:
-					break
-			
-			cpu = getProcessCpuTime(hProc)
-			if cpu < 0.5:
+			cpu = getProcessCpuTime(childPid)
+			print "cpu", cpu
+			if cpu != None and cpu < 0.5:
 				print "Kill due to CPU time"
 				try:
-					# Kill process with signal
-					import signal
-					os.kill(pid, signal.SIGTERM)
-					time.sleep(0.25)
-					os.kill(pid, signal.SIGKILL)
+					win32api.TerminateProcess(hProcPin, 0)
+					hProcChild = win32api.OpenProcess(childPid)
+					win32api.TerminateProcess(hProcChild, 0)
 				except:
 					pass
 				
 				# Prevent Zombies!
-				os.wait()
+				os.waitpid(hProcPin, 0)
 				
 				break
+			time.sleep(0.50)
 	else:
 		pid = os.spawnl(os.P_WAIT, 
-	        "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
-	        "pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
-	        "-t", 
-	        "bblocks.dll", 
-	        "--", 
-	        cmd)
+			"pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+			"pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
+			"-t", 
+			"bblocks.dll", 
+			"--", 
+			cmd)
 
 	
 	fd = open("bblocks.out", "rb+")
