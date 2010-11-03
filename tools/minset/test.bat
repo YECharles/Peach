@@ -1,1 +1,2 @@
-python minset.py samples\*.png minset "bin\pngcheck.exe %%s"
+@rmdir /s/q minset
+@minset -s samples\*.png -m minset bin\pngcheck.exe %%s

@@ -40,7 +40,9 @@ Currently WinDbg is required along with pydbgeng and comtypes.
 
 # $Id$
 
+from optparse import OptionParser
 import sys
+import time
 import os
 import glob
 import shutil
@@ -68,12 +70,13 @@ class PROCESSENTRY32(ctypes.Structure):
 class PeachCoverage:
 	
 	def __init__(self):
+		self._traceFolderCleanup = True
 		self._traceFolder = None
 		if not self.isWindows():
 			raise Exception("This tool only supports Windows for now.")
 	
 	def clean(self):
-		if self._traceFolder != None:
+		if self._traceFolder != None and self._traceFolderCleanup:
 			shutil.rmtree(self._traceFolder)
 			self._traceFolder = None
 		
@@ -311,7 +314,7 @@ class PeachCoverage:
 		if self._traceFolder == None:
 			self._traceFolder = tempfile.mkdtemp()
 		
-		if needsKilling:
+		if self._needsKilling:
 			
 			if not self.isWindows():
 				raise Exception("-gui only on Windows for now")
@@ -327,13 +330,13 @@ class PeachCoverage:
 			time.sleep(2)
 			
 			pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
-			for childPid in process_list(pid):
+			for childPid in self.process_list(pid):
 				pass
 			
 			print "parentpid:", pid, "child pid:", childPid
 			
 			while True:
-				cpu = getProcessCpuTime(childPid)
+				cpu = self.getProcessCpuTime(childPid)
 				if cpu == None:
 					print "CPU IS None!"
 					sys.exit(0)
@@ -367,56 +370,89 @@ class PeachCoverage:
 		shutil.move("bblocks.out", os.path.join(self._traceFolder, self.stripPath(sampleFile)+".trace"))
 		
 		return bblCount
-		
 	
-	def runCoverage(self, command, samplesGlob, minsetPath, needsKilling):
+	def runTraces(self, command, sampleFiles, tracesPath, needsKilling):
+		'''
+		Just take coverage traces and place them in tracesPath
+		'''
+		
+		try:
+			self._needsKilling = needsKilling
+			self._traceFolder = tracesPath
+			
+			# Most coverage
+			sampleFileMostCoverage = None
+			sampleFileMostCoverageCount = -1
+			
+			try:
+				os.mkdir(self._traceFolder)
+			except:
+				pass
+			
+			print "[*] Performing code coverage traces with %d files" % len(sampleFiles)
+			
+			for sampleFile in sampleFiles:
+				print "[*] Determining coverage with [%s]" % sampleFile
+				
+				cmd = command % sampleFile
+				bbl = self.getCoverage(cmd, sampleFile)
+				
+				if bbl > sampleFileMostCoverageCount:
+					sampleFileMostCoverage = sampleFile
+					sampleFileMostCoverageCount = bbl
+				
+				print "[-] %s hit %d blocks" % (sampleFile, bbl)
+				
+			print ""
+			print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
+			
+			# Set _traceFolder to None if we don't want
+			# cleanup to remove it
+			if tracesPath != None:
+				self._traceFolder = None
+			
+			return (sampleFileMostCoverage, sampleFileMostCoverageCount)
+			
+		finally:
+			# Clean up after ourselvs
+			self.clean()
+
+	def runCoverage(self, command, sampleFiles, minsetPath, tracesPath, needsKilling):
 		'''
 		Main entry point
 		'''
 		
 		try:
 			
-			print "[*] Finding all basic blocks"
+			# Do we already have traces, if not collect.
+			if tracesPath == None:
+				try:
+					self._traceFolderCleanup = False
+					(sampleFileMostCoverage, sampleFileMostCoverageCount ) = self.runTraces(command, sampleFiles, None, needsKilling)
+				finally:
+					self._traceFolderCleanup = True
 			
-			sampleFiles = []
-			for f in glob.glob(samplesGlob):
-				if os.path.isdir(f):
-					continue
+			else:
+				print "[*] Using existing coverage traces"
 				
-				sampleFiles.append(f)
-			
-			print "[*] Found %d sample files" % len(sampleFiles)
-			
-			#: Dictionary of lists, key is sampleFile
-			bblocks = {}
-			#: Most coverage
-			sampleFileMostCoverage = None
-			sampleFileMostCoverageCount = -1
-			#: Min set
-			minset = []
-			
-			for sampleFile in sampleFiles:
-				print "[*] Determining coverage with [%s]...." % sampleFile
+				sampleFileMostCoverageCount = -1
+				sampleFileMostCoverage = None
 				
-				cmd = command % sampleFile
-				bblocks[sampleFile] = self.getCoverage(cmd, sampleFile)
+				self._traceFolderCleanup = False
+				self._traceFolder = tracesPath
+				for sampleFile in sampleFiles:
+					bbl = self.fileLineCount(os.path.join(self._traceFolder, self.stripPath(sampleFile)+".trace"))
+					
+					if bbl > sampleFileMostCoverageCount:
+						sampleFileMostCoverage = sampleFile
+						sampleFileMostCoverageCount = bbl
 				
-				print "[-] %s hit %d blocks" % (sampleFile, bblocks[sampleFile])
-				
-			
-			# Figure out who covered the most blocks
-			for sampleFile in sampleFiles:
-				cnt = bblocks[sampleFile]
-				if cnt > sampleFileMostCoverageCount:
-					sampleFileMostCoverage = sampleFile
-					sampleFileMostCoverageCount = cnt
-			
-			minset.append(sampleFileMostCoverage)
-			
-			print ""
-			print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
+				print ""
+				print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
 			
 			# Start with file with most coverage
+			minset = []
+			minset.append(sampleFileMostCoverage)
 			coveredBlocks = self.loadBlocks(sampleFileMostCoverage)
 			
 			for sampleFile in sampleFiles:
@@ -461,37 +497,55 @@ print ""
 print "] Peach Minset Finder v0.9"
 print "] Copyright (c) Michael Eddington\n"
 
-if len(sys.argv) < 4:
-	print "Syntax: minset.py [-gui] samples minset \"command.exe\" \"args %%s\""
-	print ""
-	print "  -gui         Optional parameter indicating program will"
-	print "               not close on it's own and needs killing"
-	print "  samples      The folder containing the sample files"
-	print "               for which we will find the min."
-	print "  minset       Folder to place the min set of required files."
-	print "  command      The command line of the program to run."
-	print "               MUST contain a %%s which will be substututed"
-	print "               for the sample filename."
-	print ""
-	
-	sys.exit(0)
+usage = """
+  minset.py [-k] -s samples -m minset command.exe args %%s
+  minset.py [-k] -s samples -t traces command.exe args %%s
+  minset.py [-k] -s samples -t traces -m minset command.exe args %%s
+  
+Note:
+  "%%s" will be replaced by sample filename.
+"""
 
-needsKilling = False
-if sys.argv[1] == "-gui":
-	needsKilling = True
-	samplesGlob = sys.argv[2]
-	minsetPath = sys.argv[3]
-	command = sys.argv[4]
-	if len(sys.argv) > 5:
-		command = '"' + command + '" ' + sys.argv[5]
-else:
-	samplesGlob = sys.argv[1]
-	minsetPath = sys.argv[2]
-	command = sys.argv[3]
-	if len(sys.argv) > 4:
-		command = '"' + command + '" ' + sys.argv[4]
+parser = OptionParser(usage)
+parser.add_option("-k", "--kill", action="store_true", dest="needsKilling", default=False,
+				  help="Kill command when CPU time nears 0")
+parser.add_option("-t", "--traces", action="store", type="string", dest="tracesPath", default=None,
+				  help="Only take traces and place them in this folder.")
+parser.add_option("-s", "--samples", action="store", type="string", dest="samplesGlob",
+				  help="Path and file glob to samples (e.g. smaples/*.jpg)")
+parser.add_option("-m", "--minset", action="store", type="string", dest="minsetPath", default=None,
+				  help="Path to place minset of files.")
+(options, args) = parser.parse_args()
+
+if len(args) == 0:
+	parser.error("incorrect number of arguments")
+
+command = ""
+for a in args:
+	command += '"' + a + '" '
+
+sampleFiles = []
+for f in glob.glob(options.samplesGlob):
+	if os.path.isdir(f):
+		continue
+	
+	sampleFiles.append(f)
 
 coverage = PeachCoverage()
-coverage.runCoverage(command, samplesGlob, minsetPath, needsKilling)
+
+if options.minsetPath != None:
+	coverage.runCoverage(
+		command,
+		sampleFiles,
+		options.minsetPath,
+		options.tracesPath,
+		options.needsKilling)
+
+else:
+	coverage.runTraces(
+		command,
+		sampleFiles,
+		options.tracesPath,
+		options.needsKilling)
 
 # end
