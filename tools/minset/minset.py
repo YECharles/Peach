@@ -483,7 +483,7 @@ class PeachCoverage:
 				pass
 			
 			for sampleFile in minset:
-				print "[-]    %s" % sampleFile
+				print "[-]    %s" % self.stripPath(sampleFile)
 				shutil.copyfile(sampleFile, os.path.join(minsetPath, self.stripPath(sampleFile)))
 			
 			print "\n"
