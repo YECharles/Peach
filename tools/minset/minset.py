@@ -498,12 +498,12 @@ print "] Peach Minset Finder v0.9"
 print "] Copyright (c) Michael Eddington\n"
 
 usage = """
-  minset.py [-k] -s samples -m minset command.exe args %%s
-  minset.py [-k] -s samples -t traces command.exe args %%s
-  minset.py [-k] -s samples -t traces -m minset command.exe args %%s
+  minset.py [-k] -s samples -m minset command.exe args %s
+  minset.py [-k] -s samples -t traces command.exe args %s
+  minset.py -s samples -t traces -m minset
   
 Note:
-  "%%s" will be replaced by sample filename.
+  "%s" will be replaced by sample filename.
 """
 
 parser = OptionParser(usage)
@@ -517,7 +517,7 @@ parser.add_option("-m", "--minset", action="store", type="string", dest="minsetP
 				  help="Path to place minset of files.")
 (options, args) = parser.parse_args()
 
-if len(args) == 0:
+if len(args) == 0 and (options.tracesPath == None or options.minsetPath == None):
 	parser.error("incorrect number of arguments")
 
 command = ""
