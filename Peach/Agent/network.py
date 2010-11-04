@@ -39,7 +39,13 @@ Todo:
 # $Id$
 
 
-import sys, threading, os, time, thread, re, socket
+import sys
+import threading
+import os
+import time
+import thread
+import re
+import socket
 from Peach.agent import Monitor
 
 try:
