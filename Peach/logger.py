@@ -256,7 +256,12 @@ class Filesystem(Logger):
 		if variationCount % self.heartBeat == 0:
 			self._writeMsg("On test variation # %d" % variationCount)
 
-import xmlrpclib
+import xmlrpclib, base64
+
+class KeyValue:
+	def __init__(self, key = None, value = None):
+		self.key = key
+		self.value = value
 
 class PeachManagerLogger(Logger):
 	'''
@@ -270,6 +275,8 @@ class PeachManagerLogger(Logger):
 		self.heartBeat = 512
 		self._getProxy().Initialized()
 		self.totalVariations = 0
+		
+		self._getProxy().Initialized()
 	
 	def _getProxy(self):
 		return xmlrpclib.ServerProxy("http://127.0.0.1:8081/local.rem")
@@ -295,7 +302,31 @@ class PeachManagerLogger(Logger):
 		self._getProxy().TestCaseException(int(variationCount), str(exception))
 	
 	def OnFault(self, run, test, variationCount, monitorData, actionValues):
-		self._getProxy().Fault(int(variationCount), monitorData, actionValues)
+		
+		monitorDataKeyValue = []
+		actionValuesKeyValue = []
+		
+		for key in monitorData.keys():
+			monitorDataKeyValue.append(KeyValue(key, base64.b64encode(monitorData[key])))
+		
+		data = ""
+		for i in range(len(actionValues)):
+			fileName = "data_%d_%s_%s.txt" % (i, actionValues[i][1], actionValues[i][0])
+			
+			if len(actionValues[i]) > 2:
+				data = actionValues[i][2]
+				
+				if len(actionValues[i]) > 3 and actionValues[i][1] != 'output':
+					data = repr(actionValues[i][3])
+				
+				# Output filename from data set if we have it.
+				if len(actionValues[i]) > 3 and actionValues[i][1] == 'output':
+					fileName = "data_%d_%s_%s_fileName.txt" % (i, actionValues[i][1], actionValues[i][0])
+					data = actionValues[i][3]
+			
+			actionValuesKeyValue.append(KeyValue(fileName, base64.b64encode(data)))
+		
+		self._getProxy().Fault(int(variationCount), monitorDataKeyValue, actionValuesKeyValue)
 	
 	def OnStopRun(self, run, test, variationCount, monitorData, value):
 		self._getProxy().StopRun()

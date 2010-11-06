@@ -40,7 +40,17 @@ performing parsing tests of Peach XML files.
 
 # $Id$
 
-import sys, getopt, os, warnings,exceptions
+import sys, os
+
+# Add our root to the python path
+if not (hasattr(sys,"frozen") and sys.frozen == "console_exe"):
+	sys.path.append(sys.path[0])
+else:
+	p = os.path.dirname(os.path.abspath(sys.executable))
+	sys.path.append(p)
+	sys.path.append( os.path.normpath( os.path.join(p, "..") ) )
+
+import getopt, os, warnings,exceptions
 sys.path.append(".")
 
 ## Note: this will disable all deprication warnings!  For v2.6 compat.
@@ -168,17 +178,7 @@ Debug Peach XML File
 	restartFuzzerFile = None
 	parallel = None
 	startNum = None
-	
-	
-	# Add our root to the python path
-	if not (hasattr(sys,"frozen") and sys.frozen == "console_exe"):
-		sys.path.append(sys.path[0])
-	else:
-		p = os.path.dirname(os.path.abspath(sys.executable))
-		sys.path.append(p)
-		sys.path.append( os.path.normpath( os.path.join(p, "..") ) )
-	
-	
+		
 	try:
 		(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:1", ['strategy=','analyzer=', 'parallel=',
 																	 'restart=', 'parser=',
