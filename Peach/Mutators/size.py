@@ -127,7 +127,7 @@ class SizedVaranceMutator(Mutator):
 			nodeOf.currentValue = ""
 		
 		elif n < size:
-			nodeOf.currentValue = nodeOf.getInternalValue()[:n-diff]
+			nodeOf.currentValue = str(nodeOf.getInternalValue())[:n-diff]
 			
 		elif size == 0:
 			nodeOf.currentValue = "A" * (n-diff)
