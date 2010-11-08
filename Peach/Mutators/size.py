@@ -134,7 +134,7 @@ class SizedVaranceMutator(Mutator):
 		
 		else:
 			try:
-				nodeOf.currentValue = (nodeOf.getInternalValue() * (((n-diff)/realSize)+2))[:n-diff]
+				nodeOf.currentValue = (str(nodeOf.getInternalValue()) * (((n-diff)/realSize)+2))[:n-diff]
 			except ZeroDivisionError:
 				nodeOf.currentValue = ""
 		
