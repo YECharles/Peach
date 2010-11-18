@@ -1,3 +1,26 @@
+
+#
+# Copyright (c) Michael Eddington
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in	
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
 from Peach.Engine.common import *
 
 #Deactivate strategies
@@ -35,10 +58,10 @@ class PathFinder:
 		lastPath = [path for path in self.getRoute() if path.stop == True]
 		if len(lastPath) > 0:
 			return lastPath[0].ref
-    	
+		
 		if len(self.getRoute())>0:
 			return self.getRoute()[-1]
-    	
+		
 		return None
 		'''
 	
@@ -48,7 +71,7 @@ class PathFinder:
 	def next(self):
 		if not self.canMove():
 			raise PathException("PathFinder:: End of paths reached :: unable to move to next path")
-        
+		
 		nextPath = self.getRoute()[self.index]
 		self.index += 1
 		return nextPath
@@ -111,23 +134,23 @@ class PathFinderWithStrategy(PathFinder):
 '''
     
 class PathValidator:
-    def __init__(self, pathFinder, validationMutator):
+	def __init__(self, pathFinder, validationMutator):
 		if pathFinder == None:
 			raise PathException("PathValidator: parameter 'pathFinder' must be assigned")
-        
+		
 		self.pathFinder = pathFinder
 		self.validationMutator = validationMutator
-        
-    def validate(self):
+		
+	def validate(self):
 		# Reset pathFinder to guarantee
 		self.pathFinder.reset()
-        
+		
 		# Do we have a path declared in XML?
 		if not self.pathFinder.canMove():
 			raise PathException("PathValidator: No path definition found for the stateMachine[%s]." % self.pathFinder.stateMachine.name) 
-        
-        # Okay then check if stateMachine's initialState is the same
-        # with the first path reference or not!
+		
+		# Okay then check if stateMachine's initialState is the same
+		# with the first path reference or not!
 		if self.pathFinder.firstPath().stateName != self.pathFinder.stateMachine.initialState:
 			raise PathException("PathValidator: Initial state name[%s] of the StateMachine[%s] must be the same with the first path reference[%s]." % (self.pathFinder.stateMachine.initialState, self.pathFinder.stateMachine.name, self.pathFinder.firstPath())) 
 
@@ -165,8 +188,8 @@ class PathValidator:
 			#	raise PeachException("Invalid path. StateMachine[%s] must stop at the State[%s]." % (stateMachine.name, currPath.ref))
 		
 		# Clear ;)
-		                   
-    def _isNextState(self, stateName, nextStateName):
+	
+	def _isNextState(self, stateName, nextStateName):
 		ret = False
 		state = self.pathFinder.stateMachine.findStateByName(stateName)
 		choice = state.getChoice()
@@ -184,10 +207,12 @@ class PathValidator:
 					raise PathException("PathValidator: State[%s] must have only one changeState action referenced to state[%s] or explicitly declare a choice list containing a path reference to state[%s]" % (stateName, nextStateName, nextStateName))
 			
 		return ret
-                 
+
 class PathException:
-    def __init__(self, msg):
+	def __init__(self, msg):
 		self.msg = msg
-        
-    def __str__(self):
+		
+	def __str__(self):
 		return self.msg
+
+# end

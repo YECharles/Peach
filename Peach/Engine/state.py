@@ -647,6 +647,7 @@ class StateEngine:
 			doc = self.getXml()
 			setNodes = doc.xpath(action.setXpath)
 			if len(setNodes) == 0:
+				PrettyPrint(doc, asHtml=1)
 				raise PeachException("Slurp [%s] setXpath [%s] did not return a node" % (action.name,action.setXpath))
 			
 			# Only do this once :)
