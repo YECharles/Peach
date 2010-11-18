@@ -38,7 +38,8 @@ import number
 import blob
 import array
 import size
+import path
 
-__all__ = ["string", "datatree", "number", "blob", "array", "size"]
+__all__ = ["string", "datatree", "number", "blob", "array", "size", "path"]
 
 # end
