@@ -846,5 +846,6 @@ from Peach.analyzer import Analyzer
 from Peach.Analyzers import *
 
 from Peach.Mutators import *
+from Peach.Mutators.path import *
 
 # end

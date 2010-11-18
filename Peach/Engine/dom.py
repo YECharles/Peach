@@ -5189,6 +5189,32 @@ class State(Mutatable):
 		self.onEnter = None
 		self.onExit = None
 
+	def getChoice(self):
+		for child in self:
+			if child.elementType == 'stateChoice':
+				return child
+		
+		return None
+
+class StateChoice(ElementWithChildren):
+	def __init__(self, parent):
+		ElementWithChildren.__init__(self, None, parent)
+		self.elementType = 'stateChoice'
+		
+	def findActionByRef(self, ref):
+		for child in self:
+			if child.elementType == 'stateChoiceAction' and child.ref == ref:
+				return child
+			
+		return None
+		
+class StateChoiceAction(Element):
+	def __init__(self, ref, type, parent):
+		Element.__init__(self, None, parent)
+		self.elementType = 'stateChoiceAction'
+		self.ref = ref
+		self.type = type
+		
 class Path(Element):
 	def __init__(self, ref, parent):
 		Element.__init__(self, None, parent)

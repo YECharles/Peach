@@ -23,6 +23,7 @@
 
 import sys, os, time
 from Peach.mutator import *
+from Peach.mutatestrategies import *
 
 class NullMutator(Mutator):
 	'''
@@ -101,7 +102,7 @@ class NullMutator(Mutator):
 		return value
 	
 
-class PathValidationMutator(NullMutator):
+class PathValidationMutator(NullMutator, MutationStrategy):
 	'''
 	This mutator is just used to trace path
 	of each test for path validation purposes
@@ -114,10 +115,10 @@ class PathValidationMutator(NullMutator):
 		self.states = []
 		self.name = "PathValidationMutator"
 		
-	def onStateStart(self, state):
+	def onStateStarting(self, stateMachine, state):
 		self.states.append(state.name)
 		
-	def onStateMachineStart(self, engine):
+	def onStateMachineStarting(self, engine):
 		pass
 		
 	def onStateMachineComplete(self, engine):

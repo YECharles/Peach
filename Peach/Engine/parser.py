@@ -2837,6 +2837,10 @@ class ParseTemplate:
 				
 				state.append(action)
 				foundAction = True
+
+			elif child.nodeName == 'Choice': 
+				choice = self.HandleStateChoice(child, state)
+				state.append(choice)
 			
 			else:
 				raise PeachException("Parser: State has unknown child [%s]" % PeachStr(child.nodeName))
@@ -2846,6 +2850,27 @@ class ParseTemplate:
 		
 		return state
 	
+	def HandleStateChoice(self, node, parent):
+		choice = StateChoice(parent)
+	
+		for child in node.childNodes:
+			choice.append(self.HandleStateChoiceAction(child, node))
+		
+		return choice
+	
+	def HandleStateChoiceAction(self, node, parent):
+		
+		if not node.hasAttributeNS(None, "ref"):
+			raise PeachException("Parser: State::Choice::Action missing ref attribute")
+		
+		if not node.hasAttributeNS(None, "type"):
+			raise PeachException("Parser: State::Choice::Action missing type attribute")
+		
+		ref = self._getAttribute(node, "ref")
+		type = self._getAttribute(node, "type")
+		
+		return StateChoiceAction(ref, type, parent)
+		  	
 	def HandleAction(self, node, parent):
 		
 		if not node.hasAttributeNS(None, "type"):
