@@ -117,7 +117,7 @@ class Filesystem(Logger):
 		self.file.flush()
 		
 	def OnRunStarting(self, run):
-		suppliedPath = eval(str(self.params['path']))
+		suppliedPath = str(self.params['path']).replace("'''", "")
 		pitFile = os.path.basename(Engine.context.pitFile)
 		
 		if run.name == "DefaultRun":
