@@ -62,24 +62,25 @@ from Peach.Engine.engine import Engine
 from Peach.publisher import PublisherBuffer
 import Peach
 PeachModule = Peach
-import Ft.Xml.Domlette
-from Ft.Xml.Domlette import Print, PrettyPrint
+#import Ft.Xml.Domlette
+#from Ft.Xml.Domlette import Print, PrettyPrint
+from xml.dom import *
 from cDeepCopy import deepcopy
 
-try:
-	import Ft.Xml.Domlette
-	from Ft.Xml.Catalog import GetDefaultCatalog
-	from Ft.Xml.InputSource import InputSourceFactory
-	from Ft.Lib.Resolvers import SchemeRegistryResolver
-	from Ft.Lib import Uri
-	from Ft.Xml import Parse
-	from Ft.Xml import EMPTY_NAMESPACE
-
-except:
-	print "\nError loading 4Suite XML library.  This library"
-	print "can be installed from the dependencies folder or"
-	print "downloaded from http://4suite.org/.\n\n"
-	raise
+#try:
+#	import Ft.Xml.Domlette
+#	from Ft.Xml.Catalog import GetDefaultCatalog
+#	from Ft.Xml.InputSource import InputSourceFactory
+#	from Ft.Lib.Resolvers import SchemeRegistryResolver
+#	from Ft.Lib import Uri
+#	from Ft.Xml import Parse
+#	from Ft.Xml import EMPTY_NAMESPACE
+#
+#except:
+#	print "\nError loading 4Suite XML library.  This library"
+#	print "can be installed from the dependencies folder or"
+#	print "downloaded from http://4suite.org/.\n\n"
+#	raise
 
 class Empty(object):
 	pass
@@ -3903,8 +3904,8 @@ class XmlElement(DataElement):
 		
 		if parent == None:
 			haveParent = False
-			#parent  = Ft.Xml.Domlette.NonvalidatingReader.parseString("<Peach/>", "http://phed.org")
-			parent = Ft.Xml.Domlette.implementation.createDocument(EMPTY_NAMESPACE, None, None)
+			#parent = Ft.Xml.Domlette.implementation.createDocument(EMPTY_NAMESPACE, None, None)
+			parent = getDOMImplementation().createDocument(EMPTY_NAMESPACE, None, None)
 			doc = parent
 		else:
 			haveParent = True
@@ -3924,16 +3925,20 @@ class XmlElement(DataElement):
 				node.appendChild(doc.createTextNode(c.getValue().decode('latin-1').encode('utf8')))
 		
 		if not haveParent:
-			import cStringIO
-			buff = cStringIO.StringIO()
-			Print(node, stream=buff, encoding="utf8")
-			value = buff.getvalue()
-			buff.close()
-			
-			if sout != None:
-				sout.write(value, self.getFullDataName())
-			
-			return value
+			#import cStringIO
+			#buff = cStringIO.StringIO()
+			#Print(node, stream=buff, encoding="utf8")
+			#value = buff.getvalue()
+			#buff.close()
+			#
+			#if sout != None:
+			#	sout.write(value, self.getFullDataName())
+			#
+			#return value
+		
+			encoding = "utf8"
+			unistr = doc.toprettyxml().replace(u'<?xml version="1.0" ?>\n', u'')
+			return unistr.encode(encoding, 'xmlcharrefreplace')
 		
 		return None
 	
