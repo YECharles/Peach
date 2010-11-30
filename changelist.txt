@@ -1,6 +1,12 @@
 Peach Changlist
 ===============
 
+v2.3.8
+------
+
+ - Bug: XmlElement/XmlAttributes: xmlns:n attributes moving to parent element.
+        fixed by moving to internal python xml module instead of 4suite.
+
 v2.3.7
 ------
 
