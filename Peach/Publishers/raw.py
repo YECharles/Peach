@@ -161,10 +161,14 @@ class Raw6(Publisher):
 			# Close out old socket first
 			self._socket.close()
 		
-		# no idea why, but socket.AF_INET6 is getting clobbered, so hardcoding 23
-		#self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW)
-		self._socket = socket.socket(23, socket.SOCK_RAW)
-		self._socket.bind((self._interface,0))
+		try:
+			# no idea why, but socket.AF_INET6 is getting clobbered, so hardcoding 23
+			#self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW)
+			self._socket = socket.socket(23, socket.SOCK_RAW)
+			self._socket.bind((self._interface,0))
+			#self._socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL,None,0)
+		except:
+			self._socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.IPPROTO_IP)
 	
 	def close(self):
 		if self._socket != None:
