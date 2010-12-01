@@ -92,7 +92,7 @@ Syntax:
   peach.py -a [port] [password]
   peach.py -c peach_xml_file [run_name]
   peach.py -g
-  peach.py [--skipto #] peach_xml_flie [run_name]
+  peach.py [--skipto #] peach_xml_file [run_name]
   peach.py -p 10,2 [--skipto #] peach_xml_file [run_name]
   peach.py --range 100,200 peach_xml_file [run_name]
   peach.py -t peach_xml_file
@@ -164,7 +164,7 @@ Debug Peach XML File
 """)
 		sys.exit(0)
 	
-	printError("\n] Peach 2.3.7 DEV Runtime")
+	printError("\n] Peach 2.3.8 DEV Runtime")
 	printError("] Copyright (c) Michael Eddington\n")
 	
 	if sys.version[:3] not in ['2.5', '2.6']:
