@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.8
 ------
 
+ - New: New IPv6 Raw publisher (raw.Raw6) added.
  - Bug: Fixed ValidValues mutator/hint to work with Numbers
  - Bug: XmlElement/XmlAttributes: xmlns:n attributes moving to parent element.
         fixed by moving to internal python xml module instead of 4suite.
