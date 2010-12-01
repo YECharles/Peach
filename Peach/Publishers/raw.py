@@ -7,7 +7,7 @@ Default included Raw publishers.
 '''
 
 #
-# Copyright (c) 2007-2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,13 +30,13 @@ Default included Raw publishers.
 
 # Authors:
 #   Adam Cecchetti (adam@cecchetti.com)
+#   Michael Eddington (mike@phed.org)
+
 # $Id$
 
 
 import socket, time, sys
 from Peach.publisher import Publisher
-
-#__all__ = ['Raw']
 
 class Raw(Publisher):
 	'''
@@ -160,7 +160,10 @@ class Raw6(Publisher):
 		if self._socket != None:
 			# Close out old socket first
 			self._socket.close()
-		self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW)
+		
+		# no idea why, but socket.AF_INET6 is getting clobbered, so hardcoding 23
+		#self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW)
+		self._socket = socket.socket(23, socket.SOCK_RAW)
 		self._socket.bind((self._interface,0))
 	
 	def close(self):
