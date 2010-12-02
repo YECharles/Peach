@@ -131,7 +131,7 @@ class Raw6(Publisher):
 	'''
 	
 	
-	def __init__(self, interface, timeout = 0.1):
+	def __init__(self, dest_addr, timeout = 0.1):
 		'''
 		@type	host: string
 		@param	host: Remote host
@@ -141,7 +141,7 @@ class Raw6(Publisher):
 		Publisher.__init__(self)
 		self._host = None
 		self._socket = None
-		self._interface = interface
+		self._dest_addr  = dest_addr
 		self._timeout = float(timeout)
 	
 	def start(self):
@@ -162,13 +162,9 @@ class Raw6(Publisher):
 			self._socket.close()
 		
 		try:
-			# no idea why, but socket.AF_INET6 is getting clobbered, so hardcoding 23
-			#self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW)
-			self._socket = socket.socket(23, socket.SOCK_RAW)
-			self._socket.bind((self._interface,0))
-			#self._socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL,None,0)
+			self._socket = socket.socket(23, socket.SOCK_RAW, socket_IPPROTO_IPV6)
 		except:
-			self._socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.IPPROTO_IP)
+			self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_IPV6)
 	
 	def close(self):
 		if self._socket != None:
@@ -182,7 +178,7 @@ class Raw6(Publisher):
 		@type	data: string
 		@param	data: Data to send
 		'''
-		self._socket.sendall(data)
+		self._socket.sendto(data, (self._dest_addr, 0, 0, 0))
 	
 	def receive(self, size = None):
 		'''
