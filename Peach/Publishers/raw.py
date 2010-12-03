@@ -162,9 +162,11 @@ class Raw6(Publisher):
 			self._socket.close()
 		
 		try:
-			self._socket = socket.socket(23, socket.SOCK_RAW, socket_IPPROTO_IPV6)
+			self._socket = socket.socket(23, socket.SOCK_RAW, socket.IPPROTO_IPV6)
 		except:
 			self._socket = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_IPV6)
+		
+		self._socket.setsockopt(socket.IPPROTO_IPV6, socket.IP_HDRINCL, 1)
 	
 	def close(self):
 		if self._socket != None:
@@ -178,7 +180,10 @@ class Raw6(Publisher):
 		@type	data: string
 		@param	data: Data to send
 		'''
-		self._socket.sendto(data, (self._dest_addr, 0, 0, 0))
+		try:
+			self._socket.sendto(data, (self._dest_addr, 0, 0, 0))
+		except:
+			print sys.exc_info()
 	
 	def receive(self, size = None):
 		'''
