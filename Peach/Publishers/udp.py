@@ -235,6 +235,7 @@ class UdpListener(Publisher):
 			pass
 	
 	def receive(self, size = None):
+		self._socket.settimeout(self._timeout)
 		data,self.addr = self._socket.recvfrom(65565)
 		
 		if hasattr(self, "publisherBuffer"):
