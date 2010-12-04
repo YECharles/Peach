@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.8
 ------
 
+ - Changed: Updated peach.xsd to include raw.* publishers and udp.UdpListener
  - New: New IPv6 Raw publisher (raw.Raw6) added.
  - Bug: Fixed ValidValues mutator/hint to work with Numbers
  - Bug: XmlElement/XmlAttributes: xmlns:n attributes moving to parent element.

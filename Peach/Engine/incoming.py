@@ -126,7 +126,7 @@ class DataCracker:
 					else:
 						values = self._isTokenNext(child, True)
 						#Debug(1, "optmizeModelForCracking: FastCheck: back from _isTokenNext")
-						if values != None:
+						if values != None and values[0].getFullname().find(child.getFullname()) != -1:
 							fastCheck = True
 							fastCheckValue = values[0].getValue()
 							fastCheckOffset = values[1]
@@ -135,7 +135,7 @@ class DataCracker:
 							if len(fastCheckValue) < 1:
 								raise PeachException("optmizeModelForCracking: Warning, fastCheckValue is < 1 in length")
 							
-							#Debug(1, "optmizeModelForCracking: FastCheck: Found next token for '%s'" % child.name)
+							#Debug(1, "optmizeModelForCracking: FastCheck: Found next token for '%s' [%s]" % (child.name, values[0].name))
 							
 						else:
 							#Debug(1, "optmizeModelForCracking: Found no token for '%s'" % child.name)
@@ -1169,6 +1169,10 @@ class DataCracker:
 			# If we are a choice we fail
 			if n.elementType == 'choice':
 				#print "_isTokenNext: Found choice, exiting"
+				return None
+			
+			# We fail if array found
+			if n.minOccurs != 1 or n.maxOccurs != 1:
 				return None
 			
 			# If a child flag is token we don't support that
@@ -2291,6 +2295,7 @@ class DataCracker:
 			fmt += 'b'
 		elif node.size == 16:
 			fmt += 'h'
+			#print "Number: %x %x" % (ord(value[0]), ord(value[1]))
 		elif node.size == 24:
 			fmt += 'i'
 			

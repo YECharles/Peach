@@ -5,7 +5,7 @@
 
 	<!--
 		
-		Copyright (c) 2007-2009 Michael Eddington
+		Copyright (c) Michael Eddington
 		
 		Permission is hereby granted, free of charge, to any person obtaining a copy 
 		of this software and associated documentation files (the "Software"), to deal
@@ -1034,6 +1034,11 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:attributeGroup name="commonTemplateAttributes">
+		<xs:attribute name="onArrayNext" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Expression that is evaulated as an array is expanded.  Evalulated on every expantion (e.g. from 0 elements, to 1, then 2..3..4.., etc).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="minOccurs" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>The minimum number of times this element can occur. Setting this to zero
@@ -1454,6 +1459,37 @@
 													<xs:documentation>Send tests to UDP port. Requires parameters named
 														&quot;host&quot; and
 														&quot;port&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="udp.UdpListener">
+												<xs:annotation>
+													<xs:documentation>Listens for incoming UDP packets. Requires parameters named
+														&quot;host&quot; and
+														&quot;port&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="raw.Raw">
+												<xs:annotation>
+													<xs:documentation>Send raw TCP packets.  Requires paramters named
+														&quot;interface_ip&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="raw.Raw6">
+												<xs:annotation>
+													<xs:documentation>Send raw TCP packets.  Requires paramters named
+														&quot;interface_ip&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="raw.RawIp">
+												<xs:annotation>
+													<xs:documentation>Send raw IP packets..  Requires paramters named
+														&quot;interface_ip&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="raw.RawIp6">
+												<xs:annotation>
+													<xs:documentation>Send raw IPv6 packets..  Requires paramters named
+														&quot;interface_ip&quot;.</xs:documentation>
 												</xs:annotation>
 											</xs:enumeration>
 											<xs:enumeration value="process.Command">
