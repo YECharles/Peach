@@ -160,6 +160,8 @@ class Tcp(Publisher):
 		try:
 			self._socket.sendall(data)
 		except:
+			if Peach.Engine.engine.Engine.debug:
+				print "Tcp: Sendall failed: " + str(sys.exc_info()[1])
 			raise PublisherSoftException("sendall failed: " + str(sys.exc_info()[1]))
 	
 	def _receiveBySize(self, size):
