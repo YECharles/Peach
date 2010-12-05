@@ -151,7 +151,12 @@ class StateEngine:
 		
 		except SoftException:
 			
-			# Soft exceptions are okay
+			# Soft exceptions are okay except for 
+			# first iteration
+			
+			if Peach.Engine.engine.Engine.context.testCount == 1:
+			  raise PeachException("Error: First test case failed: ", str(sys.exc_info()[1]))
+			  
 			pass
 		
 		finally:
@@ -300,6 +305,10 @@ class StateEngine:
 			
 			except SoftException:
 				# SoftExceptions are fine
+				
+				if Peach.Engine.engine.Engine.context.testCount == 1:
+				  raise PeachException("Error: First test case failed: ", str(sys.exc_info()[1]))
+				
 				pass
 			
 			# Pass through the nextState?

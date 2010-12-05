@@ -658,6 +658,7 @@ class Engine(object):
 					if not countOnly:
 						self.watcher.OnTestCaseStarting(run, test, testCount)
 					
+					self.testCount = testCount
 					mutator.onTestCaseStarting(test, testCount, stateEngine)
 						
 					# Run the test
@@ -682,7 +683,7 @@ class Engine(object):
 					except SoftException, e:
 						# In the case of the first iteration we should
 						# never fail.
-						if testCount == 0:
+						if testCount == 1:
 							raise PeachException("Error: First test case failed: ",e)
 						
 						# Otherwise ignore any SoftExceptions
