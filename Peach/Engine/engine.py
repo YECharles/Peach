@@ -679,8 +679,13 @@ class Engine(object):
 						print "Warning: Out of memory, going to next test"
 						pass
 					
-					except SoftException:
-						# Ignore any SoftExceptions
+					except SoftException, e:
+						# In the case of the first iteration we should
+						# never fail.
+						if testCount == 0:
+							raise PeachException("Error: First test case failed: ",e)
+						
+						# Otherwise ignore any SoftExceptions
 						# and head for next iteration
 						pass
 					
