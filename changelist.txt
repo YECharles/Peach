@@ -6,6 +6,7 @@ v2.3.8
 
  - Changed: First iteration must work, else we stop
  - Changed: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - Bug: EngineWatcher.OnStopRun/Logger.OnStopRun was not being called correctly
  - New: New IPv6 Raw publisher (raw.Raw6) added.
  - Bug: Fixed ValidValues mutator/hint to work with Numbers
  - Bug: XmlElement/XmlAttributes: xmlns:n attributes moving to parent element.
