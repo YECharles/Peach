@@ -208,7 +208,10 @@ class EngineWatchPlexer(EngineWatcher):
 	def OnActionComplete(self, action):
 		for w in self.watchers:
 			w.OnActionComplete(action)
-	
+			
+	def OnStopRun(self, run, test, variationCount, monitorData, value):
+		for w in self.watchers:
+			w.OnStopRun(run, test, variationCount, monitorData, value)
 
 
 class StdoutWatcher(EngineWatcher):
