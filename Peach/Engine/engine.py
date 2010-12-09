@@ -765,44 +765,45 @@ class Engine(object):
 				results = {
 					"_Bucket" : "AgentConnectionFailed"
 				}
+				
 				self.watcher.OnFault(run, test, testCount, results, actionValues)
+			
 			raise
 		
 		except:
 			# Always save state on exceptions
 			saveState = True
+			
+			self.watcher.OnTestCaseException(run, test, testCount, None)
 			raise
 		
 		finally:
 			
-			# We no longer actually save our state as it's not needed
-			# instead, we will clean up.
+			# Make sure any publishers are shutdown
+			try:
+				for pub in test.publishers:
+					if hasattr(pub, "hasBeenConnected") and pub.hasBeenConnected:
+						pub.close()
+						pub.hasBeenConnected = False
+					
+					if hasattr(pub, "hasBeenStarted") and pub.hasBeenStarted:
+						pub.stop()
+						pub.hasBeenStarted = False
+				
+			except:
+				pass
+				
+			# We should also stop agents.
+			self._stopAgents(run, test)
+			
+			# Should we exit fast?
 			if saveState:
-				print "-- Shutting down publisher(s)"
-				
-				try:
-					for pub in test.publishers:
-						if hasattr(pub, "hasBeenConnected") and pub.hasBeenConnected:
-							pub.close()
-							pub.hasBeenConnected = False
-					
-						if hasattr(pub, "hasBeenStarted") and pub.hasBeenStarted:
-							pub.stop()
-							pub.hasBeenStarted = False
-					
-				except:
-					pass
-				
-				print "-- Done"
-				print "-- Exiting"
-				
-				if exitImmediate:
-					sys.exit(0)
+				sys.exit(-1)
 		
 		if not countOnly:
 			self.watcher.OnTestFinished(run, test)
 		
-		self._stopAgents(run, test)
+		#self._stopAgents(run, test)
 		return None
 	
 	def _runPathTest(self, run, test):
