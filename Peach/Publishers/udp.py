@@ -255,7 +255,7 @@ class Udp6Listener(Publisher):
 		@param	port: Remote port
 		'''
 		Publisher.__init__(self)
-		self._host = host
+		self._host = host.lower()
 		self._port = port
 		self._timeout = float(timeout)
 		
@@ -277,8 +277,8 @@ class Udp6Listener(Publisher):
 		if self._socket != None:
 			# Close out old socket first
 			self._socket.close()
-		self._socket = socket.socket(socket.AF_INETV6, socket.SOCK_DGRAM)
-		self._socket.bind((self._host,int(self._port)))
+		self._socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+		self._socket.bind(("",int(self._port)))
 		
 	def send(self, data):
 		'''
@@ -294,11 +294,14 @@ class Udp6Listener(Publisher):
 			pass
 	
 	def receive(self, size = None):
-		data,self.addr = self._socket.recvfrom(65565)
+		while True:
+			data,self.addr = self._socket.recvfrom(65565)
+			if self.addr[0].lower().find(self._host) != -1:
+				break
 		
 		if hasattr(self, "publisherBuffer"):
 			self.publisherBuffer.haveAllData = True
-			
+		
 		return data
 
 # end
