@@ -3909,7 +3909,7 @@ class XmlElement(DataElement):
 		
 		if not haveParent:
 			encoding = "utf8"
-			unistr = doc.toprettyxml().replace(u'<?xml version="1.0" ?>\n', u'')
+			unistr = doc.toxml().replace(u'<?xml version="1.0" ?>\n', u'')
 			return unistr.encode(encoding, 'xmlcharrefreplace')
 		
 		return None

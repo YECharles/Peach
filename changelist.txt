@@ -12,6 +12,7 @@ v2.3.8
  - Bug: Fixed ValidValues mutator/hint to work with Numbers
  - Bug: XmlElement/XmlAttributes: xmlns:n attributes moving to parent element.
         fixed by moving to internal python xml module instead of 4suite.
+        Also not pretty printing :)
 
 v2.3.7
 ------
