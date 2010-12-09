@@ -242,4 +242,63 @@ class UdpListener(Publisher):
 			
 		return data
 
+class Udp6Listener(Publisher):
+	'''
+	A simple UDP publisher.
+	'''
+	
+	def __init__(self, host, port, timeout = 2):
+		'''
+		@type	host: string
+		@param	host: Remote hostname
+		@type	port: number
+		@param	port: Remote port
+		'''
+		Publisher.__init__(self)
+		self._host = host
+		self._port = port
+		self._timeout = float(timeout)
+		
+		if self._timeout == None:
+			self._timeout = 2
+			
+		self._socket = None
+			
+	def stop(self):
+		'''Close connection if open'''
+		self.close()
+			
+	def close(self):
+		if self._socket != None:
+			self._socket.close()
+			self._socket = None
+			
+	def connect(self):
+		if self._socket != None:
+			# Close out old socket first
+			self._socket.close()
+		self._socket = socket.socket(socket.AF_INETV6, socket.SOCK_DGRAM)
+		self._socket.bind((self._host,int(self._port)))
+		
+	def send(self, data):
+		'''
+		Send data via sendall.
+		
+		@type	data: string
+		@param	data: Data to send
+		'''
+		try:
+			self._socket.sendto(data, self.addr)
+		
+		except socket.error:
+			pass
+	
+	def receive(self, size = None):
+		data,self.addr = self._socket.recvfrom(65565)
+		
+		if hasattr(self, "publisherBuffer"):
+			self.publisherBuffer.haveAllData = True
+			
+		return data
+
 # end
