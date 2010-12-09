@@ -33,7 +33,7 @@ Mutators that operate on numerical types.
 
 # $Id$
 
-import sys, os, time, random
+import sys, os, time, random, hashlib
 from Peach.Generators.data import *
 from Peach.mutator import *
 from Peach.Engine.common import *
@@ -55,7 +55,6 @@ class NumericalVarianceMutator(Mutator):
 		self._count = None
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		
 		self._n = self._getN(node, 50)
 		self._values = range(0 - self._n, self._n)
@@ -83,17 +82,6 @@ class NumericalVarianceMutator(Mutator):
 		if self._currentCount >= len(self._values):
 			raise MutatorCompleted()
 	
-	#def getCount(self):
-	#	if self._count == None:
-	#		cnt = 0
-	#		for i in self._values:
-	#			if i >= self._minValue and i <= self._maxValue:
-	#				cnt += 1
-	#		
-	#		self._count = cnt
-	#	
-	#	return self._count
-
 	def getCount(self):
 		return len(self._values)
 	
@@ -141,10 +129,10 @@ class NumericalVarianceMutator(Mutator):
 		if isinstance(node, String):
 			node.currentValue = unicode(node.currentValue)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		try:
-			count = self._random.choice(self._values)
+			count = rand.choice(self._values)
 			node.currentValue = str(long(node.getInternalValue()) + count)
 			if isinstance(node, String):
 				node.currentValue = unicode(node.currentValue)
@@ -192,7 +180,6 @@ class NumericalEdgeCaseMutator(Mutator):
 					break
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		self._currentCount = 0
 		
 		if isinstance(node, String):
@@ -327,12 +314,12 @@ class NumericalEdgeCaseMutator(Mutator):
 			except:
 				break
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
-			node.currentValue = unicode(self._random.choice(self._values[self._size]))
+			node.currentValue = unicode(rand.choice(self._values[self._size]))
 		else:
-			node.currentValue = self._random.choice(self._values[self._size])
+			node.currentValue = rand.choice(self._values[self._size])
 
 
 #class NumericalEvenDistributionMutator(Mutator):
@@ -494,8 +481,6 @@ class FiniteRandomNumbersMutator(Mutator):
 		self._peach = peach
 		self._countThread = None
 		
-		self._random = random.Random()
-		
 		self._n = self._getN(node, 500)
 		self._currentCount = 0
 		
@@ -538,18 +523,23 @@ class FiniteRandomNumbersMutator(Mutator):
 		return n
 	
 	def sequencialMutation(self, node):
+		
+		# Allow us to skip ahead and always get same number
+		rand = random.Random()
+		rand.seed(hashlib.sha512(str(self._currentCount)).digest())
+		
 		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
-			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
+			node.currentValue = unicode(rand.randint(self._minValue, self._maxValue))
 		else:
-			node.currentValue = self._random.randint(self._minValue, self._maxValue)
+			node.currentValue = rand.randint(self._minValue, self._maxValue)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		if isinstance(node, String):
-			node.currentValue = unicode(self._random.randint(self._minValue, self._maxValue))
+			node.currentValue = unicode(rand.randint(self._minValue, self._maxValue))
 		else:
-			node.currentValue = self._random.randint(self._minValue, self._maxValue)
+			node.currentValue = rand.randint(self._minValue, self._maxValue)
 
 
 

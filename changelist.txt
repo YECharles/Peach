@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.8
 ------
 
+ - Changed: You can now --skipto in Random Strategy
  - Changed: Added Udp6Listener publisher
  - Changed: First iteration must work, else we stop
  - Changed: Updated peach.xsd to include raw.* publishers and udp.UdpListener

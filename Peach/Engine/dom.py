@@ -3912,8 +3912,8 @@ class XmlElement(DataElement):
 			try:
 				encoding = "utf8"
 				unistr = doc.toxml().replace(u'<?xml version="1.0" ?>\n', u'')
-				#return unistr.encode(encoding, 'xmlcharrefreplace')
-				return unistr
+				return unistr.encode(encoding, 'xmlcharrefreplace')
+				#return unistr
 			except:
 				return u""
 		

@@ -33,8 +33,7 @@ Mutators that operate on blob types.
 
 # $Id$
 
-import sys, os, time, struct, traceback
-sys.path.append("c:/peach")
+import sys, os, time, struct, traceback, hashlib
 from Peach.mutator import *
 from Peach.Engine.common import *
 
@@ -84,9 +83,9 @@ class DWORDSliderMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._position)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.randint(0, self._len-1)
+		count = rand.randint(0, self._len-1)
 		self._performMutation(node, count)
 
 	def _performMutation(self, node, position):
@@ -165,41 +164,45 @@ class BitFlipperMutator(Mutator):
 	supportedDataElement = staticmethod(supportedDataElement)
 	
 	def sequencialMutation(self, node):
+		# Allow us to skip ahead and always get same number
+		rand = random.Random()
+		rand.seed(hashlib.sha512(str(self._current)).digest())
+		
 		self.changedName = node.getFullnameInDataModel()
 		data = node.getInternalValue()
 		
-		for i in range(self._random.randint(0, 10)):
+		for i in range(rand.randint(0, 10)):
 			if self._len - 1 <= 0:
 				count = 0
 			else:
-				count = self._random.randint(0, self._len-1)
+				count = rand.randint(0, self._len-1)
 				
-			data = self._performMutation(data, count)
+			data = self._performMutation(data, count, rand)
 			
 		node.currentValue = data
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		data = node.getInternalValue()
 		
-		for i in range(self._random.randint(0, 10)):
+		for i in range(rand.randint(0, 10)):
 			if self._len -1 <= 0:
 				count = 0
 			else:
-				count = self._random.randint(0, self._len-1)
+				count = rand.randint(0, self._len-1)
 			
-			data = self._performMutation(data, count)
+			data = self._performMutation(data, count, rand)
 		
 		node.currentValue = data
 	
-	def _performMutation(self, data, position):
+	def _performMutation(self, data, position, rand):
 		length = len(data)
 		
 		if len(data) == 0:
 			return data
 		
 		# How many bytes to change
-		size = self._random.choice([1, 2, 4, 8])
+		size = rand.choice([1, 2, 4, 8])
 		
 		if (position+size) >= length:
 			position = length - size
@@ -210,7 +213,7 @@ class BitFlipperMutator(Mutator):
 		
 		for i in range(position, position+size):
 			byte = struct.unpack('B', data[i])[0]
-			byte ^= self._random.randint(0, 255)
+			byte ^= rand.randint(0, 255)
 			
 			packedup = struct.pack("B", byte)
 			data = data[:i] + packedup + data[i+1:]
@@ -231,31 +234,35 @@ class BlobMutator(BitFlipperMutator):
 		self.name = "BlobMutator"
 	
 	def sequencialMutation(self, node):
+		# Allow us to skip ahead and always get same number
+		rand = random.Random()
+		rand.seed(hashlib.sha512(str(self._current)).digest())
+		
 		self.changedName = node.getFullnameInDataModel()
-		node.currentValue = self._performMutation(node)
+		node.currentValue = self._performMutation(node, rand)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		node.currentValue = self._performMutation(node)
+		node.currentValue = self._performMutation(node, rand)
 
-	def getRange(self, size):
-		start = self._random.randint(0, size)
-		end = self._random.randint(0, size)
+	def getRange(self, size, rand):
+		start = rand.randint(0, size)
+		end = rand.randint(0, size)
 		
 		if start > end:
 			return (end, start)
 		
 		return (start, end)
 
-	def getPosition(self, size, len = 0):
-		pos = self._random.randint(0, size - len)
+	def getPosition(self, rand, size, len = 0):
+		pos = rand.randint(0, size - len)
 		return pos
 
-	def _performMutation(self, node):
+	def _performMutation(self, node, rand):
 		
 		data = node.getInternalValue()
 		
-		func = self._random.choice([
+		func = rand.choice([
 			self.changeExpandBuffer,
 			self.changeReduceBuffer,
 			self.changeChangeRange,
@@ -265,60 +272,60 @@ class BlobMutator(BitFlipperMutator):
 			])
 		
 		#print "BlobMutator:", func
-		return func(data)
+		return func(data, rand)
 	
-	def changeExpandBuffer(self, data):
+	def changeExpandBuffer(self, data, rand):
 		'''
 		Expand the size of our buffer
 		'''
 		
-		size = self._random.randint(0, 255)
+		size = rand.randint(0, 255)
 		pos = self.getPosition(size)
 		
-		return data[:pos] + self.generateNewBytes(size) + data[pos:]
+		return data[:pos] + self.generateNewBytes(size, rand) + data[pos:]
 	
-	def changeReduceBuffer(self, data):
+	def changeReduceBuffer(self, data, rand):
 		'''
 		Reduce the size of our buffer
 		'''
-		(start, end) = self.getRange(len(data))
+		(start, end) = self.getRange(len(data), rand)
 		
 		return data[:start] + data[end:]
 	
-	def changeChangeRange(self, data):
+	def changeChangeRange(self, data, rand):
 		'''
 		Change a sequence of bytes in our buffer
 		'''
-		(start, end) = self.getRange(len(data))
+		(start, end) = self.getRange(len(data), rand)
 		
 		if end > (start+100):
 			end = start+100
 		
 		for i in range(start, end):
-			data = data[:i] + chr(self._random.randint(0, 255)) + data[i+1:]
+			data = data[:i] + chr(rand.randint(0, 255)) + data[i+1:]
 		
 		return data
 	
-	def changeChangeRangeSpecial(self, data):
+	def changeChangeRangeSpecial(self, data, rand):
 		'''
 		Change a sequence of bytes in our buffer
 		to some special chars.
 		'''
 		special = ["\x00", "\x01", "\xfe", "\xff"]
-		(start, end) = self.getRange(len(data))
+		(start, end) = self.getRange(len(data), rand)
 		
 		if end > (start+100):
 			end = start+100
 		
 		for i in range(start, end):
-			data = data[:i-1] + self._random.choice(special) + data[i:]
+			data = data[:i-1] + rand.choice(special) + data[i:]
 		return data
 
-	def changeNullRange(self, data):
+	def changeNullRange(self, data, rand):
 		'''
 		Change a range of bytes to null.
 		'''
-		(start, end) = self.getRange(len(data))
+		(start, end) = self.getRange(len(data), rand)
 		
 		if end > (start+100):
 			end = start+100
@@ -332,49 +339,49 @@ class BlobMutator(BitFlipperMutator):
 		'''
 		Change all zero's in a range to something else.
 		'''
-		(start, end) = self.getRange(len(data))
+		(start, end) = self.getRange(len(data), rand)
 		
 		if end > (start+100):
 			end = start+100
 		
 		for i in range(start, end):
 			if ord(data[i]) == 0:
-				data = data[:i-1] + chr(self._random.randint(1, 255)) + data[i:]
+				data = data[:i-1] + chr(rand.randint(1, 255)) + data[i:]
 		
 		return data
 
 	# ######################################
 	
-	def generateNewBytes(self, size):
+	def generateNewBytes(self, size, rand):
 		'''
 		Generate new bytes to inject into Blob.
 		'''
 		
-		func = self._random.choice([
+		func = rand.choice([
 			self.GenerateNewBytesSingleRandom,
 			self.GenerateNewBytesIncrementing,
 			self.GenerateNewBytesZero,
 			self.GenerateNewBytesAllRandom,
 			])
 		
-		return func(size)
+		return func(size, rand)
 	
-	def GenerateNewBytesSingleRandom(self, size):
+	def GenerateNewBytesSingleRandom(self, size, rand):
 		'''
 		Generate a buffer of size bytes, each
 		byte is the same random number.
 		'''
 		
-		return chr(self._random.randint(0,255)) * size
+		return chr(rand.randint(0,255)) * size
 	
-	def GenerateNewBytesIncrementing(self, size):
+	def GenerateNewBytesIncrementing(self, size, rand):
 		'''
 		Generate a buffer of size bytes, each
 		byte is incrementing from a random start.
 		'''
 		
 		buff = ""
-		x = self._random.randint(0, size)
+		x = rand.randint(0, size)
 		for i in range(0, size):
 			
 			if i+x > 255:
@@ -384,14 +391,14 @@ class BlobMutator(BitFlipperMutator):
 		
 		return buff
 	
-	def GenerateNewBytesZero(self, size):
+	def GenerateNewBytesZero(self, size, rand):
 		'''
 		Generate a buffer of size bytes, each
 		byte is zero (NULL).
 		'''
 		return "\0" * size
 	
-	def GenerateNewBytesAllRandom(self, size):
+	def GenerateNewBytesAllRandom(self, size, rand):
 		'''
 		Generate a buffer of size bytes, each
 		byte is randomly generated.
@@ -399,7 +406,7 @@ class BlobMutator(BitFlipperMutator):
 		buff = ""
 		
 		for i in range(size):
-			buff += chr(self._random.randint(0, 255))
+			buff += chr(rand.randint(0, 255))
 		
 		return buff
 

@@ -21,7 +21,7 @@
 # SOFTWARE.
 #
 
-import sys, os, time
+import sys, os, time, hashlib
 from Peach.mutator import *
 from Peach.mutatestrategies import *
 

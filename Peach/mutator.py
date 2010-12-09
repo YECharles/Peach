@@ -39,7 +39,7 @@ tests against fields.
 
 # $Id$
 
-import random, threading, random
+import random, threading, random, hashlib
 import pickle, types
 from Peach.Engine.dom import *
 

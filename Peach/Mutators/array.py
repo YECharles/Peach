@@ -33,7 +33,7 @@ Mutators that operate on arrays and count relations.
 
 # $Id$
 
-import sys, os, time, random
+import sys, os, time, random, hashlib
 
 from Peach.Generators.data import BadPositiveNumbersSmaller
 from Peach.mutator import *
@@ -124,13 +124,13 @@ class ArrayVarianceMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._currentCount)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		'''
 		Perform a random mutation
 		'''
 		
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.randint(self._minCount, self._maxCount)
+		count = rand.randint(self._minCount, self._maxCount)
 		self._performMutation(node, count)
 	
 	def _performMutation(self, node, count):
@@ -223,12 +223,12 @@ class ArrayNumericalEdgeCasesMutator(ArrayVarianceMutator):
 	def getCount(self):
 		return len(self._counts)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		'''
 		Perform a random mutation
 		'''
 		
-		count = self._random.choice(self._counts)
+		count = rand.choice(self._counts)
 		self._performMutation(node, count)
 
 
@@ -308,14 +308,18 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 		return self._n
 	
 	def sequencialMutation(self, node):
+		# Allow us to skip ahead and always get same number
+		rand = random.Random()
+		rand.seed(hashlib.sha512(str(self._count)).digest())
+		
 		self.changedName = node.getFullnameInDataModel()
-		self._performMutation(node)
+		self._performMutation(node, rand)
 
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		self._performMutation(node)
+		self._performMutation(node, rand)
 
-	def _performMutation(self, node):
+	def _performMutation(self, node, rand):
 		arrayHead = node
 		headIndex = arrayHead.parent.index(arrayHead)
 		items = []
@@ -331,7 +335,7 @@ class ArrayRandomizeOrderMutator(ArrayVarianceMutator):
 			for obj in items:
 				del parent[obj.name]
 			
-			random.shuffle(items)
+			rand.shuffle(items)
 			
 			for i in xrange(len(items)):
 				obj = items[i]

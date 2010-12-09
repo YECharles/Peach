@@ -33,7 +33,7 @@ Mutators that modify the data tree structure.
 
 # $Id$
 
-import sys, os, time
+import sys, os, time, hashlib
 from Peach.mutator import *
 from Peach.Engine.common import *
 
@@ -67,7 +67,7 @@ class DataTreeRemoveMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		node.setValue("")
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		node.setValue("")
 
@@ -107,9 +107,9 @@ class DataTreeDuplicateMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		node.setValue( node.getValue() * self._cnt )
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.randint(0, self._cnt)
+		count = rand.randint(0, self._cnt)
 		node.setValue( node.getValue() * count )
 
 
@@ -189,7 +189,7 @@ class DataTreeSwapNearNodesMutator(Mutator):
 			node.setValue(v2)
 			nextNode.setValue(v1)
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
 		self.sequencialMutation(node)
 

@@ -32,7 +32,7 @@ Mutation Strategies
 
 # $Id$
 
-import sys, os, time, random
+import sys, os, time, random, hashlib
 from Peach.Engine.engine import Engine
 from Peach.mutatestrategies import *
 from Peach.Engine.incoming import DataCracker
@@ -82,11 +82,13 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		#: Random number generator for our instance
 		self._random = random.Random()
+		self._random.seed(hashlib.sha512(str(self.iterationCount)).digest())
 	
 		self._mutator = _RandomMutator()
 		
 	def next(self):
-		pass
+		self.iterationCount += 1
+		self._random.seed(hashlib.sha512(str(self.iterationCount)).digest())
 	
 	def getCount(self):
 		'''
@@ -119,8 +121,6 @@ class RandomMutationStrategy(MutationStrategy):
 		@type	stateEngine: StateEngine instance
 		@param	stateEngine: StateEngine instance in use
 		'''
-		
-		self.iterationCount += 1
 		
 		if not self._isFirstTestCase:
 			## Select the data model to change
@@ -420,7 +420,7 @@ class RandomMutationStrategy(MutationStrategy):
 							#       sometimes a mutation will fail.  We should
 							#       ignore those failures.
 							try:
-								mutator.randomMutation(node)
+								mutator.randomMutation(node, self._random)
 							except:
 								pass
 						
@@ -444,7 +444,7 @@ class RandomMutationStrategy(MutationStrategy):
 						#       sometimes a mutation will fail.  We should
 						#       ignore those failures.
 						try:
-							mutator.randomMutation(node)
+							mutator.randomMutation(node, self._random)
 						except:
 							pass
 					

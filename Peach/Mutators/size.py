@@ -33,7 +33,7 @@ Mutators that operate on size-of relations.
 
 # $Id$
 
-import sys, os, time, random
+import sys, os, time, random, hashlib
 from Peach.Generators.data import *
 from Peach.mutator import *
 from Peach.Engine.common import *
@@ -55,7 +55,6 @@ class SizedVaranceMutator(Mutator):
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		
 		self._n = self._getN(node, 50)
 		self._range = range(0 - self._n, self._n)
@@ -90,9 +89,9 @@ class SizedVaranceMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.choice(self._range)
+		count = rand.choice(self._range)
 		self._performMutation(node, count)
 	
 	def _performMutation(self, node, count):
@@ -171,7 +170,6 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		
 		self._n = self._getN(node, 50)
 		self._range = self._populateValues(node)
@@ -247,9 +245,9 @@ class SizedNumericalEdgeCasesMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.choice(self._range)
+		count = rand.choice(self._range)
 		self._performMutation(node, count)
 	
 	def _performMutation(self, node, count):
@@ -330,7 +328,6 @@ class SizedDataVaranceMutator(Mutator):
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		
 		self._n = self._getN(node, 50)
 		self._range = range(0 - self._n, self._n)
@@ -365,9 +362,9 @@ class SizedDataVaranceMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.choice(self._range)
+		count = rand.choice(self._range)
 		self._performMutation(node, count)
 	
 	def _performMutation(self, node, count):
@@ -420,7 +417,6 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 		self._peach = peach
 		
 		self._dataElementName = node.getFullname()
-		self._random = random.Random()
 		
 		self._n = self._getN(node, 50)
 		self._range = self._populateValues(node)
@@ -495,9 +491,9 @@ class SizedDataNumericalEdgeCasesMutator(Mutator):
 		self.changedName = node.getFullnameInDataModel()
 		self._performMutation(node, self._range[self._currentCount])
 	
-	def randomMutation(self, node):
+	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
-		count = self._random.choice(self._range)
+		count = rand.choice(self._range)
 		self._performMutation(node, count)
 	
 	def _performMutation(self, node, count):
