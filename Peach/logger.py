@@ -143,7 +143,12 @@ class Filesystem(Logger):
 		self.file.write("Peach Fuzzer Run\n")
 		self.file.write("=================\n\n")
 		self.file.write("Date of run: " + asctime() + "\n")
+		
+		if Engine.context.SEED != None:
+			self.file.write("SEED: %s\n" % Engine.context.SEED)
+		
 		self.file.write("Run name: " + run.name + "\n\n")
+		
 	
 	def OnRunFinished(self, run):
 		self.file.write("\n\n== Run completed ==\n" + asctime() + "\n")

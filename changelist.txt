@@ -4,6 +4,8 @@ Peach Changlist
 v2.3.8
 ------
 
+ - New: --seed paramter to set random seed
+ - Changed: Random SEED now logged
  - Changed: You can now --skipto in Random Strategy
  - Changed: Added Udp6Listener publisher
  - Changed: First iteration must work, else we stop

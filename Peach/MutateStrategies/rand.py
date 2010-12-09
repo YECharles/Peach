@@ -53,6 +53,8 @@ class RandomMutationStrategy(MutationStrategy):
 	def __init__(self, args):
 		MutationStrategy.__init__(self, args)
 		
+		RandomMutationStrategy.SEED = Engine.context.SEED
+		
 		#: Number of iterations befor we switch files
 		self.switchCount = 100
 		
@@ -82,13 +84,13 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		#: Random number generator for our instance
 		self._random = random.Random()
-		self._random.seed(hashlib.sha512(str(self.iterationCount)).digest())
+		self._random.seed(hashlib.sha512(str(RandomMutationStrategy.SEED) + str(self.iterationCount)).digest())
 	
 		self._mutator = _RandomMutator()
 		
 	def next(self):
 		self.iterationCount += 1
-		self._random.seed(hashlib.sha512(str(self.iterationCount)).digest())
+		self._random.seed(hashlib.sha512(str(RandomMutationStrategy.SEED) + str(self.iterationCount)).digest())
 	
 	def getCount(self):
 		'''

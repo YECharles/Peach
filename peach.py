@@ -40,7 +40,7 @@ performing parsing tests of Peach XML files.
 
 # $Id$
 
-import sys, os
+import sys, os, time
 
 # Add our root to the python path
 if not (hasattr(sys,"frozen") and sys.frozen == "console_exe"):
@@ -109,6 +109,7 @@ Syntax:
   --skipto N                 Skip to a specific test #.  This replaced -r
 							 for restarting a Peach run.
   --range N,M                Provide a range of test #'s to be run.
+  --seed N                   Seed to use for Random strategies
 
 Peach Agent
 
@@ -178,13 +179,14 @@ Debug Peach XML File
 	restartFuzzerFile = None
 	parallel = None
 	startNum = None
+	SEED = time.time()
 		
 	try:
 		(optlist, args) = getopt.getopt(sys.argv[1:], "p:vstcwagr:1", ['strategy=','analyzer=', 'parallel=',
 																	 'restart=', 'parser=',
 																	 'test', 'count', 'web', 'agent',
 																	 'gui', 'debug', 'new', 'skipto=',
-																	 'range'])
+																	 'range', 'seed='])
 	except:
 		usage()
 	
@@ -279,6 +281,11 @@ Debug Peach XML File
 				print "Error using mutation strategy '%s'.\n" % strategy
 				sys.exit(0)
 		
+		elif optlist[i][0] == '--seed':
+				SEED = optlist[i][1]
+				print "[*] Using SEED: '%s'" % SEED
+				
+				
 		elif optlist[i][0] == '--debug':
 			
 			# show debugging messages
@@ -470,6 +477,7 @@ Debug Peach XML File
 	from Peach.Engine.common import *
 	
 	engine = engine.Engine()
+	engine.SEED = SEED
 	watcher = None
 	
 	try:
