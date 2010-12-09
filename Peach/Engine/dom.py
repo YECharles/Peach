@@ -3906,11 +3906,16 @@ class XmlElement(DataElement):
 				
 			elif c.isDataElement:
 				node.appendChild(doc.createTextNode(c.getValue().decode('latin-1').encode('utf8')))
+				#node.appendChild(doc.createTextNode(c.getValue()))
 		
 		if not haveParent:
-			encoding = "utf8"
-			unistr = doc.toxml().replace(u'<?xml version="1.0" ?>\n', u'')
-			return unistr.encode(encoding, 'xmlcharrefreplace')
+			try:
+				encoding = "utf8"
+				unistr = doc.toxml().replace(u'<?xml version="1.0" ?>\n', u'')
+				#return unistr.encode(encoding, 'xmlcharrefreplace')
+				return unistr
+			except:
+				return u""
 		
 		return None
 	

@@ -796,10 +796,6 @@ class Engine(object):
 			# We should also stop agents.
 			self._stopAgents(run, test)
 			
-			# Should we exit fast?
-			if saveState:
-				sys.exit(-1)
-		
 		if not countOnly:
 			self.watcher.OnTestFinished(run, test)
 		
