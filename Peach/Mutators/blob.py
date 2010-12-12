@@ -335,7 +335,7 @@ class BlobMutator(BitFlipperMutator):
 		
 		return data
 	
-	def changeUnNullRange(self, data):
+	def changeUnNullRange(self, data, rand):
 		'''
 		Change all zero's in a range to something else.
 		'''

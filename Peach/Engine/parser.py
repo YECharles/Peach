@@ -2662,6 +2662,9 @@ class ParseTemplate:
 		
 		if not node.hasAttributeNS(None, "class"):
 			raise PeachException("Publisher element missing class attribute")
+			
+		if len(node.getAttributeNS(None, "class")) == 0:
+			raise PeachException("Publisher class attribute is empty")
 		
 		publisher.classStr = publisherClass = self._getAttribute(node, "class")
 		
@@ -2725,7 +2728,20 @@ class ParseTemplate:
 		
 		code += ')'
 		
-		pub = eval(code, globals(), locals())
+		try:
+			pub = eval(code, globals(), locals())
+		
+		except TypeError, e:
+			error = str(e)
+			if error.find("__init__() takes at least") > -1:
+				m = re.search("takes at least (\d+) arguments \((\d+) given\)", error)
+				required = int(m.group(1)) - 1
+				have = int(m.group(2)) - 1
+				
+				raise PeachException("Error: Publisher '%s' requires at least %d arguments, but %d were specified." %(publisher.classStr, required, have) )
+				
+			raise e
+			
 		pub.domPublisher = publisher
 		return pub
 	
