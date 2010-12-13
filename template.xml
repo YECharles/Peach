@@ -7,7 +7,7 @@
 
 	<!-- TODO: Create data model -->
 	<DataModel name="TheDataModel">
-
+		<String value="Hello World!" />
 	</DataModel>
 
 	<!-- TODO: Create state model -->
@@ -18,12 +18,18 @@
 				<DataModel ref="TheDataModel"/>
 				<!-- <Data fileName="sample.png" /> -->
 			</Action>
-
 		</State>
 
 	</StateModel>
 
+	<!-- TODO: Configure Agent -->
+	<Agent name="TheAgent">
+
+	</Agent>
+
 	<Test name="TheTest">
+		<!-- TODO: Enable Agent -->
+		<!-- <Agent ref="TheAgent"/> -->
 		<StateModel ref="TheState"/>
 
 		<!-- TODO: Configure a publisher -->
