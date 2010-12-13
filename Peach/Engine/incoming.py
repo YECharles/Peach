@@ -437,11 +437,29 @@ class DataCracker:
 			
 			elif maxOccurs == 0:
 				
-				#for child in node.getElementsByType(DataElement):
-				#	# Remove relation (else we get errors)
-				#	for relation in child.getRelationsOfThisElement():
-				#		relation.parent.relations.remove(relation)
-				#		relation.parent.__delitem__(relation.name)
+				for child in node.getElementsByType(DataElement):
+					if child == node:
+						continue
+					
+					# Remove relation (else we get errors)
+					for relation in child.getRelationsOfThisElement():
+						
+						if node.getFullname().find(relation.parent.getFullname()) == 0:
+							# Relation inside of block we are removing
+							continue
+						
+						Debug(1, "@! Child Relation: From: %s  - of: %s" % (relation.parent.name, relation.of))
+						relation.parent.relations.remove(relation)
+						if relation.parent.has_key(relation.name):
+							del relation.parent[relation.name]
+						
+						for rfrom in node.relations:
+							if rfrom.From != None and rfrom.From.endswith(relation.parent.name):
+								Debug(1, "@ Also removing FROM side")
+								node.relations.remove(rfrom)
+								if node.parent.has_key(rfrom.name):
+									del node.parent[rfrom.name]
+						
 				
 				# Remove relation (else we get errors)
 				for relation in node.getRelationsOfThisElement():
@@ -501,8 +519,10 @@ class DataCracker:
 							Debug(1, "@ minOccurs == 0, removing node")
 							
 							#for child in node.getElementsByType(DataElement):
+							#	Debug(1, "@@!! CHild: "+child.name)
 							#	# Remove relation (else we get errors)
 							#	for relation in child.getRelationsOfThisElement():
+							#		Debug(1, "@!! Found relation we should remove: "+relation.of)
 							#		relation.parent.relations.remove(relation)
 							#		relation.parent.__delitem__(relation.name)
 							

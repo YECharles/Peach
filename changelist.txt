@@ -12,6 +12,8 @@ v2.3.8
  - Changed: Added Udp6Listener publisher
  - Changed: First iteration must work, else we stop
  - Changed: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - Bug: When a count relation goes into an array that can be 0, remove
+        relation-ship when array is 0, but only if a count is providing the 0.
  - Bug: Inconsistent behaviour with exceptions and watchers/agents/publishers
  - Bug: EngineWatcher.OnStopRun/Logger.OnStopRun was not being called correctly
  - New: New IPv6 Raw publisher (raw.Raw6) added.
