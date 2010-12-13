@@ -6,6 +6,7 @@ v2.3.8
 
  - New: Nice error message for some Publisher parsing exceptions
  - New: --seed paramter to set random seed
+ - Changed: Added <Agent/> back to template.xml
  - Changed: Removed warning about vtrace/windbg not loading
  - Changed: Random SEED now logged
  - Changed: You can now --skipto in Random Strategy
