@@ -149,7 +149,7 @@ class PeachShark:
 		# Search from us forward
 		sibling = sizeNode.nextSibling
 		while sibling != None:
-			checkSize = int(sibling.getAttributeNS(None, 'size'))
+			checkSize = self._getNodeSize(sibling)
 			
 			if checkSize == size:
 				return sibling
@@ -159,7 +159,7 @@ class PeachShark:
 		# That didn't work look from parent
 		for child in node.childNodes:
 			if child != sizeNode:
-				checkSize = int(child.getAttributeNS(None, 'size'))
+				checkSize = self._getNodeSize(child)
 				if checkSize == size:
 					return child
 				
@@ -170,6 +170,10 @@ class PeachShark:
 		# Search from parent forward
 		sibling = node.nextSibling
 		while sibling != None:
+			if not sibling.hasAttributeNS(None, 'size'):
+				sibling = sibling.nextSibling
+				continue
+			
 			checkSize = int(sibling.getAttributeNS(None, 'size'))
 			
 			if checkSize == size:
@@ -262,8 +266,8 @@ class PeachShark:
 		Check if parent - me + prior siblings == size
 		'''
 		
-		parentSize = int(node.parentNode.getAttributeNS(None, 'size'))
-		sizeUptoMe = int(node.getAttributeNS(None, 'size'))
+		parentSize = self._getNodeSize(node.parentNode)
+		sizeUptoMe = self._getNodeSize(node)
 		size = self.findSizeGetSize(node)
 		#debug("%d:%d" % (parentSize,size))
 		
@@ -353,6 +357,32 @@ class PeachShark:
 		
 		return None
 	
+	def _getNodeSize(self, node):
+		if not node.hasAttributeNS(None, 'size'):
+			size = 0
+			
+			for child in node.childNodes:
+				if child.hasAttributeNS(None, "size"):
+					size += int(child.getAttributeNS(None, 'size'))
+		else:
+			size = int(node.getAttributeNS(None, 'size'))
+		
+		return size
+	
+	def _getNodePosition(self, node):
+		if not node.hasAttributeNS(None, "pos"):
+			pos = 0
+			
+			for child in node.childNodes:
+				if child.hasAttributeNS(None, "pos"):
+					pos = int(child.getAttributeNS(None, 'pos'))
+					break
+			
+		else:
+			pos = int(node.getAttributeNS(None, 'pos'))
+		
+		return pos
+		
 	def peachNode(self, node, tabCount, size, parent):
 		
 		if node.nodeName == '#text':
@@ -362,8 +392,9 @@ class PeachShark:
 		name = node.getAttributeNS(None, 'name')
 		show = node.getAttributeNS(None, 'show')
 		showName = node.getAttributeNS(None, 'showname')
-		size = int(node.getAttributeNS(None, 'size'))
-		pos = int(node.getAttributeNS(None, 'pos'))
+		size = self._getNodeSize(node)
+		pos = self._getNodePosition(node)
+		
 		ret = ''
 		nodeName = self.getNodeName(node)
 		if nodeName != None:
@@ -375,8 +406,8 @@ class PeachShark:
 		
 		# This should be prior sibling, not parent!!
 		if parent != None:
-			parentPos = int(parent.getAttributeNS(None, 'pos'))
-			parentSize = int(parent.getAttributeNS(None, 'size'))
+			parentPos = self._getNodePosition(parent)
+			parentSize = self._getNodeSize(parent)
 		else:
 			parentPos = -1
 			parentSize = -1
@@ -403,6 +434,7 @@ class PeachShark:
 			
 			name = node.getAttributeNS(None, 'name')
 		
+		#if len(node.childNodes) > 0 and not (self._getNodeSize(node.childNodes[0]) == size and self._getNodePosition(node.childNodes[0]) == pos):
 		if len(node.childNodes) > 0:
 			
 			curPos = pos
@@ -416,15 +448,18 @@ class PeachShark:
 			
 			for child in node.childNodes:
 				
+				if not child.hasAttributeNS(None, "value"):
+					continue
+				
 				sibling = child.nextSibling
 				if sibling != None:
-					siblingPos = int(sibling.getAttributeNS(None, 'pos'))
-					siblingSize = int(sibling.getAttributeNS(None, 'size'))
-					childPos = int(child.getAttributeNS(None, 'pos'))
-					childSize = int(child.getAttributeNS(None, 'size'))
+					siblingSize = self._getNodeSize(sibling)
+					siblingPos = self._getNodePosition(sibling)
+					childSize = self._getNodeSize(child)
+					childPos = self._getNodePosition(child)
 					
-					if siblingPos == childPos and siblingSize < childSize:
-						debug("Found that crazy stuff" + child.getAttributeNS(None, 'name'))
+					if siblingPos == childPos and siblingSize < childSize and sibling.hasAttributeNS(None, "value"):
+						debug("Skipping " + child.getAttributeNS(None, 'name') + " same as " + sibling.getAttributeNS(None, "name"))
 						ret += tabs + "\t<!-- Skipping %s, same as following fields -->\n" % child.getAttributeNS(None, 'name')
 						continue
 				
@@ -489,8 +524,8 @@ class PeachShark:
 			
 			if type != 'bit_flag':
 				if node.previousSibling != None:
-					previousSiblingPos = int(node.previousSibling.getAttributeNS(None, 'pos'))
-					previousSiblingSize = int(node.previousSibling.getAttributeNS(None, 'size'))
+					previousSiblingPos = self._getNodePosition(node.previousSibling)
+					previousSiblingSize = self._getNodeSize(node.previousSibling)
 					
 					if pos == previousSiblingPos and size == previousSiblingSize:
 						debug("node same position and size of previousSibling")
@@ -847,8 +882,9 @@ class PeachShark:
 				debug("getFlagBits(): Something fishy about this!!! %d" % (len(firstDots) + len(number) + len(lastDots)))
 		
 			return offset, bits
+		
 		except:
-			return 0, 1
+			return -1, 1
 	
 	def figureType(self, node):
 	
@@ -858,13 +894,16 @@ class PeachShark:
 		showName = node.getAttributeNS(None, 'showname')
 		value = self.hex2bin(node.getAttributeNS(None, 'value'))
 		valueHex = node.getAttributeNS(None, 'value')
-		size = int(node.getAttributeNS(None, 'size'))
-		pos = int(node.getAttributeNS(None, 'pos'))
-		parentPos = int(node.parentNode.getAttributeNS(None, 'pos'))
-		parentSize = int(node.parentNode.getAttributeNS(None, 'size'))
+		size = self._getNodeSize(node)
+		pos = self._getNodePosition(node)
+		parentPos = self._getNodePosition(node.parentNode)
+		parentSize = self._getNodeSize(node.parentNode)
 		
 		#print "Show: [%s], valueHex: [%s], size: %d" % (show, valueHex, size)
 	
+		if showName != None and showName.find("Data:") == 0:
+			return 'blob'
+		
 		# If just compar pos == parentPos we will get the first
 		# child.  Should also check next child and size
 		if pos == parentPos and parentSize == size:
@@ -872,10 +911,12 @@ class PeachShark:
 			# parent will have size of 1
 			#print "bit_flag: pos: %d parentPos: %d" % (pos, parentPos)
 			#debug("show: %s - showName: %s" % (show, showName))
-			return 'bit_flag'
-		#else:
-		#	print "pos: %d parentPos: %d" % (pos, parentPos)
-	
+			
+			(p,l) = self.getFlagBits(node)
+			
+			if p > -1:
+				return 'bit_flag'
+		
 		if len(value) > 2 and value.isalnum() and not show.isdigit():
 			return 'str'
 		
@@ -1079,7 +1120,10 @@ def DoTheShark(fileName,  proto):
 	shark = PeachShark()
 	shark.removeTextNodes(node.parentNode)
 	
-	ret = """
+	ret = """<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://phed.org/2008/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://phed.org/2008/Peach /peach/peach.xsd">
+
 	<!-- ==// Auto Generated by PeachShark //== -->
 	
 	<!--
@@ -1090,6 +1134,9 @@ def DoTheShark(fileName,  proto):
 		- Integrate into a Peach Fuzzer
 	
 	-->
+	
+	<!-- Import defaults for Peach instance -->
+	<Include ns="default" src="file:defaults.xml"/>
 	
 """
 	
@@ -1117,7 +1164,8 @@ def DoTheShark(fileName,  proto):
 	<Run name="DefaultRun">
 		<Test ref="MyTest" />
 	</Run>
-
+	
+</Peach>
 """ % shark.figureOutPublisher(doc)
 	
 	return ret
