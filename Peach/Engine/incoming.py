@@ -449,7 +449,8 @@ class DataCracker:
 							continue
 						
 						Debug(1, "@! Child Relation: From: %s  - of: %s" % (relation.parent.name, relation.of))
-						relation.parent.relations.remove(relation)
+						if relation in relation.parent.relations:
+							relation.parent.relations.remove(relation)
 						if relation.parent.has_key(relation.name):
 							del relation.parent[relation.name]
 						
