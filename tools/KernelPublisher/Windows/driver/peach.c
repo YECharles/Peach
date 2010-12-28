@@ -28,8 +28,7 @@ Environment:
 
 #include "peach.h"
 
-char _tag[] = {'C', 'A', 'E', 'P'};
-#define TAG (ULONG)*_tag
+#define TAG 'caep'
 #define NT_DEVICE_NAME      L"\\Device\\Peach"
 #define DOS_DEVICE_NAME     L"\\DosDevices\\Peach"
 
@@ -218,6 +217,10 @@ Return Value:
 	if(data)
 		ExFreePoolWithTag(data, TAG);
 
+	methodName = NULL;
+	propertyName = NULL;
+	data = NULL;
+
     Irp->IoStatus.Status = STATUS_SUCCESS;
     Irp->IoStatus.Information = 0;
 
@@ -328,10 +331,10 @@ Return Value:
 
     switch ( irpSp->Parameters.DeviceIoControl.IoControlCode )
     {
-	/* Sent by Peach to say "Starting run" */
+	/* Sent by Peach to say "Starting iteration" */
 	case IOCTL_PEACH_METHOD_START:
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_START"));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_START\n"));
 
 		started = TRUE;
 
@@ -339,10 +342,10 @@ Return Value:
 
 		break;
 
-	/* Sent by Peach to say "Stopping run" */
+	/* Sent by Peach to say "Stopping iteration" */
 	case IOCTL_PEACH_METHOD_STOP:
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_STOP"));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_STOP\n"));
 
 		started = FALSE;
 
@@ -362,10 +365,10 @@ Return Value:
 			methodName = NULL;
 		}
 
-		methodName = ExAllocatePoolWithTag(PagedPool, inBufLength, TAG);
+		methodName = ExAllocatePoolWithTag(NonPagedPool, inBufLength, TAG);
 		RtlCopyBytes(methodName, Irp->AssociatedIrp.SystemBuffer, inBufLength);
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_CALL: [%s]", methodName));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_CALL: [%s]\nh", methodName));
 
 		break;
 
@@ -379,10 +382,10 @@ Return Value:
 			propertyName = NULL;
 		}
 
-		propertyName = ExAllocatePoolWithTag(PagedPool, inBufLength, TAG);
+		propertyName = ExAllocatePoolWithTag(NonPagedPool, inBufLength, TAG);
 		RtlCopyBytes(propertyName, Irp->AssociatedIrp.SystemBuffer, inBufLength);
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_PROPERTY: [%s]", propertyName));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_PROPERTY: [%s]\n", propertyName));
 
 		break;
 
@@ -390,7 +393,7 @@ Return Value:
 	 * should send back TRUE (1) or FALSE (0) */
 	case IOCTL_PEACH_METHOD_NEXT:
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_NEXT"));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_NEXT\n"));
 
 		// TODO: Change ret based on our status
 		ret = 1;
@@ -403,7 +406,7 @@ Return Value:
 	/* Sent by Peach to deliver DATA to Kernel */
     case IOCTL_PEACH_METHOD_DATA:
 
-		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_DATA: Length: %d", inBufLength));
+		PEACH_KDPRINT(("IOCTL_PEACH_METHOD_DATA: Length: %d\n", inBufLength));
 
 		if(data != NULL)
 		{
@@ -411,7 +414,7 @@ Return Value:
 			data = NULL;
 		}
 
-		data = ExAllocatePoolWithTag(PagedPool, inBufLength, TAG);
+		data = ExAllocatePoolWithTag(NonPagedPool, inBufLength, TAG);
 		RtlCopyBytes(data, Irp->AssociatedIrp.SystemBuffer, inBufLength);
 
 		// TODO: Place code here to fuzz something!!

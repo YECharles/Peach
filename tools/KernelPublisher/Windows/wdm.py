@@ -62,21 +62,18 @@ class WindowsKernel(Publisher):
 				"\\\\.\\Peach",
 				win32file.GENERIC_READ|win32file.GENERIC_WRITE,
 				0,
-				NULL,
+				None,
 				win32file.CREATE_ALWAYS,
 				win32file.FILE_ATTRIBUTE_NORMAL,
-				NULL)
+				None)
 		
 		buff = "START!"
 		bytesReturned = 0
 		
 		win32file.DeviceIoControl ( self.hDevice,
 			self.IOCTL_PEACH_METHOD_START,
-			buff, len(buff),
-			buff, len(buff),
-			bytesReturned,
-			NULL
-			)
+			buff,
+			1)
 	
 	def stop(self):
 		'''
@@ -91,13 +88,10 @@ class WindowsKernel(Publisher):
 		buff = "STOP!"
 		bytesReturned = 0
 		
-		win32file.DeviceIoControl ( self.hDevice,
+		win32file.DeviceIoControl(self.hDevice,
 			self.IOCTL_PEACH_METHOD_STOP,
-			buff, len(buff),
-			buff, len(buff),
-			bytesReturned,
-			NULL
-			)
+			buff,
+			1)
 		
 		win32api.CloseHandle(self.hDevice)
 		self.hDevice = None
@@ -110,13 +104,13 @@ class WindowsKernel(Publisher):
 		@param	data: Data to publish
 		'''
 		
-		win32file.DeviceIoControl ( self.hDevice,
+		if len(data) == 0:
+			print "WindowsKernelDriver: Skipping send with zero bytes."
+			return
+		
+		win32file.DeviceIoControl(self.hDevice,
 			self.IOCTL_PEACH_METHOD_DATA,
-			data, len(data),
-			data, len(data),
-			bytesReturned,
-			NULL
-			)
+			data, 1)
 	
 	def receive(self, size = None):
 		'''
@@ -141,22 +135,16 @@ class WindowsKernel(Publisher):
 		@return: data returned (if any)
 		'''
 		
-		win32file.DeviceIoControl ( self.hDevice,
+		win32file.DeviceIoControl(self.hDevice,
 			self.IOCTL_PEACH_METHOD_CALL,
-			method, len(method),
-			method, len(method),
-			bytesReturned,
-			NULL
-			)
+			method,
+			1)
 		
 		for data in args:
-			win32file.DeviceIoControl ( self.hDevice,
+			win32file.DeviceIoControl(self.hDevice,
 				self.IOCTL_PEACH_METHOD_DATA,
-				data, len(data),
-				data, len(data),
-				bytesReturned,
-				NULL
-				)
+				data,
+				1)
 	
 	def property(self, property, value = None):
 		'''
@@ -168,21 +156,15 @@ class WindowsKernel(Publisher):
 		@param	value: Value to set.  If None, return property instead
 		'''
 		
-		win32file.DeviceIoControl ( self.hDevice,
+		win32file.DeviceIoControl(self.hDevice,
 			self.IOCTL_PEACH_METHOD_PROPERTY,
-			property, len(property),
-			property, len(property),
-			bytesReturned,
-			NULL
-			)
+			property,
+			1)
 		
-		win32file.DeviceIoControl ( self.hDevice,
+		win32file.DeviceIoControl(self.hDevice,
 			self.IOCTL_PEACH_METHOD_DATA,
-			value, len(value),
-			value, len(value),
-			bytesReturned,
-			NULL
-			)
+			value,
+			1)
 	
 	def connect(self):
 		'''
