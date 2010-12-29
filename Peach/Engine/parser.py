@@ -605,12 +605,12 @@ class ParseTemplate:
 	def GetValueFromNode(self, node):
 		
 		value = None
-		type = 'literal'
+		type = 'string'
 		
 		if node.hasAttributeNS(None, 'valueType'):
 			type = self._getAttribute(node, 'valueType')
 			if not (type == 'literal' or type == 'hex'):
-				type = 'literal'
+				type = 'string'
 		
 		if node.hasAttributeNS(None, 'value'):
 			value = self._getAttribute(node, 'value')
@@ -633,8 +633,11 @@ class ParseTemplate:
 						break
 				
 				return ret
+			
+			elif type == 'literal':
+				return eval(value)
 		
-		if value != None and (self._getAttribute(node, 'valueType') == 'string' or not node.hasAttributeNS(None, 'valueType')):
+		if value != None and (type == 'string' or not node.hasAttributeNS(None, 'valueType')):
 			value = re.sub(r"([^\\])\\n", r"\1\n", value)
 			value = re.sub(r"([^\\])\\r", r"\1\r", value)
 			value = re.sub(r"([^\\])\\t", r"\1\t", value)
