@@ -655,12 +655,12 @@ class ParseTemplate:
 		'''
 		
 		value = None
-		type = 'literal'
+		type = 'string'
 		
 		if node.hasAttributeNS(None, 'valueType'):
 			type = self._getAttribute(node, 'valueType')
-			if not (type == 'literal' or type == 'hex'):
-				type = 'literal'
+			if not type in ['literal', 'hex', 'string']:
+				raise PeachException("Error: [%s] has invalid valueType attribute." % node.getFullname())
 		
 		if node.hasAttributeNS(None, 'value'):
 			value = node.getAttributeNS(None, 'value')
@@ -685,8 +685,11 @@ class ParseTemplate:
 						break
 				
 				return ret
+			
+			elif type == 'literal':
+				value = eval(value)
 		
-		if value != None and (self._getAttribute(node, 'valueType') == 'string' or not node.hasAttributeNS(None, 'valueType')):
+		if value != None and type == 'string':
 			value = re.sub(r"([^\\])\\n", r"\1\n", value)
 			value = re.sub(r"([^\\])\\r", r"\1\r", value)
 			value = re.sub(r"([^\\])\\t", r"\1\t", value)
@@ -697,18 +700,18 @@ class ParseTemplate:
 			value = re.sub(r"^\\r", r"\r", value)
 			value = re.sub(r"^\\t", r"\t", value)
 			value = re.sub(r"\\\\", r"\\", value)
-
+		
 		return value
 		
 	def GetValueFromNodeNumber(self, node):
 		
 		value = None
-		type = 'literal'
+		type = 'string'
 		
 		if node.hasAttributeNS(None, 'valueType'):
 			type = self._getAttribute(node, 'valueType')
-			if not (type == 'literal' or type == 'hex'):
-				type = 'literal'
+			if not type in ['literal', 'hex', 'string']:
+				raise PeachException("Error: [%s] has invalid valueType attribute." % node.getFullname())
 		
 		if node.hasAttributeNS(None, 'value'):
 			value = self._getAttribute(node, 'value')
