@@ -98,6 +98,12 @@ class Monitor:
 		'''
 		return None
 	
+	def RedoTest(self):
+		'''
+		Should the current test be reperformed.
+		'''
+		return False
+	
 	def DetectedFault(self):
 		'''
 		Check if a fault was detected.
@@ -165,6 +171,7 @@ class _MsgType:
 	OnTestStarting = 13		#: On Test Case Starting
 	OnTestFinished = 14		#: On Test Case Finished
 	StopRun = 20
+	RedoTest = 30			#: Should we re-perform the current test?
 	
 	StartMonitor = 15		#: Startup a monitor
 	# Expect a msg.monitorName: str, msg.monitorClass: str and msg.params: dictionary
@@ -361,6 +368,26 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 				msg.results = True
 		
 		print "Agent: Sending detectFault result [%s]" % repr(msg.results)
+		return pickle.dumps(msg)
+	
+	def xmlrpc_redoTest(self, msg):
+		msg = pickle.loads(msg)
+		if self._id == None or msg.id != self._id:
+			return pickle.dumps(_Msg(None, _MsgType.Nack))
+		
+		if msg.type != _MsgType.RedoTest:
+			return pickle.dumps(_Msg(None, _MsgType.Nack))
+		
+		print "Agent: redoTest()"
+		
+		msg = _Msg(None, _MsgType.Ack)
+		msg.results = False
+		
+		for m in self._monitors:
+			if m.RedoTest():
+				msg.results = True
+		
+		print "Agent: Sending redoTest result [%s]" % repr(msg.results)
 		return pickle.dumps(msg)
 	
 	def xmlrpc_getMonitorData(self, msg):
@@ -901,6 +928,28 @@ class AgentClient:
 		
 		return msg.results
 	
+	def RedoTest(self):
+		'''
+		SHould we repeat current test
+		'''
+		
+		Debug("> RedoTest")
+		
+		try:
+			msg = _Msg(self._id, _MsgType.RedoTest)
+			msg = pickle.loads(self._agent.redoTest(pickle.dumps(msg)))
+			
+		except:
+			self.Reconnect()
+			raise RedoTestException("Communication error with Agent %s" % self._name)
+		
+		if msg.type != _MsgType.Ack:
+			raise PeachException("Lost connection to Agent %s during RedoTest call." % self._name)
+		
+		Debug("< RedoTest")
+		
+		return msg.results
+	
 	def DetectedFault(self):
 		'''
 		Check if a fault was detected.
@@ -1096,6 +1145,17 @@ class AgentPlexer:
 				for key in hashOfData.keys():
 					#print "Creating key: [%s]" % ( "%s_%s" % (name, key))
 					ret["%s_%s" % (name, key)] = hashOfData[key]
+		
+		return ret
+	
+	def RedoTest(self):
+		'''
+		Check if a fault was detected.
+		'''
+		ret = False
+		for name in self._agents.keys():
+			if self._agents[name].RedoTest():
+				ret = True
 		
 		return ret
 	

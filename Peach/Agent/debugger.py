@@ -35,7 +35,7 @@ detect faults.  Would be nice to also eventually do other things like
 
 # $Id$
 
-import struct, sys, time, psutil
+import struct, sys, time, psutil, signal
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re, pickle
@@ -61,6 +61,9 @@ try:
 	# ###############################################################################################
 	# ###############################################################################################
 	# ###############################################################################################
+	
+	def handlerSigAlarm(signum, frame):
+		raise Exception()
 	
 	class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
 		
@@ -210,6 +213,7 @@ try:
 										   c_char_p("kb"),
 										   DbgEng.DEBUG_EXECUTE_ECHO)
 				self.buff += "\n\n"
+				
 				
 				## 3. Write dump file
 				minidump = None
@@ -744,12 +748,37 @@ try:
 			
 			return None
 		
+		def RedoTest(self):
+			'''
+			Returns True if the current iteration should be repeated
+			'''
+			
+			if self.handlingFault == None:
+				return False
+			
+			if self.thread and self.thread.is_alive():
+				time.sleep(0.15)
+			
+			if not self.handlingFault.is_set():
+				return False
+			
+			print "RedoTest: Waiting for self.handledFault..."
+			
+			t = 60.0 * 3
+			self.handledFault.wait(timeout=t)
+			
+			if not self.handledFault.is_set():
+				print "RedoTest: Timmed out waiting for fault information"
+				print "RedoTest: Attempting to re-run iteration"
+				self._StopDebugger()
+				return True
+			
+			return False
+		
 		def DetectedFault(self):
 			'''
 			Check if a fault was detected.
 			'''
-			
-			print "DetectedFault()"
 			
 			if self.handlingFault == None:
 				print "DetectedFault: Agent was re-set, returning false"
@@ -757,12 +786,9 @@ try:
 			
 			if self.thread and self.thread.is_alive():
 				time.sleep(0.15)
-
+			
 			if not self.handlingFault.is_set():
 				return False
-			
-			print "DetectedFault(): Waiting for handledFault"
-			self.handledFault.wait()
 			
 			print ">>>>>> RETURNING FAULT <<<<<<<<<"
 			

@@ -4,6 +4,7 @@ Peach Changlist
 v2.3.8
 ------
 
+ - New: Timeout and iteration repeat when debugger hangs
  - New: Windows Kernel module for fuzzing in Kernel space
  - New: Nice error message for some Publisher parsing exceptions
  - New: --seed paramter to set random seed

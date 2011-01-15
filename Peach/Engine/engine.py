@@ -704,6 +704,11 @@ class Engine(object):
 					
 					self.agent.OnTestFinished()
 					
+					# Should we repeat this test?
+					if self.agent.RedoTest():
+						print "-- Repeating test --"
+						raise RedoTestException()
+					
 					# Check for faults
 					if self.agent.DetectedFault():
 						# Collect data
