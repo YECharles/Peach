@@ -34,6 +34,7 @@ Base Publisher object implementation.
 # $Id$
 
 from Peach.Engine.common import SoftException
+from Peach.Engine.common import PeachException
 
 class PublisherStartError(Exception):
 	'''
