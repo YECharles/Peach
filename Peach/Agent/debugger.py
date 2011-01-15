@@ -636,20 +636,15 @@ try:
 			
 			print "_StopDebugger()"
 			
-			try:
-				if self.cpu_hq != None:
-					win32pdh.RemoveCounter(self.cpu_counter_handle)
-					win32pdh.CloseQuery(self.cpu_hq)
-					self.cpu_hq = None
-					self.cpu_counter_handle = None
-			except:
-				pass
-			
 			if self.thread != None and self.thread.is_alive():
 				self.quit.set()
 				self.started.clear()
 				
 				self.thread.join(5)
+				
+				if self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+					print "_StopDebugger(): Not killing process due to fault handling - 2"
+					return
 				
 				if self.thread.is_alive():
 					self.thread.terminate()
@@ -677,8 +672,6 @@ try:
 				self._StopDebugger()
 		
 		def PublisherCall(self, method):
-			
-			print "PublisherCall"
 			
 			if not self.StartOnCall:
 				return None
