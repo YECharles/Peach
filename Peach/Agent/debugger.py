@@ -68,6 +68,7 @@ try:
 	class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
 		
 		buff = ''
+		TakeStackTrace = True
 		
 		def LocateWinDbg(self):
 			'''
@@ -209,11 +210,15 @@ try:
 				## 2. Ouput stack trace
 				print "Exception: 2. Output stack trace"
 				
-				dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
-										   c_char_p("kb"),
-										   DbgEng.DEBUG_EXECUTE_ECHO)
-				self.buff += "\n\n"
+				if _DbgEventHandler.TakeStackTrace:
+					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
+											   c_char_p("kb"),
+											   DbgEng.DEBUG_EXECUTE_ECHO)
+					self.buff += "\n\n"
 				
+				else:
+					_DbgEventHandler.TakeStackTrace = True
+					self.buff += "\n[Peach] Error, stack trace failed.\n\n"
 				
 				## 3. Write dump file
 				minidump = None
@@ -771,6 +776,7 @@ try:
 				print "RedoTest: Timmed out waiting for fault information"
 				print "RedoTest: Attempting to re-run iteration"
 				self._StopDebugger()
+				_DbgEventHandler.TakeStackTrace = False
 				return True
 			
 			return False
