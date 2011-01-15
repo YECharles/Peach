@@ -35,7 +35,7 @@ detect faults.  Would be nice to also eventually do other things like
 
 # $Id$
 
-import struct, sys, time
+import struct, sys, time, psutil
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re, pickle
@@ -703,12 +703,9 @@ try:
 					
 					if self.NoCpuKill == False and self.pid != None:
 						# Check and see if the CPU utalization is low
-						if self.cpu_process == None:
-							self.cpu_process = self.getProcessInstance(self.pid)
-						
-						cpu = self.getProcessCpuTimeWindows(self.cpu_process)
+						cpu = psutil.Process(self.pid).get_cpu_percent(interval=1.0)
 						if cpu != None and cpu < 1.0:
-							cpu = self.getProcessCpuTimeWindows(self.cpu_process)
+							cpu = psutil.Process(self.pid).get_cpu_percent(interval=1.0)
 							if cpu != None and cpu < 1.0 and not self.quit.is_set():
 								print "PublisherCall: Stopping debugger, CPU:", cpu
 								self._StopDebugger()
@@ -717,114 +714,7 @@ try:
 				return not self.quit.is_set()
 			
 			return None
-			
-		def getProcessCpuTimeWindows(self, process):
-			'''
-			Get the current CPU processor time as a double based on a process
-			instance (chrome#10).
-			'''
-			
-			print ">> getProcessCpuTimeWindows"
-			
-			try:
-				if process == None:
-					print "getProcessCpuTimeWindows: process is null"
-					return None
-				
-				if self.cpu_path == None:
-					self.cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
-				
-				if self.cpu_hq == None:
-					self.cpu_hq = win32pdh.OpenQuery()
-				
-				if self.cpu_counter_handle == None:
-					self.cpu_counter_handle = win32pdh.AddCounter(self.cpu_hq, self.cpu_path) #convert counter path to counter handle
-					win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-					time.sleep(0.25)
-				
-				win32pdh.CollectQueryData(self.cpu_hq) #collects data for the counter
-				(v,cpu) = win32pdh.GetFormattedCounterValue(self.cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
-				return cpu
-			
-			except:
-				print "getProcessCpuTimeWindows threw exception!"
-				print sys.exc_info()
-			
-			finally:
-				print "<< getProcessCpuTimeWindows"
-			
-			return None
 		
-		def getProcessInstance(self, pid):
-			'''
-			Get the process instance name using pid.
-			'''
-			
-			print ">> getProcessInstance"
-			
-			hq = None
-			counter_handle = None
-			
-			try:
-				
-				win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
-				junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
-			
-				proc_dict = {}
-				for instance in instances:
-					if proc_dict.has_key(instance):
-						proc_dict[instance] = proc_dict[instance] + 1
-					else:
-						proc_dict[instance]=0
-				
-				proc_ids = []
-				for instance, max_instances in proc_dict.items():
-					for inum in xrange(max_instances+1):
-						hq = win32pdh.OpenQuery() # initializes the query handle 
-						try:
-							path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
-							counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
-							try:
-								win32pdh.CollectQueryData(hq) #collects data for the counter 
-								type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
-								proc_ids.append((instance, val))
-								
-								if val == pid:
-									return "%s#%d" % (instance, inum)
-								
-							except win32pdh.error, e:
-								#print e
-								pass
-							
-							win32pdh.RemoveCounter(counter_handle)
-							counter_handle = None
-						
-						except win32pdh.error, e:
-							#print e
-							pass
-						win32pdh.CloseQuery(hq)
-						hq = None
-			except:
-				print "getProcessInstance thew exception"
-				print sys.exc_info()
-			
-			finally:
-				
-				try:
-					if counter_handle != None:
-						win32pdh.RemoveCounter(counter_handle)
-						counter_handle = None
-					if hq != None:
-						win32pdh.CloseQuery(hq)
-						hq = None
-				except:
-					pass
-				
-				print "<< getProcessInstance"
-			
-			# SHouldn't get here...we hope!
-			return None
-	
 		def OnTestFinished(self):
 			if not self.StartOnCall or not self._IsDebuggerAlive():
 				return
