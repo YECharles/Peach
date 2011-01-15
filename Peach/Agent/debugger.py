@@ -62,9 +62,6 @@ try:
 	# ###############################################################################################
 	# ###############################################################################################
 	
-	def handlerSigAlarm(signum, frame):
-		raise Exception()
-	
 	class _DbgEventHandler(PyDbgEng.IDebugOutputCallbacksSink, PyDbgEng.IDebugEventCallbacksSink):
 		
 		buff = ''
@@ -208,9 +205,9 @@ try:
 				self.buff += "\n\n"
 				
 				## 2. Ouput stack trace
-				print "Exception: 2. Output stack trace"
-				
 				if _DbgEventHandler.TakeStackTrace:
+					print "Exception: 2. Output stack trace"
+					
 					dbg.idebug_control.Execute(DbgEng.DEBUG_OUTCTL_THIS_CLIENT,
 											   c_char_p("kb"),
 											   DbgEng.DEBUG_EXECUTE_ECHO)
