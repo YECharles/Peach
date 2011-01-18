@@ -97,7 +97,7 @@ class IgnoreWindow:
 		# Found the text but need to WM_CLOSE
 		elif self.foundText and self.item[2] == None:
 			try:
-				#win32gui.PostMessage(self.IgnoreHwnd, win32con.WM_CLOSE, 0, 0)
+				win32gui.PostMessage(self.IgnoreHwnd, win32con.WM_CLOSE, 0, 0)
 				pass
 			except:
 				pass
