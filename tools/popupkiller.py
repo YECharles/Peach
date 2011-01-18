@@ -130,7 +130,7 @@ class IgnoreWindow:
 				self._savePopup(title)
 				if self.item[1] == None and self.item[2] == None:
 					try:
-						#win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+						win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
 						pass
 					except:
 						pass
