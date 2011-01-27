@@ -206,6 +206,9 @@ Debug Peach XML File
 				from Peach.Engine.common import *
 				from Peach.Analyzers import *
 				
+				if analyzer.find('.') > -1:
+					exec("import %s" % analyzer[:analyzer.find('.')])
+				
 				cls = eval(analyzer)
 				if cls.supportCommandLine:
 					print "[*] Using %s as analyzer" % analyzer

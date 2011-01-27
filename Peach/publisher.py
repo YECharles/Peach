@@ -169,6 +169,18 @@ class Publisher:
 			N+=length
 		print result
 
+	def initialize(self):
+		'''
+		Called at start of test run.  Called once per <test> section.
+		'''
+		pass
+	
+	def finalize(self):
+		'''
+		Called at end of test run.  Called once per <test> section.
+		'''
+		pass
+	
 	def start(self):
 		'''
 		Change state such that send/receave will work.  For Tcp this

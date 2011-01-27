@@ -4,10 +4,13 @@ Peach Changlist
 v2.3.8
 ------
 
+ - New: Publishers now have self.parent set by parser code.
+ - New: DataModel can be defined inside of Action
  - New: Timeout and iteration repeat when debugger hangs
  - New: Windows Kernel module for fuzzing in Kernel space
  - New: Nice error message for some Publisher parsing exceptions
  - New: --seed paramter to set random seed
+ - Changed: No longer warn when Unix debugger does not load
  - Changed: Now using psutil module to get cpu time
  - Changed: Added <Agent/> back to template.xml
  - Changed: Removed warning about vtrace/windbg not loading

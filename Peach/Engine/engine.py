@@ -572,6 +572,10 @@ class Engine(object):
 		if not countOnly:
 			self.watcher.OnTestStarting(run, test, totalTests)
 		
+		# Initialize publishers
+		for p in pub:
+			p.initialize()
+		
 		errorCount = 0
 		maxErrorCount = 10
 		
@@ -795,6 +799,7 @@ class Engine(object):
 						pub.stop()
 						pub.hasBeenStarted = False
 				
+					pub.finalize()
 			except:
 				pass
 				

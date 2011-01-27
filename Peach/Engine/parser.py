@@ -2749,6 +2749,7 @@ class ParseTemplate:
 			raise e
 			
 		pub.domPublisher = publisher
+		pub.parent = parent
 		return pub
 	
 
@@ -2947,8 +2948,8 @@ class ParseTemplate:
 				if action.type not in ['input', 'output', 'getprop']:
 					raise PeachException("Parser: DataModel is an invalid child of Action for this Action type")
 				
-				if not child.hasAttributeNS(None, 'ref'):
-					raise PeachException("Parser: When DataModel is a child of Action it must have the ref attribute.")
+				#if not child.hasAttributeNS(None, 'ref'):
+				#	raise PeachException("Parser: When DataModel is a child of Action it must have the ref attribute.")
 				
 				if action.template != None:
 					raise PeachException("Error, action [%s] already has a DataModel specified." % action.name)
@@ -3023,8 +3024,8 @@ class ParseTemplate:
 			
 			if child.nodeName == 'Template' or child.nodeName == 'DataModel':
 				
-				if not child.hasAttributeNS(None, 'ref'):
-					raise PeachException("Parser: When Template is a child of ActionParam it must have the ref attribute.")
+				#if not child.hasAttributeNS(None, 'ref'):
+				#	raise PeachException("Parser: When Template is a child of ActionParam it must have the ref attribute.")
 				
 				obj = self.HandleTemplate(child, param)
 				param.template = obj
