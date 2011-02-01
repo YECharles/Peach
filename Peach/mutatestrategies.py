@@ -47,11 +47,12 @@ class MutationStrategy(object):
 	
 	DefaultStrategy = None
 	
-	def __init__(self, args):
+	def __init__(self, node, parent):
 		'''
 		@type	args: Dictionary
 		@param	args: Arguments
 		'''
+		self.parent = parent  # This will be a Test object
 		pass
 	
 	def isFinite(self):

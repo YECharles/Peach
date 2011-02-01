@@ -590,7 +590,7 @@ class Engine(object):
 				except:
 					raise PeachException("Unable to load mutator [%s], please verify it was imported correctly." % m.name)
 		
-		mutator = test.mutator = MutationStrategy.DefaultStrategy(None)
+		mutator = test.mutator
 		value = "StateMachine"
 		
 		if self.restartState != None:

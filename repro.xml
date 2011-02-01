@@ -32,6 +32,9 @@
 		
 		<!-- TODO: Complete publisher -->
 		<Publisher />
+		
+		<!-- Use the Repro Strategy -->
+		<Strategy class="sequencial.ReproStrategy"/>
 	</Test>
 	
 	<!-- Configure a single run -->

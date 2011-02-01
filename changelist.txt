@@ -10,15 +10,17 @@ v2.3.8
  - New: Windows Kernel module for fuzzing in Kernel space
  - New: Nice error message for some Publisher parsing exceptions
  - New: --seed paramter to set random seed
- - Changed: No longer warn when Unix debugger does not load
- - Changed: Now using psutil module to get cpu time
- - Changed: Added <Agent/> back to template.xml
- - Changed: Removed warning about vtrace/windbg not loading
- - Changed: Random SEED now logged
- - Changed: You can now --skipto in Random Strategy
- - Changed: Added Udp6Listener publisher
- - Changed: First iteration must work, else we stop
- - Changed: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - New: <Strategy> element added to <Test>
+ - CHange: --strategy command line argument depricated
+ - Change: No longer warn when Unix debugger does not load
+ - Change: Now using psutil module to get cpu time
+ - Change: Added <Agent/> back to template.xml
+ - Change: Removed warning about vtrace/windbg not loading
+ - Change: Random SEED now logged
+ - Change: You can now --skipto in Random Strategy
+ - Change: Added Udp6Listener publisher
+ - Change: First iteration must work, else we stop
+ - Change: Updated peach.xsd to include raw.* publishers and udp.UdpListener
  - Bug: Not loading custom analyzer modules when asCommandLine enabled.
  - Bug: valueType of literal was not always evaulated
  - Bug: Fixed several bugs in Peach Shark.

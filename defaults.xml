@@ -37,6 +37,7 @@
 	<Import from="Peach.Fixups" import="*" />
 	<Import from="Peach.Publishers" import="*" />
 	<Import from="Peach.publisher" import="*" />
+	<Import from="Peach.MutateStrategies" import="*" />
 	
 	<!--
 	Default set of mutators to use.  These can be

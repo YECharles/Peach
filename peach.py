@@ -262,27 +262,40 @@ Debug Peach XML File
 			
 			# Set the fuzzing strategy to use
 			
-			try:	
-				strategy = optlist[i][1]
-				if strategy == None or len(strategy) == 0:
-					strategy = args[0]
-				
-				from Peach.Engine.common import *
-				from Peach.mutatestrategies import *
-				from Peach.MutateStrategies import *
-				
-				try:
-					exec("MutationStrategy.DefaultStrategy = %s" % strategy)
-					
-				except:
-					parts = strategy.split(".")
-					exec("import %s" % parts[0])
-					exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+			print ""
+			print "Error, The --strategy paramter has been depricated.  Please specify the "
+			print "strategy in the <Test> element via the <Strategy> child element."
+			print ""
+			print "Example:"
+			print "  <Test name=\"TheTest\">"
+			print "     <Strategy class=\"rand.RandomMutationStrategy\" />"
+			print ""
+			print "     <!-- ... -->"
+			print "  </Test>"
+			print ""
+			sys.exit(0)
 			
-			except:
-				print ""
-				print "Error using mutation strategy '%s'.\n" % strategy
-				sys.exit(0)
+			#try:	
+			#	strategy = optlist[i][1]
+			#	if strategy == None or len(strategy) == 0:
+			#		strategy = args[0]
+			#	
+			#	from Peach.Engine.common import *
+			#	from Peach.mutatestrategies import *
+			#	from Peach.MutateStrategies import *
+			#	
+			#	try:
+			#		exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+			#		
+			#	except:
+			#		parts = strategy.split(".")
+			#		exec("import %s" % parts[0])
+			#		exec("MutationStrategy.DefaultStrategy = %s" % strategy)
+			#
+			#except:
+			#	print ""
+			#	print "Error using mutation strategy '%s'.\n" % strategy
+			#	sys.exit(0)
 		
 		elif optlist[i][0] == '--seed':
 				SEED = optlist[i][1]

@@ -48,8 +48,8 @@ class SequencialMutationStrategy(MutationStrategy):
 	Note: First test case will not be modified
 	'''
 	
-	def __init__(self, args):
-		MutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		MutationStrategy.__init__(self, node, parent)
 		
 		#: Is this a finite strategy?
 		self.isFinite = True
@@ -231,8 +231,8 @@ class RandomDeterministicMutationStrategy(MutationStrategy):
 	Note: First test case will not be modified
 	'''
 	
-	def __init__(self, args):
-		MutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		MutationStrategy.__init__(self, node, parent)
 		
 		self._random = random.Random()
 		self._random.seed("fnord")
@@ -385,8 +385,8 @@ class ReproStrategy(MutationStrategy):
 	to try.
 	'''
 	
-	def __init__(self, args):
-		MutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		MutationStrategy.__init__(self, node, parent)
 		
 		#: Number of iterations befor we switch files
 		self.switchCount = 100

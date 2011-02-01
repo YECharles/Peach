@@ -50,13 +50,19 @@ class RandomMutationStrategy(MutationStrategy):
 	Note: First test case will not be modified
 	'''
 	
-	def __init__(self, args):
-		MutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		MutationStrategy.__init__(self, node, parent)
 		
-		RandomMutationStrategy.SEED = Engine.context.SEED
+		if node != None and node.hasAttributeNS(None, "seed"):
+			Engine.context.SEED = RandomMutationStrategy.SEED = node.getAttributeNS(None, "seed")
+		else:
+			RandomMutationStrategy.SEED = Engine.context.SEED
 		
 		#: Number of iterations befor we switch files
 		self.switchCount = 100
+		
+		if node != None and node.hasAttributeNS(None, "switchCount"):
+			self.switchCount = int(node.getAttributeNS(None, "switchCount"))
 		
 		#: Number of iterations
 		self.iterationCount = 0
@@ -69,6 +75,9 @@ class RandomMutationStrategy(MutationStrategy):
 		
 		#: Number of fields to change
 		self._n = 7
+		
+		if node != None and node.hasAttributeNS(None, "maxFieldToMutate"):
+			self._n = int(node.getAttributeNS(None, "maxFieldToMutate"))
 		
 		#: Data models (fullname as key, value is node count)
 		self._dataModels = {}
@@ -468,8 +477,8 @@ class SingleRandomMutationStrategy(RandomMutationStrategy):
 	Note: First test case will not be modified
 	'''
 	
-	def __init__(self, args):
-		RandomMutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		RandomMutationStrategy.__init__(self, node, parent)
 		
 		#: Number of fields to change
 		self._n = 1
@@ -484,8 +493,8 @@ class DoubleRandomMutationStrategy(RandomMutationStrategy):
 	Note: First test case will not be modified
 	'''
 	
-	def __init__(self, args):
-		RandomMutationStrategy.__init__(self, args)
+	def __init__(self, node, parent):
+		RandomMutationStrategy.__init__(self, node, parent)
 		
 		#: Number of fields to change
 		self._n = 2

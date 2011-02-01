@@ -2450,10 +2450,16 @@ class ParseTemplate:
 				
 			elif child.nodeName == 'Include' or child.nodeName == 'Exclude':				
 				self._HandleIncludeExclude(child, test)
-					
+			
+			elif child.nodeName == 'Strategy':
+				test.mutator = self.HandleFuzzingStrategy(child, test)
+				
 			else:
 				raise PeachException("Found unexpected child of Test element")
 		
+		if test.mutator == None:
+			test.mutator = MutationStrategy.DefaultStrategy(None, test)
+			
 		if test.mutators == None:
 			# Add the default mutators instead of erroring out
 			test.mutators = self._locateDefaultMutators()
@@ -2473,6 +2479,34 @@ class ParseTemplate:
 		
 		return test
 	
+	def HandleFuzzingStrategy(self, node, parent):
+		'''
+		Handle parsing <Strategy> element that is a child of
+		<Test>
+		'''
+		
+		# name
+		
+		name = None
+		if node.hasAttributeNS(None, 'name'):
+			name = self._getAttribute(node, 'name')
+		
+		# class
+		
+		cls = None
+		if node.hasAttributeNS(None, 'class'):
+			cls = self._getAttribute(node, 'class')
+		
+		strategy = None
+		try:
+			exec("strategy = PeachXml_%s(node, parent)" % cls)
+			
+		except:
+			raise
+			#raise PeachException("Error, unable to load strategy '%s'." % cls)
+		
+		return strategy
+
 	def HandlePath(self, node, parent):
 		if not node.hasAttributeNS(None, 'ref'):
 			raise PeachException("Parser: Test::StateModel::Path missing ref attribute")
@@ -2564,7 +2598,7 @@ class ParseTemplate:
 		# children
 		for child in node.childNodes:
 			if not child.nodeName == 'Param':
-				raise PeachException(PeachStr("Unexpected Transformer child node: %s" % child.nodeName))
+				raise PeachException(PeachStr("Unexpected Strategy child node: %s" % child.nodeName))
 			
 			param = self.HandleParam(child, parent)
 			strategy.params[param.name] = eval(param.defaultValue)
