@@ -2210,7 +2210,7 @@ class ParseTemplate:
 		if node.hasAttributeNS(None, 'switchCount'):
 			data.switchCount = int(self._getAttribute(node, 'switchCount'))
 		else:
-			data.switchCount = 200
+			data.switchCount = None
 		
 		# expression
 		

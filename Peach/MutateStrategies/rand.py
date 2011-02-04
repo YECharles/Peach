@@ -59,7 +59,7 @@ class RandomMutationStrategy(MutationStrategy):
 			RandomMutationStrategy.SEED = Engine.context.SEED
 		
 		#: Number of iterations befor we switch files
-		self.switchCount = 100
+		self.switchCount = 200
 		
 		if node != None and node.hasAttributeNS(None, "switchCount"):
 			self.switchCount = int(node.getAttributeNS(None, "switchCount"))
@@ -299,7 +299,7 @@ class RandomMutationStrategy(MutationStrategy):
 		@param	dataModel: Data model we are using
 		'''
 		
-		if action.data != None and action.data.multipleFiles:
+		if action.data != None and action.data.multipleFiles and action.data.switchCount != None:
 			self.switchCount = action.data.switchCount
 		
 		if action.data != None and action.data.multipleFiles and \
