@@ -63,7 +63,7 @@ class CleanupFolder(Monitor):
 		
 		listing = os.listdir(self._folder)
 		for item in listing:
-			if item not in self.folderListing:
+			if item not in self._folderListing:
 				realName = os.path.join(self._folder, item)
 				print "CleanupFolder: Removing '%s'" % realName
 				
