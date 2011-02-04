@@ -56,7 +56,7 @@ class CleanupFolder(Monitor):
 		self._folder = args['Folder'].replace("'''","")
 		self._folderListing = os.listdir(self._folder)
 	
-	def OnTestFinished(self):
+	def OnTestStarting(self):
 		'''
 		Called right after a test case or varation
 		'''
