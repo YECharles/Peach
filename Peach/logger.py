@@ -145,7 +145,7 @@ class Filesystem(Logger):
 		self.file.write("=================\n\n")
 		self.file.write("Command line: ")
 		for arg in sys.argv:
-			self.file.write("%s ")
+			self.file.write("%s " % arg)
 		self.file.write("\n")
 		
 		self.file.write("Date of run: " + asctime() + "\n")
