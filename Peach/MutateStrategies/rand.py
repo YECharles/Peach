@@ -76,8 +76,8 @@ class RandomMutationStrategy(MutationStrategy):
 		#: Number of fields to change
 		self._n = 7
 		
-		if node != None and node.hasAttributeNS(None, "maxFieldToMutate"):
-			self._n = int(node.getAttributeNS(None, "maxFieldToMutate"))
+		if node != None and node.hasAttributeNS(None, "maxFieldsToMutate"):
+			self._n = int(node.getAttributeNS(None, "maxFieldsToMutate"))
 		
 		#: Data models (fullname as key, value is node count)
 		self._dataModels = {}
