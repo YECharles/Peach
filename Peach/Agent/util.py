@@ -1,11 +1,13 @@
 
 '''
+General Utility Monitors
+
 @author: Michael Eddington
 @version: $Id$
 '''
 
 #
-# Copyright (c) 2007 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,10 +33,49 @@
 
 # $Id$
 
-import network, debugger, vm, process, test, memory, power, gui, socketmon, osx, util
+import sys, os, shutil
+from Peach.agent import Monitor
 
-__all__ = [ "network", "debugger", "vm", "process", "test",
-		   "memory", "power", "socketmon", "gui", "osx", "util" ]
-
+class CleanupFolder(Monitor):
+	'''
+	This monitor will remove any files created in a folder during
+	a fuzzing iteration.  Greate for removing stale temp files, etc.
+	'''
+	
+	def __init__(self, args):
+		'''
+		Constructor.  Arguments are supplied via the Peach XML
+		file.
+		
+		@type	args: Dictionary
+		@param	args: Dictionary of parameters
+		'''
+		
+		# Our name for this monitor
+		self._name = None
+		self._folder = args['Folder'].replace("'''","")
+		self._folderListing = os.listdir(self._folder)
+	
+	def OnTestFinished(self):
+		'''
+		Called right after a test case or varation
+		'''
+		
+		listing = os.listdir(self._folder)
+		for item in listing:
+			if item not in self.folderListing:
+				realName = os.path.join(self._folder, item)
+				print "CleanupFolder: Removing '%s'" % realName
+				
+				try:
+					os.unlink(realName)
+				except:
+					pass
+				
+				try:
+					shutil.rmtree(realName)
+				except:
+					pass
+	
 
 # end
