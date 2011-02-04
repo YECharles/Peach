@@ -2593,6 +2593,7 @@ class Test(ElementWithChildren):
 		self.stateMachine = None
 		self.ref = None
 		self.mutators = None
+		self.mutator = None
 
 		# To mark Mutatable elements
 		self.mutatables = []

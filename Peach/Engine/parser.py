@@ -56,6 +56,7 @@ import Peach.Engine
 from Peach.Mutators import *
 from Peach.Engine.common import *
 from Peach.Engine.incoming import DataCracker
+from Peach.mutatestrategies import *
 
 def PeachStr(s):
 	'''

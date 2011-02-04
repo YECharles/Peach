@@ -142,11 +142,17 @@ class Filesystem(Logger):
 		
 		self.file.write("Peach Fuzzer Run\n")
 		self.file.write("=================\n\n")
+		self.file.write("Command line: ")
+		for arg in sys.args:
+			self.file.write("%s ")
+		self.file.write("\n")
+		
 		self.file.write("Date of run: " + asctime() + "\n")
 		
 		if Engine.context.SEED != None:
 			self.file.write("SEED: %s\n" % Engine.context.SEED)
 		
+		self.file.write("Pit File: %s\n" % pitFile)
 		self.file.write("Run name: " + run.name + "\n\n")
 		
 	
