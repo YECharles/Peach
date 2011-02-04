@@ -35,6 +35,7 @@ extend from Logger.
 
 # $Id$
 
+import sys, os
 from Engine.engine import EngineWatcher
 from Engine.engine import Engine
 
@@ -143,7 +144,7 @@ class Filesystem(Logger):
 		self.file.write("Peach Fuzzer Run\n")
 		self.file.write("=================\n\n")
 		self.file.write("Command line: ")
-		for arg in sys.args:
+		for arg in sys.argv:
 			self.file.write("%s ")
 		self.file.write("\n")
 		
