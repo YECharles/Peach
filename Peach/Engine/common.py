@@ -175,11 +175,13 @@ def evalEvent(code, environment, node = None):
 
 	globalScope = {
 		'Print' : peachPrint,
+		'peachPrint' : peachPrint,
 		'ChangeDefaultEndian' : changeDefaultEndian,
 		'DomPrint' : domPrint,
 	}
 	localScope = {
 		'Print' : peachPrint,
+		'peachPrint' : peachPrint,
 		'ChangeDefaultEndian' : changeDefaultEndian,
 		'DomPrint' : domPrint,
 	}
@@ -203,6 +205,7 @@ def evalEvent(code, environment, node = None):
 		ret = eval(code, globalScope, localScope)
 	except:
 		print "Code: [%s]" % code
+		print "Exception: ", sys.exc_info()
 		print "Environment:"
 		for k in environment.keys():
 			print "  [%s] = [%s]" % (k, repr(environment[k]))
