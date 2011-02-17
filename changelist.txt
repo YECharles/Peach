@@ -1,5 +1,5 @@
-Peach Changlist
-===============
+Peach Changelist
+================
 
 v2.3.8
 ------
