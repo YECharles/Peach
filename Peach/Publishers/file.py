@@ -35,6 +35,7 @@ Some default file publishers.  Output generated data to a file, etc.
 
 import os, sys, time
 from Peach.Engine.engine import Engine
+from Peach.Engine.dom import Data, State, Action
 from Peach.publisher import Publisher
 import base64
 
@@ -392,8 +393,51 @@ class FilePerIteration(FileWriter):
 		self._origFilename = filename
 		self.setFilename(filename % self._roundCount)
 		self._closed = True
+		self.data = None
+		self.dataLookedFor = False
 	
+	def _getStateByName(self, stateMachine, stateName):
+		'''
+		Locate a State object by name in the StateMachine.
+		'''
+		
+		for child in stateMachine:
+			if child.elementType == 'state' and child.name == stateName:
+				return child
+		
+		return None
+	
+	def _getDataWithFileName(self):
+		'''
+		Will search state model for a <Data> and get the
+		filename from it.
+		'''
+		stateMachine = self.parent.stateMachine
+		for state in stateMachine:
+			if isinstance(state, State):
+				for action in state:
+					if isinstance(action, Action):
+						if action.data != None and action.data.fileName != None:
+							return action.data
+		
+		return None
+		
 	def connect(self):
+		if self.data == None and self.dataLookedFor == False:
+			self.data = self._getDataWithFileName()
+			self.dataLookedFor = True
+		
+		if self.data != None:
+			fileBase = self.data.fileName
+			if fileBase.find('\\'):
+				fileBase = fileBase.split('\\')[-1]
+			if fileBase.find('/'):
+				fileBase = fileBase.split('/')[-1]
+			fileBase = fileBase.split('.')[0]
+			self.setFilename( (self._origFilename % self._roundCount).replace("##FILEBASE##", fileBase) )
+		else:
+			self.setFilename(self._origFilename % self._roundCount)
+		
 		FileWriter.connect(self)
 		self._closed = False
 	
@@ -404,11 +448,24 @@ class FilePerIteration(FileWriter):
 		FileWriter.close(self)
 		if not self._closed:
 			self._roundCount += 1
-			self.setFilename(self._origFilename % self._roundCount)
+			
+			if self.data != None:
+				fileBase = self.data.fileName
+				if fileBase.find('\\'):
+					fileBase = fileBase.split('\\')[-1]
+				if fileBase.find('/'):
+					fileBase = fileBase.split('/')[-1]
+				fileBase = fileBase.split('.')[0]
+				self.setFilename( (self._origFilename % self._roundCount).replace("##FILEBASE##", fileBase) )
+			else:
+				self.setFilename(self._origFilename % self._roundCount)
+			
 			self._closed = True
 	
 	def send(self, data):
 		FileWriter.send(self, data)
+
+
 
 class FileWriterLauncher(Publisher):
 	'''
