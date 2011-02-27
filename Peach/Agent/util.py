@@ -120,22 +120,28 @@ class CleanupRegistry(Monitor):
 		self._key = self._key[self._key.find("\\")+1:]
 	
 	def OnTestStarting(self):
+		self.deleteKey(self._root, self._key)
+	
+	def deleteKey(self, hKey, subKey):
+		'''
+		Recursively remove registry keys
+		'''
 		
-		hKey = win32api.RegOpenKeyEx(self._root, self._key, 0, win32con.KEY_ALL_ACCESS)
+		hKey = win32api.RegOpenKeyEx(hKey, subKey, 0, win32con.KEY_ALL_ACCESS)
 		
 		try:
 			i = 0
 			while True:
-				s = win32api.RegEnumKey(hKey, i)
-				#i += 1
+				s = win32api.RegEnumKey(hKey, 0)
+				self.deleteKey(hKey, s)
 				
 				print "CleanupRegistry: Removing sub-key '%s'" % s
 				win32api.RegDeleteKey(hKey, s)
-			
+		
 		except win32api.error:
 			pass
-		
-		win32api.RegCloseKey(hKey)
+		finally:
+			win32api.RegCloseKey(hKey)
 
 	
 
