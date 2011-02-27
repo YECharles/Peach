@@ -127,21 +127,25 @@ class CleanupRegistry(Monitor):
 		Recursively remove registry keys
 		'''
 		
-		hKey = win32api.RegOpenKeyEx(hKey, subKey, 0, win32con.KEY_ALL_ACCESS)
-		
 		try:
-			i = 0
-			while True:
-				s = win32api.RegEnumKey(hKey, 0)
-				self.deleteKey(hKey, s)
-				
-				print "CleanupRegistry: Removing sub-key '%s'" % s
-				win32api.RegDeleteKey(hKey, s)
-		
-		except win32api.error:
+			hKey = win32api.RegOpenKeyEx(hKey, subKey, 0, win32con.KEY_ALL_ACCESS)
+			
+			try:
+				i = 0
+				while True:
+					s = win32api.RegEnumKey(hKey, 0)
+					self.deleteKey(hKey, s)
+					
+					print "CleanupRegistry: Removing sub-key '%s'" % s
+					win32api.RegDeleteKey(hKey, s)
+			
+			except win32api.error:
+				pass
+			finally:
+				win32api.RegCloseKey(hKey)
+		except:
+			print "Warning: Unable to open registry key!"
 			pass
-		finally:
-			win32api.RegCloseKey(hKey)
 
 	
 
