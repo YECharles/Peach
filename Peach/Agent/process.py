@@ -36,8 +36,6 @@ issued to the fuzzer.
 # $Id$
 
 import sys, time
-sys.path.append("..")
-sys.path.append("../..")
 import os
 
 try:
@@ -81,6 +79,8 @@ class PageHeap(Monitor):
 		import win32api, win32con
 		try:
 			hkey = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, "Software\\Microsoft\\DebuggingTools")
+			val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
+			return val
 		except:
 			
 			# Lets try a few common places before failing.
@@ -108,11 +108,9 @@ class PageHeap(Monitor):
 					
 					if os.path.exists(testPath):
 						return testPath
-			
-			return None
 		
-		val, type = win32api.RegQueryValueEx(hkey, "WinDbg")
-		return val
+		print "!!! Unable to locate gflags.exe !!!"
+			
 		
 	def OnShutdown(self):
 		os.spawnv(os.P_WAIT, self._path, self._offParams )

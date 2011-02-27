@@ -68,11 +68,7 @@ try:
 	elif sys.platform != 'win32':
 		import pcap
 	
-	else:
-		print "Warning: pypcap not found, disabling network monitor."
-
 except:
-	#print "Warning: pypcap not found, disabling network monitor."
 	pass
 
 

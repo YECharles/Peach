@@ -76,6 +76,66 @@ class CleanupFolder(Monitor):
 					shutil.rmtree(realName)
 				except:
 					pass
+
+try:
+	import win32api, win32con
+
+except:
+	pass
+
+class CleanupRegistry(Monitor):
+	'''
+	This monitor will remove any sub-keys for a specified registry key
+	before each run.  This is usefull for removing document recovery keys
+	for fuzzing Office.
+	'''
+	
+	def __init__(self, args):
+		'''
+		Constructor.  Arguments are supplied via the Peach XML
+		file.
+		
+		@type	args: Dictionary
+		@param	args: Dictionary of parameters
+		'''
+		
+		# Our name for this monitor
+		self._name = None
+		self._key = args['Key'].replace("'''","")
+		
+		if self._key.startswith("HKCU\\"):
+			self._root = win32con.HKEY_CURRENT_USER
+		elif self._key.startswith("HKCC\\"):
+			self._root = win32con.HKEY_CURRENT_CONFIG
+		elif self._key.startswith("HKLM\\"):
+			self._root = win32con.HKEY_LOCAL_MACHINE
+		elif self._key.startswith("HKPD\\"):
+			self._root = win32con.HKEY_PERFORMANCE_DATA
+		elif self._key.startswith("HKU\\"):
+			self._root = win32con.HKEY_USERS
+		else:
+			print "CleanupRegistry: Error, key must be prefixed with: HKCU, HKCC, HKLM, HKPD, or HKU."
+			raise Exception("CleanupRegistry: Error, key must be prefixed with: HKCU, HKCC, HKLM, HKPD, or HKU.")
+		
+		self._key = self._key[self._key.find("\\")+1:]
+	
+	def OnTestStarting(self):
+		
+		hKey = win32api.RegOpenKeyEx(self._root, self_key, 0, win32con.KEY_ALL_ACCESS)
+		
+		try:
+			i = 0
+			while True:
+				s, obj, objtype = win32api.RegEnumKey(hKey, i)
+				i += 1
+				
+				win32api.RegDeleteKey(hKey, s)
+			
+		except win32api.error:
+			pass
+		
+		win32api.RegCloseKey(hKey)
+
 	
 
 # end
