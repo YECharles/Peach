@@ -121,7 +121,7 @@ class CleanupRegistry(Monitor):
 	
 	def OnTestStarting(self):
 		
-		hKey = win32api.RegOpenKeyEx(self._root, self_key, 0, win32con.KEY_ALL_ACCESS)
+		hKey = win32api.RegOpenKeyEx(self._root, self._key, 0, win32con.KEY_ALL_ACCESS)
 		
 		try:
 			i = 0
