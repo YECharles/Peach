@@ -129,6 +129,7 @@ class CleanupRegistry(Monitor):
 				s, obj, objtype = win32api.RegEnumKey(hKey, i)
 				i += 1
 				
+				print "CleanupRegistry: Removing sub-key '%s'" % s
 				win32api.RegDeleteKey(hKey, s)
 			
 		except win32api.error:
