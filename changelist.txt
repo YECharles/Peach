@@ -15,7 +15,8 @@ v2.3.8
  - New: <Strategy> element added to <Test>
  - New: file system logger now logs command line
  - New: file system logger now logs pit file name
- - CHange: --strategy command line argument depricated
+ - Change: Aliased internal analyzers to XmlAnalyzer, Asn1Analyzer, BinaryAnalyzer, PitXmlAnalyzer, WireSharkAnalyzer, StringTokenAnalyzer
+ - Change: --strategy command line argument depricated
  - Change: No longer warn when Unix debugger does not load
  - Change: Now using psutil module to get cpu time
  - Change: Added <Agent/> back to template.xml

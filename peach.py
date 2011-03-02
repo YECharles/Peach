@@ -198,6 +198,8 @@ Debug Peach XML File
 			
 			# set the analyzer to use
 			from Peach.Engine.common import PeachException
+			from Peach.Analyzers import *
+			
 			try:	
 				analyzer = optlist[i][1]
 				if analyzer == None or len(analyzer) == 0:
@@ -206,10 +208,18 @@ Debug Peach XML File
 				from Peach.Engine.common import *
 				from Peach.Analyzers import *
 				
-				if analyzer.find('.') > -1:
-					exec("from Peach.Analyzers.%s import %s" % (analyzer[:analyzer.find('.')],analyzer[analyzer.find('.')+1:]))
-
-				cls = eval(analyzer)
+				try:
+					cls = eval(analyzer)
+					
+				except:
+					try:
+						parts = analyzer.split(".")
+						exec("import %s" % parts[0])
+						
+						cls = eval(analyzer)
+					except:
+						raise PeachException("Error, unable to load Analyzer: %s" % (repr(sys.exc_info())))
+				
 				if cls.supportCommandLine:
 					print "[*] Using %s as analyzer" % analyzer
 					

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008 Michael Eddington
+# Copyright (c) Michael Eddington
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,24 @@ import xml
 import binary
 import asn1
 
-__all__ = ["xml", "shark", "stringtoken", "pit", "binary", "asn1"]
+from xml import XmlAnalyzer
+
+# Alias default analyzers
+XmlAnalyzer = xml.XmlAnalyzer
+Asn1Analyzer = asn1.Asn1Analyzer
+BinaryAnalyzer = binary.Binary
+PitXmlAnalyzer = pit.PitXmlAnalyzer
+WireSharkAnalyzer = shark.WireSharkAnalyzer
+StringTokenAnalyzer = stringtoken.StringTokenAnalyzer
+
+__all__ = ["xml", "shark", "stringtoken", "pit", "binary", "asn1",
+			"XmlAnalyzer",
+			"Asn1Analyzer",
+			"BinaryAnalyzer",
+			"PitXmlAnalyzer",
+			"WireSharkAnalyzer",
+			"StringTokenAnalyzer"
+			]
+
 
 # end
