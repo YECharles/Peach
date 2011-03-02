@@ -110,6 +110,8 @@ Syntax:
 							 for restarting a Peach run.
   --range N,M                Provide a range of test #'s to be run.
   --seed N                   Seed to use for Random strategies
+  --analyzer=CLASS           Use analyzer via command line
+  --parser=CLASS             Use a custom parser analyzer (replaces default XML parser)
 
 Peach Agent
 
@@ -235,10 +237,13 @@ Debug Peach XML File
 				elif cls.supportParser:
 					print "[*] Using %s as parser" % analyzer
 					Analyzer.DefaultParser = cls
+				
+				else:
+					print "Error, analyzer does not support command line usage.\n"
 			
 			except PeachException, pe:
 				print ""
-				print pe.msg, "\n"
+				print "Error loading analyzer:", pe.msg, "\n"
 				
 			sys.exit(0)
 		
@@ -251,10 +256,22 @@ Debug Peach XML File
 				if analyzer == None or len(analyzer) == 0:
 					analyzer = args[0]
 				
+				from Peach.Engine.common import PeachException
 				from Peach.Engine.common import *
 				from Peach.Analyzers import *
 				
-				cls = eval(analyzer)
+				try:
+					cls = eval(analyzer)
+					
+				except:
+					try:
+						parts = analyzer.split(".")
+						exec("import %s" % parts[0])
+						
+						cls = eval(analyzer)
+					except:
+						raise PeachException("Error, unable to load Analyzer: %s" % (repr(sys.exc_info())))
+				
 				if cls.supportParser:
 					print "[*] Using %s as parser" % analyzer
 					Analyzer.DefaultParser = cls

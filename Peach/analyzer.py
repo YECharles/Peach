@@ -82,7 +82,7 @@ class Analyzer(object):
 		
 		Should produce a Peach DOM.
 		'''
-		raise Exception("asParser not supported")
+		raise Exception("Error, this analyzer cannot be used the parser.")
 
 	def asDataElement(self, parent, args, dataBuffer):
 		'''
@@ -90,14 +90,14 @@ class Analyzer(object):
 		
 		Should return a DataElement such as Block, Number or String.
 		'''
-		raise Exception("asDataElement not supported")
+		raise PeachException("Error, this analyzer does not support being attached to a data element via the analyzer attribute.")
 	
 	def asCommandLine(self, args):
 		'''
 		Called when Analyzer is used from command line.  Analyzer
 		should produce Peach PIT XML as output.
 		'''
-		raise Exception("asCommandLine not supported")
+		raise PeachException("Error, this analyzer does not support running from the command line.")
 	
 	def asTopLevel(self, peach, args):
 		'''
@@ -109,7 +109,7 @@ class Analyzer(object):
 		@type	args	Dictionary
 		@param	args	Arguments from <Param>'s
 		'''
-		raise Exception("asTopLevel not supported")
+		raise Exception("Error, this analyzer does not support being used as a top level element.")
 	
 
 # end
