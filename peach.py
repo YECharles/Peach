@@ -197,7 +197,7 @@ Debug Peach XML File
 		if optlist[i][0] == '--analyzer':
 			
 			# set the analyzer to use
-			
+			from Peach.Engine.common import PeachException
 			try:	
 				analyzer = optlist[i][1]
 				if analyzer == None or len(analyzer) == 0:
@@ -207,8 +207,8 @@ Debug Peach XML File
 				from Peach.Analyzers import *
 				
 				if analyzer.find('.') > -1:
-					exec("import %s" % analyzer[:analyzer.find('.')])
-				
+					exec("from Peach.Analyzers.%s import %s" % (analyzer[:analyzer.find('.')],analyzer[analyzer.find('.')+1:]))
+
 				cls = eval(analyzer)
 				if cls.supportCommandLine:
 					print "[*] Using %s as analyzer" % analyzer

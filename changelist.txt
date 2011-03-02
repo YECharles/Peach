@@ -25,6 +25,7 @@ v2.3.8
  - Change: Added Udp6Listener publisher
  - Change: First iteration must work, else we stop
  - Change: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - Bug: Bug loading analyzers
  - Bug: Not loading custom analyzer modules when asCommandLine enabled.
  - Bug: valueType of literal was not always evaulated
  - Bug: Fixed several bugs in Peach Shark.
