@@ -77,7 +77,7 @@ if __name__ == '__main__':
 			from Peach.Engine import engine
 			engine.Engine.context.watcher.watchers[-1].OnCrashOrBreak()
 		except:
-			print sys.exc_info()
+			pass
 	atexit.register(atexit_handler)
 	
 	try:
