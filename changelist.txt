@@ -4,6 +4,9 @@ Peach Changelist
 v2.3.8
 ------
 
+ - New: Peach filesystem logger now always writes out first test case #
+ - New: Peach filesystem logger logs test case skipping
+ - New: Peach filesystem logger logs atexit, last test case #
  - New: CleanupRegistry monitor added
  - New: FilePerIteration publisher supports "##FILEBASE##" in filename
  - New: Publishers now have self.parent set by parser code.

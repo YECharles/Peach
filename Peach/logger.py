@@ -44,6 +44,12 @@ class Logger(EngineWatcher):
 	Parent class for all logger implementations.
 	'''
 	
+	def OnCrashOrBreak(self):
+		'''
+		Called when we are exiting due to crash or Ctrl+BREAK/Ctrl+C.
+		'''
+		pass
+	
 	def OnRunStarting(self, run):
 		'''
 		Called when a run is starting.
@@ -112,11 +118,21 @@ class Filesystem(Logger):
 		self.params = params
 		self.heartBeat = 512
 		self.file = None
+		self.lastTestCount = 0
+		self.firstIter = True
 	
 	def _writeMsg(self, line):
 		self.file.write(asctime() + ": " + line + "\n")
 		self.file.flush()
 		
+	def OnCrashOrBreak(self):
+		'''
+		Called when we are exiting due to crash or Ctrl+BREAK/Ctrl+C.
+		'''
+		if self.file != None:
+			self._writeMsg("FORCED EXIT OR CRASH!")
+			self._writeMsg("Last test #: %d" % self.lastTestCount)
+	
 	def OnRunStarting(self, run):
 		suppliedPath = str(self.params['path']).replace("'''", "")
 		pitFile = os.path.basename(Engine.context.pitFile)
@@ -156,17 +172,22 @@ class Filesystem(Logger):
 		self.file.write("Pit File: %s\n" % pitFile)
 		self.file.write("Run name: " + run.name + "\n\n")
 		
+		self.lastTestCount = 0
+		self.firstIter = True
+		
 	
 	def OnRunFinished(self, run):
 		self.file.write("\n\n== Run completed ==\n" + asctime() + "\n")
 		self.file.close()
 		self.file = None
+		self.lastTestCount = 0
 	
 	def OnTestStarting(self, run, test, totalVariations):
 		self._writeMsg("")
 		self._writeMsg("Test starting: " + test.name)
 		#self._writeMsg("Test has %d variations" % totalVariations)
 		self._writeMsg("")
+		self.firstIter = True
 	
 	def OnTestFinished(self, run, test):
 		self._writeMsg("")
@@ -259,14 +280,15 @@ class Filesystem(Logger):
 		self._writeMsg("!!!! TEST ABORTING AT %d" % variationCount)
 		self._writeMsg("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		self._writeMsg("")
-		
-		
+	
 	def OnTestCaseStarting(self, run, test, variationCount):
 		'''
 		Called on start of a test case.
 		'''
-		if variationCount % self.heartBeat == 0:
+		if self.firstIter or variationCount > (self.lastTestCount+1) or variationCount % self.heartBeat == 0:
 			self._writeMsg("On test variation # %d" % variationCount)
+			self.firstIter = False
+		self.lastTestCount = variationCount
 
 import xmlrpclib, base64
 

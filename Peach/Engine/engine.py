@@ -66,6 +66,9 @@ class EngineWatcher(object):
 	def setTotalVariations(self, totalVariations):
 		self.totalVariations = totalVariations
 		
+	def OnCrashOrBreak(self):
+		pass
+	
 	def OnRunStarting(self, run):
 		'''
 		Called when a run is starting.
@@ -309,6 +312,8 @@ class Engine(object):
 	nativeDeepCopy = True
 	#: Test range
 	testRange = None
+	#: The Engine instance
+	context = None
 	
 	def __init__(self):
 		self.noCount = True

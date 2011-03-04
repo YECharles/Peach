@@ -67,6 +67,18 @@ except:
 
 # Note: this is required for multiprocessing module to work.
 if __name__ == '__main__':
+		
+	import sys
+	import atexit
+	
+	def atexit_handler():
+		try:
+			# We want to flush the log file
+			from Peach.Engine import engine
+			engine.Engine.context.watcher.watchers[-1].OnCrashOrBreak()
+		except:
+			print sys.exc_info()
+	atexit.register(atexit_handler)
 	
 	try:
 		from multiprocessing import freeze_support
