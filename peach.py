@@ -101,13 +101,13 @@ Please submit any bugs to Michael Eddington <mike@phed.org>.
 
 Syntax:
 
-  peach.py -a [port] [password]
-  peach.py -c peach_xml_file [run_name]
-  peach.py -g
-  peach.py [--skipto #] peach_xml_file [run_name]
-  peach.py -p 10,2 [--skipto #] peach_xml_file [run_name]
-  peach.py --range 100,200 peach_xml_file [run_name]
-  peach.py -t peach_xml_file
+  peach -a [port] [password]
+  peach -c peach_xml_file [run_name]
+  peach -g
+  peach [--skipto #] peach_xml_file [run_name]
+  peach -p 10,2 [--skipto #] peach_xml_file [run_name]
+  peach --range 100,200 peach_xml_file [run_name]
+  peach -t peach_xml_file
 
   -1                         Perform a single iteration
   -a,--agent                 Launch Peach Agent
@@ -127,9 +127,9 @@ Syntax:
 
 Peach Agent
 
-  Syntax: peach.py -a
-  Syntax: peach.py -a port
-  Syntax: peach.py -a port password
+  Syntax: peach -a
+  Syntax: peach -a port
+  Syntax: peach -a port password
   
   Starts up a Peach Agent instance on this current machine.  Defaults to
   port 9000.  When specifying a password, the port # must also be given.
@@ -138,9 +138,9 @@ Peach Agent
 
 Performing Fuzzing Run
 
-  Syntax: peach.py peach_xml_flie [run_name]
-  Syntax: peach.py --skipto 1234 peach_xml_flie [run_name]
-  Syntax: peach.py --range 100,200 peach_xml_flie [run_name]
+  Syntax: peach peach_xml_flie [run_name]
+  Syntax: peach --skipto 1234 peach_xml_flie [run_name]
+  Syntax: peach --range 100,200 peach_xml_flie [run_name]
   
   A fuzzing run is started by by specifying the Peach XML file and the
   name of a run to perform.
@@ -152,7 +152,7 @@ Performing Fuzzing Run
 
 Performing A Parellel Fuzzing Run
 
-  Syntax: peach.py -p 10,2 peach_xml_flie [run_name]
+  Syntax: peach -p 10,2 peach_xml_flie [run_name]
 
   A parallel fuzzing run uses multiple machines to perform the same fuzzing
   which shortens the time required.  To run in parallel mode we will need
@@ -162,14 +162,14 @@ Performing A Parellel Fuzzing Run
 
 Validate Peach XML File
 
-  Syntax: peach.py -t peach_xml_file
+  Syntax: peach -t peach_xml_file
   
   This will perform a parsing pass of the Peach XML file and display any
   errors that are found.
 
 Debug Peach XML File
 
-  Syntax: peach.py -1 --debug peach_xml_file
+  Syntax: peach -1 --debug peach_xml_file
   
   This will perform a single iteration (-1) of your pit file while displaying
   alot of debugging information (--debug).  The debugging information was

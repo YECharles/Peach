@@ -34,6 +34,9 @@
 
 		<!-- TODO: Configure a publisher -->
 		<Publisher class="" />
+        
+        <!-- OPTIONAL: Configure a strategy -->
+        <!-- <Strategy class=""/> -->
 	</Test>
 
 	<!-- Configure a single run -->

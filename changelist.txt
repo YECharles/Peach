@@ -6,7 +6,7 @@ v2.3.8
 
  - New: Peach filesystem logger now always writes out first test case #
  - New: Peach filesystem logger logs test case skipping
- - New: Peach filesystem logger logs atexit, last test case #
+ - New: Peach logging better detects crashes/ctrl+c and logs last test case #
  - New: CleanupRegistry monitor added
  - New: FilePerIteration publisher supports "##FILEBASE##" in filename
  - New: Publishers now have self.parent set by parser code.
@@ -18,7 +18,8 @@ v2.3.8
  - New: <Strategy> element added to <Test>
  - New: file system logger now logs command line
  - New: file system logger now logs pit file name
- - Change: Aliased internal analyzers to XmlAnalyzer, Asn1Analyzer, BinaryAnalyzer, PitXmlAnalyzer, WireSharkAnalyzer, StringTokenAnalyzer
+ - Change: Aliased internal analyzers to XmlAnalyzer, Asn1Analyzer, BinaryAnalyzer,
+           PitXmlAnalyzer, WireSharkAnalyzer, StringTokenAnalyzer
  - Change: --strategy command line argument depricated
  - Change: No longer warn when Unix debugger does not load
  - Change: Now using psutil module to get cpu time
