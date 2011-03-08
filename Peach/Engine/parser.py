@@ -624,14 +624,18 @@ class ParseTemplate:
 
 				ret = ''
 				
-				for i in range(len(self._regsHex)):
-					match = self._regsHex[i].search(value)
-					if match != None:
-						while match != None:
-							ret += chr(int(match.group(2),16))
-							value = self._regsHex[i].sub('', value)
-							match = self._regsHex[i].search(value)
-						break
+				valueLen = len(value)+1
+				while valueLen > len(value):
+					valueLen = len(value)
+					
+					for i in range(len(self._regsHex)):
+						match = self._regsHex[i].search(value)
+						if match != None:
+							while match != None:
+								ret += chr(int(match.group(2),16))
+								value = self._regsHex[i].sub('', value)
+								match = self._regsHex[i].search(value)
+							break
 				
 				return ret
 			
@@ -679,14 +683,18 @@ class ParseTemplate:
 				
 				ret = ''
 				
-				for i in range(len(self._regsHex)):
-					match = self._regsHex[i].search(value)
-					if match != None:
-						while match != None:
-							ret += chr(int(match.group(2),16))
-							value = self._regsHex[i].sub('', value)
-							match = self._regsHex[i].search(value)
-						break
+				valueLen = len(value)+1
+				while valueLen > len(value):
+					valueLen = len(value)
+					
+					for i in range(len(self._regsHex)):
+						match = self._regsHex[i].search(value)
+						if match != None:
+							while match != None:
+								ret += chr(int(match.group(2),16))
+								value = self._regsHex[i].sub('', value)
+								match = self._regsHex[i].search(value)
+							break
 				
 				return ret
 			
@@ -722,20 +730,23 @@ class ParseTemplate:
 			
 			# Convert variouse forms of hex into a binary string
 			if type == 'hex':
-				
 				if len(value) == 1:
 					value = "0" + value
-
+				
 				ret = ''
 				
-				for i in range(len(self._regsHex)):
-					match = self._regsHex[i].search(value)
-					if match != None:
-						while match != None:
-							ret += match.group(2)
-							value = self._regsHex[i].sub('', value)
-							match = self._regsHex[i].search(value)
-						break
+				valueLen = len(value)+1
+				while valueLen > len(value):
+					valueLen = len(value)
+					
+					for i in range(len(self._regsHex)):
+						match = self._regsHex[i].search(value)
+						if match != None:
+							while match != None:
+								ret += match.group(2)
+								value = self._regsHex[i].sub('', value)
+								match = self._regsHex[i].search(value)
+							break
 				
 				return long(ret, 16)
 			
@@ -2742,14 +2753,18 @@ class ParseTemplate:
 				
 				ret = ''
 				
-				for i in range(len(self._regsHex)):
-					match = self._regsHex[i].search(value)
-					if match != None:
-						while match != None:
-							ret += '\\x' + match.group(2)
-							value = self._regsHex[i].sub('', value)
-							match = self._regsHex[i].search(value)
-						break
+				valueLen = len(value)+1
+				while valueLen > len(value):
+					valueLen = len(value)
+					
+					for i in range(len(self._regsHex)):
+						match = self._regsHex[i].search(value)
+						if match != None:
+							while match != None:
+								ret += '\\x' + match.group(2)
+								value = self._regsHex[i].sub('', value)
+								match = self._regsHex[i].search(value)
+							break
 				
 				value = "'" + ret + "'"
 			
@@ -2831,14 +2846,18 @@ class ParseTemplate:
 				
 				ret = ''
 				
-				for i in range(len(self._regsHex)):
-					match = self._regsHex[i].search(value)
-					if match != None:
-						while match != None:
-							ret += '\\x' + match.group(2)
-							value = self._regsHex[i].sub('', value)
-							match = self._regsHex[i].search(value)
-						break
+				valueLen = len(value)+1
+				while valueLen > len(value):
+					valueLen = len(value)
+					
+					for i in range(len(self._regsHex)):
+						match = self._regsHex[i].search(value)
+						if match != None:
+							while match != None:
+								ret += '\\x' + match.group(2)
+								value = self._regsHex[i].sub('', value)
+								match = self._regsHex[i].search(value)
+							break
 				
 				value = "'" + ret + "'"
 			
@@ -3165,14 +3184,18 @@ class ParseTemplate:
 			
 			ret = ''
 			
-			for i in range(len(self._regsHex)):
-				match = self._regsHex[i].search(value)
-				if match != None:
-					while match != None:
-						ret += '\\x' + match.group(2)
-						value = self._regsHex[i].sub('', value)
-						match = self._regsHex[i].search(value)
-					break
+			valueLen = len(value)+1
+			while valueLen > len(value):
+				valueLen = len(value)
+				
+				for i in range(len(self._regsHex)):
+					match = self._regsHex[i].search(value)
+					if match != None:
+						while match != None:
+							ret += '\\x' + match.group(2)
+							value = self._regsHex[i].sub('', value)
+							match = self._regsHex[i].search(value)
+						break
 			
 			value = "'" + ret + "'"
 		
