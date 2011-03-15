@@ -4,6 +4,7 @@ Peach Changelist
 v2.3.8
 ------
 
+ - New: Moving to Python 2.7, this is the final python 2 version.
  - New: Peach filesystem logger now always writes out first test case #
  - New: Peach filesystem logger logs test case skipping
  - New: Peach logging better detects crashes/ctrl+c and logs last test case #
@@ -30,6 +31,7 @@ v2.3.8
  - Change: Added Udp6Listener publisher
  - Change: First iteration must work, else we stop
  - Change: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - Bug: Capture more stack traces when Publisher miss-configured
  - Bug: Fixed parsing of hex values from XML
  - Bug: Bug loading analyzers
  - Bug: Not loading custom analyzer modules when asCommandLine enabled.

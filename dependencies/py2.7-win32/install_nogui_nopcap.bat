@@ -11,4 +11,5 @@ msiexec /qn /i pyvmware-0.1.win32-py2.7.msi
 msiexec /qn /i zope.interface-3.6.1.win32-py2.7.msi
 msiexec /qn /i Twisted-8.0.1.win32-py2.7.msi
 msiexec /qn /i PyDbgEng-0.14.win32-py2.7.msi
+msiexec /qn /i pywin32-216.0.win32-py2.7.msi
 

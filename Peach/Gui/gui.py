@@ -5,7 +5,7 @@
 import wx
 
 # begin wxGlade: extracode
-import wx.propgrid as wxpg
+#import wx.propgrid as wxpg
 
 from hex import HexView
 

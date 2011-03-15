@@ -69,7 +69,13 @@ class PageHeap(Monitor):
 		self._onParams = [ 'gflags.exe', '/p', '/full', '/enable', self._exe ]
 		self._offParams = [ 'gflags.exe', '/p', '/disable', self._exe ]
 		
-		os.spawnv(os.P_WAIT, self._path, self._onParams )
+		try:
+			os.spawnv(os.P_WAIT, self._path, self._onParams )
+		except:
+			print "Error, PageHeap failed to launch:"
+			print "\tself._path:", self._path
+			print "\tself._onParams", self._onParams
+			raise
 	
 	def LocateWinDbg(self):
 		'''

@@ -56,7 +56,7 @@ except:
 
 import gui
 import wx
-import wx.propgrid as wxpg
+#import wx.propgrid as wxpg
 import re, pickle
 
 from Peach.publisher import PublisherBuffer

@@ -182,8 +182,8 @@ Debug Peach XML File
 	printError("\n] Peach 2.3.8 DEV Runtime")
 	printError("] Copyright (c) Michael Eddington\n")
 	
-	if sys.version[:3] not in ['2.5', '2.6']:
-		printError("Error: Peach requires Python v2.5 or v2.6.")
+	if sys.version[:3] not in ['2.5', '2.6', '2.7']:
+		printError("Error: Peach requires Python v2.5, v2.6, or v2.7.")
 		sys.exit(0)
 	
 	noCount = False
@@ -314,28 +314,6 @@ Debug Peach XML File
 			print ""
 			sys.exit(0)
 			
-			#try:	
-			#	strategy = optlist[i][1]
-			#	if strategy == None or len(strategy) == 0:
-			#		strategy = args[0]
-			#	
-			#	from Peach.Engine.common import *
-			#	from Peach.mutatestrategies import *
-			#	from Peach.MutateStrategies import *
-			#	
-			#	try:
-			#		exec("MutationStrategy.DefaultStrategy = %s" % strategy)
-			#		
-			#	except:
-			#		parts = strategy.split(".")
-			#		exec("import %s" % parts[0])
-			#		exec("MutationStrategy.DefaultStrategy = %s" % strategy)
-			#
-			#except:
-			#	print ""
-			#	print "Error using mutation strategy '%s'.\n" % strategy
-			#	sys.exit(0)
-		
 		elif optlist[i][0] == '--seed':
 				SEED = optlist[i][1]
 				print "[*] Using SEED: '%s'" % SEED
@@ -445,21 +423,6 @@ Debug Peach XML File
 				engine.Count(args[0], None)
 			
 			sys.exit(0)
-			
-		#elif optlist[i][0] == '--gui' or optlist[i][0] == '-g':
-		#	
-		#	# Start peach builder UI
-		#	
-		#	from Peach.Engine import *
-		#	from Peach.Engine.common import *
-		#
-		#	import os
-		#	from Peach.Gui import PeachGui
-		#
-		#	os.chdir( sys.path[0] + "/peach/gui" )
-		#
-		#	PeachGui.RunPeachEditor()
-		#	sys.exit(0)
 		
 		elif optlist[i][0] == '-w' or optlist[i][0] == '--web':
 			
@@ -553,8 +516,7 @@ Debug Peach XML File
 			engine.Run(args[0], None, verbose, watcher, restartFuzzerFile, noCount, parallel, startNum)
 	
 	except PeachException, pe:
-		print ""
-		print pe.msg
+		print "\n",pe.msg,"\n"
 	
 	except Ft.Xml.ReaderException, e:
 		print ""

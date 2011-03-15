@@ -2789,13 +2789,15 @@ class ParseTemplate:
 		
 		except TypeError, e:
 			error = str(e)
-			if error.find("__init__() takes at least") > -1:
-				m = re.search("takes at least (\d+) arguments \((\d+) given\)", error)
-				required = int(m.group(1)) - 1
-				have = int(m.group(2)) - 1
+			
+			if error.find(r"__init__() takes ") > -1:
+				m = re.match(r"^__init__\(\) (.*) (\d+) arguments \((\d+) given\)$", error)
+				msg = m.group(1)
+				arg = int(m.group(2)) - 1
+				given = int(m.group(3)) - 1
 				
-				raise PeachException("Error: Publisher '%s' requires at least %d arguments, but %d were specified." %(publisher.classStr, required, have) )
-				
+				raise PeachException("Error: Publisher '%s' %s %d arguments (%d given)" %(publisher.classStr, msg, arg, given) )
+			
 			raise e
 			
 		pub.domPublisher = publisher
