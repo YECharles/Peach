@@ -64,3 +64,12 @@ STDMETHODIMP CPeachComTest::put_Property1(BSTR newVal)
 
 	return S_OK;
 }
+
+STDMETHODIMP CPeachComTest::Method5(LONG int1, SHORT short1, LONG* retval)
+{
+	// TODO: Add your implementation code here
+	*retval = int1 + short1;
+	wprintf(L"CPeachComTest::Method5(%d, %d, %d)\n", int1, short1, *retval);
+
+	return S_OK;
+}

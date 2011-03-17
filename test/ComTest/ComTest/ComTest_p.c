@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0500 */
-/* at Wed Jun 11 11:33:09 2008
+/* at Wed Mar 16 16:43:29 2011
  */
 /* Compiler settings for .\ComTest.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
@@ -49,8 +49,8 @@
 
 #include "ComTest_i.h"
 
-#define TYPE_FORMAT_STRING_SIZE   57                                
-#define PROC_FORMAT_STRING_SIZE   217                               
+#define TYPE_FORMAT_STRING_SIZE   61                                
+#define PROC_FORMAT_STRING_SIZE   265                               
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   1            
@@ -289,6 +289,51 @@ static const ComTest_MIDL_PROC_FORMAT_STRING ComTest__MIDL_ProcFormatString =
 /* 214 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
+	/* Procedure Method5 */
+
+/* 216 */	0x33,		/* FC_AUTO_HANDLE */
+			0x6c,		/* Old Flags:  object, Oi2 */
+/* 218 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 222 */	NdrFcShort( 0xd ),	/* 13 */
+/* 224 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
+/* 226 */	NdrFcShort( 0xe ),	/* 14 */
+/* 228 */	NdrFcShort( 0x24 ),	/* 36 */
+/* 230 */	0x44,		/* Oi2 Flags:  has return, has ext, */
+			0x4,		/* 4 */
+/* 232 */	0x8,		/* 8 */
+			0x1,		/* Ext Flags:  new corr desc, */
+/* 234 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 236 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 238 */	NdrFcShort( 0x0 ),	/* 0 */
+
+	/* Parameter int1 */
+
+/* 240 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 242 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 244 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
+	/* Parameter short1 */
+
+/* 246 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 248 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 250 */	0x6,		/* FC_SHORT */
+			0x0,		/* 0 */
+
+	/* Parameter retval */
+
+/* 252 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 254 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 256 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
+	/* Return value */
+
+/* 258 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 260 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 262 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
 			0x0
         }
     };
@@ -338,6 +383,10 @@ static const ComTest_MIDL_TYPE_FORMAT_STRING ComTest__MIDL_TypeFormatString =
 /* 50 */	NdrFcShort( 0x4 ),	/* 4 */
 /* 52 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 54 */	NdrFcShort( 0xfff4 ),	/* Offset= -12 (42) */
+/* 56 */	
+			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
+/* 58 */	0x8,		/* FC_LONG */
+			0x5c,		/* FC_PAD */
 
 			0x0
         }
@@ -380,7 +429,8 @@ static const unsigned short IPeachComTest_FormatStringOffsetTable[] =
     78,
     114,
     144,
-    180
+    180,
+    216
     };
 
 static const MIDL_STUBLESS_PROXY_INFO IPeachComTest_ProxyInfo =
@@ -404,7 +454,7 @@ static const MIDL_SERVER_INFO IPeachComTest_ServerInfo =
     0,
     0,
     0};
-CINTERFACE_PROXY_VTABLE(13) _IPeachComTestProxyVtbl = 
+CINTERFACE_PROXY_VTABLE(14) _IPeachComTestProxyVtbl = 
 {
     &IPeachComTest_ProxyInfo,
     &IID_IPeachComTest,
@@ -420,7 +470,8 @@ CINTERFACE_PROXY_VTABLE(13) _IPeachComTestProxyVtbl =
     (void *) (INT_PTR) -1 /* IPeachComTest::Method3 */ ,
     (void *) (INT_PTR) -1 /* IPeachComTest::Method4 */ ,
     (void *) (INT_PTR) -1 /* IPeachComTest::get_Property1 */ ,
-    (void *) (INT_PTR) -1 /* IPeachComTest::put_Property1 */
+    (void *) (INT_PTR) -1 /* IPeachComTest::put_Property1 */ ,
+    (void *) (INT_PTR) -1 /* IPeachComTest::Method5 */
 };
 
 
@@ -435,6 +486,7 @@ static const PRPC_STUB_FUNCTION IPeachComTest_table[] =
     NdrStubCall2,
     NdrStubCall2,
     NdrStubCall2,
+    NdrStubCall2,
     NdrStubCall2
 };
 
@@ -442,7 +494,7 @@ CInterfaceStubVtbl _IPeachComTestStubVtbl =
 {
     &IID_IPeachComTest,
     &IPeachComTest_ServerInfo,
-    13,
+    14,
     &IPeachComTest_table[-3],
     CStdStubBuffer_DELEGATING_METHODS
 };

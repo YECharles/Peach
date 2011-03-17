@@ -53,6 +53,7 @@ public:
 	STDMETHOD(Method4)(void);
 	STDMETHOD(get_Property1)(BSTR* pVal);
 	STDMETHOD(put_Property1)(BSTR newVal);
+	STDMETHOD(Method5)(LONG int1, SHORT short1, LONG* retval);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(PeachComTest), CPeachComTest)

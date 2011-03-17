@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0500 */
-/* at Wed Jun 11 11:33:09 2008
+/* at Wed Mar 16 16:43:29 2011
  */
 /* Compiler settings for .\ComTest.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
@@ -105,6 +105,11 @@ EXTERN_C const IID IID_IPeachComTest;
         virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_Property1( 
             /* [in] */ BSTR newVal) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE Method5( 
+            /* [in] */ LONG int1,
+            /* [in] */ SHORT short1,
+            /* [retval][out] */ LONG *retval) = 0;
+        
     };
     
 #else 	/* C style interface */
@@ -178,6 +183,12 @@ EXTERN_C const IID IID_IPeachComTest;
             IPeachComTest * This,
             /* [in] */ BSTR newVal);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *Method5 )( 
+            IPeachComTest * This,
+            /* [in] */ LONG int1,
+            /* [in] */ SHORT short1,
+            /* [retval][out] */ LONG *retval);
+        
         END_INTERFACE
     } IPeachComTestVtbl;
 
@@ -231,6 +242,9 @@ EXTERN_C const IID IID_IPeachComTest;
 
 #define IPeachComTest_put_Property1(This,newVal)	\
     ( (This)->lpVtbl -> put_Property1(This,newVal) ) 
+
+#define IPeachComTest_Method5(This,int1,short1,retval)	\
+    ( (This)->lpVtbl -> Method5(This,int1,short1,retval) ) 
 
 #endif /* COBJMACROS */
 

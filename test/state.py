@@ -23,6 +23,7 @@ def suite():
 	suite.addTest(StateData4TestCase())
 	suite.addTest(StateCall1TestCase())
 	suite.addTest(StateCall2TestCase())
+	suite.addTest(StateCall3TestCase())
 	suite.addTest(StateProperty1TestCase())
 	#suite.addTest(StateHttp1TestCase())
 	
@@ -104,6 +105,11 @@ class StateCall2TestCase(utils.PeachTestCase):
 		#self.peachUtils = utils.Utils()
 		self.peachUtils.RunPeachXml("stateCall2.xml")
 		assert True, "stateCall2.xml failed"
+
+class StateCall3TestCase(utils.PeachTestCase):	
+	def runTest(self):
+		self.peachUtils.RunPeachXml("stateCall3.xml")
+		assert True, "stateCall3.xml failed"
 
 class StateProperty1TestCase(utils.PeachTestCase):	
 	def runTest(self):

@@ -11,7 +11,7 @@ import threading
 
 class Utils:
 	
-	pythonPath = "c:/python25/python.exe"
+	pythonPath = "c:/python27/python.exe"
 
 	localAgentPid = 0
 	dataBuff = None
