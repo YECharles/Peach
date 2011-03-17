@@ -62,6 +62,7 @@ class Com(Publisher):
 		"""
 		Publisher.__init__(self)
 		self._clsid = clsid
+		self.withNode = True
 	
 	def start(self):
 		try:
@@ -79,7 +80,8 @@ class Com(Publisher):
 	def stop(self):
 		self._object = None
 	
-	def call(self, method, args):
+#	def call(self, method, args):
+	def callWithNode(self, method, args, argNodes):
 		'''
 		Call method on COM object.
 		
@@ -91,13 +93,17 @@ class Com(Publisher):
 		
 		self._lastReturn = None
 		
+		for arg in argNodes:
+			print "Type", type(arg.getInternalValue())
+			print "Value", repr(arg.getInternalValue())
+		
 		try:
 			ret = None
 			callStr = "ret = self._object.%s(" % str(method)
 			
-			if len(args) > 0:
-				for i in range(0, len(args)):
-					callStr += "args[%d]," % i
+			if len(argNodes) > 0:
+				for i in range(0, len(argNodes)):
+					callStr += "argNodes[%d].getInternalValue()," % i
 				
 				callStr = callStr[:len(callStr)-1] + ")"
 			
@@ -116,12 +122,14 @@ class Com(Publisher):
 			raise
 		
 		except:
-			print "Com::send(): Caught unknown exception"
+			print "Com::Call(): Caught unknown exception"
 			raise
 		
 		return None
 		
-	def property(self, property, value = None):
+		
+#	def property(self, property, value = None):
+	def propertyWithNode(self, property, value, valueNode):
 		'''
 		Get or set property
 		
@@ -141,7 +149,7 @@ class Com(Publisher):
 				return ret
 			
 			ret = None
-			callStr = "self._object.%s = value" % str(property)
+			callStr = "self._object.%s = valueNode.getInternalValue()" % str(property)
 			
 			#print "Call string:", callStr
 			exec callStr

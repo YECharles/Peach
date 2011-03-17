@@ -8,7 +8,7 @@
 	
 	<!-- Create a simple data template containing a single string -->
 	<DataModel name="TestCase">
-		<Blob name="data" valueType="literal" value="'Peach%s' % ' World'" isStatic="true" />
+		<Blob name="data" valueType="literal" value="&quot;Peach%s&quot; % &quot; World&quot;" isStatic="true" />
 	</DataModel>
 	
 	<StateModel name="TestState" initialState="Initial">

@@ -2047,12 +2047,6 @@ class ParseTemplate:
 		blob.defaultValue = PeachStr(self.GetValueFromNode(node))
 		blob.valueType = self._getValueType(node)
 		
-		#print "Value of blob: ", repr(blob.defaultValue)
-		
-		# Hex handled elsewere.
-		if blob.valueType == 'literal':
-			blob.defaultValue = PeachStr(eval(blob.defaultValue))
-		
 		# length (in bytes)
 		
 		if node.hasAttributeNS(None, 'lengthType') and self._getAttribute(node, 'lengthType') == 'calc':

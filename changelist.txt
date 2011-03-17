@@ -31,6 +31,7 @@ v2.3.8
  - Change: Added Udp6Listener publisher
  - Change: First iteration must work, else we stop
  - Change: Updated peach.xsd to include raw.* publishers and udp.UdpListener
+ - Bug: COM publisher was not using "WithNode" mode to get Python data type
  - Bug: Capture more stack traces when Publisher miss-configured
  - Bug: Fixed parsing of hex values from XML
  - Bug: Bug loading analyzers
