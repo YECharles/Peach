@@ -15,8 +15,7 @@ rmdir /s/q dist
 
 copy tools\minset\minset.py
 
-rem -O0 will cause optmized byte code to
-rem be generated
+rem -O0 will cause optmized byte code to be generated
 python -OO setup.py py2exe
 
 del /q minset.py
@@ -24,16 +23,9 @@ ren dist bin
 rmdir /s/q build
 del /q setup.py
 
-rem Build DbgProxyEvent
-rem cd c:\peach\dependencies\src\peach-PyDbgEng
-rem rmdir /s/q build dist
-rem python py2exe\setup.py py2exe
-rem copy /y dist\* c:\peach\bin
-rem cd c:\peach
-
 rem Extra re-dist files
-copy C:\Python25\lib\site-packages\wx-2.8-msw-ansi\wx\gdiplus.dll bin
-copy C:\Python25\lib\site-packages\wx-2.8-msw-ansi\wx\MSVCP71.dll bin
+copy C:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\gdiplus.dll bin
+rem copy C:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\MSVCP71.dll bin
 copy c:\windows\system32\MFC71.DLL bin
 copy c:\windows\SysWOW64\mfc71.dll bin
 del /q bin\iphlpapi.dll
