@@ -29,6 +29,7 @@ cd ..
 
 cd peach-pypcap
 rmdir /s/q build dist
+python setup.py config
 python setup.py bdist_msi
 copy dist\*.msi ..
 cd ..
@@ -63,3 +64,10 @@ python setup.py bdist_msi
 copy dist\*.msi ..
 cd ..
 
+cd Twisted-10.2.0
+rmdir /s/q build dist
+python setup.py bdist_msi
+copy dist\*.msi ..
+cd ..
+
+rem END
