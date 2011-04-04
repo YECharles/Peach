@@ -38,6 +38,7 @@ class config_pcap(config.config):
             f.write('#define %s %s\n' % (k, v))
     
     def _pcap_config(self, dirs=[ None ]):
+	print "configuring"
         cfg = {}
         if not dirs[0]:
             dirs = [ '/usr', sys.prefix ] + glob.glob('/opt/libpcap*') + \
@@ -66,9 +67,10 @@ class config_pcap(config.config):
     
     def run(self):
         #config.log.set_verbosity(0)
-        cPickle.dump(self._pcap_config([ self.with_pcap ]),
-                     open(pcap_cache, 'wb'))
+	conf = self._pcap_config([ self.with_pcap ])
+        cPickle.dump(conf, open(pcap_cache, 'wb'))
         self.temp_files.append(pcap_cache)
+	print conf
 
 class clean_pcap(clean.clean):
     def run(self):
@@ -77,17 +79,19 @@ class clean_pcap(clean.clean):
             print "removing '%s'" % pcap_cache
             os.unlink(pcap_cache)
 
-if len(sys.argv) > 1 and sys.argv[1] == 'build':
+if len(sys.argv) > 1 and sys.argv[1] in ['build', 'bdist_msi', 'install']:
     try:
         pcap_config = cPickle.load(open(pcap_cache))
+	print pcap_config
     except IOError:
         print >>sys.stderr, 'run "%s config" first!' % sys.argv[0]
         sys.exit(1)
 
+
 pcap = Extension(name='pcap',
                  sources=[ 'pcap.pyx', 'pcap_ex.c' ],
-                 include_dirs=pcap_config.get('include_dirs', ''),
-                 library_dirs=pcap_config.get('library_dirs', ''),
+                 include_dirs=pcap_config.get('include_dirs',''),
+                 library_dirs=pcap_config.get('library_dirs',''),
                  libraries=pcap_config.get('libraries', ''),
                  extra_compile_args=pcap_config.get('extra_compile_args', ''))
 
