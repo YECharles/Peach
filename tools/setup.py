@@ -8,8 +8,6 @@ setup(
 	console=['peach.py', 'minset.py'],
 	windows=['peachvalidator.pyw'],
 	
-	#zipfile = None,
-	
 	data_files=[
 			("",
 			  ["peach.xsd"],

@@ -16,8 +16,7 @@ rmdir /s/q dist
 copy tools\minset\minset.py
 
 rem -O0 will cause optmized byte code to be generated
-python -OO setup.py py2exe
-
+python -OO setup.py py2exe -p win32com -p twisted
 del /q minset.py
 ren dist bin
 rmdir /s/q build
