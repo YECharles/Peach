@@ -24,7 +24,6 @@ del /q setup.py
 
 rem Extra re-dist files
 copy C:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\gdiplus.dll bin
-rem copy C:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\MSVCP71.dll bin
 copy c:\windows\system32\MFC71.DLL bin
 copy c:\windows\SysWOW64\mfc71.dll bin
 del /q bin\iphlpapi.dll
