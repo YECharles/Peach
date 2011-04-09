@@ -4,6 +4,8 @@ Peach Changelist
 v2.3.9
 ------
 
+ - Change: Optimized minset, much faster now.
+
 v2.3.8
 ------
 

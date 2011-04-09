@@ -84,6 +84,11 @@ class PeachCoverage:
 			os.unlink("bblocks.out")
 		except:
 			pass
+		
+		try:
+			os.unlink("bblocks.existing")
+		except:
+			pass
 	
 	def delta(self, list1, list2):
 		'''
@@ -367,6 +372,11 @@ class PeachCoverage:
 		# for use later.
 		
 		bblCount = self.fileLineCount("bblocks.out")
+		
+		# Only copy first bblocks.out to bblocks.existing
+		if not os.path.exists("bblocks.existing"):
+			shutil.copy("bblocks.out", "bblocks.existing");
+		
 		shutil.move("bblocks.out", os.path.join(self._traceFolder, self.stripPath(sampleFile)+".trace"))
 		
 		return bblCount
@@ -401,10 +411,10 @@ class PeachCoverage:
 					sampleFileMostCoverage = sampleFile
 					sampleFileMostCoverageCount = bbl
 				
-				print "[-] %s hit %d blocks" % (sampleFile, bbl)
+				print "[-] %s hit %d new blocks" % (sampleFile, bbl)
 				
 			print ""
-			print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
+			#print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
 			
 			# Set _traceFolder to None if we don't want
 			# cleanup to remove it
@@ -448,7 +458,7 @@ class PeachCoverage:
 						sampleFileMostCoverageCount = bbl
 				
 				print ""
-				print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
+				#print "[*] Master template is [%s] with a coverage of %d blocks" % (sampleFileMostCoverage, sampleFileMostCoverageCount)
 			
 			# Start with file with most coverage
 			minset = []
@@ -494,7 +504,7 @@ class PeachCoverage:
 
 
 print ""
-print "] Peach Minset Finder v0.9"
+print "] Peach Minset Finder v0.10"
 print "] Copyright (c) Michael Eddington\n"
 
 usage = """
