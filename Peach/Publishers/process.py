@@ -206,6 +206,78 @@ class Launcher(Publisher):
 		
 		return childPids
 
+from ctypes import *
+import time
+
+PUL = POINTER(c_ulong)
+class KeyBdInput(Structure):
+    _fields_ = [("wVk", c_ushort),
+                ("wScan", c_ushort),
+                ("dwFlags", c_ulong),
+                ("time", c_ulong),
+                ("dwExtraInfo", PUL)]
+
+class HardwareInput(Structure):
+    _fields_ = [("uMsg", c_ulong),
+                ("wParamL", c_short),
+                ("wParamH", c_ushort)]
+
+class MouseInput(Structure):
+    _fields_ = [("dx", c_long),
+                ("dy", c_long),
+                ("mouseData", c_ulong),
+                ("dwFlags", c_ulong),
+                ("time",c_ulong),
+                ("dwExtraInfo", PUL)]
+               
+class Input_I(Union):
+    _fields_ = [("ki", KeyBdInput),
+                 ("mi", MouseInput),
+                 ("hi", HardwareInput)]
+
+class Input(Structure):
+    _fields_ = [("type", c_ulong),
+                ("ii", Input_I)]
+
+class SendProgramRefresh(Publisher):
+	'''
+	Send target process F5
+	'''
+	
+	def __init__(self):
+		'''
+		'''
+		
+		Publisher.__init__(self)
+	
+	def call(self, method, args):
+		self.windowName = method
+		if sys.platform != 'win32':
+			raise Exception("This publisher is windows only")
+		
+		win32gui.EnumWindows(SendProgramRefresh.enumCallback, self)
+	
+	def enumCallback(hwnd, self):
+		title = win32gui.GetWindowText(hwnd)
+
+		if title.find(self.windowName) > -1:
+			try:
+				win32gui.SetActiveWindow(hwnd)
+				win32gui.SetForegroundWindow(hwnd)
+				
+				FInputs = Input * 1
+				extra = c_ulong(0)
+				ii_ = Input_I()
+				ii_.ki = KeyBdInput( win32con.VK_F5, 0x3f, 0, 0, pointer(extra) )
+				x = FInputs( ( 1, ii_ ) )
+				windll.user32.SendInput(1, pointer(x), sizeof(x[0]))
+				
+			except:
+				pass
+		
+		return True
+	enumCallback = staticmethod(enumCallback)
+	
 
 class DebuggerLauncher(Publisher):
 	'''
