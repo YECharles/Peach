@@ -52,6 +52,7 @@ import win32con
 import win32process
 import win32pdh
 import ctypes
+import psutil
 
 TH32CS_SNAPPROCESS = 0x00000002
 class PROCESSENTRY32(ctypes.Structure):
@@ -187,105 +188,6 @@ class PeachCoverage:
 		
 		return False
 	
-	def getProcessCpuTime(self, pid):
-		'''
-		Get the current CPU processor time as a double based on a process
-		instance (chrome#10).
-		'''
-	
-		process = self.getProcessInstance(pid)
-		
-		try:
-			if process == None:
-				print "getProcessCpuTimeWindows: process is null"
-				return None
-			
-			#if cpu_path == None:
-			cpu_path = win32pdh.MakeCounterPath( (None, 'Process', process, None, 0, '% Processor Time') )
-			
-			#if cpu_hq == None:
-			cpu_hq = win32pdh.OpenQuery()
-			
-			#if cpu_counter_handle == None:
-			cpu_counter_handle = win32pdh.AddCounter(cpu_hq, cpu_path) #convert counter path to counter handle
-			win32pdh.CollectQueryData(cpu_hq) #collects data for the counter
-			time.sleep(0.25)
-			
-			win32pdh.CollectQueryData(cpu_hq) #collects data for the counter
-			(v,cpu) = win32pdh.GetFormattedCounterValue(cpu_counter_handle, win32pdh.PDH_FMT_DOUBLE)
-			return cpu
-		
-		except:
-			print "getProcessCpuTimeWindows threw exception!"
-			print sys.exc_info()
-		
-		return None
-	
-	def getProcessInstance(self, pid):
-		'''
-		Get the process instance name using pid.
-		'''
-		
-		hq = None
-		counter_handle = None
-		
-		try:
-			
-			win32pdh.EnumObjects(None, None, win32pdh.PERF_DETAIL_WIZARD)
-			junk, instances = win32pdh.EnumObjectItems(None,None,'Process', win32pdh.PERF_DETAIL_WIZARD)
-		
-			proc_dict = {}
-			for instance in instances:
-				if proc_dict.has_key(instance):
-					proc_dict[instance] = proc_dict[instance] + 1
-				else:
-					proc_dict[instance]=0
-			
-			proc_ids = []
-			for instance, max_instances in proc_dict.items():
-				for inum in xrange(max_instances+1):
-					hq = win32pdh.OpenQuery() # initializes the query handle 
-					try:
-						path = win32pdh.MakeCounterPath( (None, 'Process', instance, None, inum, 'ID Process') )
-						counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
-						try:
-							win32pdh.CollectQueryData(hq) #collects data for the counter 
-							type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
-							proc_ids.append((instance, val))
-							
-							if val == pid:
-								return "%s#%d" % (instance, inum)
-							
-						except win32pdh.error, e:
-							#print e
-							pass
-						
-						win32pdh.RemoveCounter(counter_handle)
-						counter_handle = None
-					
-					except win32pdh.error, e:
-						#print e
-						pass
-					win32pdh.CloseQuery(hq)
-					hq = None
-		except:
-			print "getProcessInstance thew exception"
-			print sys.exc_info()
-		
-		finally:
-			
-			try:
-				if counter_handle != None:
-					win32pdh.RemoveCounter(counter_handle)
-					counter_handle = None
-				if hq != None:
-					win32pdh.CloseQuery(hq)
-					hq = None
-			except:
-				pass
-		
-		# SHouldn't get here...we hope!
-		return None
 	
 	def fileLineCount(self, fname):
 		f = open(fname)
@@ -332,31 +234,43 @@ class PeachCoverage:
 				"--", 
 				cmd)
 			
-			time.sleep(2)
+			childPid = None
+			for i in range(10):
+				time.sleep(1)
+				
+				pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
+				for childPid in self.process_list(pid):
+					pass
+				
+				if childPid != None:
+					break
 			
-			pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
-			for childPid in self.process_list(pid):
-				pass
-			
+			if childPid == None:
+				raise Exception("Unable to locate child PID, did program already close?")
+				
 			print "parentpid:", pid, "child pid:", childPid
 			
 			while True:
-				cpu = self.getProcessCpuTime(childPid)
-				if cpu == None:
-					print "CPU IS None!"
-					sys.exit(0)
-				
-				if cpu != None and cpu < 0.5:
-					print "Kill due to CPU time"
+				try:
+					cpu = psutil.Process(int(childPid)).get_cpu_percent(interval=1.0)
+					if cpu == None:
+						print "CPU IS None!"
+						sys.exit(0)
 					
-					os.system("taskkill /pid %d" % (childPid))
-					os.system("taskkill /f /pid %d" % (childPid))
+					if cpu != None and cpu < 0.5:
+						print "Kill due to CPU time"
+						
+						os.system("taskkill /pid %d" % childPid)
+						os.system("taskkill /f /pid %d" % childPid)
+						
+						# Prevent Zombies!
+						os.waitpid(hProcPin, 0)
+						break
 					
-					# Prevent Zombies!
-					os.waitpid(hProcPin, 0)
+					time.sleep(0.50)
+					
+				except psutil.error.NoSuchProcess:
 					break
-				
-				time.sleep(0.50)
 		else:
 			pid = os.spawnl(os.P_WAIT, 
 				"pin-2.8-37300-msvc10-ia32_intel64-windows\\ia32\\bin\\pin.exe", 
