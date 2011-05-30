@@ -324,6 +324,7 @@ try:
 		IgnoreSecondChanceGardPage = kwargs.get('IgnoreSecondChanceGardPage', None)
 		quit = kwargs['Quit']
 		Tempfile = kwargs['Tempfile']
+		WinDbg = kwargs['WinDbg']
 		TempfilePid = kwargs['TempfilePid']
 		FaultOnEarlyExit = kwargs['FaultOnEarlyExit']
 		
@@ -350,14 +351,16 @@ try:
 				dbg = PyDbgEng.KernelAttacher(  connection_string = KernelConnectionString,
 					event_callbacks_sink = _eventHandler,
 					output_callbacks_sink = _eventHandler,
-					symbols_path = SymbolsPath)
+					symbols_path = SymbolsPath,
+					dbg_eng_dll_path = WinDbg)
 			
 			elif CommandLine:
 				dbg = PyDbgEng.ProcessCreator(command_line = CommandLine,
 					follow_forks = True,
 					event_callbacks_sink = _eventHandler,
 					output_callbacks_sink = _eventHandler,
-					symbols_path = SymbolsPath)
+					symbols_path = SymbolsPath,
+					dbg_eng_dll_path = WinDbg)
 			
 			elif ProcessName:
 				
@@ -376,14 +379,16 @@ try:
 				dbg = PyDbgEng.ProcessAttacher(pid,
 					event_callbacks_sink = _eventHandler,
 					output_callbacks_sink = _eventHandler,
-					symbols_path = SymbolsPath)
+					symbols_path = SymbolsPath,
+					dbg_eng_dll_path = WinDbg)
 			
 			elif ProcessID:
 				
 				print "Attaching by pid:", ProcessID
 				pid = ProcessID
 				dbg = PyDbgEng.ProcessAttacher(pid,	event_callbacks_sink = _eventHandler,
-					output_callbacks_sink = _eventHandler, symbols_path = SymbolsPath)
+					output_callbacks_sink = _eventHandler, symbols_path = SymbolsPath,
+					dbg_eng_dll_path = WinDbg)
 				
 			elif Service:
 				
@@ -415,7 +420,8 @@ try:
 				dbg = PyDbgEng.ProcessAttacher(pid,
 					event_callbacks_sink = _eventHandler,
 					output_callbacks_sink = _eventHandler,
-					symbols_path = SymbolsPath)
+					symbols_path = SymbolsPath,
+					dbg_eng_dll_path = WinDbg)
 			
 			else:
 				raise Exception("Didn't find way to start debugger... bye bye!!")
@@ -499,6 +505,7 @@ try:
 			self.fault = False
 			self.thread = None
 			self.tempfile = None
+			self.WinDbg = None
 			
 			if args.has_key('CommandLine'):
 				self.CommandLine = str(args['CommandLine']).replace("'''", "")
@@ -533,6 +540,9 @@ try:
 			if args.has_key("StartOnCall"):
 				self.StartOnCall = True
 				self.OnCallMethod = str(args['StartOnCall']).replace("'''", "").lower()
+				
+			if args.has_key("WinDbg"):
+				self.WinDbg = str(args['WinDbg']).replace("'''", "").lower()
 				
 			else:
 				self.StartOnCall = False
@@ -612,6 +622,7 @@ try:
 				'IgnoreSecondChanceGardPage':self.IgnoreSecondChanceGardPage,
 				'Quit':self.quit,
 				'Tempfile':self.tempfile,
+				'WinDbg':self.WinDbg,
 				'TempfilePid':self.tempfilepid,
 				'FaultOnEarlyExit':self.FaultOnEarlyExit
 				})
