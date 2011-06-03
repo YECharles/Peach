@@ -913,7 +913,7 @@ try:
 	class _TraceThread(threading.Thread):
 		def __init__(self):
 			threading.Thread.__init__(self)
-			
+
 		def run(self):
 			
 			self.trace = vtrace.getTrace()
@@ -1043,8 +1043,8 @@ try:
 			Check if a fault was detected.
 			'''
 			
-				time.sleep(0.25)
-			
+			time.sleep(0.25)
+
 			if not UnixDebugger.handlingFault.is_set():
 				return False
 			
@@ -1052,11 +1052,11 @@ try:
 			UnixDebugger.lock.acquire()
 			
 			if UnixDebugger.fault or not self.thread.isAlive():
-			print ">>>>>> RETURNING FAULT <<<<<<<<<"
+				print ">>>>>> RETURNING FAULT <<<<<<<<<"
 				UnixDebugger.fault = False
 				UnixDebugger.lock.release()
-			return True
-		
+				return True
+			
 			UnixDebugger.lock.release()
 			return False
 		
@@ -1071,6 +1071,7 @@ try:
 			Called when Agent is shutting down.
 			'''
 			self._StopDebugger()
+
 
 except:
 	# Only complain on non-Windows platforms.
