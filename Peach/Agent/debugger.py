@@ -40,7 +40,6 @@ from Peach.agent import Monitor
 
 import struct, sys, time, os, re, pickle
 import gc, tempfile
-from multiprocessing import *
 
 try:
 	
@@ -55,6 +54,7 @@ try:
 	import win32serviceutil
 	import win32service
 	import win32api, win32con, win32process, win32pdh
+	from multiprocessing import *
 	
 	
 	# ###############################################################################################
@@ -822,6 +822,7 @@ except:
 try:
 	
 	import vtrace, envi
+	import threading
 	
 	class PeachNotifier(vtrace.Notifier):
 		def __init__(self):
@@ -830,14 +831,9 @@ try:
 		def notify(self, event, trace):
 			print "Got event: %d from pid %d, signal: %d" % (event, trace.getPid(), trace.getMeta("PendingSignal"))
 			
-			# Don't allow recursion in handling
-			if self.handlingFault.is_set() or self.handledFault.is_set():
-				return
-			
-			self.crasshInfo = {}
-			self.handlingFault.set()
-			
+			UnixDebugger.handlingFault.set()
 			buff = ""
+			
 			addr = None
 			
 			# Stacktrace
@@ -886,14 +882,11 @@ try:
 			
 			print buff
 			
-			self.crashInfo = { 'DebuggerOutput.txt' : buff, 'Bucket' : "AV_at_%d" % addr }
-			
-			print "Exception: Writing to file"
-			fd = open(self.Tempfile, "wb+")
-			fd.write(pickle.dumps(self.crashInfo))
-			fd.close()
-			
-			self.handledFault.set()
+			UnixDebugger.lock.acquire()
+			UnixDebugger.crashInfo = { 'DebuggerOutput.txt' : buff, 'Bucket' : "AV_at_%d" % addr }
+			UnixDebugger.fault = True
+			UnixDebugger.lock.release()
+			UnixDebugger.handledFault.set()
 			
 		
 		def bestName(self, trace, address):
@@ -917,37 +910,22 @@ try:
 		
 			return "Who knows?!?!!?"
 
-	class _TraceThread(Process):
-		def __init__(self, kwargs):
-			Process.__init__(self, group = None, target = self.run, **kwargs)
-
-	def TraceThread_run(*args, **kwargs):
-		
-			started = kwargs['Started']
-			handlingFault = kwargs['HandlingFault']
-			handledFault = kwargs['HandledFault']
-			_command = kwargs['Command']
-			_params = kwargs['Parameters']
-			_pid = kwargs['ProcessID']
-			quit = kwargs['Quit']
-			Tempfile = kwargs['Tempfile']
+	class _TraceThread(threading.Thread):
+		def __init__(self):
+			threading.Thread.__init__(self)
 			
-			notifier = PeachNotifier()
-			notifier.handlingFault = handlingFault
-			notifier.handledFault = handledFault
-			notifier.quit = quit
-			notifier.Tempfile = Tempfile
+		def run(self):
 			
-			trace = vtrace.getTrace()
-			trace.registerNotifier(vtrace.NOTIFY_SIGNAL, notifier)
-			trace.execute(_command + " " + _params)
-			started.set()
-			trace.run()
+			self.trace = vtrace.getTrace()
+			self.trace.registerNotifier(vtrace.NOTIFY_SIGNAL, PeachNotifier())
+			self.trace.execute(self._command + " " + self._params)
+			UnixDebugger.started.set()
+			self.trace.run()
 			
 	
 	class UnixDebugger(Monitor):
 		'''
-		Unix vtrace monitor.  This debugger monitor uses the gdb
+		Unix GDB monitor.  This debugger monitor uses the gdb
 		debugger via pygdb wrapper.  Tested under Linux and OS X.
 		
 			* Collect core files
@@ -957,14 +935,14 @@ try:
 		'''
 		
 		def __init__(self, args):
-			Monitor.__init__(self, args)
 			
-			self.quit = Event()
-			self.started = Event()
-			self.handlingFault = Event()
-			self.handledFault = Event()
-			self.crashInfo = None
-			self.fault = False
+			UnixDebugger.quit = threading.Event()
+			UnixDebugger.started = threading.Event()
+			UnixDebugger.handlingFault = threading.Event()
+			UnixDebugger.handledFault = threading.Event()
+			UnixDebugger.lock = threading.Lock()
+			UnixDebugger.crashInfo = None
+			UnixDebugger.fault = False
 			self.thread = None
 			
 			if args.has_key('Command'):
@@ -996,42 +974,28 @@ try:
 				self._StartDebugger()
 		
 		def _StartDebugger(self):
-			self.started = Event()
-			self.quit = Event()
-			self.handlingFault = Event()
-			self.handledFault = Event()
-			self.crashInfo = None
-			self.fault = False
+			UnixDebugger.quit.clear()
+			UnixDebugger.started.clear()
+			UnixDebugger.handlingFault.clear()
+			UnixDebugger.handledFault.clear()
+			UnixDebugger.fault = False
+			UnixDebugger.crashInfo = None
 			
-			(fd, self.tempfile) = tempfile.mkstemp()
-			os.close(fd)
-			
-			try:
-				os.unlink(self.tempfile)
-			except:
-				pass
-			
-			self.thread = Process(group = None, target = TraceThread_run, kwargs = {
-				'Started':self.started,
-				'HandlingFault':self.handlingFault,
-				'HandledFault':self.handledFault,
-				'Command':self._command,
-				'Parameters':self._params,
-				'ProcessID':self._pid,
-				'Quit':self.quit,
-				'Tempfile':self.tempfile
-				})
+			self.thread = _TraceThread()
+			self.thread._command = self._command
+			self.thread._params = self._params
+			self.thread._pid = self._pid
 			
 			self.thread.start()
-			self.started.wait()
+			UnixDebugger.started.wait()
 			time.sleep(2)	# Let things spin up!
 		
 		def _StopDebugger(self):
 			
 			if self.thread != None:
-				if self.thread.is_alive():
-					self.quit.set()
-					self.started.clear()
+				if self.thread.isAlive():
+					UnixDebugger.quit.set()
+					UnixDebugger.started.clear()
 					self.thread.trace.kill()
 					self.thread.join()
 					time.sleep(0.25)	# Take a breath
@@ -1040,7 +1004,7 @@ try:
 				self.thread.trace.releaseMemory() # FIX fd
 		
 		def _IsDebuggerAlive(self):
-			return self.thread != None and self.thread.is_alive()
+			return self.thread != None and self.thread.isAlive()
 		
 		def OnTestStarting(self):
 			'''
@@ -1062,23 +1026,16 @@ try:
 			'''
 			Get any monitored data.
 			'''
-			
-			print "GetMonitorData(): Loading from file"
-			fd = open(self.tempfile, "rb+")
-			self.crashInfo = pickle.loads(fd.read())
-			fd.close()
-			
-			try:
-				os.unlink(self.tempfile)
-			except:
-				pass
-			
-			print "GetMonitorData(): Got it!"
-			if self.crashInfo != None:
-				ret = self.crashInfo
-				self.crashInfo = None
+			UnixDebugger.lock.acquire()
+			if UnixDebugger.crashInfo != None:
+				ret = UnixDebugger.crashInfo
+				UnixDebugger.crashInfo = None
+				UnixDebugger.lock.release()
+				print "Returning crash data!"
 				return ret
 			
+			UnixDebugger.lock.release()
+			print "Not returning any crash data!"
 			return None
 		
 		def DetectedFault(self):
@@ -1086,16 +1043,22 @@ try:
 			Check if a fault was detected.
 			'''
 			
-			if self.thread and self.thread.is_alive():
 				time.sleep(0.25)
 			
-			if not self.handlingFault.is_set():
+			if not UnixDebugger.handlingFault.is_set():
 				return False
 			
-			self.handledFault.wait()
+			UnixDebugger.handledFault.wait()
+			UnixDebugger.lock.acquire()
 			
+			if UnixDebugger.fault or not self.thread.isAlive():
 			print ">>>>>> RETURNING FAULT <<<<<<<<<"
+				UnixDebugger.fault = False
+				UnixDebugger.lock.release()
 			return True
+		
+			UnixDebugger.lock.release()
+			return False
 		
 		def OnFault(self):
 			'''
