@@ -8,6 +8,7 @@ v2.3.9
  - Change: Optimized minset, much faster now.
  - Bug: Fixed issue killing hung process on Windows
  - Bug: Fixed several Linux related issues in PeachValidator.pyw
+ - Bug: Fixed cracking bug with padded strings
 
 v2.3.8
 ------
