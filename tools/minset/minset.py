@@ -235,7 +235,7 @@ class PeachCoverage:
 				cmd)
 			
 			childPid = None
-			for i in range(10):
+			for i in range(60):
 				time.sleep(1)
 				
 				pid = ctypes.windll.kernel32.GetProcessId(hProcPin)
