@@ -56,7 +56,7 @@ from Peach.Gui import PeachValidator
 
 # Chdir so we can locate our icons
 if not (hasattr(sys,"frozen") and sys.frozen == "windows_exe"):
-	os.chdir( sys.path[0] + "/peach/gui" )
+	os.chdir(os.path.join(sys.path[0], "Peach", "Gui"))
 else:
 	os.chdir(os.path.dirname(os.path.abspath(sys.executable)))
 	
