@@ -1899,7 +1899,7 @@ class DataCracker:
 						
 						# Handle padding
 						if node.length != len(defaultValue):
-							defaultValue += node.padCharacter * (node.Length - len(defaultValue))
+							defaultValue += node.padCharacter * (node.length - len(defaultValue))
 						
 						if value != defaultValue and node.isStatic:
 							Debug(1, "%s_handleString: %s: Bad match, static, but default didn't match [%s != %s]" % ('\t'*self.deepString, node.name, repr(value), repr(defaultValue)))
