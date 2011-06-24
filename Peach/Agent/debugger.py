@@ -540,12 +540,12 @@ try:
 			if args.has_key("StartOnCall"):
 				self.StartOnCall = True
 				self.OnCallMethod = str(args['StartOnCall']).replace("'''", "").lower()
+			else:
+				self.StartOnCall = False
 				
 			if args.has_key("WinDbg"):
 				self.WinDbg = str(args['WinDbg']).replace("'''", "").lower()
 				
-			else:
-				self.StartOnCall = False
 			
 			if args.has_key("IgnoreFirstChanceGardPage"):
 				self.IgnoreFirstChanceGardPage = True
