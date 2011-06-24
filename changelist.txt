@@ -6,6 +6,8 @@ v2.3.9
 
  - New: Windows debugger has new paramter "WinDbg" or path to windows debugger
  - Change: Optimized minset, much faster now.
+ - Bug: Fixed issue killing hung process on Windows
+ - Bug: Fixed several Linux related issues in PeachValidator.pyw
 
 v2.3.8
 ------
