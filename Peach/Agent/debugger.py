@@ -639,9 +639,9 @@ try:
 				# CPU killing k0de.
 				time.sleep(1)
 		
-		def _StopDebugger(self):
+		def _StopDebugger(self, force = False):
 			
-			if self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+			if not force and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
 				print "_StopDebugger(): Not killing process due to fault handling"
 				return
 			
@@ -653,7 +653,7 @@ try:
 				
 				self.thread.join(5)
 				
-				if self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+				if not force and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
 					print "_StopDebugger(): Not killing process due to fault handling - 2"
 					return
 				
@@ -776,7 +776,7 @@ try:
 			if not self.handledFault.is_set():
 				print "RedoTest: Timmed out waiting for fault information"
 				print "RedoTest: Attempting to re-run iteration"
-				self._StopDebugger()
+				self._StopDebugger(True)
 				_DbgEventHandler.TakeStackTrace = False
 				return True
 			
