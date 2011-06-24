@@ -95,15 +95,15 @@ class PeachValidatorGui(gui.PeachValidation):
 		
 		# Create Tree image list
 		self.treeImages = wx.ImageList(16,16)
-		self.treeImages.NodeTemplate= self.treeImages.Add(wx.Bitmap("icons\\node-template.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeBlock   = self.treeImages.Add(wx.Bitmap("icons\\node-block.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeChoice  = self.treeImages.Add(wx.Bitmap("icons\\node-choice.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeFlags   = self.treeImages.Add(wx.Bitmap("icons\\node-flags.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeNumber  = self.treeImages.Add(wx.Bitmap("icons\\node-number.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeString  = self.treeImages.Add(wx.Bitmap("icons\\node-string.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeUnknown = self.treeImages.Add(wx.Bitmap("icons\\node-unknown.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeBlob    = self.treeImages.Add(wx.Bitmap("icons\\node-blob.png", wx.BITMAP_TYPE_ANY))
-		self.treeImages.NodeError   = self.treeImages.Add(wx.Bitmap("icons\\node-error.png", wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeTemplate= self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-template.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeBlock   = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-block.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeChoice  = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-choice.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeFlags   = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-flags.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeNumber  = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-number.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeString  = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-string.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeUnknown = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-unknown.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeBlob    = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-blob.png"), wx.BITMAP_TYPE_ANY))
+		self.treeImages.NodeError   = self.treeImages.Add(wx.Bitmap(os.path.join("icons", "node-error.png"), wx.BITMAP_TYPE_ANY))
 		
 		self.ImageLookup = {'block':self.treeImages.NodeBlock,
 							'choice':self.treeImages.NodeChoice,
