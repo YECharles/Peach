@@ -355,9 +355,10 @@ Debug Peach XML File
 			from Peach.Engine.common import *
 			
 			try:
-				range = optlist[i][1].split(',')
+				range = args[0].split(',')
 				range[0] = long(range[0])
 				range[1] = long(range[1])
+				args = args[1:]
 			except:
 				range = [long(args[0]), long(args[1])]
 				args = args[2:]
