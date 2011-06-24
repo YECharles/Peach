@@ -48,7 +48,7 @@ class RemotePublisher(Publisher):
 		self._cls = cls
 		self._args = args
 		self._initialized = False
-	
+		
 	def start(self):
 		if self._initialized == False:
 			self._agent = Engine.context.agent[self._agentName]
