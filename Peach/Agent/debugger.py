@@ -641,11 +641,11 @@ try:
 		
 		def _StopDebugger(self, force = False):
 			
-			if not force and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+			if force == False and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
 				print "_StopDebugger(): Not killing process due to fault handling"
 				return
 			
-			print "_StopDebugger()"
+			print "_StopDebugger() - force:", force
 			
 			if self.thread != None and self.thread.is_alive():
 				self.quit.set()
@@ -653,7 +653,7 @@ try:
 				
 				self.thread.join(5)
 				
-				if not force and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
+				if force == False and self.handledFault != None and (self.handlingFault.is_set() and not self.handledFault.is_set()):
 					print "_StopDebugger(): Not killing process due to fault handling - 2"
 					return
 				
@@ -783,9 +783,10 @@ try:
 			
 			if not self.handledFault.is_set():
 				print "RedoTest: Timmed out waiting for fault information"
-				print "RedoTest: Attempting to re-run iteration"
+				print "RedoTest: Killing debugger and target"
 				self._StopDebugger(True)
 				_DbgEventHandler.TakeStackTrace = False
+				print "RedoTest: Attempting to re-run iteration"
 				return True
 			
 			return False
