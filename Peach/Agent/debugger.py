@@ -658,7 +658,15 @@ try:
 					return
 				
 				if self.thread.is_alive():
+					
+					# 1. Terminate child process
+					if self.pid != None:
+						psutil.Process(self.pid).terminate()
+					
+					# 2. Terminate debugger process
 					self.thread.terminate()
+					
+					# 3. Join process to avoid ZOMBIES!
 					self.thread.join()
 				
 				time.sleep(0.25) # Take a breath
