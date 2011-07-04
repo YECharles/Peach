@@ -9,6 +9,7 @@ v2.3.9
  - Bug: Fixed issue killing hung process on Windows
  - Bug: Fixed several Linux related issues in PeachValidator.pyw
  - Bug: Fixed cracking bug with padded strings
+ - Bug: Made some fixes to the COM publisher regarding Numbers
 
 v2.3.8
 ------
