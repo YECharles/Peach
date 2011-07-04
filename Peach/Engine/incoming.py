@@ -1189,7 +1189,16 @@ class DataCracker:
 			
 			# If we are a choice we fail
 			if n.elementType == 'choice':
-				#print "_isTokenNext: Found choice, exiting"
+				# Really we can look into our choice and see
+				# if there is a token we can match.
+				
+				for child in n:
+					if child.choiceCache[0] == False:
+						return None
+					
+					# All children are fast checks!
+					return (n, length)
+				
 				return None
 			
 			# We fail if array found
@@ -2716,26 +2725,42 @@ class DataCracker:
 				
 				Debug(1, "_handleBlob: self._isTokenNext(%s): %s" % (node.name, staticNode.name))
 				
-				# 1. Locate staticNode position
-				val = staticNode.getValue()
-				Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
-				
-				valPos = buff.data[pos:].find(val)
-				while valPos == -1:
-					if buff.haveAllData:
+				valPos = -1
+				if isinstance(staticNode, Choice):
+					for n in staticNode:
+						Debug(1, "Looking from choice for [%s][%s]" % (repr(n.choiceCache[2]), repr(buff.data[pos:])))
+						valPos = buff.data[pos:].find(n.choiceCache[2])
+						if valPos != -1:
+							break
+					
+					if valPos == -1:
 						newpos = pos
 						value = ""
 						rating = 4
-						Debug(1, " :( Have all data")
-						break
+						Debug(1, "Unable to find choice branch in look ahead")
 					
-					try:
-						buff.read(1)
-						
-					except:
-						pass
+				else:
+				
+					# 1. Locate staticNode position
+					val = staticNode.getValue()
+					Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
 					
 					valPos = buff.data[pos:].find(val)
+					while valPos == -1:
+						if buff.haveAllData:
+							newpos = pos
+							value = ""
+							rating = 4
+							Debug(1, " :( Have all data")
+							break
+						
+						try:
+							buff.read(1)
+							
+						except:
+							pass
+						
+						valPos = buff.data[pos:].find(val)
 				
 				if valPos != -1:
 					# 2. Subtract length
