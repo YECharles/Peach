@@ -93,7 +93,15 @@ class Com(Publisher):
 		
 		self._lastReturn = None
 		
+		realArgNodes = []
 		for arg in argNodes:
+			if len(arg) == 1:
+				realArgNodes.append(arg[0])
+			else:
+				realArgNodes.append(arg)
+		
+		
+		for arg in realArgNodes:
 			print "Type", type(arg.getInternalValue())
 			print "Value", repr(arg.getInternalValue())
 		
@@ -101,14 +109,16 @@ class Com(Publisher):
 			ret = None
 			callStr = "ret = self._object.%s(" % str(method)
 			
-			if len(argNodes) > 0:
+			if len(realArgNodes) > 0:
 				for i in range(0, len(argNodes)):
-					callStr += "argNodes[%d].getInternalValue()," % i
+					callStr += "realArgNodes[%d].getInternalValue()," % i
 				
 				callStr = callStr[:len(callStr)-1] + ")"
 			
 			else:
 				callStr += ")"
+			
+			print "Call:", callStr
 			
 			exec callStr
 			return ret
