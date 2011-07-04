@@ -73,3 +73,11 @@ STDMETHODIMP CPeachComTest::Method5(LONG int1, SHORT short1, LONG* retval)
 
 	return S_OK;
 }
+
+STDMETHODIMP CPeachComTest::Method6(SHORT shortParam, INT intParam)
+{
+	// TODO: Add your implementation code here
+	wprintf(L"CPeachComTest::Method6(%d, %d)\n", shortParam, intParam);
+
+	return S_OK;
+}

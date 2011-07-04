@@ -23,6 +23,7 @@ interface IPeachComTest : IDispatch{
 	[propget, id(5), helpstring("property Property1")] HRESULT Property1([out, retval] BSTR* pVal);
 	[propput, id(5), helpstring("property Property1")] HRESULT Property1([in] BSTR newVal);
 	[id(6), helpstring("method Method5")] HRESULT Method5([in] LONG int1, [in] SHORT short1, [out,retval] LONG* retval);
+	[id(7), helpstring("method Method6")] HRESULT Method6([in] SHORT shortParam, [in] INT intParam);
 };
 [
 	uuid(BA7F9B7B-ABB3-46BD-9594-5F643A5BED35),

@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0500 */
-/* at Wed Mar 16 16:43:29 2011
+/* at Mon Jul 04 15:30:13 2011
  */
 /* Compiler settings for .\ComTest.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
@@ -110,6 +110,10 @@ EXTERN_C const IID IID_IPeachComTest;
             /* [in] */ SHORT short1,
             /* [retval][out] */ LONG *retval) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE Method6( 
+            /* [in] */ SHORT shortParam,
+            /* [in] */ INT intParam) = 0;
+        
     };
     
 #else 	/* C style interface */
@@ -189,6 +193,11 @@ EXTERN_C const IID IID_IPeachComTest;
             /* [in] */ SHORT short1,
             /* [retval][out] */ LONG *retval);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *Method6 )( 
+            IPeachComTest * This,
+            /* [in] */ SHORT shortParam,
+            /* [in] */ INT intParam);
+        
         END_INTERFACE
     } IPeachComTestVtbl;
 
@@ -245,6 +254,9 @@ EXTERN_C const IID IID_IPeachComTest;
 
 #define IPeachComTest_Method5(This,int1,short1,retval)	\
     ( (This)->lpVtbl -> Method5(This,int1,short1,retval) ) 
+
+#define IPeachComTest_Method6(This,shortParam,intParam)	\
+    ( (This)->lpVtbl -> Method6(This,shortParam,intParam) ) 
 
 #endif /* COBJMACROS */
 
