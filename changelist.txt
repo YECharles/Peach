@@ -10,6 +10,7 @@ v2.3.9
  - Bug: Fixed several Linux related issues in PeachValidator.pyw
  - Bug: Fixed cracking bug with padded strings
  - Bug: Made some fixes to the COM publisher regarding Numbers
+ - Bug: Fixed incoming parsing when unsized blob next to choice with tokens
 
 v2.3.8
 ------
