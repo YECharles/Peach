@@ -55,7 +55,7 @@ class ExpressionFixup(Fixup):
 		if stuff == None:
 			raise Exception("Error: ExpressionFixup was unable to locate [%s]" % self.ref)
 		
-		return evalEvent(self.expression, { "self" : self, "ref" : ref, "data" : stuff  }, self)
+		return evalEvent(self.expression, { "self" : self, "ref" : ref, "data" : stuff  }, ref)
 
 class SHA224Fixup(Fixup):
 	def __init__(self, ref):
