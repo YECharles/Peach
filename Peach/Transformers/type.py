@@ -280,7 +280,7 @@ class AsInt24(Transformer):
 			else:
 				return v[1:]
 		except:
-			return 0
+			return '0'
 		
 class AsInt32(_AsNumber):
 	'''Transform an number to an INT32 or UINT32
