@@ -36,6 +36,7 @@ detect faults.  Would be nice to also eventually do other things like
 # $Id$
 
 import struct, sys, time, psutil, signal
+from psutil.error import NoSuchProcess
 from Peach.agent import Monitor
 
 import struct, sys, time, os, re, pickle
@@ -720,14 +721,18 @@ try:
 								pass
 					
 					if self.NoCpuKill == False and self.pid != None:
-						# Check and see if the CPU utalization is low
-						cpu = psutil.Process(self.pid).get_cpu_percent(interval=1.0)
-						if cpu != None and cpu < 1.0:
+						try:
+							# Check and see if the CPU utalization is low
 							cpu = psutil.Process(self.pid).get_cpu_percent(interval=1.0)
-							if cpu != None and cpu < 1.0 and not self.quit.is_set():
-								print "PublisherCall: Stopping debugger, CPU:", cpu
-								self._StopDebugger()
-								return False
+							if cpu != None and cpu < 1.0:
+								cpu = psutil.Process(self.pid).get_cpu_percent(interval=1.0)
+								if cpu != None and cpu < 1.0 and not self.quit.is_set():
+									print "PublisherCall: Stopping debugger, CPU:", cpu
+									self._StopDebugger()
+									return False
+						
+						except NoSuchProcess, e:
+							pass
 				
 				return not self.quit.is_set()
 			
