@@ -12,6 +12,7 @@ v2.3.9
  - Bug: Made some fixes to the COM publisher regarding Numbers
  - Bug: Fixed incoming parsing when unsized blob next to choice with tokens
  - Bug: Fixed a bug with 24 bit Numbers causing crash
+ - Bug: Early termination of process could cause psutil exception
 
 v2.3.8
 ------
