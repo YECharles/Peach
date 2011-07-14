@@ -191,6 +191,7 @@ class PeachCoverage:
 	
 	def fileLineCount(self, fname):
 		f = open(fname)
+		i = 0
 		for i, l in enumerate(f):
 			pass
 		
@@ -431,6 +432,7 @@ Note:
 """
 
 parser = OptionParser(usage)
+parser.disable_interspersed_args()
 parser.add_option("-k", "--kill", action="store_true", dest="needsKilling", default=False,
 				  help="Kill command when CPU time nears 0")
 parser.add_option("-t", "--traces", action="store", type="string", dest="tracesPath", default=None,
