@@ -880,6 +880,9 @@ class DataCracker:
 			
 			length = None
 			relation = node.getRelationOfThisElement('size')
+			if relation.isOutputOnly:
+				relation = None
+			
 			if relation != None and node.parent != None:
 				try:
 					

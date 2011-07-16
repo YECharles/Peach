@@ -2361,6 +2361,8 @@ class DataElement(Mutatable):
 		else:
 			#print "getValue(%s): Using getrawvalue" % self.name
 			value = self.getRawValue(sout)
+			#print "getValue(%s): Using getrawvalue: %s" % (self.name, type(value))
+			
 		
 		# See if we need to repeat ourselvs.
 		if not self.isArray():
@@ -3623,6 +3625,7 @@ class Number(DataElement):
 		return 0
 	
 	def getRawValue(self, sout = None):
+		
 		value = self.getInternalValue()
 		if value == '':
 			return ''
@@ -4783,6 +4786,9 @@ class Relation(Element):
 		self.relative = False
 		#: Relative to this element (string)
 		self.relativeTo = None
+		
+		#:Only for output?
+		self.isOutputOnly = False
 		
 		#: Parent of this object
 		#self.parent = parent

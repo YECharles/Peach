@@ -1135,6 +1135,9 @@ class ParseTemplate:
 		relation.expressionGet = expressionGet
 		relation.expressionSet = expressionSet
 		
+		if self._getAttribute(node, "isOutputOnly") != None and self._getAttribute(node, "isOutputOnly") in ["True","true"]:
+			relation.isOutputOnly = True
+		
 		if relative != None:
 			if relative.lower() in ["true", "1"]:
 				relation.relative = True
