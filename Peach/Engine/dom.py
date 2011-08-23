@@ -293,7 +293,8 @@ class Element(object):
 		if owner == None:
 			owner = parent
 		
-		if hasattr(self, 'ref') and self.ref != None:
+		# Only use ref if name is not available!
+		if hasattr(self, 'ref') and self.ref != None and not self.name.startswith('Named_'):
 			ref = self.ref.replace(":", "_")
 			node = owner.createElementNS(None, ref)
 		else:
