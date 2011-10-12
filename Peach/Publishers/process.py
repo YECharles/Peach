@@ -301,6 +301,18 @@ class DebuggerLauncher(Publisher):
 			
 			time.sleep(0.25)
 
+class DebuggerLauncherNoWait(Publisher):
+	'''
+	Launch a program via Debugger
+	'''
+	
+	def __init__(self, waitTime = 3):
+		Publisher.__init__(self)
+		self.waitTime = float(waitTime)
+		
+	def call(self, method, args):
+		Engine.context.agent.OnPublisherCall(method)
+
 try:
 	import win32gui, win32con, win32process, win32event, win32api
 	import sys,time, os, signal, subprocess, ctypes
