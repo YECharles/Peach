@@ -419,7 +419,12 @@ class RandomMutationStrategy(MutationStrategy):
 				
 				for i in range(self._random.randint(1, maxN)):
 					# Now perform mutations on fields
-					for node in self._random.sample(fields, self._random.randint(1, len(fields))):
+					if len(fields) < 3:
+						sampleset = fields
+					else:
+						sampleset = self._random.sample(fields, self._random.randint(1, len(fields)))
+					
+					for node in sampleset:
 						try:
 							mutator = self._random.choice(self._fieldMutators[node.getFullname()])
 							
