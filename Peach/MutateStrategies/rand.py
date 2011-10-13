@@ -373,7 +373,11 @@ class RandomMutationStrategy(MutationStrategy):
 				nodes = dataModel.getAllChildDataElements()
 				nodes.append(dataModel)
 				
+				nonMutableNodes = []
+				
 				for node in nodes:
+					if not node.isMutable:
+						nonMutableNodes.append(node)
 					mutators = []
 					self._fieldMutators[node.getFullname()] = mutators
 					
@@ -382,7 +386,12 @@ class RandomMutationStrategy(MutationStrategy):
 							# Need to create new instance from class
 							for i in range(m.weight**4):
 								mutators.append( m(Engine.context,node) )
-			
+				
+				for node in nonMutableNodes:
+					nodes.remove(node)
+				
+				nonMutableNodes = None
+				
 			return
 		
 		else:
