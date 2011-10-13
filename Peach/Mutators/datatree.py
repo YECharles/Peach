@@ -65,10 +65,12 @@ class DataTreeRemoveMutator(Mutator):
 	
 	def sequencialMutation(self, node):
 		self.changedName = node.getFullnameInDataModel()
+		print "DataTreeRemoveMutator: " + self.changedName
 		node.setValue("")
 	
 	def randomMutation(self, node, rand):
 		self.changedName = node.getFullnameInDataModel()
+		print "DataTreeRemoveMutator: " + self.changedName
 		node.setValue("")
 
 
