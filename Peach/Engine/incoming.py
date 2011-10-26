@@ -110,7 +110,7 @@ class DataCracker:
 		for node in datamodel.getAllChildDataElements():
 			if node.elementType == 'choice':
 				for child in node:
-					
+				
 					# If _isTokenNext on our choice child is true we can cache
 					# cache that value and use it to super speed up choice checks
 					fastCheck = False
@@ -1196,7 +1196,7 @@ class DataCracker:
 				# if there is a token we can match.
 				
 				for child in n:
-					if child.choiceCache[0] == False:
+					if not hasattr(child, "choiceCache") or child.choiceCache[0] == False:
 						return None
 					
 					# All children are fast checks!
