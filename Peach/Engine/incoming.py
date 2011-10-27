@@ -2068,7 +2068,7 @@ class DataCracker:
 					
 					# 1. Locate staticNode position
 					val = staticNode.getValue()
-					Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])))
+					Debug(1, "Looking for [%s][%s]" % (repr(val), repr(buff.data[pos:])[:50]))
 					valPos = buff.data[pos:].find(val)
 					while valPos == -1:
 						if buff.haveAllData:

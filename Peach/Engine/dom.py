@@ -1761,8 +1761,21 @@ class DataElement(Mutatable):
 				obj = self._checkDottedName(self.getRootOfDataMap(), names)
 				if obj != None:
 					return obj
-				
-			return cPeach.findDataElementByName(self, names)
+			
+			#if len(names) > 1:
+			#	obj = cPeach.findDataElementByName(self, [names[0]])
+			#	if obj != None:
+			#		print obj
+			#		obj = self._checkDottedName(obj, names)
+			#		if obj != None:
+			#			#print "[%s] R: %s" %(name, obj)
+			#			return obj
+			
+			ret = cPeach.findDataElementByName(self, names)
+			#print "[%s] R: %s" % (name, ret)
+			
+			return ret
+			
 			
 			##print "----"
 			##for block in self._findAllBlocksGoingUp():
@@ -2441,6 +2454,9 @@ class DataElement(Mutatable):
 		to deal with, so keep going until we find no more.
 		'''
 		
+		#print "---> FIX REAL PARENT <-----", node
+		#print traceback.format_stack()
+		
 		while True:
 			# 1. Find root
 		
@@ -2449,8 +2465,9 @@ class DataElement(Mutatable):
 				root = root.parent
 		
 			# 2. Check if has a realParent
-		
+			
 			if hasattr(root, 'realParent') and root.realParent != None:
+				#print "FIXING:", root
 				root.parent = root.realParent
 			else:
 				break
@@ -2468,10 +2485,14 @@ class DataElement(Mutatable):
 		root.
 		'''
 		
+		#print "---> UN-FIX REAL PARENT <-----", node
+		#print traceback.format_stack()
+		
 		parents = [node]
 		
 		root = node
-		while root.parent != None and not root.parent.isDataElement:
+		#while root.parent != None and not root.parent.isDataElement:
+		while root.parent != None and root.parent.isDataElement:
 			root = root.parent
 			parents.append(root)
 		
@@ -2479,6 +2500,7 @@ class DataElement(Mutatable):
 			# 1. Look for fake root
 			if hasattr(parent, 'realParent') and parent.parent != None:
 				# 2. Remove parent link
+				#print "UNFIXING:", parent
 				parent.parent = None
 
 	def	calcLength(self):
