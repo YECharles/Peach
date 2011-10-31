@@ -436,7 +436,7 @@ class Process(Monitor):
 		self._StopProcess()
 
 try:
-	import win32serviceutils
+	import win32serviceutil
 except:
 	pass
 
