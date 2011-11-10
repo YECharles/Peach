@@ -481,7 +481,7 @@ class FiniteRandomNumbersMutator(Mutator):
 		self._peach = peach
 		self._countThread = None
 		
-		self._n = self._getN(node, 500)
+		self._n = self._getN(node, 5000)
 		self._currentCount = 0
 		
 		if isinstance(node, String):
