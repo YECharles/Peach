@@ -318,7 +318,7 @@ class XmlParserTestsInvalid(XmlParserTestsGeneric):
 		'''
 		XmlParserTestsGeneric.__init__(self, group, testsFolder, None)
 		self.setGroup(group)
-		self._testsFile = 'valid.txt'
+		self._testsFile = 'invalid.txt'
 		if testsFolder != None:
 			self._testsFolder = testsFolder
 
