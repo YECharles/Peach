@@ -34,6 +34,7 @@ Default included TCP publishers.
 # $Id$
 
 import socket, time, sys
+from Peach.Engine.engine import Engine
 from Peach.Engine.common import SoftException, PeachException
 from Peach.publisher import Publisher
 from Peach.publisher import Timeout
