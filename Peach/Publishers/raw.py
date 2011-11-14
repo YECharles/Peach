@@ -248,8 +248,13 @@ class RawIp(Publisher):
 		if self._socket != None:
 			# Close out old socket first
 			self._socket.close()
-		self._socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
-		self._socket.bind((self._interface,0))
+		self._socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
+		self._socket.bind((self._interface, 0))
+
+		# Include IP headers
+		self._socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+		#self._socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+		#self._socket.bind((self._interface,0))
 	
 	def close(self):
 		if self._socket != None:
