@@ -2459,11 +2459,11 @@ class DataElement(Mutatable):
 		
 		while True:
 			# 1. Find root
-		
+			
 			root = node
 			while root.parent != None:
 				root = root.parent
-		
+			
 			# 2. Check if has a realParent
 			
 			if hasattr(root, 'realParent') and root.realParent != None:
@@ -2517,7 +2517,7 @@ class DataElement(Mutatable):
 			return evalEvent(self.lengthCalc, environment, self)
 		finally:
 			self._unFixRealParent(self)
-		
+
 class Transformer(ElementWithChildren):
 	'''
 	The Trasnfomer DOM object.  Should only be a child of
@@ -3874,9 +3874,11 @@ try:
 					
 				# Otherwise allow parent to perform encoding
 				return asn1Obj
+			
 			except:
 				print sys.exc_info()
-				raise PeachException("ASN.1 FAILURE")
+				print "Warning, ASN.1 Failed to emmit, this is OK after first iteration."
+				return ""
 			
 			return None
 		
