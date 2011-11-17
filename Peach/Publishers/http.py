@@ -45,6 +45,7 @@ class HttpPost:
 	'''
 	
 	def __init__(self, url):
+		Publisher.__init__(self)
 		#: Indicates which method should be called.
 		self.withNode = False
 		self.url = url
