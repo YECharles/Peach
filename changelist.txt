@@ -7,6 +7,9 @@ v2.3.9
  - New: Windows debugger has new paramter "WinDbg" or path to windows debugger
  - Change: Optimized minset, much faster now.
  - Change: minset now supported parameters with "-" to get target program
+ - Change: getElementsByType checks Fixups off of DataElements
+ - Change: _fixParents now updates .fixup if it exists
+ - Bug: Fixed issue with Placement and fixups
  - Bug: Fixed issue killing hung process on Windows
  - Bug: Fixed several Linux related issues in PeachValidator.pyw
  - Bug: Fixed cracking bug with padded strings
