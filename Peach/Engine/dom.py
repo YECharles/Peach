@@ -502,6 +502,9 @@ class Element(object):
 		if parent != None:
 			start.parent = parent
 		
+		if hasattr(start, 'fixup') and getattr(start, 'fixup') != None:
+			start.fixup.parent = start
+		
 		if start.isElementWithChildren:
 			for child in start._children:
 				self._FixParents(child, start)
@@ -648,7 +651,7 @@ class ElementWithChildren(Element):
 		
 		if isinstance(self, type):
 			ret.append(self)
-			
+		
 		for child in self:
 			if child.isElementWithChildren:
 				child.getElementsByType(type, ret)
@@ -1044,6 +1047,31 @@ class DataElement(Mutatable):
 		self._possiblePos = value
 		return self._possiblePos
 	possiblePos = property(get_possiblePos, set_possiblePos, None)
+
+	def getElementsByType(self, type, ret = None):
+		'''
+		Will return an array all elements of a specific type
+		in the tree starting with us.
+		'''
+
+		#print "getElementsByType: %s: %s" % (self.name, self.elementType)
+		
+		if ret == None:
+			ret = []
+		
+		if isinstance(self, type):
+			ret.append(self)
+		
+		elif self.fixup != None:
+			for child in self.fixup:
+				if child.isElementWithChildren:
+					child.getElementsByType(type, ret)
+		
+		for child in self:
+			if child.isElementWithChildren:
+				child.getElementsByType(type, ret)
+
+		return ret
 	
 	def clone(self, obj):
 		

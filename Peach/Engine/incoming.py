@@ -52,6 +52,18 @@ def Debug(level, msg):
 		if DataCracker._tabLevel == 0:
 			print msg
 
+def PeachStr(s):
+	'''
+	Our implementation of str() which does not
+	convert None to 'None'.
+	'''
+	
+	if s == None:
+		return None
+	
+	return str(s)
+
+
 class DataCracker:
 	'''
 	This class will try and parse data into a data model.  This
@@ -245,6 +257,7 @@ class DataCracker:
 				Debug(1, "Moving element [%s] to after [%s]." % (placement.parent.name, after.name))
 				Debug(1, "  Pre-name: %s" % placement.parent.getFullDataName())
 				Debug(1, "  Found %d relations" % len(relationsHold))
+				Debug(1, "  Found %d param references" % len(paramReferences))
 				
 				# Remove from old place
 				placement.parent.origName = placement.parent.name
@@ -278,6 +291,7 @@ class DataCracker:
 				Debug(1, "Moving element [%s] to before [%s]." % (placement.parent.name, before.name))
 				Debug(1, "  Pre-name: %s" % placement.parent.getFullDataName())
 				Debug(1, "  Found %d relations" % len(relationsHold))
+				Debug(1, "  Found %d param references" % len(paramReferences))
 				
 				# Remove from old place
 				placement.parent.origName = placement.parent.name
@@ -319,9 +333,34 @@ class DataCracker:
 					
 				#print "Updating %s to %s" % (relation.getFullname(), relation.of)
 			
-			Debug(1, "Update relations")
+			Debug(1, "Update param references")
 			for param, obj in paramReferences:
+				
+				# Need to recreate the fixup to make sure
+				# it re-parses the ref parameter.
+				
 				param.defaultValue = "'''%s'''" % obj.getFullnameInDataModel()
+				
+				fixup = param.parent
+				
+				code = "PeachXml_"+fixup.classStr + '('
+				
+				isFirst = True
+				for param in fixup:
+					if not isinstance(param, Param):
+						continue
+					
+					if not isFirst:
+						code += ', '
+					else:
+						isFirst = False
+					
+					code += PeachStr(param.defaultValue)
+				
+				code += ')'
+				
+				fixup.fixup = evalEvent(code, {})
+
 			
 		Debug(1, "Done cracking stuff")
 		#sys.exit(0)
