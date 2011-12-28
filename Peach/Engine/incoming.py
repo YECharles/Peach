@@ -715,6 +715,11 @@ class DataCracker:
 							else:
 								minParents = len(currentParents)
 							
+							# Make sure i gets initialized
+							# in some cases (minParents == 0) we never
+							# go through this next for loop and i is unknown.
+							i = minParents
+							
 							for i in range(minParents):
 								if relationParents[i] != currentParents[i]:
 									#Debug(1, "_handleArray: Miss-match parents: %s, %s" % (relationParents[i].name, currentParents[i].name))
