@@ -82,7 +82,7 @@ class Element(object):
 	
 	def __init__(self, name = None, parent = None):
 		#: Name of Element, cannot include "."s
-		self.name = name
+		self._name = name
 		#: Parent of Element
 		self.parent = parent
 		#self._parent = parent
@@ -105,9 +105,9 @@ class Element(object):
 		
 		self.ref = None		#: The reference that made us, or None
 		
-		if self.name == None or len(self.name) == 0:
-			self.name = self.getUniqueName()
-
+		if self._name == None or len(self._name) == 0:
+			self._name = self.getUniqueName()
+		
 	## The following are used for debugging purposes only
 	#
 	#def getParent(self):
@@ -125,6 +125,20 @@ class Element(object):
 	#	
 	#	self._parent = parent
 	#parent = property(fget=getParent, fset=setParent)
+	
+	def get_Name(self):
+		return self._name
+	def set_Name(self, value):
+		if(hasattr(self, "parent") and self.parent != None):
+			if self.parent.has_key(self._name):
+				del self.parent._childrenHash[self._name]
+				delattr(self.parent.children, obj.name)
+				
+				self.parent._childrenHash[value] = self
+				setattr(self.parent.children, value, self)
+				
+		self._name = value
+	name = property(get_Name, set_Name, None)
 	
 	def __deepcopy__(self, memo):
 		'''
@@ -616,8 +630,7 @@ class ElementWithChildren(Element):
 		self.isElementWithChildren = True
 		#: Used instead of isinstance which is slow
 		self.isElement = True
-	
-		
+
 	def getByName(self, name):
 		'''
 		Internal helper method, not for use!
@@ -756,6 +769,7 @@ class ElementWithChildren(Element):
 		
 		self._children.insert(index, obj)
 		if obj.name != None:
+			#print "inserting ",obj.name
 			self._childrenHash[obj.name] = obj
 			setattr(self.children, obj.name, obj)
 	
@@ -1893,12 +1907,19 @@ class DataElement(Mutatable):
 		'''
 		
 		if node.name != names[0]:
-			#print "_checkDottedName: %s != %s" % (node.name, names[0])
+			print "_checkDottedName: %s != %s" % (node.name, names[0])
 			return None
 		
 		obj = node
 		for i in range(1, len(names)):
 			if not obj.has_key(names[i]):
+				#print "_checkDottedName: %s not found" % (names[i])
+				#for child in obj:
+				#	print "_checkDottedNames: Have:", child.name
+				#	if child.parent != obj:
+				#		print "_checkDottedNames: BAD PARRENT"
+				#for key in obj._childrenHash.keys():
+				#	print "_checkDottedName: Key:", key
 				return None
 			
 			obj = obj[names[i]]
