@@ -697,11 +697,11 @@ class StateEngine:
 						setElement.defaultValue = valueElement.getValue()
 					
 					else:
-						setElement.currentValue = valueElement.currentValue
+						setElement.currentValue = valueElement.getValue()
 						setElement.defaultValue = valueElement.defaultValue
 					
 					setElement.value = None
-				
+					
 				else:
 					
 					Debug(1, "Action-Slurp: 2 Setting %s to %s" % (

@@ -308,7 +308,7 @@ class Element(object):
 			owner = parent
 		
 		# Only use ref if name is not available!
-		if hasattr(self, 'ref') and self.ref != None and not self.name.startswith('Named_'):
+		if hasattr(self, 'ref') and self.ref != None and self.name.startswith('Named_'):
 			ref = self.ref.replace(":", "_")
 			node = owner.createElementNS(None, ref)
 		else:
@@ -3397,7 +3397,6 @@ class Block(DataElement):
 		# 1. Override with currentValue
 		
 		if self.currentValue != None:
-			#print "Block.getInternalValue(%s): Using currentValue" % self.name
 			value = str(self.currentValue)
 			if sout != None:
 				sout.write(value, self.getFullDataName())
