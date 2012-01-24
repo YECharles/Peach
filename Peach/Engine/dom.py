@@ -130,9 +130,9 @@ class Element(object):
 		return self._name
 	def set_Name(self, value):
 		if(hasattr(self, "parent") and self.parent != None):
-			if self.parent.has_key(self._name):
+			if self.parent.has_key(self._name) and self.parent[self._name] == self:
 				del self.parent._childrenHash[self._name]
-				delattr(self.parent.children, obj.name)
+				delattr(self.parent.children, self._name)
 				
 				self.parent._childrenHash[value] = self
 				setattr(self.parent.children, value, self)
