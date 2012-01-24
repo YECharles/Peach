@@ -841,9 +841,19 @@ class ElementWithChildren(Element):
 			return self._children.__delitem__(key)
 		
 		obj = self._childrenHash[key]
-		self._children.remove(obj)
-		del self._childrenHash[key]
-		delattr(self.children, key)
+		
+		try:
+			self._children.remove(obj)
+		except:
+			pass
+		
+		try:
+			del self._childrenHash[key]
+		except:
+			pass
+		
+		if hasattr(self.children, key):
+			delattr(self.children, key)
 	
 	def __iter__(self):
 		return self._children.__iter__()
