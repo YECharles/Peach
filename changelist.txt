@@ -4,6 +4,7 @@ Peach Changelist
 v2.3.9
 ------
 
+ - New: LinuxApport monitor that replaces UnixDebugger.
  - New: Windows debugger has new paramter "WinDbg" or path to windows debugger
  - Change: Optimized minset, much faster now.
  - Change: minset now supported parameters with "-" to get target program
