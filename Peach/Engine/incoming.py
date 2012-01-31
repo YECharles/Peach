@@ -445,6 +445,9 @@ class DataCracker:
 		Debug(1, "_handleArray(%s): %s >>Enter" % (node.name, node.elementType))
 		Debug(1, "_handleArray(%s): %s" % (node.name, node.getFullname()))
 		
+		if node.parent == None:
+			raise Exception("Error, parent is null: " + node.name)
+		
 		Debug(1, "*** Node Occures more then once!")
 		rating = newRating = 1
 		newCurPos = pos
