@@ -56,13 +56,18 @@ class LinuxApport(Monitor):
 		else:
 			self.logFolder = "/var/crash/"
 		
+		if not args.has_key('PeachApport'):
+			raise PeachException("Error, LinuxApport monitor requires the PeachApport parameter providing full path to \"peach-apport\" program.")
+		
+		self.PeachApport = self.logFolder = str(args['LogFolder']).replace("'''", "")
+		
 		# Our name for this monitor
 		self._name = "LinuxApport"
 		
 		self.data = None
 		self.startingFiles = None
 		
-		os.system('echo "|/home/dd/peach/tools/peach-apport/peach-apport %p %s %c" > /proc/sys/kernel/core_pattern')
+		os.system('echo "|' + self.PeachApport +' %p %s %c" > /proc/sys/kernel/core_pattern')
 	
 	
 	def OnTestStarting(self):
