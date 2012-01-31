@@ -34,7 +34,8 @@
 import network, debugger, vm, process, test, memory, power, gui, socketmon, osx, util
 
 __all__ = [ "network", "debugger", "vm", "process", "test",
-		   "memory", "power", "socketmon", "gui", "osx", "util" ]
+	    "memory", "power", "socketmon", "gui", "osx", "util",
+            "linux"]
 
 
 # end
