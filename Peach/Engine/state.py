@@ -702,6 +702,12 @@ class StateEngine:
 					
 					setElement.value = None
 					
+					#print " --- valueElement --- "
+					#pub.send(valueElement.getValue())
+					#print " --- setElement --- "
+					#pub.send(setElement.getValue())
+					#print " --------------------"
+					
 				else:
 					
 					Debug(1, "Action-Slurp: 2 Setting %s to %s" % (

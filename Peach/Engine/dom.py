@@ -490,11 +490,11 @@ class Element(object):
 			
 			if hasattr(self, 'realParent'):
 				self.realParent = selfRealParent
-		
+			
 			for child in self.getAllChildDataElements():
 				if hasattr(child, 'realParent') and child.realParent != None:
 					child.realParent = child.parent
-		
+			
 			for child in newSelf.getAllChildDataElements():
 				if hasattr(child, 'realParent') and child.realParent != None:
 					child.realParent = child.parent

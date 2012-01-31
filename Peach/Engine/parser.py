@@ -1328,7 +1328,7 @@ class ParseTemplate:
 		else:
 			block = dom.Block(name, parent)
 			block.ref = None
-		
+			
 		#block.node = node
 		
 		# length (in bytes)
