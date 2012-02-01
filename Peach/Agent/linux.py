@@ -59,7 +59,7 @@ class LinuxApport(Monitor):
 		if not args.has_key('PeachApport'):
 			raise PeachException("Error, LinuxApport monitor requires the PeachApport parameter providing full path to \"peach-apport\" program.")
 		
-		self.PeachApport = self.logFolder = str(args['LogFolder']).replace("'''", "")
+		self.PeachApport = self.logFolder = str(args['PeachApport']).replace("'''", "")
 		
 		# Our name for this monitor
 		self._name = "LinuxApport"
