@@ -801,6 +801,12 @@ try:
 			Check if a fault was detected.
 			'''
 			
+			if self.FaultOnEarlyExit and (self.thread == None or not self.thread.is_alive()) and \
+				(self.handledFault == None or not self.handledFault.is_set()):
+				
+				print ">>>>>> RETURNING EARLY EXIT FAULT <<<<<<<<<"
+				return True
+			
 			if self.handlingFault == None:
 				print "DetectedFault: Agent was re-set, returning false"
 				return False
