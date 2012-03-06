@@ -2694,6 +2694,7 @@ class Test(ElementWithChildren):
 		
 		return ret
 	
+
 	def markMutatableElements(self, node):
 		if len(self.mutatables) == 0:
 			return
@@ -2709,7 +2710,8 @@ class Test(ElementWithChildren):
 				xnodes = xmlDom.xpath(xpath)
 				#print "XPATH: %s # of nodes: %s" % (xpath, str(len(xnodes)))
 				if len(xnodes) == 0:
-					raise PeachException("XPath:[%s] must return at least an XNode. Please check your references or xpath declarations." % xpath)
+					print "Warning: XPath:[%s] must return at least an XNode. Please check your references or xpath declarations." % xpath
+					continue
 				
 				for node in xnodes:
 					try:
@@ -3964,6 +3966,37 @@ class XmlElement(DataElement):
 		# TODO: Should support Ctype, return a string or something...
 		raise Exception("This DataElement (XmlElement) does not support asCType()!")
 	
+	def toXmlDomLight(self, parent, dict):
+		'''
+		Convert to an XML DOM object tree for use in xpath queries.
+		Does not include values (Default or otherwise)
+		'''
+		
+		owner = parent.ownerDocument
+		if owner == None:
+			owner = parent
+		
+		#if hasattr(self, 'ref') and self.ref != None:
+		#	node = owner.createElementNS(None, self.ref)
+		#else:
+		node = owner.createElementNS(None, self.name)
+		
+		node.setAttributeNS(None, "elementType", self.elementType)
+		node.setAttributeNS(None, "name", self.name)
+		node.setAttributeNS(None, "elementName", self.elementName)
+		
+		if hasattr(self, 'ref') and self.ref != None:
+			self._setXmlAttribute(node, "ref", self.ref)
+		
+		self._setXmlAttribute(node, "fullName", self.getFullname())
+		
+		dict[node] = self
+		dict[self] = node
+		
+		parent.appendChild(node)
+		
+		return node
+
 	def getInternalValue(self, sout = None, parent = None):
 		'''
 		Return the internal value of this date element.  This
