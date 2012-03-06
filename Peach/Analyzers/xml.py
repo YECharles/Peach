@@ -247,7 +247,11 @@ class _Xml2Peach(object):
 		doc = Ft.Xml.Domlette.NonvalidatingReader.parse(isrc)
 		
 		peachDoc = Ft.Xml.Domlette.implementation.createDocument(EMPTY_NAMESPACE, None, None)
-		self.handleElement(doc.firstChild, peachDoc)
+		child = doc.firstChild
+		while(child.nodeName == "#comment"):
+			child = child.nextSibling
+			
+		self.handleElement(child, peachDoc)
 		
 		# Get the string representation
 		import cStringIO
@@ -297,12 +301,12 @@ class _Xml2Peach(object):
 					string.setAttributeNS(None, "value", child.nodeValue)
 					string.setAttributeNS(None, "type", "utf8")
 					element.appendChild(string)
-				
+			
 			elif child.nodeName == "#comment":
 				# xml comment
 				pass
 			else:
-				childElement = self.handleElement(child, element)
+				self.handleElement(child, element)
 		
 		return element
 	
@@ -339,7 +343,11 @@ class _Xml2Dom(object):
 	
 	def xml2Dom(self, data):
 		doc = Ft.Xml.Parse(data)
-		root = self.handleElement(doc.firstChild, None)
+		child = doc.firstChild
+		while(child.nodeName == "#comment"):
+			child = child.nextSibling
+			
+		root = self.handleElement(child, None)
 		
 		return root
 		
