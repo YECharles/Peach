@@ -4005,6 +4005,18 @@ class XmlElement(DataElement):
 		
 		For Numbers this is the python int value.
 		'''
+		# 0. If using a stream store our location
+		if sout != None:
+			pos = sout.storePosition(self.getFullDataName())
+		
+		# 1. Override with currentValue
+		
+		if self.currentValue != None:
+			value = str(self.currentValue)
+			if sout != None:
+				sout.write(value, self.getFullDataName())
+		
+			return value
 		
 		if parent == None:
 			haveParent = False
@@ -4029,6 +4041,7 @@ class XmlElement(DataElement):
 				#node.appendChild(doc.createTextNode(c.getValue()))
 		
 		if not haveParent:
+			
 			try:
 				encoding = "utf8"
 				unistr = doc.toxml().replace(u'<?xml version="1.0" ?>\n', u'')
