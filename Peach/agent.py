@@ -699,7 +699,13 @@ class AgentXmlRpc(xmlrpc.XMLRPC):
 		
 		return self._publishers[name].receive(size)
 
-import imp, os, sys
+import imp, os, sys, subprocess
+
+try:
+	import win32process
+	import win32con
+except:
+	pass
 
 class AgentClient:
 	'''
@@ -733,16 +739,22 @@ class AgentClient:
 		if agentUri == "LocalAgent":
 			# Swan up our own agent instance!
 			agentUri = self._agentUri = "http://127.0.0.1:9000"
-
+			
 			# Only Windows on windows, this covers both 32bit & 64bit			
 			if sys.platform == "win32":
 				if self.main_is_frozen():
 					# We are in py2exe
-					os.system("start \"Local Peach Agent\" \"%s\" -a" % (sys.argv[0]))
+					#subprocess.call("start \"Local Peach Agent\" \"%s\" -a" % (sys.argv[0]), shell=True)
+					self.LaunchWin32Process("cmd.exe /c \"start \"Local Peach Agent\"  \"%s\" -a\"" % (sys.argv[0]))
+					
 				else:
 					# Figure out were Peach is!
 					peachPath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-					os.system("start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a" % (sys.executable, peachPath))
+					#subprocess.call("start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a" %
+					#	(sys.executable, peachPath), shell=True)
+					self.LaunchWin32Process("cmd.exe /c \"start \"Local Peach Agent\" \"%s\" \"%s\\peach.py\" -a\"" %
+						(sys.executable, peachPath))
+					
 			else:
 				raise PeachException("Sorry, we only support auto starting agents on Windows.  Please configure all agents with location uris and pre-launch any Agent processes.")
 			
@@ -754,6 +766,26 @@ class AgentClient:
 			raise PeachException("Please make sure your agent location string is a valid http URL.")
 		
 		self.Connect()
+		
+	def LaunchWin32Process(self, command):
+		try:
+			StartupInfo = win32process.STARTUPINFO()
+			StartupInfo.dwFlags = win32process.STARTF_USESHOWWINDOW
+			StartupInfo.wShowWindow = win32con.SW_NORMAL
+			win32process.CreateProcess(
+				None,
+				command,
+				None,
+				None,
+				0,
+				win32process.NORMAL_PRIORITY_CLASS,
+				None,
+				None,
+				StartupInfo)
+		except:
+			print sys.exc_info()
+			print "Exception in LaunchWin32Process"
+			pass
 	
 	def main_is_frozen(self):
 		return (hasattr(sys, "frozen") or # new py2exe
