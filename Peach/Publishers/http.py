@@ -36,7 +36,7 @@ Send something by HTTP.
 import time, urllib2, httplib, urllib
 from Peach.publisher import Publisher
 
-class HttpPost:
+class HttpPost(Publisher):
 	'''
 	This publisher can be called like a method including one or more
 	parameters to be sent.
