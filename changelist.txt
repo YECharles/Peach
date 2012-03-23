@@ -10,6 +10,7 @@ v2.3.9
  - Change: minset now supported parameters with "-" to get target program
  - Change: getElementsByType checks Fixups off of DataElements
  - Change: _fixParents now updates .fixup if it exists
+ - Bug: Fixed HttpPost publisher to have correct parent
  - Bug: Fixed when spawning local agent, agent would have a file handle to log
  - Bug: Fixed non-working fault on exit parameter to windows debug engine
  - Bug: Fixed small bug when re-naming elements.
