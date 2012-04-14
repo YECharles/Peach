@@ -58,7 +58,6 @@ except:
 
 from Peach.Engine import parser, engine, incoming, dom
 from Peach.Engine.dom import *
-from Peach.Engine.dom import PeachDeepCopy
 import Peach
 
 class PeachResolver(SchemeRegistryResolver):
@@ -194,8 +193,6 @@ class Missing:
 		Add back in the non-pickleable instancemethods.
 		'''
 		
-		if not hasattr(model, "__deepcopy__"):
-			model.__deepcopy__ = new.instancemethod(PeachDeepCopy, model, model.__class__)
 		
 		if model.elementType == 'block':
 			model.toXml = new.instancemethod(BlockToXml, model, model.__class__)
@@ -221,8 +218,6 @@ class Missing:
 		Remove any instance methods.
 		'''
 		
-		if hasattr(model, "__deepcopy__"):
-			delattr(model, "__deepcopy__")
 		
 		if hasattr(model, "toXml") and (model.elementType == 'block' or model.elementType == 'namespace'):
 			delattr(model, "toXml")
@@ -275,6 +270,7 @@ class Missing:
 				
 				buff = PublisherBuffer(None, data)
 				cracker = incoming.DataCracker(self.peach)
+				cracker.optmizeModelForCracking(self.masterModel)
 				cracker.haveAllData = True
 				model = self.masterModel.copy(None)
 				(rating, pos) = cracker.crackData(model, buff, "setDefaultValue")
