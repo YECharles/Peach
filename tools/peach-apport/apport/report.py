@@ -19,7 +19,7 @@ import problem_report
 import apport
 import apport.fileutils
 #import packaging
-from apport.packaging_impl import impl as packaging
+#from apport.packaging_impl import impl as packaging
 
 _data_dir = os.environ.get('APPORT_DATA_DIR','/usr/share/apport')
 _common_hook_dir = '%s/general-hooks/' % (_data_dir)
@@ -246,7 +246,7 @@ class Report(problem_report.ProblemReport):
 
         u = os.uname()
         self['Uname'] = '%s %s %s' % (u[0], u[2], u[4])
-        self['Architecture'] = packaging.get_system_architecture()
+        self['Architecture'] = 'Unkown' #packaging.get_system_architecture()
 
     def add_user_info(self):
         '''Add information about the user.
