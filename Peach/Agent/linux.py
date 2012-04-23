@@ -68,6 +68,7 @@ class LinuxApport(Monitor):
 		self.startingFiles = None
 		
 		os.system('echo "|' + self.PeachApport +' %p %s %c" > /proc/sys/kernel/core_pattern')
+		os.system('rm -rf ' + self.logFolder + '/*')
 	
 	
 	def OnTestStarting(self):
