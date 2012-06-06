@@ -113,7 +113,6 @@ class DataTreeDuplicateMutator(Mutator):
 		node.setValue( node.getValue() * count )
 
 
-
 class DataTreeSwapNearNodesMutator(Mutator):
 	'''
 	Swap two nodes in the data model that

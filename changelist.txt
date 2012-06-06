@@ -10,6 +10,7 @@ v2.3.9
  - Change: minset now supported parameters with "-" to get target program
  - Change: getElementsByType checks Fixups off of DataElements
  - Change: _fixParents now updates .fixup if it exists
+ - Bug: Fixed bug in size.py mutator.
  - Bug: Fixed a couple bugs in peach-apport on Fedora
  - Bug: Fixed HttpPost publisher to have correct parent
  - Bug: Fixed when spawning local agent, agent would have a file handle to log
