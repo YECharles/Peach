@@ -252,7 +252,13 @@ class Filesystem(Logger):
 			
 			if len(actionValues[i]) > 2:
 				fout = open(fileName, "w+b")
-				fout.write(actionValues[i][2])
+				
+				# BUG - reported bug that occationally we crash here.
+				try:
+					fout.write(actionValues[i][2])
+				except:
+					print "Error, exception tripped writing out actionValues array.  Ignoring."
+					pass
 				
 				if len(actionValues[i]) > 3 and actionValues[i][1] != 'output':
 					fout.write(repr(actionValues[i][3]))
